@@ -44,13 +44,23 @@ class Restaurants(db.Model):
 
 class Calendar(db.Model):
 
+    __tablename__ = 'Calendar'
+
     date = db.Column(db.String(64), primary_key=True, unique=True)
-    period = db.Column(db.Integer)
-    quarter = db.Column(db.Integer)
-    year = db.Column(db.Integer)
-    day = db.Column(db.String(64))
-    dow = db.Column(db.Integer)
     week = db.Column(db.Integer)
+    week_start = db.Column(db.String(64))
+    week_end = db.Column(db.String(64))
+    period = db.Column(db.Integer)
+    period_start = db.Column(db.String(64))
+    period_end = db.Column(db.String(64))
+    quarter = db.Column(db.Integer)
+    quarter_start = db.Column(db.String(64))
+    quarter_end = db.Column(db.String(64))
+    year = db.Column(db.Integer)
+    year_start = db.Column(db.String(64))
+    year_end = db.Column(db.String(64))
+    dow = db.Column(db.Integer)
+    day = db.Column(db.String(64))
 
 @login_manager.user_loader
 def user_loader(id):

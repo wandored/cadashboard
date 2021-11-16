@@ -6,7 +6,8 @@ import requests
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
-from dashapp import Config
+from dashapp import Config, db
+from dashapp.authentication.models import Calendar
 
 
 def make_HTTP_request(url):
@@ -53,10 +54,7 @@ def build_query(start, end):
     return df_pivot
 
 
-
-
-def daily_sales(start, end):
-    df_cal = pd.read_csv('/home/wandored/Projects/Dashboard/Calendar.csv')
+def query_sales(start, end):
 
     # calculate date last year
     startdate = datetime.strptime(start, "%Y-%m-%d")
@@ -68,16 +66,14 @@ def daily_sales(start, end):
 
     thisyear = build_query(start, end)
     lastYear = build_query(start_ly, end_ly)
-    totals = thisyear.merge(lastYear, on='LocationName')
+    totals = thisyear.merge(lastYear, how='outer', on='LocationName', sort=True)
 
     return totals
 
 
-def store_sales(start, end):
+def get_period(startdate):
+    #startdate = datetime.strptime(date, "%Y-%m-%d")
+    start = startdate.strftime('%m/%d/%Y')
+    target = Calendar.query.filter_by(date=start)
 
-    url_filter = '$filter=date ge {}T00:00:00Z and date le {}T00:00:00Z'.format(start, end)
-    query = '$select=netSales,numberofGuests,location&{}'.format(url_filter)
-    url = '{}/SalesEmployee?{}'.format(Config.SRVC_ROOT, query)
-    sales_url = make_HTTP_request(url)
-    df = make_dataframe(sales_url)
-    group = df.groupby(['location'], as_index=False)
+    return target

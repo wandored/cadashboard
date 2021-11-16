@@ -32,6 +32,6 @@ class CreateAccountForm(FlaskForm):
                              validators=[DataRequired()])
 
 class DateForm(FlaskForm):
-    selectdate = DateField("Enter Date: ", format="%Y-%m-%d")
+    selectdate = DateField("Change Date: ", format="%Y-%m-%d")
     submit = SubmitField("Submit")
 
