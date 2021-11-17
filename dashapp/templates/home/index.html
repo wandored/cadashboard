@@ -17,12 +17,12 @@
               </div>
               <div class="text-end pt-1">
                 <p class="text-sm mb-0 text-capitalize">Daily Sales</p>
-                <h4 class="mb-0">{{ "${:,.2f}".format(daily_totals.netSales_x) }}</h4>
+                <h4 class="mb-0">{{ "${:,.2f}".format(daily_sales_totals.netSales_x) }}</h4>
               </div>
             </div>
             <hr class="dark horizontal my-0">
             <div class="card-footer p-3">
-              <p class="mb-0"><span class="text-sm font-weight-bolder">{{ "${:,.2f}".format(daily_totals.netSales_y) }}</span> SPLY</p>
+              <p class="mb-0"><span class="text-sm font-weight-bolder">{{ "${:,.2f}".format(daily_sales_totals.netSales_y) }}</span> SPLY</p>
             </div>
           </div>
         </div>
@@ -34,12 +34,12 @@
               </div>
               <div class="text-end pt-1">
                 <p class="text-sm mb-0 text-capitalize">Guest Count</p>
-                <h4 class="mb-0">{{ "{:,.0f}".format(daily_totals.numberofGuests_x|int) }}</h4>
+                <h4 class="mb-0">{{ "{:,.0f}".format(daily_sales_totals.numberofGuests_x|int) }}</h4>
               </div>
             </div>
             <hr class="dark horizontal my-0">
             <div class="card-footer p-3">
-              <p class="mb-0"><span class="text-sm font-weight-bolder">{{ "{:,.0f}".format(daily_totals.numberofGuests_y|int) }}</span> SPLY</p>
+              <p class="mb-0"><span class="text-sm font-weight-bolder">{{ "{:,.0f}".format(daily_sales_totals.numberofGuests_y|int) }}</span> SPLY</p>
             </div>
           </div>
         </div>
@@ -51,12 +51,12 @@
               </div>
               <div class="text-end pt-1">
                 <p class="text-sm mb-0 text-capitalize">Weekly Total Sales</p>
-                <h4 class="mb-0">{{ "${:,.2f}".format(weekly_totals.netSales_x) }}</h4>
+                <h4 class="mb-0">{{ "${:,.2f}".format(weekly_sales_totals.netSales_x) }}</h4>
               </div>
             </div>
             <hr class="dark horizontal my-0">
             <div class="card-footer p-3">
-              <p class="mb-0"><span class="text-sm font-weight-bolder">{{ "${:,.2f}".format(weekly_totals.netSales_y) }}</span> SPLY</p>
+              <p class="mb-0"><span class="text-sm font-weight-bolder">{{ "${:,.2f}".format(weekly_sales_totals.netSales_y) }}</span> SPLY</p>
             </div>
           </div>
         </div>
@@ -68,12 +68,12 @@
               </div>
               <div class="text-end pt-1">
                 <p class="text-sm mb-0 text-capitalize">Weekly Total Guests</p>
-                <h4 class="mb-0"> {{ "{:,.0f}".format(weekly_totals.numberofGuests_x|int) }}</h4>
+                <h4 class="mb-0"> {{ "{:,.0f}".format(weekly_sales_totals.numberofGuests_x|int) }}</h4>
               </div>
             </div>
             <hr class="dark horizontal my-0">
             <div class="card-footer p-3">
-              <p class="mb-0"><span class="text-sm font-weight-bolder">{{ "{:,.0f}".format(weekly_totals.numberofGuests_y|int) }}</span> SPLY</p>
+              <p class="mb-0"><span class="text-sm font-weight-bolder">{{ "{:,.0f}".format(weekly_sales_totals.numberofGuests_y|int) }}</span> SPLY</p>
             </div>
           </div>
         </div>
@@ -86,7 +86,7 @@
               <div class="bg-gradient-primary shadow-primary border-radius-lg py-3 pe-1">
                 <div class="chart">
                   <canvas id="chart-bars" class="chart-canvas" height="170"></canvas>
-                  <script>
+<!--                  <script>
                     var ctx = document.getElementById("chart-bars").getContext("2d");
                     var chart-bars = new Chart(ctx, {
                       type: "bar",
@@ -100,7 +100,7 @@
                       options: {
                       }
                     });
-                  </script>
+</script> -->
                 </div>
               </div>
             </div>
@@ -108,7 +108,6 @@
               <h6 class="mb-0 ">Daily Sales</h6>
               <p class="text-sm ">Last Campaign Performance</p>
               <hr class="dark horizontal">
-              </div>
             </div>
           </div>
         </div>
@@ -182,14 +181,16 @@
                   <thead>
                     <tr>
                       <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Restaurant</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Sales</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Sales Last Year</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Sales</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Sales SPLY</th>
                       <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Guest Count</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Guest Count Last Year</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Guest SPLY</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor $</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor SPLY</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {% for k, v in daily_sales.iterrows() %}
+                    {% for k, v in dailySalesLabor.iterrows() %}
                     <tr> 
                       <td>
                         <div class="d-flex px-2 py-1">
@@ -242,6 +243,28 @@
                           </div>
                         </div>
                       </td>
+                      <td>
+                        {% if v['total_x'] > v['total_y'] %}
+                        <div class="d-flex px-2 py-1">
+                          <div class="d-flex flex-column justify-content-right">
+                            <h6 class="mb-0 text-sm"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i> {{ "${:,.2f}".format(v['total_x']) }}</h6>
+                          </div>
+                        </div>
+                        {% else %}
+                        <div class="d-flex px-2 py-1">
+                          <div class="d-flex flex-column justify-content-right">
+                            <h6 class="mb-0 text-sm"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i> {{ "${:,.2f}".format(v['total_x']) }}</h6>
+                          </div>
+                        </div>
+                        {% endif %}
+                      </td>
+                      <td>
+                        <div class="d-flex px-2 py-1">
+                          <div class="d-flex flex-column justify-content-right">
+                            <h6 class="mb-0 text-sm">{{ "${:,.2f}".format(v['total_y']) }}</h6>
+                          </div>
+                        </div>
+                      </td>
                     </tr>
                     {% endfor %}
                   </tbody>
@@ -250,11 +273,11 @@
             </div>
           </div>
         </div>
-        <!-- Orders Overview -->
+        <!-- Scorecard -->
         <div class="col-lg-4 col-md-6">
           <div class="card h-100">
             <div class="card-header pb-0">
-              <h6></h6>
+              <h6>Scorecard</h6>
               <p class="text-sm">
                 <i class="fa fa-arrow-up text-success" aria-hidden="true"></i>
                 <span class="font-weight-bold">24%</span> this month

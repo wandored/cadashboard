@@ -8,7 +8,7 @@ from flask.helpers import url_for
 from sqlalchemy.util.langhelpers import NoneType
 from dashapp.home import blueprint
 from flask import render_template, session, request, redirect, url_for
-from dashapp.home.util import query_sales, get_period
+from dashapp.home.util import query_sales, query_labor, get_period
 from flask_login import login_required
 from jinja2 import TemplateNotFound
 from datetime import datetime, timedelta
@@ -19,11 +19,7 @@ from dashapp import Config
 @login_required
 def index(targetdate=None):
     fiscal_dates = get_period(datetime.strptime(session['targetdate'], "%Y-%m-%d"))
-    start_day = end_day = start_week = end_week = start_period = end_period = ""
-#    startdate = fiscal_dates['week_start']
-#    enddate = fiscal_dates['week_end']
-#    start = startdate.strftime('%Y-%m-%d')
-#    end = enddate.strftime('%Y-%m-%d')
+    start_day = end_day = start_week = end_week = ""
     form = DateForm()
     # Get Data
     if  form.validate_on_submit():
@@ -37,21 +33,28 @@ def index(targetdate=None):
         day_end = day_start + timedelta(days=1)
         week_start = datetime.strptime(i.week_start, "%m/%d/%Y")
         week_end = datetime.strptime(i.week_end, "%m/%d/%Y")
-        period_start = datetime.strptime(i.period_start, "%m/%d/%Y")
-        period_end = datetime.strptime(i.period_end, "%m/%d/%Y")
-         
+#        period_start = datetime.strptime(i.period_start, "%m/%d/%Y")
+#        period_end = datetime.strptime(i.period_end, "%m/%d/%Y")
+
         start_day = day_start.strftime("%Y-%m-%d")
         end_day = day_end.strftime("%Y-%m-%d")
         start_week = week_start.strftime("%Y-%m-%d")
         end_week = week_end.strftime("%Y-%m-%d")
-        start_period = period_start.strftime("%Y-%m-%d")
-        end_period = period_end.strftime("%Y-%m-%d")
+#        start_period = period_start.strftime("%Y-%m-%d")
+#        end_period = period_end.strftime("%Y-%m-%d")
 
+    # SalesEmployee
     daily_sales = query_sales(start_day, end_day)
     weekly_sales = query_sales(start_week, end_week)
-    print(weekly_sales)
-    daily_totals = daily_sales.loc['Totals',]
-    weekly_totals = weekly_sales.loc['Totals',]
+    daily_sales_totals = daily_sales.loc['Totals',]
+    weekly_sales_totals = weekly_sales.loc['Totals',]
+    # LaborDetail
+    daily_labor = query_labor(start_day, end_day)
+    weekly_labor = query_labor(start_week, end_week)
+    daily_labor_totals = daily_labor.loc['Totals',]
+    weekly_labor_totals = weekly_labor.loc['Totals',]
+    dailySalesLabor = daily_sales.merge(daily_labor, on='LocationName')
+
 
     return render_template(
         'home/index.html',
@@ -60,8 +63,9 @@ def index(targetdate=None):
         fiscal_dates=fiscal_dates,
         daily_sales=daily_sales,
         weekly_sales=weekly_sales,
-        daily_totals=daily_totals,
-        weekly_totals=weekly_totals
+        daily_sales_totals=daily_sales_totals,
+        dailySalesLabor=dailySalesLabor,
+        weekly_sales_totals=weekly_sales_totals
     )
 
 
