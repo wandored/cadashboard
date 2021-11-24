@@ -1,4 +1,4 @@
-*.db
+dashapp/*.db
 *.sql
 __pycache__
 .py[cod]
@@ -8,3 +8,5 @@ $py.class
 test*
 /output
 vetdiscount.py
+laborBuilder.py
+salesBuilder.py

@@ -5,35 +5,34 @@ import json
 import requests
 import pandas as pd
 import numpy as np
-from datetime import datetime, timedelta
+from flask import redirect, url_for, flash, session
+from dashapp.home import blueprint
+from datetime import datetime
+from sqlalchemy.engine.create import create_engine
 from dashapp import Config, db
-from dashapp.authentication.models import Calendar
+from dashapp.authentication.models import Calendar, Sales, Labor
 
 
-def query_sales(start, end):
-
-    current_sales = sales_employee(start, end)
-
-    start_ly = get_lastyear(start)
-    end_ly = get_lastyear(end)
-    lastYear = sales_employee(start_ly, end_ly)
-
-    totals = current_sales.merge(lastYear, how='outer', on='LocationName', sort=True)
-
-    return totals
-
-
-def query_labor(start, end):
-
-    current_labor = labor_detail(start, end)
-
-    start_ly = get_lastyear(start)
-    end_ly = get_lastyear(end)
-    lastYear = labor_detail(start_ly, end_ly)
-
-    totals = current_labor.merge(lastYear, how='outer', on='LocationName', sort=True)
-
-    return totals
+#def query_sales(start, end):
+#
+#    current_sales = sales_employee(start, end)
+##
+##    totals = current_sales.merge(lastYear, how='outer', on='name', sort=True)
+#
+#    return current_sales
+#
+#
+#def query_labor(start, end):
+#
+#    current_labor = labor_detail(start, end)
+#
+##    start_ly = get_lastyear(start)
+##    end_ly = get_lastyear(end)
+##    lastYear = labor_detail(start_ly, end_ly)
+##
+##    totals = current_labor.merge(lastYear, how='outer', on='name', sort=True)
+#
+#    return current_labor
 
 
 def make_HTTP_request(url):
@@ -61,31 +60,32 @@ def make_dataframe(sales):
 
 
 def get_lastyear(date):
-    date_dt = datetime.strptime(date, "%Y-%m-%d")
+#    date_dt = datetime.strptime(date, "%Y-%m-%d")
 #    year_ly = date_dt - timedelta(days=365)
-    date_str = date_dt.strftime('%m/%d/%Y')
-    target = Calendar.query.filter_by(date=date_str)
+#    date_str = date_dt.strftime('%Y-%m-%d')
+    target = Calendar.query.filter_by(date=date)
 #    start_ly = end_ly = datetime.now
     dt_date = datetime.now
 
     for i in target:
-        print(i.date, i.year, i.period, i.week, i.day)
+#        print(i.date, i.year, i.period, i.week, i.day)
         lst_year = str(int(i.year) - 1)
         period = i.period
         week = i.week
         day = i.day
         ly_target = Calendar.query.filter_by(year=lst_year, period=period, week=week, day=day)
         for x in ly_target:
-            print(x.date, x.year, x.period, x.week, x.day)
-            print("-")
-            string_date = datetime.strptime(x.date, "%m/%d/%Y")
-            dt_date = string_date.strftime("%Y-%m-%d")
+#            print(x.date, x.year, x.period, x.week, x.day)
+#            print("-")
+            dt_date = x.date
+#            string_date = datetime.strptime(x.date, "%Y-%m-%d")
+#            dt_date = string_date.strftime("%Y-%m-%d")
     return dt_date
 
 
 def get_period(startdate):
     #startdate = datetime.strptime(date, "%Y-%m-%d")
-    start = startdate.strftime('%m/%d/%Y')
+    start = startdate.strftime('%Y-%m-%d')
     target = Calendar.query.filter_by(date=start)
 
     return target
@@ -95,37 +95,51 @@ def sales_employee(start, end):
 
     df_loc = pd.read_csv('/home/wandored/Projects/Dashboard/locations.csv')
     url_filter = '$filter=date ge {}T00:00:00Z and date le {}T00:00:00Z'.format(start, end)
-    query = '$select=netSales,numberofGuests,location&{}'.format(url_filter)
+    query = '$select=dayPart,netSales,numberofGuests,location&{}'.format(url_filter)
     url = '{}/SalesEmployee?{}'.format(Config.SRVC_ROOT, query)
     print(url)
     rqst = make_HTTP_request(url)
     df = make_dataframe(rqst)
+    if df.empty:
+        return 1
+
     df_merge = df_loc.merge(df, on='location')
+    df_merge.rename(columns={'netSales': 'sales', 'numberofGuests': 'guests'}, inplace=True)
+
+    # pivot data and write to database
     df_pivot = df_merge.pivot_table(
-        index=['LocationName'],
-        values=['netSales',
-                'numberofGuests'],
+        index=['name',
+               'dayPart'],
+        values=['sales',
+                'guests'],
         aggfunc=np.sum
     )
-    df_pivot.loc['Totals'] = df_pivot.sum()
-    return df_pivot
+    df_pivot['date'] = start
+    df_pivot.to_sql('Sales', con=db.engine, if_exists='append')
+    return 0
 
 
 def labor_detail(start, end):
 
     df_loc = pd.read_csv('/home/wandored/Projects/Dashboard/locations.csv')
     url_filter = '$filter=dateWorked ge {}T00:00:00Z and dateWorked le {}T00:00:00Z'.format(start, end)
-    query = '$select=hours,total,location_ID&{}'.format(url_filter)
+    query = '$select=jobTitle,hours,total,location_ID&{}'.format(url_filter)
     url = '{}/LaborDetail?{}'.format(Config.SRVC_ROOT, query)
     print(url)
     rqst = make_HTTP_request(url)
     df = make_dataframe(rqst)
+    if df.empty:
+        return 1
+
     df_merge = df_loc.merge(df, left_on='location', right_on='location_ID')
+    df_merge.rename(columns={'jobTitle': 'job', 'total': 'dollars'}, inplace=True)
     df_pivot = df_merge.pivot_table(
-        index=['LocationName'],
+        index=['name',
+               'job'],
         values=['hours',
-                'total'],
+                'dollars'],
         aggfunc=np.sum
     )
-    df_pivot.loc['Totals'] = df_pivot.sum()
-    return df_pivot
+    df_pivot['date'] = start
+    df_pivot.to_sql('Labor', con=db.engine, if_exists='append')
+    return 0

@@ -12,69 +12,95 @@
         <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
           <div class="card">
             <div class="card-header p-3 pt-2">
+              <div class="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
+                <i class="material-icons opacity-10">paid</i>
+              </div>
+                {% for x in fiscal_dates %}
+                <div class="text-end pt-1">
+                  <p class="text-sm mb-0 text-capitalize">{{ x.day }}, {{ x.date }}</p>
+                  <h4 class="mb-0">{{ "${:,.0f}".format(daily_totals.sales) }}</h4>
+                </div>
+                {% endfor %}
+            </div>
+            <hr class="dark horizontal my-0">
+            {% if daily_totals.sales >= daily_totals.sales_ly %}
+              <div class="card-footer p-3">
+                <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.1f}".format((daily_totals.sales - daily_totals.sales_ly) / daily_totals.sales) }} - {{ "${:,.0f}".format(daily_totals.sales_ly) }}</span> SPLY</p>
+              </div>
+              {% else %}
+              <div class="card-footer p-3">
+                <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.1f}".format((daily_totals.sales - daily_totals.sales_ly)|abs / daily_totals.sales) }} - {{ "${:,.0f}".format(daily_totals.sales_ly) }}</span> SPLY</p>
+              </div>
+              {% endif %}
+          </div>
+        </div>
+        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+          <div class="card">
+            <div class="card-header p-3 pt-2">
               <div class="icon icon-lg icon-shape bg-gradient-success shadow-success text-center border-radius-xl mt-n4 position-absolute">
                 <i class="material-icons opacity-10">paid</i>
               </div>
-              <div class="text-end pt-1">
-                <p class="text-sm mb-0 text-capitalize">Daily Sales</p>
-                <h4 class="mb-0">{{ "${:,.2f}".format(daily_sales_totals.netSales_x) }}</h4>
-              </div>
+              {% for s in weekly_sales %}
+                {% for x in fiscal_dates %}
+                <div class="text-end pt-1">
+                  <p class="text-sm mb-0 text-capitalize">Week {{ x.week }} Sales</p>
+                  <h4 class="mb-0">{{ "${:,.2f}".format(s.total_sales) }}</h4>
+                </div>
+                {% endfor %}
+              {% endfor %}
             </div>
             <hr class="dark horizontal my-0">
-            <div class="card-footer p-3">
-              <p class="mb-0"><span class="text-sm font-weight-bolder">{{ "${:,.2f}".format(daily_sales_totals.netSales_y) }}</span> SPLY</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-          <div class="card">
-            <div class="card-header p-3 pt-2">
-              <div class="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
-                <i class="material-icons opacity-10">person</i>
+            {% for s in weekly_sales_ly %}
+              <div class="card-footer p-3">
+                <p class="mb-0"><span class="text-sm font-weight-bolder">{{ "${:,.2f}".format(s.total_sales) }}</span> SPLY</p>
               </div>
-              <div class="text-end pt-1">
-                <p class="text-sm mb-0 text-capitalize">Guest Count</p>
-                <h4 class="mb-0">{{ "{:,.0f}".format(daily_sales_totals.numberofGuests_x|int) }}</h4>
-              </div>
-            </div>
-            <hr class="dark horizontal my-0">
-            <div class="card-footer p-3">
-              <p class="mb-0"><span class="text-sm font-weight-bolder">{{ "{:,.0f}".format(daily_sales_totals.numberofGuests_y|int) }}</span> SPLY</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-          <div class="card">
-            <div class="card-header p-3 pt-2">
-              <div class="icon icon-lg icon-shape bg-gradient-dark shadow-dark text-center border-radius-xl mt-n4 position-absolute">
-                <i class="material-icons opacity-10">paid</i>
-              </div>
-              <div class="text-end pt-1">
-                <p class="text-sm mb-0 text-capitalize">Weekly Total Sales</p>
-                <h4 class="mb-0">{{ "${:,.2f}".format(weekly_sales_totals.netSales_x) }}</h4>
-              </div>
-            </div>
-            <hr class="dark horizontal my-0">
-            <div class="card-footer p-3">
-              <p class="mb-0"><span class="text-sm font-weight-bolder">{{ "${:,.2f}".format(weekly_sales_totals.netSales_y) }}</span> SPLY</p>
-            </div>
+            {% endfor %}
           </div>
         </div>
         <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
           <div class="card">
             <div class="card-header p-3 pt-2">
               <div class="icon icon-lg icon-shape bg-gradient-info shadow-info text-center border-radius-xl mt-n4 position-absolute">
-                <i class="material-icons opacity-10">person</i>
+                <i class="material-icons opacity-10">paid</i>
               </div>
-              <div class="text-end pt-1">
-                <p class="text-sm mb-0 text-capitalize">Weekly Total Guests</p>
-                <h4 class="mb-0"> {{ "{:,.0f}".format(weekly_sales_totals.numberofGuests_x|int) }}</h4>
-              </div>
+              {% for s in period_sales %}
+                {% for x in fiscal_dates %}
+                <div class="text-end pt-1">
+                  <p class="text-sm mb-0 text-capitalize">Period {{ x.period }} Sales</p>
+                  <h4 class="mb-0">{{ "${:,.2f}".format(s.total_sales) }}</h4>
+                </div>
+                {% endfor %}
+              {% endfor %}
             </div>
             <hr class="dark horizontal my-0">
-            <div class="card-footer p-3">
-              <p class="mb-0"><span class="text-sm font-weight-bolder">{{ "{:,.0f}".format(weekly_sales_totals.numberofGuests_y|int) }}</span> SPLY</p>
+            {% for s in period_sales_ly %}
+              <div class="card-footer p-3">
+                <p class="mb-0"><span class="text-sm font-weight-bolder">{{ "${:,.2f}".format(s.total_sales) }}</span> SPLY</p>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+          <div class="card">
+            <div class="card-header p-3 pt-2">
+              <div class="icon icon-lg icon-shape bg-gradient-warning shadow-warning text-center border-radius-xl mt-n4 position-absolute">
+                <i class="material-icons opacity-10">paid</i>
+              </div>
+              {% for s in yearly_sales %}
+                {% for x in fiscal_dates %}
+                <div class="text-end pt-1">
+                  <p class="text-sm mb-0 text-capitalize">Fiscal {{ x.year }} Sales</p>
+                  <h4 class="mb-0"> {{ "${:,.2f}".format(s.total_sales) }}</h4>
+                </div>
+                {% endfor %}
+              {% endfor %}
             </div>
+            <hr class="dark horizontal my-0">
+            {% for s in yearly_sales_ly %}
+              <div class="card-footer p-3">
+                <p class="mb-0"><span class="text-sm font-weight-bolder">{{ "${:,.2f}".format(s.total_sales) }}</span> SPLY</p>
+              </div>
+            {% endfor %}
           </div>
         </div>
       </div>
@@ -86,29 +112,15 @@
               <div class="bg-gradient-primary shadow-primary border-radius-lg py-3 pe-1">
                 <div class="chart">
                   <canvas id="chart-bars" class="chart-canvas" height="170"></canvas>
-<!--                  <script>
-                    var ctx = document.getElementById("chart-bars").getContext("2d");
-                    var chart-bars = new Chart(ctx, {
-                      type: "bar",
-                      data: {
-                        labels: {{ labels | safe }},
-                        datasets: [{
-                            label: "On-Hand",
-                            data: {{ values | safe }},
-                          }] 
-                      },
-                      options: {
-                      }
-                    });
-</script> -->
                 </div>
               </div>
             </div>
+            {% for s in weekly_sales %}
             <div class="card-body">
               <h6 class="mb-0 ">Daily Sales</h6>
-              <p class="text-sm ">Last Campaign Performance</p>
-              <hr class="dark horizontal">
+              <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}".format(s.total_sales) }} over last year</p>
             </div>
+            {% endfor %}
           </div>
         </div>
         <div class="col-lg-4 col-md-6 mt-4 mb-4">
@@ -120,35 +132,29 @@
                 </div>
               </div>
             </div>
+            {% for s in period_sales %}
             <div class="card-body">
-              <h6 class="mb-0 "> Daily Sales </h6>
-              <p class="text-sm "> (<span class="font-weight-bolder">+15%</span>) increase in today sales. </p>
-              <hr class="dark horizontal">
-              <div class="d-flex ">
-                <i class="material-icons text-sm my-auto me-1">schedule</i>
-                <p class="mb-0 text-sm"> updated 4 min ago </p>
-              </div>
+              <h6 class="mb-0 ">Period Sales</h6>
+              <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}".format(s.total_sales) }} over last year</p>
             </div>
+            {% endfor %}
           </div>
         </div>
         <div class="col-lg-4 mt-4 mb-3">
           <div class="card z-index-2 ">
             <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-              <div class="bg-gradient-dark shadow-dark border-radius-lg py-3 pe-1">
+              <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
                 <div class="chart">
                   <canvas id="chart-line-tasks" class="chart-canvas" height="170"></canvas>
                 </div>
               </div>
             </div>
+              {% for s in yearly_sales %}
             <div class="card-body">
-              <h6 class="mb-0 ">Completed Tasks</h6>
-              <p class="text-sm ">Last Campaign Performance</p>
-              <hr class="dark horizontal">
-              <div class="d-flex ">
-                <i class="material-icons text-sm my-auto me-1">schedule</i>
-                <p class="mb-0 text-sm">just updated</p>
-              </div>
+              <h6 class="mb-0 ">Yearly Sales</h6>
+              <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}".format(s.total_sales) }} over last year</p>
             </div>
+            {% endfor %}
           </div>
         </div>
       </div>
@@ -158,9 +164,11 @@
           <div class="card">
             <div class="card-header pb-0">
               <div class="row">
+                {% for x in fiscal_dates %}
                 <div class="col-lg-6 col-7">
-                  <h6>Daily Sales</h6>
+                  <h6>Daily Sales - {{ x.day }}, {{ x.date }}</h6>
                 </div>
+                {% endfor %}
                 <div class="col-lg-6 col-5 my-auto text-end">
                   <div class="dropdown float-lg-end pe-4">
                     <a class="cursor-pointer" id="dropdownTable" data-bs-toggle="dropdown" aria-expanded="false">
@@ -190,26 +198,26 @@
                     </tr>
                   </thead>
                   <tbody>
-                    {% for k, v in dailySalesLabor.iterrows() %}
+                    {% for k, v in daily_table.iterrows() %}
                     <tr> 
                       <td>
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex flex-column justify-content-left">
-                            <h6 class="mb-0 text-sm">{{ k }}</h6>
+                            <h6 class="mb-0 text-sm">{{ v.name }}</h6>
                           </div>
                         </div>
                       </td>
                       <td>
-                        {% if v['netSales_x'] > v['netSales_y'] %}
+                        {% if v.sales >= v.sales_ly %}
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex flex-column justify-content-right">
-                            <h6 class="mb-0 text-sm"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i> {{ "${:,.2f}".format(v['netSales_x']) }}</h6>
+                            <h6 class="mb-0 text-sm"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i> {{ "${:,.2f}".format(v.sales) }}</h6>
                           </div>
                         </div>
                         {% else %}
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex flex-column justify-content-right">
-                            <h6 class="mb-0 text-sm"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i> {{ "${:,.2f}".format(v['netSales_x']) }}</h6>
+                            <h6 class="mb-0 text-sm"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i> {{ "${:,.2f}".format(v.sales) }}</h6>
                           </div>
                         </div>
                         {% endif %}
@@ -217,21 +225,21 @@
                       <td>
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex flex-column justify-content-right">
-                            <h6 class="mb-0 text-sm">{{ "${:,.2f}".format(v['netSales_y']) }}</h6>
+                            <h6 class="mb-0 text-sm">{{ "${:,.2f}".format(v.sales_ly) }}</h6>
                           </div>
                         </div>
                       </td>
                       <td>
-                        {% if v['numberofGuests_x'] > v['numberofGuests_y'] %}
+                        {% if v.guests >= v.guests_ly %}
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex flex-column justify-content-right">
-                            <h6 class="mb-0 text-sm"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i> {{ v['numberofGuests_x']|int }}</h6>
+                            <h6 class="mb-0 text-sm"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i> {{ v.guests|int }}</h6>
                           </div>
                         </div>
                         {% else %}
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex flex-column justify-content-right">
-                            <h6 class="mb-0 text-sm"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i> {{ v['numberofGuests_x']|int }}</h6>
+                            <h6 class="mb-0 text-sm"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i> {{ v.guests|int }}</h6>
                           </div>
                         </div>
                         {% endif %}
@@ -239,21 +247,21 @@
                       <td>
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex flex-column justify-content-right">
-                            <h6 class="mb-0 text-sm">{{ v['numberofGuests_y']|int }}</h6>
+                            <h6 class="mb-0 text-sm">{{ v.guests_ly|int }}</h6>
                           </div>
                         </div>
                       </td>
                       <td>
-                        {% if v['total_x'] > v['total_y'] %}
+                        {% if v.dollars >= v.dollars_ly %}
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex flex-column justify-content-right">
-                            <h6 class="mb-0 text-sm"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i> {{ "${:,.2f}".format(v['total_x']) }}</h6>
+                            <h6 class="mb-0 text-sm"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i> {{ "${:,.2f}".format(v.dollars) }}</h6>
                           </div>
                         </div>
                         {% else %}
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex flex-column justify-content-right">
-                            <h6 class="mb-0 text-sm"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i> {{ "${:,.2f}".format(v['total_x']) }}</h6>
+                            <h6 class="mb-0 text-sm"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i> {{ "${:,.2f}".format(v.dollars) }}</h6>
                           </div>
                         </div>
                         {% endif %}
@@ -261,7 +269,7 @@
                       <td>
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex flex-column justify-content-right">
-                            <h6 class="mb-0 text-sm">{{ "${:,.2f}".format(v['total_y']) }}</h6>
+                            <h6 class="mb-0 text-sm">{{ "${:,.2f}".format(v.dollars_ly) }}</h6>
                           </div>
                         </div>
                       </td>
@@ -273,11 +281,11 @@
             </div>
           </div>
         </div>
-        <!-- Scorecard -->
+        <!-- scorecard -->
         <div class="col-lg-4 col-md-6">
           <div class="card h-100">
             <div class="card-header pb-0">
-              <h6>Scorecard</h6>
+              <h6>scorecard</h6>
               <p class="text-sm">
                 <i class="fa fa-arrow-up text-success" aria-hidden="true"></i>
                 <span class="font-weight-bold">24%</span> this month
@@ -360,15 +368,30 @@
     new Chart(ctx, {
       type: "bar",
       data: {
-        labels: ["M", "T", "W", "T", "F", "S", "S"],
+        labels: ["W", "T", "F", "S", "S", "M", "T"],
         datasets: [{
-          label: "Sales",
+          label: "Daily Sales",
           tension: 0.4,
           borderWidth: 0,
           borderRadius: 4,
           borderSkipped: false,
           backgroundColor: "rgba(255, 255, 255, .8)",
-          data: [50, 20, 10, 22, 50, 10, 40],
+          data: {{ values1 | safe }},
+          maxBarThickness: 6
+        }, {
+          label: "Last Year",
+          tension: 0,
+          borderWidth: 0,
+          pointRadius: 5,
+          pointBackgroundColor: "rgba(75, 192, 235, .8)",
+          pointBorderColor: "transparent",
+          borderColor: "rgba(75, 192, 235, .8)",
+          borderColor: "rgba(75, 192, 235, .8)",
+          borderWidth: 4,
+          type: "line",
+          backgroundColor: "transparent",
+          fill: true,
+          data: {{ values1_ly | safe }},
           maxBarThickness: 6
         }, ],
       },
@@ -439,25 +462,39 @@
     var ctx2 = document.getElementById("chart-line").getContext("2d");
 
     new Chart(ctx2, {
-      type: "line",
+      type: "bar",
       data: {
-        labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+        labels: ["W1", "W2", "W3", "W4"],
         datasets: [{
-          label: "Mobile apps",
-          tension: 0,
+          label: "Weekly Sales",
+          tension: 0.4,
           borderWidth: 0,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(255, 255, 255, .8)",
-          pointBorderColor: "transparent",
-          borderColor: "rgba(255, 255, 255, .8)",
-          borderColor: "rgba(255, 255, 255, .8)",
-          borderWidth: 4,
-          backgroundColor: "transparent",
+          backgroundcolor: "rgba(255, 255, 255, .8)",
+          pointradius: 5,
+          pointbackgroundcolor: "rgba(255, 255, 255, .8)",
+          pointbordercolor: "transparent",
+          bordercolor: "rgba(255, 255, 255, .8)",
+          bordercolor: "rgba(255, 255, 255, .8)",
+          borderwidth: 4,
           fill: true,
-          data: [50, 40, 300, 320, 500, 350, 200, 230, 500],
-          maxBarThickness: 6
-
-        }],
+          data: {{ values2 | safe }},
+          maxbarthickness: 6
+        }, {
+          label: "Last Year",
+          tension: 0,
+          borderwidth: 0,
+          pointradius: 5,
+          pointbackgroundcolor: "rgba(255, 255, 255, .8)",
+          pointbordercolor: "transparent",
+          bordercolor: "rgba(255, 255, 255, .8)",
+          bordercolor: "rgba(255, 255, 255, .8)",
+          borderwidth: 4,
+          type: "bar",
+          backgroundcolor: "transparent",
+          fill: true,
+          data: {{ values2_ly | safe }},
+          maxbarthickness: 6
+        }, ],
       },
       options: {
         responsive: true,
@@ -524,9 +561,9 @@
     new Chart(ctx3, {
       type: "line",
       data: {
-        labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+        labels: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13"],
         datasets: [{
-          label: "Mobile apps",
+          label: "Period Sales",
           tension: 0,
           borderWidth: 0,
           pointRadius: 5,
@@ -536,10 +573,23 @@
           borderWidth: 4,
           backgroundColor: "transparent",
           fill: true,
-          data: [50, 40, 300, 220, 500, 250, 400, 230, 500],
+          data: {{ values3 | safe }},
           maxBarThickness: 6
-
-        }],
+        }, {
+          label: "Last Year",
+          tension: 0,
+          borderWidth: 0,
+          pointRadius: 5,
+          pointBackgroundColor: "rgba(255, 255, 255, .8)",
+          pointBorderColor: "transparent",
+          borderColor: "rgba(255, 255, 255, .8)",
+          borderWidth: 4,
+          type: "line",
+          backgroundColor: "transparent",
+          fill: true,
+          data: {{ values3_ly | safe }},
+          maxBarThickness: 6
+        }, ],
       },
       options: {
         responsive: true,

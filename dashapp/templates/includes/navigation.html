@@ -8,11 +8,6 @@
           </ol>
           <h6 class="font-weight-bolder mb-0">Dashboard</h6>
         </nav>
-          {% for i in fiscal_dates %}
-          <div>
-            <h5 class="font-weight-bolder mb-0">{{ i.day }}: {{ i.date }} -  Period: {{ i.period }} - Week: {{ i.week }}</h5>
-          </div>
-          {% endfor %}
         <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
           <div class="ms-md-auto pe-md-3 d-flex align-items-center">
             <form method="POST" action="">

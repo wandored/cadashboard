@@ -62,6 +62,31 @@ class Calendar(db.Model):
     dow = db.Column(db.Integer)
     day = db.Column(db.String(64))
 
+
+class Sales(db.Model):
+
+    __tablename__ = 'Sales'
+
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.String(64))
+    daypart = db.Column(db.String(64))
+    name = db.Column(db.String(64))
+    sales = db.Column(db.Integer)
+    guests = db.Column(db.Integer)
+
+
+class Labor(db.Model):
+
+    __tablename__ = 'Labor'
+
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.String(64))
+    job = db.Column(db.String(64))
+    name = db.Column(db.String(64))
+    hours = db.Column(db.Integer)
+    dollars = db.Column(db.Integer)
+
+
 @login_manager.user_loader
 def user_loader(id):
     return Users.query.filter_by(id=id).first()
