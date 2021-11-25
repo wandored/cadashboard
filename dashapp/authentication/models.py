@@ -38,7 +38,10 @@ class Users(db.Model, UserMixin):
 
 class Restaurants(db.Model):
 
-    location = db.Column(db.String(64), primary_key=True, unique=True)
+    __tablename__ = 'Restaurants'
+
+    id = db.Column(db.Integer, primary_key=True)
+    location = db.Column(db.String(64), unique=True)
     name = db.Column(db.String(64), unique=True)
 
 

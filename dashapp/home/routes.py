@@ -79,187 +79,12 @@ def index(targetdate=None):
         session['targetdate'] = Config.YSTDAY.strftime('%Y-%m-%d')
         return redirect(url_for('home_blueprint.index'))
 
-    # query dail, weekly, period sales
-#    daily_sales = (
-#        db.session.query(
-#            Sales,
-#            func.sum(Sales.sales).label('total_sales'),
-#            func.sum(Sales.guests).label('total_guests'),
-#        )
-#        .filter(
-#            Sales.date == start_day,
-#        )
-#        .all()
-#    )
-#
-#    daily_sales_ly = (
-#        db.session.query(
-#            Sales,
-#            func.sum(Sales.sales).label('total_sales'),
-#            func.sum(Sales.guests).label('total_guests'),
-#        )
-#        .filter(
-#            Sales.date == start_day_ly,
-#        )
-#        .all()
-#    )
-
-    weekly_sales = (
-        db.session.query(
-            Sales,
-            func.sum(Sales.sales).label('total_sales'),
-            func.sum(Sales.guests).label('total_guests'),
-        )
-        .filter(
-            Sales.date >= start_week,
-            Sales.date <= end_week,
-        )
-        .all()
-    )
-
-    weekly_sales_ly = (
-        db.session.query(
-            Sales,
-            func.sum(Sales.sales).label('total_sales'),
-            func.sum(Sales.guests).label('total_guests'),
-        )
-        .filter(
-            Sales.date >= start_week_ly,
-            Sales.date <= end_week_ly,
-        )
-        .all()
-    )
-
-    period_sales = (
-        db.session.query(
-            Sales,
-            func.sum(Sales.sales).label('total_sales'),
-            func.sum(Sales.guests).label('total_guests'),
-        )
-        .filter(
-            Sales.date >= start_period,
-            Sales.date <end_period,
-        )
-        .all()
-    )
-
-    period_sales_ly = (
-        db.session.query(
-            Sales,
-            func.sum(Sales.sales).label('total_sales'),
-            func.sum(Sales.guests).label('total_guests'),
-        )
-        .filter(
-            Sales.date >= start_period_ly,
-            Sales.date <= end_period_ly,
-        )
-        .all()
-    )
-
-    yearly_sales = (
-        db.session.query(
-            Sales,
-            func.sum(Sales.sales).label('total_sales'),
-            func.sum(Sales.guests).label('total_guests'),
-        )
-        .filter(
-            Sales.date >= start_year,
-            Sales.date <end_year,
-        )
-        .all()
-    )
-
-    yearly_sales_ly = (
-        db.session.query(
-            Sales,
-            func.sum(Sales.sales).label('total_sales'),
-            func.sum(Sales.guests).label('total_guests'),
-        )
-        .filter(
-            Sales.date >= start_year_ly,
-            Sales.date <= end_year_ly,
-        )
-        .all()
-    )
 
     # LaborDetail
     Labor.query.filter_by(date=start_day).delete()
     db.session.commit()
     labor_detail(start_day, end_day)
 
-    # query dail, weekly, period labor
-#    daily_labor = (
-#        db.session.query(
-#            Labor,
-#            func.sum(Labor.dollars).label('total_dollars'),
-#            func.sum(Labor.hours).label('total_hours'),
-#        )
-#        .filter(Labor.date == start_day).all()
-#    )
-#
-#    daily_labor_ly = (
-#        db.session.query(
-#            Labor,
-#            func.sum(Labor.dollars).label('total_dollars'),
-#            func.sum(Labor.hours).label('total_hours'),
-#        )
-#        .filter(
-#            Labor.date == start_day_ly,
-#        )
-#        .all()
-#    )
-
-    weekly_labor = (
-        db.session.query(
-            Labor,
-            func.sum(Labor.dollars).label('total_dollars'),
-            func.sum(Labor.hours).label('total_hours'),
-        )
-        .filter(
-            Labor.date >= start_week,
-            Labor.date <= end_week,
-        )
-        .all()
-    )
-
-    weekly_labor_ly = (
-        db.session.query(
-            Labor,
-            func.sum(Labor.dollars).label('total_dollars'),
-            func.sum(Labor.hours).label('total_hours'),
-        )
-        .filter(
-            Labor.date >= start_week_ly,
-            Labor.date <= end_week_ly,
-        )
-        .all()
-    )
-
-    period_labor = (
-        db.session.query(
-            Labor,
-            func.sum(Labor.dollars).label('total_dollars'),
-            func.sum(Labor.hours).label('total_hours'),
-        )
-        .filter(
-            Labor.date >= start_period,
-            Labor.date <end_period,
-        )
-        .all()
-    )
-
-    period_labor_ly = (
-        db.session.query(
-            Labor,
-            func.sum(Labor.dollars).label('total_dollars'),
-            func.sum(Labor.hours).label('total_hours'),
-        )
-        .filter(
-            Labor.date >= start_period_ly,
-            Labor.date <= end_period_ly,
-        )
-        .all()
-    )
 
     # Daily Chart
     daily_chart = db.session.query(Sales,
@@ -344,7 +169,6 @@ def index(targetdate=None):
 
     df_sales_day = pd.DataFrame.from_records(sales_day, columns=['name', 'sales', 'guests'])
     df_sales_day_ly = pd.DataFrame.from_records(sales_day_ly, columns=['name', 'sales_ly', 'guests_ly'])
-    print(df_sales_day_ly)
     sales_table = df_sales_day.merge(df_sales_day_ly, how='outer', sort=True)
 
     labor_day = db.session.query(Labor.name,
@@ -368,8 +192,144 @@ def index(targetdate=None):
     daily_table.set_index('name', inplace=True)
     daily_table.loc['TOTALS'] = daily_table.sum()
     daily_totals = daily_table.loc['TOTALS']
-    print(daily_table)
-    print(daily_totals)
+
+
+    # Weekly Sales Table
+    sales_week = db.session.query(Sales.name,
+                                   func.sum(Sales.sales).label('total_sales'),
+                                   func.sum(Sales.guests).label('total_guests')
+                                   ).filter(Sales.date >= start_week,
+                                            Sales.date <= end_week
+                                            ).group_by(Sales.name).all()
+
+
+    sales_week_ly = db.session.query(Sales.name,
+                                   func.sum(Sales.sales).label('total_sales_ly'),
+                                    func.sum(Sales.guests).label('total_guests_ly')
+                                   ).filter(Sales.date >= start_week_ly,
+                                            Sales.date <= end_week_ly
+                                            ).group_by(Sales.name).all()
+
+    df_sales_week = pd.DataFrame.from_records(sales_week, columns=['name', 'sales', 'guests'])
+    df_sales_week_ly = pd.DataFrame.from_records(sales_week_ly, columns=['name', 'sales_ly', 'guests_ly'])
+    sales_table_wk = df_sales_week.merge(df_sales_week_ly, how='outer', sort=True)
+
+    labor_week = db.session.query(Labor.name,
+                                   func.sum(Labor.hours).label('total_hours'),
+                                   func.sum(Labor.dollars).label('total_dollars')
+                                   ).filter(Labor.date >= start_week,
+                                            Labor.date <= end_week
+                                            ).group_by(Labor.name).all()
+
+
+    labor_week_ly = db.session.query(Labor.name,
+                                   func.sum(Labor.hours).label('total_hours_ly'),
+                                    func.sum(Labor.dollars).label('total_dollars_ly')
+                                   ).filter(Labor.date >= start_week_ly,
+                                            Labor.date <= end_week_ly
+                                            ).group_by(Labor.name).all()
+
+    df_labor_week = pd.DataFrame.from_records(labor_week, columns=['name', 'hours', 'dollars'])
+    df_labor_week_ly = pd.DataFrame.from_records(labor_week_ly, columns=['name', 'hours_ly', 'dollars_ly'])
+    labor_table_wk = df_labor_week.merge(df_labor_week_ly, how='outer', sort=True)
+
+    weekly_table = sales_table_wk.merge(labor_table_wk, how='outer', sort=True)
+    weekly_table.set_index('name', inplace=True)
+    weekly_table.loc['TOTALS'] = weekly_table.sum()
+    weekly_totals = weekly_table.loc['TOTALS']
+
+
+    # Period Sales Table
+    sales_period = db.session.query(Sales.name,
+                                   func.sum(Sales.sales).label('total_sales'),
+                                   func.sum(Sales.guests).label('total_guests')
+                                   ).filter(Sales.date >= start_period,
+                                            Sales.date <= end_period
+                                            ).group_by(Sales.name).all()
+
+
+    sales_period_ly = db.session.query(Sales.name,
+                                   func.sum(Sales.sales).label('total_sales_ly'),
+                                    func.sum(Sales.guests).label('total_guests_ly')
+                                   ).filter(Sales.date >= start_period_ly,
+                                            Sales.date <= end_period_ly
+                                            ).group_by(Sales.name).all()
+
+    df_sales_period = pd.DataFrame.from_records(sales_period, columns=['name', 'sales', 'guests'])
+    df_sales_period_ly = pd.DataFrame.from_records(sales_period_ly, columns=['name', 'sales_ly', 'guests_ly'])
+    sales_table_pd = df_sales_period.merge(df_sales_period_ly, how='outer', sort=True)
+
+    labor_period = db.session.query(Labor.name,
+                                   func.sum(Labor.hours).label('total_hours'),
+                                   func.sum(Labor.dollars).label('total_dollars')
+                                   ).filter(Labor.date >= start_period,
+                                            Labor.date <= end_period
+                                            ).group_by(Labor.name).all()
+
+
+    labor_period_ly = db.session.query(Labor.name,
+                                   func.sum(Labor.hours).label('total_hours_ly'),
+                                    func.sum(Labor.dollars).label('total_dollars_ly')
+                                   ).filter(Labor.date >= start_period_ly,
+                                            Labor.date <= end_period_ly
+                                            ).group_by(Labor.name).all()
+
+    df_labor_period = pd.DataFrame.from_records(labor_period, columns=['name', 'hours', 'dollars'])
+    df_labor_period_ly = pd.DataFrame.from_records(labor_period_ly, columns=['name', 'hours_ly', 'dollars_ly'])
+    labor_table_pd = df_labor_period.merge(df_labor_period_ly, how='outer', sort=True)
+
+    period_table = sales_table_pd.merge(labor_table_pd, how='outer', sort=True)
+    period_table.set_index('name', inplace=True)
+    period_table.loc['TOTALS'] = period_table.sum()
+    period_totals = period_table.loc['TOTALS']
+
+
+    # Yearly Sales Table
+    sales_yearly = db.session.query(Sales.name,
+                                   func.sum(Sales.sales).label('total_sales'),
+                                   func.sum(Sales.guests).label('total_guests')
+                                   ).filter(Sales.date >= start_year,
+                                            Sales.date <= end_year
+                                            ).group_by(Sales.name).all()
+
+
+    sales_yearly_ly = db.session.query(Sales.name,
+                                   func.sum(Sales.sales).label('total_sales_ly'),
+                                    func.sum(Sales.guests).label('total_guests_ly')
+                                   ).filter(Sales.date >= start_year_ly,
+                                            Sales.date <= end_year_ly
+                                            ).group_by(Sales.name).all()
+
+    df_sales_yearly = pd.DataFrame.from_records(sales_yearly, columns=['name', 'sales', 'guests'])
+    df_sales_yearly_ly = pd.DataFrame.from_records(sales_yearly_ly, columns=['name', 'sales_ly', 'guests_ly'])
+    print(df_sales_yearly_ly)
+    sales_table_yr = df_sales_yearly.merge(df_sales_yearly_ly, how='outer', sort=True)
+
+    labor_yearly = db.session.query(Labor.name,
+                                   func.sum(Labor.hours).label('total_hours'),
+                                   func.sum(Labor.dollars).label('total_dollars')
+                                   ).filter(Labor.date >= start_year,
+                                            Labor.date <= end_year
+                                            ).group_by(Labor.name).all()
+
+
+    labor_yearly_ly = db.session.query(Labor.name,
+                                   func.sum(Labor.hours).label('total_hours_ly'),
+                                    func.sum(Labor.dollars).label('total_dollars_ly')
+                                   ).filter(Labor.date >= start_year_ly,
+                                            Labor.date <= end_year_ly
+                                            ).group_by(Labor.name).all()
+
+    df_labor_yearly = pd.DataFrame.from_records(labor_yearly, columns=['name', 'hours', 'dollars'])
+    df_labor_yearly_ly = pd.DataFrame.from_records(labor_yearly_ly, columns=['name', 'hours_ly', 'dollars_ly'])
+    labor_table_yr = df_labor_yearly.merge(df_labor_yearly_ly, how='outer', sort=True)
+
+    yearly_table = sales_table_yr.merge(labor_table_yr, how='outer', sort=True)
+    yearly_table.set_index('name', inplace=True)
+    yearly_table.loc['TOTALS'] = yearly_table.sum()
+    yearly_totals = yearly_table.loc['TOTALS']
+    print(yearly_table)
+    print(yearly_totals)
 
 
     return render_template(
@@ -377,28 +337,20 @@ def index(targetdate=None):
         form=form,
         segment='index',
         fiscal_dates=fiscal_dates,
-#        daily_sales=daily_sales,
-#        daily_sales_ly=daily_sales_ly,
-        weekly_sales=weekly_sales,
-        weekly_sales_ly=weekly_sales_ly,
-        period_sales=period_sales,
-        period_sales_ly=period_sales_ly,
-        yearly_sales=yearly_sales,
-        yearly_sales_ly=yearly_sales_ly,
-#        daily_labor=daily_labor,
-        weekly_labor=weekly_labor,
-        period_labor=period_labor,
-#        daily_labor_ly=daily_labor_ly,
-        weekly_labor_ly=weekly_labor_ly,
-        period_labor_ly=period_labor_ly,
         values1=values1,
-        values1_ly=values1_ly,
         values2=values2,
         values3=values3,
+        values1_ly=values1_ly,
         values2_ly=values2_ly,
         values3_ly=values3_ly,
         daily_table=daily_table,
-        daily_totals=daily_totals
+        daily_totals=daily_totals,
+        weekly_table=weekly_table,
+        weekly_totals=weekly_totals,
+        period_table=period_table,
+        period_totals=period_totals,
+        yearly_table=yearly_table,
+        yearly_totals=yearly_totals
     )
 
 
