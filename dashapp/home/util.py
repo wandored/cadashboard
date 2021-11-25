@@ -60,26 +60,17 @@ def make_dataframe(sales):
 
 
 def get_lastyear(date):
-#    date_dt = datetime.strptime(date, "%Y-%m-%d")
-#    year_ly = date_dt - timedelta(days=365)
-#    date_str = date_dt.strftime('%Y-%m-%d')
     target = Calendar.query.filter_by(date=date)
-#    start_ly = end_ly = datetime.now
     dt_date = datetime.now
 
     for i in target:
-#        print(i.date, i.year, i.period, i.week, i.day)
         lst_year = str(int(i.year) - 1)
         period = i.period
         week = i.week
         day = i.day
         ly_target = Calendar.query.filter_by(year=lst_year, period=period, week=week, day=day)
         for x in ly_target:
-#            print(x.date, x.year, x.period, x.week, x.day)
-#            print("-")
             dt_date = x.date
-#            string_date = datetime.strptime(x.date, "%Y-%m-%d")
-#            dt_date = string_date.strftime("%Y-%m-%d")
     return dt_date
 
 

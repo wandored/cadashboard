@@ -25,6 +25,7 @@ from sqlalchemy import and_, func
 def index(targetdate=None):
     fiscal_dates = get_period(datetime.strptime(session['targetdate'], "%Y-%m-%d"))
     start_day = end_day = start_week = end_week = start_period = end_period = start_year = end_year = calendar_day = ""
+    DOW = WTD = PTD = 0
     form = DateForm()
     # Get Data
     if  form.validate_on_submit():
@@ -36,37 +37,47 @@ def index(targetdate=None):
     for i in fiscal_dates:
         day_start = datetime.strptime(i.date, "%Y-%m-%d")
         day_end = day_start + timedelta(days=1)
-        week_start = datetime.strptime(i.week_start, "%Y-%m-%d")
-        week_end = datetime.strptime(i.week_end, "%Y-%m-%d")
-        period_start = datetime.strptime(i.period_start, "%Y-%m-%d")
-        period_end = datetime.strptime(i.period_end, "%Y-%m-%d")
-        year_start = datetime.strptime(i.year_start, "%Y-%m-%d")
-        year_end = datetime.strptime(i.year_end, "%Y-%m-%d")
+#        week_start = datetime.strptime(i.week_start, "%Y-%m-%d")
+#        week_end = datetime.strptime(i.week_end, "%Y-%m-%d")
+#        period_start = datetime.strptime(i.period_start, "%Y-%m-%d")
+#        period_end = datetime.strptime(i.period_end, "%Y-%m-%d")
+#        year_start = datetime.strptime(i.year_start, "%Y-%m-%d")
+#        year_end = datetime.strptime(i.year_end, "%Y-%m-%d")
 
-        start_day = day_start.strftime("%Y-%m-%d")
+#        start_day = day_start.strftime("%Y-%m-%d")
+        start_day = i.date
         end_day = day_end.strftime("%Y-%m-%d")
-        start_week = week_start.strftime("%Y-%m-%d")
-        end_week = week_end.strftime("%Y-%m-%d")
-        start_period = period_start.strftime("%Y-%m-%d")
-        end_period = period_end.strftime("%Y-%m-%d")
-        start_year = year_start.strftime("%Y-%m-%d")
-        end_year = year_end.strftime("%Y-%m-%d")
+        start_week = i.week_start
+        end_week = i.week_end
+        start_period = i.period_start
+        end_period = i.period_end
+        start_year = i.year_start
+        end_year = i.year_end
+#        start_week = week_start.strftime("%Y-%m-%d")
+#        end_week = week_end.strftime("%Y-%m-%d")
+#        start_period = period_start.strftime("%Y-%m-%d")
+#        end_period = period_end.strftime("%Y-%m-%d")
+#        start_year = year_start.strftime("%Y-%m-%d")
+#        end_year = year_end.strftime("%Y-%m-%d")
 
 
     # Get matching day, week and period start and end dates
     start_day_ly = get_lastyear(start_day)
-    end_day_ly = get_lastyear(end_day)
+#    end_day_ly = get_lastyear(end_day)
     start_week_ly = get_lastyear(start_week)
     end_week_ly = get_lastyear(end_week)
+    week_to_date = get_lastyear(start_day)
     start_period_ly = get_lastyear(start_period)
     end_period_ly = get_lastyear(end_period)
+    period_to_date = get_lastyear(start_day)
     start_year_ly = get_lastyear(start_year)
     end_year_ly = get_lastyear(end_year)
+    year_to_date = get_lastyear(start_day)
 
     # Get the Day Of Week integer
-    last_day = Calendar.query.filter_by(date=start_day).first()
-    WTD = last_day.dow
-    print(f'this is the {WTD} dow')
+#    last_day = Calendar.query.filter_by(date=start_day).first()
+#    WTD = last_day.dow
+#    print(f'Period-{PTD}, Week-{WTD}, Day-{DOW}')
 
     # SalesEmployee
     # delete current days data from database and replace with fresh data
@@ -75,7 +86,7 @@ def index(targetdate=None):
     baddates = sales_employee(start_day, end_day)
 
     if baddates == 1:
-        flash(f'The date you selected does not have sales.  Please select another date!', 'warning')
+        flash(f'I cannot find sales for the day you selected.  Please select another date!', 'warning')
         session['targetdate'] = Config.YSTDAY.strftime('%Y-%m-%d')
         return redirect(url_for('home_blueprint.index'))
 
@@ -190,6 +201,15 @@ def index(targetdate=None):
 
     daily_table = sales_table.merge(labor_table, how='outer', sort=True)
     daily_table.set_index('name', inplace=True)
+
+    # Grab top sales over last year before we add totals
+    dy_sales = daily_table.sales - daily_table.sales_ly
+    dy_top_sales = dy_sales.nlargest(5)
+    dy_sales_avg = (daily_table.sales - daily_table.sales_ly) / daily_table.sales_ly * 100
+    dy_avg_sales = dy_sales_avg.nlargest(5)
+    print(dy_top_sales.tolist())
+    print(dy_avg_sales.tolist())
+
     daily_table.loc['TOTALS'] = daily_table.sum()
     daily_totals = daily_table.loc['TOTALS']
 
@@ -207,7 +227,7 @@ def index(targetdate=None):
                                    func.sum(Sales.sales).label('total_sales_ly'),
                                     func.sum(Sales.guests).label('total_guests_ly')
                                    ).filter(Sales.date >= start_week_ly,
-                                            Sales.date <= end_week_ly
+                                            Sales.date <= week_to_date,
                                             ).group_by(Sales.name).all()
 
     df_sales_week = pd.DataFrame.from_records(sales_week, columns=['name', 'sales', 'guests'])
@@ -226,7 +246,7 @@ def index(targetdate=None):
                                    func.sum(Labor.hours).label('total_hours_ly'),
                                     func.sum(Labor.dollars).label('total_dollars_ly')
                                    ).filter(Labor.date >= start_week_ly,
-                                            Labor.date <= end_week_ly
+                                            Labor.date <= week_to_date
                                             ).group_by(Labor.name).all()
 
     df_labor_week = pd.DataFrame.from_records(labor_week, columns=['name', 'hours', 'dollars'])
@@ -235,6 +255,15 @@ def index(targetdate=None):
 
     weekly_table = sales_table_wk.merge(labor_table_wk, how='outer', sort=True)
     weekly_table.set_index('name', inplace=True)
+
+    # Grab top sales over last year before we add totals
+    wk_sales = weekly_table.sales - weekly_table.sales_ly
+    wk_top_sales = wk_sales.nlargest(5)
+    wk_sales_avg = (weekly_table.sales - weekly_table.sales_ly) / weekly_table.sales_ly * 100
+    wk_avg_sales = wk_sales_avg.nlargest(5)
+    print(wk_top_sales.tolist())
+    print(wk_avg_sales.tolist())
+
     weekly_table.loc['TOTALS'] = weekly_table.sum()
     weekly_totals = weekly_table.loc['TOTALS']
 
@@ -252,7 +281,7 @@ def index(targetdate=None):
                                    func.sum(Sales.sales).label('total_sales_ly'),
                                     func.sum(Sales.guests).label('total_guests_ly')
                                    ).filter(Sales.date >= start_period_ly,
-                                            Sales.date <= end_period_ly
+                                            Sales.date <= period_to_date
                                             ).group_by(Sales.name).all()
 
     df_sales_period = pd.DataFrame.from_records(sales_period, columns=['name', 'sales', 'guests'])
@@ -271,7 +300,7 @@ def index(targetdate=None):
                                    func.sum(Labor.hours).label('total_hours_ly'),
                                     func.sum(Labor.dollars).label('total_dollars_ly')
                                    ).filter(Labor.date >= start_period_ly,
-                                            Labor.date <= end_period_ly
+                                            Labor.date <= period_to_date
                                             ).group_by(Labor.name).all()
 
     df_labor_period = pd.DataFrame.from_records(labor_period, columns=['name', 'hours', 'dollars'])
@@ -280,6 +309,14 @@ def index(targetdate=None):
 
     period_table = sales_table_pd.merge(labor_table_pd, how='outer', sort=True)
     period_table.set_index('name', inplace=True)
+
+    # Grab top sales over last year before we add totals
+    pd_sales = period_table.sales - period_table.sales_ly
+    pd_top_sales = pd_sales.nlargest(5)
+    pd_sales_avg = (period_table.sales - period_table.sales_ly) / period_table.sales_ly * 100
+    pd_avg_sales = pd_sales_avg.nlargest(5)
+    print(pd_top_sales.tolist())
+
     period_table.loc['TOTALS'] = period_table.sum()
     period_totals = period_table.loc['TOTALS']
 
@@ -297,12 +334,11 @@ def index(targetdate=None):
                                    func.sum(Sales.sales).label('total_sales_ly'),
                                     func.sum(Sales.guests).label('total_guests_ly')
                                    ).filter(Sales.date >= start_year_ly,
-                                            Sales.date <= end_year_ly
+                                            Sales.date <= year_to_date
                                             ).group_by(Sales.name).all()
 
     df_sales_yearly = pd.DataFrame.from_records(sales_yearly, columns=['name', 'sales', 'guests'])
     df_sales_yearly_ly = pd.DataFrame.from_records(sales_yearly_ly, columns=['name', 'sales_ly', 'guests_ly'])
-    print(df_sales_yearly_ly)
     sales_table_yr = df_sales_yearly.merge(df_sales_yearly_ly, how='outer', sort=True)
 
     labor_yearly = db.session.query(Labor.name,
@@ -317,7 +353,7 @@ def index(targetdate=None):
                                    func.sum(Labor.hours).label('total_hours_ly'),
                                     func.sum(Labor.dollars).label('total_dollars_ly')
                                    ).filter(Labor.date >= start_year_ly,
-                                            Labor.date <= end_year_ly
+                                            Labor.date <= year_to_date
                                             ).group_by(Labor.name).all()
 
     df_labor_yearly = pd.DataFrame.from_records(labor_yearly, columns=['name', 'hours', 'dollars'])
@@ -326,10 +362,20 @@ def index(targetdate=None):
 
     yearly_table = sales_table_yr.merge(labor_table_yr, how='outer', sort=True)
     yearly_table.set_index('name', inplace=True)
+
+    # Grab top sales over last year before we add totals
+    yr_sales = yearly_table.sales - yearly_table.sales_ly
+    yr_top_sales = yr_sales.nlargest(5)
+    yr_sales_avg = (yearly_table.sales - yearly_table.sales_ly) / yearly_table.sales_ly * 100
+    yr_avg_sales = yr_sales_avg.nlargest(5)
+    print(yr_top_sales.tolist())
+    print(yr_avg_sales.tolist())
+
     yearly_table.loc['TOTALS'] = yearly_table.sum()
     yearly_totals = yearly_table.loc['TOTALS']
-    print(yearly_table)
-    print(yearly_totals)
+
+
+    # Scorecard
 
 
     return render_template(
@@ -350,7 +396,13 @@ def index(targetdate=None):
         period_table=period_table,
         period_totals=period_totals,
         yearly_table=yearly_table,
-        yearly_totals=yearly_totals
+        yearly_totals=yearly_totals,
+        dy_top_sales=dy_top_sales,
+        dy_avg_sales=dy_avg_sales,
+        wk_top_sales=wk_top_sales,
+        wk_avg_sales=wk_avg_sales,
+        pd_top_sales=pd_top_sales,
+        pd_avg_sales=pd_avg_sales
     )
 
 

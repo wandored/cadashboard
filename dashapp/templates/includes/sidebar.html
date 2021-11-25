@@ -8,6 +8,28 @@
       </a>
     </div>
     <hr class="horizontal light mt-0 mb-2">
+    <form method="POST" action="" style="text-align:center">
+      {{ form.hidden_tag() }}
+      <fieldset id="" class="form-group mb-1">
+        <div class="form-group mb-1">
+          {{ form.selectdate.label(class="form=control-label") }}
+          {% if form.selectdate.errors %}
+              {{ form.selectdate(class="form=control form-control-md is-invalid") }}
+              <div class="invalid-feedback">
+                  {% for error in form.selectdate.errors %}
+                      <span>{{ error }}</span>
+                  {% endfor %}
+              </div>
+          {% else %}
+              {{ form.selectdate(class="form=control form-control-md") }}
+          {% endif %}
+        </div>
+      </fieldset>
+      <div class="form-group">
+        {{ form.submit(class="btn btn-info") }}
+      </div>
+    </form>
+    <hr class="horizontal light mt-0 mb-2">
     <div class="collapse navbar-collapse  w-auto  max-height-vh-100" id="sidenav-collapse-main">
       <ul class="navbar-nav">
         <li class="nav-item">

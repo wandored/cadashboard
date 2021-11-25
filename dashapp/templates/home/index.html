@@ -25,11 +25,11 @@
             <hr class="dark horizontal my-0">
             {% if daily_totals.sales >= daily_totals.sales_ly %}
               <div class="card-footer p-3">
-                <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((daily_totals.sales - daily_totals.sales_ly) / daily_totals.sales_ly) * 100) }} - {{ "${:,.0f}".format(daily_totals.sales_ly) }}</span> SPLY</p>
+                <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((daily_totals.sales - daily_totals.sales_ly) / daily_totals.sales_ly) * 100) }} - {{ "${:,.0f}".format(daily_totals.sales_ly) }}</span> SDLY</p>
               </div>
               {% else %}
               <div class="card-footer p-3">
-                <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((daily_totals.sales - daily_totals.sales_ly)|abs / daily_totals.sales_ly) * 100) }} - {{ "${:,.0f}".format(daily_totals.sales_ly) }}</span> SPLY</p>
+                <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((daily_totals.sales - daily_totals.sales_ly)|abs / daily_totals.sales_ly) * 100) }} - {{ "${:,.0f}".format(daily_totals.sales_ly) }}</span> SDLY</p>
               </div>
               {% endif %}
           </div>
@@ -43,18 +43,18 @@
                 {% for x in fiscal_dates %}
                 <div class="text-end pt-1">
                   <p class="text-sm mb-0 text-capitalize">Week {{ x.week }} Sales</p>
-                  <h4 class="mb-0">{{ "${:,.2f}".format(weekly_totals.sales) }}</h4>
+                  <h4 class="mb-0">{{ "${:,.0f}".format(weekly_totals.sales) }}</h4>
                 </div>
                 {% endfor %}
             </div>
             <hr class="dark horizontal my-0">
               {% if weekly_totals.sales >= weekly_totals.sales_ly %}
               <div class="card-footer p-3">
-                <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((weekly_totals.sales - weekly_totals.sales_ly) / weekly_totals.sales_ly) * 100) }} - {{ "${:,.0f}".format(weekly_totals.sales_ly) }}</span> SPLY</p>
+                <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((weekly_totals.sales - weekly_totals.sales_ly) / weekly_totals.sales_ly) * 100) }} - {{ "${:,.0f}".format(weekly_totals.sales_ly) }}</span> WTD</p>
               </div>
               {% else %}
               <div class="card-footer p-3">
-                <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((weekly_totals.sales - weekly_totals.sales_ly)|abs / weekly_totals.sales_ly) * 100) }} - {{ "${:,.0f}".format(weekly_totals.sales_ly) }}</span> SPLY</p>
+                <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((weekly_totals.sales - weekly_totals.sales_ly)|abs / weekly_totals.sales_ly) * 100) }} - {{ "${:,.0f}".format(weekly_totals.sales_ly) }}</span> WTD</p>
               </div>
               {% endif %}
           </div>
@@ -68,18 +68,18 @@
                 {% for x in fiscal_dates %}
                 <div class="text-end pt-1">
                   <p class="text-sm mb-0 text-capitalize">Period {{ x.period }} Sales</p>
-                  <h4 class="mb-0">{{ "${:,.2f}".format(period_totals.sales) }}</h4>
+                  <h4 class="mb-0">{{ "${:,.0f}".format(period_totals.sales) }}</h4>
                 </div>
                 {% endfor %}
             </div>
             <hr class="dark horizontal my-0">
               {% if period_totals.sales >= period_totals.sales_ly %}
               <div class="card-footer p-3">
-                <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((period_totals.sales - period_totals.sales_ly) / period_totals.sales_ly) * 100) }} - {{ "${:,.0f}".format(period_totals.sales_ly) }}</span> SPLY</p>
+                <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((period_totals.sales - period_totals.sales_ly) / period_totals.sales_ly) * 100) }} - {{ "${:,.0f}".format(period_totals.sales_ly) }}</span> PTD</p>
               </div>
               {% else %}
               <div class="card-footer p-3">
-                <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((period_totals.sales - period_totals.sales_ly)|abs / period_totals.sales_ly) * 100) }} - {{ "${:,.0f}".format(period_totals.sales_ly) }}</span> SPLY</p>
+                <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((period_totals.sales - period_totals.sales_ly)|abs / period_totals.sales_ly) * 100) }} - {{ "${:,.0f}".format(period_totals.sales_ly) }}</span> PTD</p>
               </div>
               {% endif %}
           </div>
@@ -93,18 +93,18 @@
                 {% for x in fiscal_dates %}
                 <div class="text-end pt-1">
                   <p class="text-sm mb-0 text-capitalize">Fiscal {{ x.year }} Sales</p>
-                  <h4 class="mb-0"> {{ "${:,.2f}".format(yearly_totals.sales) }}</h4>
+                  <h4 class="mb-0"> {{ "${:,.0f}".format(yearly_totals.sales) }}</h4>
                 </div>
                 {% endfor %}
             </div>
             <hr class="dark horizontal my-0">
               {% if yearly_totals.sales >= yearly_totals.sales_ly %}
               <div class="card-footer p-3">
-                <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((yearly_totals.sales - yearly_totals.sales_ly) / yearly_totals.sales_ly) * 100) }} - {{ "${:,.0f}".format(yearly_totals.sales_ly) }}</span> SPLY</p>
+                <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((yearly_totals.sales - yearly_totals.sales_ly) / yearly_totals.sales_ly) * 100) }} - {{ "${:,.0f}".format(yearly_totals.sales_ly) }}</span> YTD</p>
               </div>
               {% else %}
               <div class="card-footer p-3">
-                <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((yearly_totals.sales - yearly_totals.sales_ly)|abs / yearly_totals.sales_ly) * 100) }} - {{ "${:,.0f}".format(yearly_totals.sales_ly) }}</span> SPLY</p>
+                <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((yearly_totals.sales - yearly_totals.sales_ly)|abs / yearly_totals.sales_ly) * 100) }} - {{ "${:,.0f}".format(yearly_totals.sales_ly) }}</span> YTD</p>
               </div>
               {% endif %}
           </div>
@@ -122,7 +122,7 @@
               </div>
             </div>
             <div class="card-body">
-              <h6 class="mb-0 ">Daily Sales</h6>
+              <h6 class="mb-0 ">Week to Date Sales</h6>
               {% if weekly_totals.sales > weekly_totals.sales_ly %}
               <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.0f}".format(weekly_totals.sales - weekly_totals.sales_ly) }} over last year</p>
               {% else %}
@@ -141,7 +141,7 @@
               </div>
             </div>
             <div class="card-body">
-              <h6 class="mb-0 ">Period Sales</h6>
+              <h6 class="mb-0 ">Period to Date Sales</h6>
               {% if period_totals.sales > period_totals.sales_ly %}
               <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.0f}".format(period_totals.sales - period_totals.sales_ly) }} over last year</p>
               {% else %}
@@ -160,7 +160,7 @@
               </div>
             </div>
             <div class="card-body">
-              <h6 class="mb-0 ">Yearly Sales</h6>
+              <h6 class="mb-0 ">Year to Date Sales</h6>
               {% if yearly_totals.sales > yearly_totals.sales_ly %}
               <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.0f}".format(yearly_totals.sales - yearly_totals.sales_ly) }} over last year</p>
               {% else %}
@@ -297,69 +297,28 @@
         <div class="col-lg-4 col-md-6">
           <div class="card h-100">
             <div class="card-header pb-0">
-              <h6>scorecard</h6>
+              <h6>Scorecard</h6>
               <p class="text-sm">
-                <i class="fa fa-arrow-up text-success" aria-hidden="true"></i>
-                <span class="font-weight-bold">24%</span> this month
+                <span class="font-weight-bold">Top 5 List</span>
               </p>
             </div>
-            <div class="card-body p-3">
-              <div class="timeline timeline-one-side">
-                <div class="timeline-block mb-3">
-                  <span class="timeline-step">
-                    <i class="material-icons text-success text-gradient">notifications</i>
-                  </span>
-                  <div class="timeline-content">
-                    <h6 class="text-dark text-sm font-weight-bold mb-0">$2400, Design changes</h6>
-                    <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">22 DEC 7:20 PM</p>
-                  </div>
-                </div>
-                <div class="timeline-block mb-3">
-                  <span class="timeline-step">
-                    <i class="material-icons text-danger text-gradient">code</i>
-                  </span>
-                  <div class="timeline-content">
-                    <h6 class="text-dark text-sm font-weight-bold mb-0">New order #1832412</h6>
-                    <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">21 DEC 11 PM</p>
-                  </div>
-                </div>
-                <div class="timeline-block mb-3">
-                  <span class="timeline-step">
-                    <i class="material-icons text-info text-gradient">shopping_cart</i>
-                  </span>
-                  <div class="timeline-content">
-                    <h6 class="text-dark text-sm font-weight-bold mb-0">Server payments for April</h6>
-                    <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">21 DEC 9:34 PM</p>
-                  </div>
-                </div>
-                <div class="timeline-block mb-3">
-                  <span class="timeline-step">
-                    <i class="material-icons text-warning text-gradient">credit_card</i>
-                  </span>
-                  <div class="timeline-content">
-                    <h6 class="text-dark text-sm font-weight-bold mb-0">New card added for order #4395133</h6>
-                    <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">20 DEC 2:20 AM</p>
-                  </div>
-                </div>
-                <div class="timeline-block mb-3">
-                  <span class="timeline-step">
-                    <i class="material-icons text-primary text-gradient">key</i>
-                  </span>
-                  <div class="timeline-content">
-                    <h6 class="text-dark text-sm font-weight-bold mb-0">Unlock packages for development</h6>
-                    <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">18 DEC 4:54 AM</p>
-                  </div>
-                </div>
-                <div class="timeline-block">
-                  <span class="timeline-step">
-                    <i class="material-icons text-dark text-gradient">payments</i>
-                  </span>
-                  <div class="timeline-content">
-                    <h6 class="text-dark text-sm font-weight-bold mb-0">New order #9583120</h6>
-                    <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">17 DEC</p>
-                  </div>
-                </div>
+            <div class="alert alert-info" role="alert">
+              <legend class="text-dark mb-1">Daily Sales Over LY</legend>
+              <div class="alert alert-light" role="alert">
+                {% for i, v in dy_top_sales.items() %}
+                <p class="mb-0">{{ i }} - {{ "${:,.2f}".format(v) }}</p>
+                {% endfor %}
               </div>
+            </div>
+            <div class="alert alert-info" role="alert">
+              <legend class="text-dark mb-1">Daily Percent Increase Over LY</legend>
+              <div class="alert alert-light" role="alert">
+                {% for i, v in dy_avg_sales.items() %}
+                <p class="mb-0">{{ i }} - {{ "%{:,.0f}".format(v) }}</p>
+                {% endfor %}
+              </div>
+            </div>
+            <div class="card-body p-3">
             </div>
           </div>
         </div>
@@ -395,10 +354,9 @@
           tension: 0,
           borderWidth: 0,
           pointRadius: 5,
-          pointBackgroundColor: "rgba(75, 192, 235, .8)",
+          pointBackgroundColor: "rgba(200, 200, 200, 1)",
           pointBorderColor: "transparent",
-          borderColor: "rgba(75, 192, 235, .8)",
-          borderColor: "rgba(75, 192, 235, .8)",
+          borderColor: "rgba(200, 200, 200, 1)",
           borderWidth: 4,
           type: "line",
           backgroundColor: "transparent",
@@ -441,7 +399,11 @@
                 style: 'normal',
                 lineHeight: 2
               },
-              color: "#fff"
+              color: "#fff",
+              // Abbreviate the millions
+              callback: function(value, index, values) {
+                return value / 1e3 + ' T';
+              },
             },
           },
           x: {
@@ -541,6 +503,10 @@
                 style: 'normal',
                 lineHeight: 2
               },
+              // Abbreviate the millions
+              callback: function(value, index, values) {
+                return value / 1e6 + ' M';
+              },
             }
           },
           x: {
@@ -592,9 +558,9 @@
           tension: 0,
           borderWidth: 0,
           pointRadius: 5,
-          pointBackgroundColor: "rgba(255, 255, 255, .8)",
+          pointBackgroundColor: "rgba(200, 200, 200, 1)",
           pointBorderColor: "transparent",
-          borderColor: "rgba(255, 255, 255, .8)",
+          borderColor: "rgba(200, 200, 200, 1)",
           borderWidth: 4,
           type: "line",
           backgroundColor: "transparent",
@@ -636,7 +602,11 @@
                 style: 'normal',
                 lineHeight: 2
               },
-            }
+              // Abbreviate the millions
+              callback: function(value, index, values) {
+                return value / 1e6 + ' M';
+              },
+            },
           },
           x: {
             grid: {

@@ -14,5 +14,3 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     TODAY = datetime.date(datetime.now())
     YSTDAY = TODAY - timedelta(days=1)
-    SDLY = TODAY - timedelta(days=366)
-    SDLY2 = SDLY + timedelta(days=1)
