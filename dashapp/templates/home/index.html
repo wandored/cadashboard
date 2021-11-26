@@ -304,17 +304,17 @@
             </div>
             <div class="alert alert-info" role="alert">
               <legend class="text-dark mb-1">Daily Sales Over LY</legend>
-              <div class="alert alert-light" role="alert">
+              <div class="card card-light mb-1" role="card">
                 {% for i, v in dy_top_sales.items() %}
-                <p class="mb-0">{{ i }} - {{ "${:,.2f}".format(v) }}</p>
+                <p class="mb-0 ms-1">{{ i }} - {{ "${:,.2f}".format(v) }}</p>
                 {% endfor %}
               </div>
             </div>
-            <div class="alert alert-info" role="alert">
+            <div class="alert alert-success" role="alert">
               <legend class="text-dark mb-1">Daily Percent Increase Over LY</legend>
-              <div class="alert alert-light" role="alert">
+              <div class="card card-light mb-1" role="card">
                 {% for i, v in dy_avg_sales.items() %}
-                <p class="mb-0">{{ i }} - {{ "%{:,.0f}".format(v) }}</p>
+                <p class="mb-0 ms-1">{{ i }} - {{ "%{:,.0f}".format(v) }}</p>
                 {% endfor %}
               </div>
             </div>

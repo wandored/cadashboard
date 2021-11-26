@@ -10,7 +10,7 @@ from dashapp.home import blueprint
 from datetime import datetime
 from sqlalchemy.engine.create import create_engine
 from dashapp import Config, db
-from dashapp.authentication.models import Calendar, Sales, Labor
+from dashapp.authentication.models import Calendar, Sales, Labor, Restaurants
 
 
 #def query_sales(start, end):
@@ -84,7 +84,6 @@ def get_period(startdate):
 
 def sales_employee(start, end):
 
-    df_loc = pd.read_csv('/home/wandored/Projects/Dashboard/locations.csv')
     url_filter = '$filter=date ge {}T00:00:00Z and date le {}T00:00:00Z'.format(start, end)
     query = '$select=dayPart,netSales,numberofGuests,location&{}'.format(url_filter)
     url = '{}/SalesEmployee?{}'.format(Config.SRVC_ROOT, query)
@@ -94,6 +93,9 @@ def sales_employee(start, end):
     if df.empty:
         return 1
 
+    data = db.session.query(Restaurants).all()
+    df_loc = pd.DataFrame([(x.name, x.location) for x in data],
+                          columns=['name', 'location'])
     df_merge = df_loc.merge(df, on='location')
     df_merge.rename(columns={'netSales': 'sales', 'numberofGuests': 'guests'}, inplace=True)
 
@@ -112,7 +114,6 @@ def sales_employee(start, end):
 
 def labor_detail(start, end):
 
-    df_loc = pd.read_csv('/home/wandored/Projects/Dashboard/locations.csv')
     url_filter = '$filter=dateWorked ge {}T00:00:00Z and dateWorked le {}T00:00:00Z'.format(start, end)
     query = '$select=jobTitle,hours,total,location_ID&{}'.format(url_filter)
     url = '{}/LaborDetail?{}'.format(Config.SRVC_ROOT, query)
@@ -122,6 +123,9 @@ def labor_detail(start, end):
     if df.empty:
         return 1
 
+    data = db.session.query(Restaurants).all()
+    df_loc = pd.DataFrame([(x.name, x.location) for x in data],
+                          columns=['name', 'location'])
     df_merge = df_loc.merge(df, left_on='location', right_on='location_ID')
     df_merge.rename(columns={'jobTitle': 'job', 'total': 'dollars'}, inplace=True)
     df_pivot = df_merge.pivot_table(
