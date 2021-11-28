@@ -1,5 +1,4 @@
 import json
-from datetime import datetime, timedelta
 
 with open("/etc/config.json") as config_file:
     config = json.load(config_file)
@@ -12,5 +11,3 @@ class Config:
     SRVC_PSWRD = config.get("SRVC_PSWRD")
     SQLALCHEMY_DATABASE_URI = config.get("SQLALCHEMY_DATABASE_URI")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    TODAY = datetime.date(datetime.now())
-    YSTDAY = TODAY - timedelta(days=1)

@@ -12,26 +12,18 @@ from dashapp import Config
 
 
 class LoginForm(FlaskForm):
-    username = StringField('Username',
-                         id='username_login',
-                         validators=[DataRequired()])
-    password = PasswordField('Password',
-                             id='pwd_login',
-                             validators=[DataRequired()])
+    username = StringField("Username", id="username_login", validators=[DataRequired()])
+    password = PasswordField("Password", id="pwd_login", validators=[DataRequired()])
 
 
 class CreateAccountForm(FlaskForm):
-    username = StringField('Username',
-                         id='username_create',
-                         validators=[DataRequired()])
-    email = EmailField('Email',
-                      id='email_create',
-                      validators=[DataRequired(), Email()])
-    password = PasswordField('Password',
-                             id='pwd_create',
-                             validators=[DataRequired()])
+    username = StringField(
+        "Username", id="username_create", validators=[DataRequired()]
+    )
+    email = EmailField("Email", id="email_create", validators=[DataRequired(), Email()])
+    password = PasswordField("Password", id="pwd_create", validators=[DataRequired()])
+
 
 class DateForm(FlaskForm):
     selectdate = DateField("Change Date: ", format="%Y-%m-%d")
     submit = SubmitField("Submit")
-

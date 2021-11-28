@@ -19,13 +19,12 @@ def register_extensions(app):
 
 
 def register_blueprints(app):
-    for module_name in ('authentication', 'home'):
-        module = import_module('dashapp.{}.routes'.format(module_name))
+    for module_name in ("authentication", "home"):
+        module = import_module("dashapp.{}.routes".format(module_name))
         app.register_blueprint(module.blueprint)
 
 
 def configure_database(app):
-
     @app.before_first_request
     def initialize_database():
         db.create_all()

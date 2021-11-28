@@ -223,13 +223,13 @@
                         {% if v.sales >= v.sales_ly %}
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex flex-column justify-content-right">
-                            <h6 class="mb-0 text-sm"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i> {{ "${:,.2f}".format(v.sales) }}</h6>
+                            <h6 class="mb-0 text-sm"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i> {{ "${:,.0f}".format(v.sales) }}</h6>
                           </div>
                         </div>
                         {% else %}
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex flex-column justify-content-right">
-                            <h6 class="mb-0 text-sm"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i> {{ "${:,.2f}".format(v.sales) }}</h6>
+                            <h6 class="mb-0 text-sm"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i> {{ "${:,.0f}".format(v.sales) }}</h6>
                           </div>
                         </div>
                         {% endif %}
@@ -237,7 +237,7 @@
                       <td>
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex flex-column justify-content-right">
-                            <h6 class="mb-0 text-sm">{{ "${:,.2f}".format(v.sales_ly) }}</h6>
+                            <h6 class="mb-0 text-sm">{{ "${:,.0f}".format(v.sales_ly) }}</h6>
                           </div>
                         </div>
                       </td>
@@ -245,13 +245,13 @@
                         {% if v.guests >= v.guests_ly %}
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex flex-column justify-content-right">
-                            <h6 class="mb-0 text-sm"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i> {{ v.guests|int }}</h6>
+                            <h6 class="mb-0 text-sm"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i> {{ "{:,.0f}".format(v.guests) }}</h6>
                           </div>
                         </div>
                         {% else %}
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex flex-column justify-content-right">
-                            <h6 class="mb-0 text-sm"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i> {{ v.guests|int }}</h6>
+                            <h6 class="mb-0 text-sm"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i> {{ "{:,.0f}".format(v.guests) }}</h6>
                           </div>
                         </div>
                         {% endif %}
@@ -267,13 +267,13 @@
                         {% if v.dollars <= v.dollars_ly %}
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex flex-column justify-content-right">
-                            <h6 class="mb-0 text-sm"><i class="fa fa-arrow-down text-success" aria-hidden="true"></i> {{ "${:,.2f}".format(v.dollars) }}</h6>
+                            <h6 class="mb-0 text-sm"><i class="fa fa-arrow-down text-success" aria-hidden="true"></i> {{ "${:,.0f}".format(v.dollars) }}</h6>
                           </div>
                         </div>
                         {% else %}
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex flex-column justify-content-right">
-                            <h6 class="mb-0 text-sm"><i class="fa fa-arrow-up text-danger" aria-hidden="true"></i> {{ "${:,.2f}".format(v.dollars) }}</h6>
+                            <h6 class="mb-0 text-sm"><i class="fa fa-arrow-up text-danger" aria-hidden="true"></i> {{ "${:,.0f}".format(v.dollars) }}</h6>
                           </div>
                         </div>
                         {% endif %}
@@ -281,7 +281,7 @@
                       <td>
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex flex-column justify-content-right">
-                            <h6 class="mb-0 text-sm">{{ "${:,.2f}".format(v.dollars_ly) }}</h6>
+                            <h6 class="mb-0 text-sm">{{ "${:,.0f}".format(v.dollars_ly) }}</h6>
                           </div>
                         </div>
                       </td>
@@ -306,7 +306,7 @@
               <legend class="text-dark mb-1">Daily Sales Over LY</legend>
               <div class="card card-light mb-1" role="card">
                 {% for i, v in dy_top_sales.items() %}
-                <p class="mb-0 ms-1">{{ i }} - {{ "${:,.2f}".format(v) }}</p>
+                <p class="mb-0 ms-1">{{ i }} - {{ "${:,.0f}".format(v) }}</p>
                 {% endfor %}
               </div>
             </div>
