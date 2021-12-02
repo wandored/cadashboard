@@ -13,6 +13,33 @@ from sqlalchemy.engine.create import create_engine
 from dashapp.authentication.models import Calendar, Sales, Labor, Restaurants, db
 
 
+def refresh_data(start, end):
+        """
+        When new date submitted, the data for that date will be replaced with new data from R365
+        We check if there are infact sales for that day, if not, it resets to yesterday, if
+        there are sales, then labor is polled
+        """
+        # delete current days data from database and replace with fresh data
+        Sales.query.filter_by(date=start).delete()
+        db.session.commit()
+        baddates = sales_employee(start, end)
+        if baddates == 1:
+            return 1
+#            flash(
+#                f"I cannot find sales for the day you selected.  Please select another date!",
+#                "warning",
+#            )
+#            TODAY = datetime.date(datetime.now())
+#            YSTDAY = TODAY - timedelta(days=1)
+#            session["targetdate"] = YSTDAY.strftime("%Y-%m-%d")
+#            return redirect(url_for("home_blueprint.route_default"))
+
+        Labor.query.filter_by(date=start).delete()
+        db.session.commit()
+        labor_detail(start, end)
+        return 0
+
+
 def make_HTTP_request(url):
     all_records = []
     while True:

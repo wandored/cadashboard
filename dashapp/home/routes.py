@@ -8,7 +8,7 @@ from flask_security.decorators import auth_required
 import pandas as pd
 from dashapp.home import blueprint
 from flask import flash, render_template, session, request, redirect, url_for
-from dashapp.home.util import labor_detail, get_period, get_lastyear, sales_employee
+from dashapp.home.util import get_period, get_lastyear, refresh_data, refresh_data
 from flask_security import login_required
 from jinja2 import TemplateNotFound
 from datetime import datetime, timedelta
@@ -56,8 +56,15 @@ def index(targetdate=None):
     end_year_ly = get_lastyear(end_year)
     year_to_date = get_lastyear(start_day)
 
-    form = DateForm()
+    # Check for no sales
+    if not Sales.query.filter_by(date=start_day).first():
+        refresh_data(start_day, end_day)
+        session["targetdate"] = start_day
+        return redirect(url_for("home_blueprint.index"))
+
+
     # Get Data
+    form = DateForm()
     if form.validate_on_submit():
         """
         When new date submitted, the data for that date will be replaced with new data from R365
@@ -68,10 +75,11 @@ def index(targetdate=None):
         day_end = form.selectdate.data + timedelta(days=1)
         end_day = day_end.strftime("%Y-%m-%d")
 
-        # delete current days data from database and replace with fresh data
-        Sales.query.filter_by(date=start_day).delete()
-        db.session.commit()
-        baddates = sales_employee(start_day, end_day)
+        baddates = refresh_data(start_day, end_day)
+#        # delete current days data from database and replace with fresh data
+#        Sales.query.filter_by(date=start_day).delete()
+#        db.session.commit()
+#        baddates = sales_employee(start_day, end_day)
         if baddates == 1:
             flash(
                 f"I cannot find sales for the day you selected.  Please select another date!",
@@ -81,10 +89,10 @@ def index(targetdate=None):
             YSTDAY = TODAY - timedelta(days=1)
             session["targetdate"] = YSTDAY.strftime("%Y-%m-%d")
             return redirect(url_for("home_blueprint.route_default"))
-
-        Labor.query.filter_by(date=start_day).delete()
-        db.session.commit()
-        labor_detail(start_day, end_day)
+#
+#        Labor.query.filter_by(date=start_day).delete()
+#        db.session.commit()
+#        labor_detail(start_day, end_day)
 
         session["targetdate"] = start_day
         return redirect(url_for("home_blueprint.index"))
