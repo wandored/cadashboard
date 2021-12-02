@@ -82,7 +82,7 @@
         </li>
         <li class="nav-item">
           <a class="nav-link text-white {% if 'profile' in segment %} active bg-gradient-primary {% endif %}" 
-             href=""><!-- /profile.html -->
+             href="#"><!-- /profile.html -->
             <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
               <i class="material-icons opacity-10">person</i>
             </div>
@@ -90,7 +90,15 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link text-white " href="{{ url_for('authentication_blueprint.logout') }}">
+          <a class="nav-link text-white" href="/admin">
+            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="material-icons opacity-10">person</i>
+            </div>
+            <span class="nav-link-text ms-1">Admin</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white" href="/logout">
             <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
               <i class="material-icons opacity-10">directions_run</i>
             </div>

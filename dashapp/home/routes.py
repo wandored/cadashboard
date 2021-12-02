@@ -4,36 +4,32 @@ Copyright (c) 2019 - present AppSeed.us
 """
 
 from flask.helpers import url_for
+from flask_security.decorators import auth_required
 import pandas as pd
-from sqlalchemy.util.langhelpers import NoneType
 from dashapp.home import blueprint
 from flask import flash, render_template, session, request, redirect, url_for
 from dashapp.home.util import labor_detail, get_period, get_lastyear, sales_employee
-from flask_login import login_required
+from flask_security import login_required
 from jinja2 import TemplateNotFound
 from datetime import datetime, timedelta
-from dashapp import Config, db
 from dashapp.authentication.forms import DateForm
-from dashapp.authentication.models import Calendar, Sales, Labor
-from dashapp import Config
+from dashapp.authentication.models import db, Calendar, Sales, Labor
 from sqlalchemy import and_, func
+
+
+@blueprint.route("/")
+def route_default():
+    TODAY = datetime.date(datetime.now())
+    YSTDAY = TODAY - timedelta(days=1)
+    session["targetdate"] = YSTDAY.strftime("%Y-%m-%d")
+    return redirect(url_for("home_blueprint.index"))
 
 
 @blueprint.route("/index", methods=["GET", "POST"])
 @login_required
 def index(targetdate=None):
+    start_day = end_day = start_week = end_week = start_period = end_period = start_year = end_year = ""
     fiscal_dates = get_period(datetime.strptime(session["targetdate"], "%Y-%m-%d"))
-    start_day = (
-        end_day
-    ) = start_week = end_week = start_period = end_period = start_year = end_year = ""
-    DOW = WTD = PTD = 0
-    form = DateForm()
-    # Get Data
-    if form.validate_on_submit():
-        """update screen with new date"""
-        session["targetdate"] = form.selectdate.data.strftime("%Y-%m-%d")
-        return redirect(url_for("home_blueprint.index"))
-
     for i in fiscal_dates:
         day_start = datetime.strptime(i.date, "%Y-%m-%d")
         day_end = day_start + timedelta(days=1)
@@ -60,26 +56,38 @@ def index(targetdate=None):
     end_year_ly = get_lastyear(end_year)
     year_to_date = get_lastyear(start_day)
 
-    # SalesEmployee
-    # delete current days data from database and replace with fresh data
-    Sales.query.filter_by(date=start_day).delete()
-    db.session.commit()
-    baddates = sales_employee(start_day, end_day)
+    form = DateForm()
+    # Get Data
+    if form.validate_on_submit():
+        """
+        When new date submitted, the data for that date will be replaced with new data from R365
+        We check if there are infact sales for that day, if not, it resets to yesterday, if
+        there are sales, then labor is polled
+        """
+        start_day = form.selectdate.data.strftime("%Y-%m-%d")
+        day_end = form.selectdate.data + timedelta(days=1)
+        end_day = day_end.strftime("%Y-%m-%d")
 
-    if baddates == 1:
-        flash(
-            f"I cannot find sales for the day you selected.  Please select another date!",
-            "warning",
-        )
-        TODAY = datetime.date(datetime.now())
-        YSTDAY = TODAY - timedelta(days=1)
-        session["targetdate"] = YSTDAY.strftime("%Y-%m-%d")
+        # delete current days data from database and replace with fresh data
+        Sales.query.filter_by(date=start_day).delete()
+        db.session.commit()
+        baddates = sales_employee(start_day, end_day)
+        if baddates == 1:
+            flash(
+                f"I cannot find sales for the day you selected.  Please select another date!",
+                "warning",
+            )
+            TODAY = datetime.date(datetime.now())
+            YSTDAY = TODAY - timedelta(days=1)
+            session["targetdate"] = YSTDAY.strftime("%Y-%m-%d")
+            return redirect(url_for("home_blueprint.route_default"))
+
+        Labor.query.filter_by(date=start_day).delete()
+        db.session.commit()
+        labor_detail(start_day, end_day)
+
+        session["targetdate"] = start_day
         return redirect(url_for("home_blueprint.index"))
-
-    # LaborDetail
-    Labor.query.filter_by(date=start_day).delete()
-    db.session.commit()
-    labor_detail(start_day, end_day)
 
     # Daily Chart
     daily_chart = (
@@ -213,6 +221,7 @@ def index(targetdate=None):
     daily_table.set_index("name", inplace=True)
 
     # Grab top sales over last year before we add totals
+    daily_table.fillna(0, inplace=True)
     dy_sales = daily_table.sales - daily_table.sales_ly
     dy_top_sales = dy_sales.nlargest(5)
     dy_sales_avg = (
@@ -291,6 +300,7 @@ def index(targetdate=None):
     weekly_table.set_index("name", inplace=True)
 
     # Grab top sales over last year before we add totals
+    weekly_table.fillna(0, inplace=True)
     wk_sales = weekly_table.sales - weekly_table.sales_ly
     wk_top_sales = wk_sales.nlargest(5)
     wk_sales_avg = (
@@ -366,6 +376,7 @@ def index(targetdate=None):
     period_table.set_index("name", inplace=True)
 
     # Grab top sales over last year before we add totals
+    period_table.fillna(0, inplace=True)
     pd_sales = period_table.sales - period_table.sales_ly
     pd_top_sales = pd_sales.nlargest(5)
     pd_sales_avg = (
@@ -441,6 +452,7 @@ def index(targetdate=None):
     yearly_table.set_index("name", inplace=True)
 
     # Grab top sales over last year before we add totals
+    yearly_table.fillna(0, inplace=True)
     yr_sales = yearly_table.sales - yearly_table.sales_ly
     yr_top_sales = yr_sales.nlargest(5)
     yr_sales_avg = (

@@ -3,19 +3,17 @@ CentraArchy Dashboard App
 """
 
 from flask import Flask
-from flask_login import LoginManager
-from flask_sqlalchemy import SQLAlchemy
 from importlib import import_module
+from dashapp.authentication.models import db, admin, security, user_datastore, mail
 from dashapp.config import Config
-
-
-db = SQLAlchemy()
-login_manager = LoginManager()
 
 
 def register_extensions(app):
     db.init_app(app)
-    login_manager.init_app(app)
+    mail.init_app(app)
+#    login_manager.init_app(app)
+    admin.init_app(app)
+    security.init_app(app, user_datastore)
 
 
 def register_blueprints(app):
@@ -29,9 +27,11 @@ def configure_database(app):
     def initialize_database():
         db.create_all()
 
+
     @app.teardown_request
     def shutdown_session(exception=None):
         db.session.remove()
+
 
 
 def create_app(config_class=Config):

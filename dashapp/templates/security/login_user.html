@@ -1,4 +1,5 @@
 {% extends "layouts/base-fullscreen.html" %}
+{% from "security/_macros.html" import render_field_with_errors, render_field %}
 
 {% block title %} Sign IN {% endblock %} 
 
@@ -32,30 +33,26 @@
             </div>
             <div class="card-body">
               
-              <form role="form" method="post" action="" class="text-start">
+              <form role="form" method="post" action="{{ url_for_security('login') }}" class="text-start">
 
-                {{ form.hidden_tag() }} 
+                {{ login_user_form.hidden_tag() }} 
 
                 <div class="input-group input-group-outline mb-3">
-                    <label class="form-label">Username</label>
-                    {{ form.username(class="form-control") }}
+                    <label class="form-label">Email Address</label>
+                    {{ login_user_form.email(class="form-control") }}
                 </div>
                 <div class="input-group input-group-outline mb-3">
                   <label class="form-label">Password</label>
-                  {{ form.password(class="form-control", type="password") }}
+                  {{ login_user_form.password(class="form-control", type="password") }}
                 </div>
                 <div class="form-check form-switch d-flex align-items-center mb-3">
                   <input class="form-check-input" type="checkbox" id="rememberMe">
                   <label class="form-check-label mb-0 ms-2" for="rememberMe">Remember me</label>
                 </div>
                 <div class="text-center">
-                  <button type="submit" name="login" 
-                          class="btn bg-gradient-primary w-100 my-4 mb-2">Sign in</button>
+                  {{ render_field(login_user_form.next) }}
+                  {{ render_field(login_user_form.submit, class="btn btn-lg bg-gradient-primary btn-lg w-100 mt-4 mb-0") }}
                 </div>
-                <p class="mt-4 text-sm text-center">
-                  Don't have an account?
-                  <a href="" class="text-primary text-gradient font-weight-bold">Sign UP</a>
-                </p>
               </form>
             </div>
           </div>

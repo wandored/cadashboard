@@ -7,32 +7,10 @@ import pandas as pd
 import numpy as np
 from flask import redirect, url_for, flash, session
 from dashapp.home import blueprint
+from dashapp.config import Config
 from datetime import datetime
 from sqlalchemy.engine.create import create_engine
-from dashapp import Config, db
-from dashapp.authentication.models import Calendar, Sales, Labor, Restaurants
-
-
-# def query_sales(start, end):
-#
-#    current_sales = sales_employee(start, end)
-##
-##    totals = current_sales.merge(lastYear, how='outer', on='name', sort=True)
-#
-#    return current_sales
-#
-#
-# def query_labor(start, end):
-#
-#    current_labor = labor_detail(start, end)
-#
-##    start_ly = get_lastyear(start)
-##    end_ly = get_lastyear(end)
-##    lastYear = labor_detail(start_ly, end_ly)
-##
-##    totals = current_labor.merge(lastYear, how='outer', on='name', sort=True)
-#
-#    return current_labor
+from dashapp.authentication.models import Calendar, Sales, Labor, Restaurants, db
 
 
 def make_HTTP_request(url):

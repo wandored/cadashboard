@@ -6,13 +6,12 @@ Copyright (c) 2019 - present AppSeed.us
 from flask_wtf import FlaskForm
 from wtforms import SubmitField, EmailField, StringField, PasswordField, DateField
 from wtforms.validators import Email, DataRequired
-from dashapp import Config
 
 # login and registration
 
 
 class LoginForm(FlaskForm):
-    username = StringField("Username", id="username_login", validators=[DataRequired()])
+    email = StringField("Email Address", id="email_login", validators=[DataRequired(), Email()])
     password = PasswordField("Password", id="pwd_login", validators=[DataRequired()])
 
 
