@@ -1,38 +1,43 @@
-'''
+"""
 CentraArchy Dashboard by wandored
-'''
+"""
 import json
 import requests
 import pandas as pd
 import numpy as np
 from flask import redirect, url_for, flash, session
 from dashapp.home import blueprint
+from dashapp.config import Config
 from datetime import datetime
 from sqlalchemy.engine.create import create_engine
-from dashapp import Config, db
-from dashapp.authentication.models import Calendar, Sales, Labor, Restaurants
+from dashapp.authentication.models import Calendar, Sales, Labor, Restaurants, db
 
 
-#def query_sales(start, end):
-#
-#    current_sales = sales_employee(start, end)
-##
-##    totals = current_sales.merge(lastYear, how='outer', on='name', sort=True)
-#
-#    return current_sales
-#
-#
-#def query_labor(start, end):
-#
-#    current_labor = labor_detail(start, end)
-#
-##    start_ly = get_lastyear(start)
-##    end_ly = get_lastyear(end)
-##    lastYear = labor_detail(start_ly, end_ly)
-##
-##    totals = current_labor.merge(lastYear, how='outer', on='name', sort=True)
-#
-#    return current_labor
+def refresh_data(start, end):
+        """
+        When new date submitted, the data for that date will be replaced with new data from R365
+        We check if there are infact sales for that day, if not, it resets to yesterday, if
+        there are sales, then labor is polled
+        """
+        # delete current days data from database and replace with fresh data
+        Sales.query.filter_by(date=start).delete()
+        db.session.commit()
+        baddates = sales_employee(start, end)
+        if baddates == 1:
+            return 1
+#            flash(
+#                f"I cannot find sales for the day you selected.  Please select another date!",
+#                "warning",
+#            )
+#            TODAY = datetime.date(datetime.now())
+#            YSTDAY = TODAY - timedelta(days=1)
+#            session["targetdate"] = YSTDAY.strftime("%Y-%m-%d")
+#            return redirect(url_for("home_blueprint.route_default"))
+
+        Labor.query.filter_by(date=start).delete()
+        db.session.commit()
+        labor_detail(start, end)
+        return 0
 
 
 def make_HTTP_request(url):
@@ -40,14 +45,12 @@ def make_HTTP_request(url):
     while True:
         if not url:
             break
-        r = requests.get(
-            url, auth=(Config.SRVC_USER, Config.SRVC_PSWRD)
-        )
+        r = requests.get(url, auth=(Config.SRVC_USER, Config.SRVC_PSWRD))
         if r.status_code == 200:
             json_data = json.loads(r.text)
-            all_records = all_records + json_data['value']
-            if '@odata.nextLink' in json_data:
-                url = json_data['@odata.nextLink']
+            all_records = all_records + json_data["value"]
+            if "@odata.nextLink" in json_data:
+                url = json_data["@odata.nextLink"]
             else:
                 break
     return all_records
@@ -68,15 +71,17 @@ def get_lastyear(date):
         period = i.period
         week = i.week
         day = i.day
-        ly_target = Calendar.query.filter_by(year=lst_year, period=period, week=week, day=day)
+        ly_target = Calendar.query.filter_by(
+            year=lst_year, period=period, week=week, day=day
+        )
         for x in ly_target:
             dt_date = x.date
     return dt_date
 
 
 def get_period(startdate):
-    #startdate = datetime.strptime(date, "%Y-%m-%d")
-    start = startdate.strftime('%Y-%m-%d')
+    # startdate = datetime.strptime(date, "%Y-%m-%d")
+    start = startdate.strftime("%Y-%m-%d")
     target = Calendar.query.filter_by(date=start)
 
     return target
@@ -84,9 +89,11 @@ def get_period(startdate):
 
 def sales_employee(start, end):
 
-    url_filter = '$filter=date ge {}T00:00:00Z and date le {}T00:00:00Z'.format(start, end)
-    query = '$select=dayPart,netSales,numberofGuests,location&{}'.format(url_filter)
-    url = '{}/SalesEmployee?{}'.format(Config.SRVC_ROOT, query)
+    url_filter = "$filter=date ge {}T00:00:00Z and date le {}T00:00:00Z".format(
+        start, end
+    )
+    query = "$select=dayPart,netSales,numberofGuests,location&{}".format(url_filter)
+    url = "{}/SalesEmployee?{}".format(Config.SRVC_ROOT, query)
     print(url)
     rqst = make_HTTP_request(url)
     df = make_dataframe(rqst)
@@ -94,29 +101,32 @@ def sales_employee(start, end):
         return 1
 
     data = db.session.query(Restaurants).all()
-    df_loc = pd.DataFrame([(x.name, x.location) for x in data],
-                          columns=['name', 'location'])
-    df_merge = df_loc.merge(df, on='location')
-    df_merge.rename(columns={'netSales': 'sales', 'numberofGuests': 'guests'}, inplace=True)
+    df_loc = pd.DataFrame(
+        [(x.name, x.location) for x in data], columns=["name", "location"]
+    )
+    df_merge = df_loc.merge(df, on="location")
+    df_merge.rename(
+        columns={"netSales": "sales", "dayPart": "daypart"}, inplace=True
+    )
 
     # pivot data and write to database
     df_pivot = df_merge.pivot_table(
-        index=['name',
-               'dayPart'],
-        values=['sales',
-                'guests'],
-        aggfunc=np.sum
+        index=["name", "daypart"], values=["sales"], aggfunc=np.sum
     )
-    df_pivot['date'] = start
-    df_pivot.to_sql('Sales', con=db.engine, if_exists='append')
+    df_pivot["date"] = start
+    df_pivot.to_sql("Sales", con=db.engine, if_exists="append")
     return 0
 
 
 def labor_detail(start, end):
 
-    url_filter = '$filter=dateWorked ge {}T00:00:00Z and dateWorked le {}T00:00:00Z'.format(start, end)
-    query = '$select=jobTitle,hours,total,location_ID&{}'.format(url_filter)
-    url = '{}/LaborDetail?{}'.format(Config.SRVC_ROOT, query)
+    url_filter = (
+        "$filter=dateWorked ge {}T00:00:00Z and dateWorked le {}T00:00:00Z".format(
+            start, end
+        )
+    )
+    query = "$select=jobTitle,hours,total,location_ID&{}".format(url_filter)
+    url = "{}/LaborDetail?{}".format(Config.SRVC_ROOT, query)
     print(url)
     rqst = make_HTTP_request(url)
     df = make_dataframe(rqst)
@@ -124,17 +134,14 @@ def labor_detail(start, end):
         return 1
 
     data = db.session.query(Restaurants).all()
-    df_loc = pd.DataFrame([(x.name, x.location) for x in data],
-                          columns=['name', 'location'])
-    df_merge = df_loc.merge(df, left_on='location', right_on='location_ID')
-    df_merge.rename(columns={'jobTitle': 'job', 'total': 'dollars'}, inplace=True)
-    df_pivot = df_merge.pivot_table(
-        index=['name',
-               'job'],
-        values=['hours',
-                'dollars'],
-        aggfunc=np.sum
+    df_loc = pd.DataFrame(
+        [(x.name, x.location) for x in data], columns=["name", "location"]
     )
-    df_pivot['date'] = start
-    df_pivot.to_sql('Labor', con=db.engine, if_exists='append')
+    df_merge = df_loc.merge(df, left_on="location", right_on="location_ID")
+    df_merge.rename(columns={"jobTitle": "job", "total": "dollars"}, inplace=True)
+    df_pivot = df_merge.pivot_table(
+        index=["name", "job"], values=["hours", "dollars"], aggfunc=np.sum
+    )
+    df_pivot["date"] = start
+    df_pivot.to_sql("Labor", con=db.engine, if_exists="append")
     return 0
