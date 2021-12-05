@@ -9,7 +9,7 @@ import pandas as pd
 from dashapp.home import blueprint
 from flask import flash, render_template, session, request, redirect, url_for
 from dashapp.home.util import get_period, get_lastyear, refresh_data, refresh_data
-from flask_security import login_required
+from flask_security import login_required, current_user
 from jinja2 import TemplateNotFound
 from datetime import datetime, timedelta
 from dashapp.authentication.forms import DateForm
@@ -76,10 +76,6 @@ def index(targetdate=None):
         end_day = day_end.strftime("%Y-%m-%d")
 
         baddates = refresh_data(start_day, end_day)
-#        # delete current days data from database and replace with fresh data
-#        Sales.query.filter_by(date=start_day).delete()
-#        db.session.commit()
-#        baddates = sales_employee(start_day, end_day)
         if baddates == 1:
             flash(
                 f"I cannot find sales for the day you selected.  Please select another date!",
@@ -89,17 +85,13 @@ def index(targetdate=None):
             YSTDAY = TODAY - timedelta(days=1)
             session["targetdate"] = YSTDAY.strftime("%Y-%m-%d")
             return redirect(url_for("home_blueprint.route_default"))
-#
-#        Labor.query.filter_by(date=start_day).delete()
-#        db.session.commit()
-#        labor_detail(start_day, end_day)
 
         session["targetdate"] = start_day
         return redirect(url_for("home_blueprint.index"))
 
     # Daily Chart
     daily_chart = (
-        db.session.query(Sales, func.sum(Sales.sales).label("total_sales"))
+        db.session.query(func.sum(Sales.sales).label("total_sales"))
         .filter(Sales.date >= start_week, Sales.date <= end_week)
         .group_by(Sales.date)
         .order_by(Sales.date)
@@ -109,7 +101,7 @@ def index(targetdate=None):
         values1.append(v.total_sales)
 
     daily_chart_ly = (
-        db.session.query(Sales, func.sum(Sales.sales).label("total_sales"))
+        db.session.query(func.sum(Sales.sales).label("total_sales"))
         .filter(Sales.date >= start_week_ly, Sales.date <= end_week_ly)
         .group_by(Sales.date)
         .order_by(Sales.date)
@@ -120,10 +112,11 @@ def index(targetdate=None):
 
     # Weekly Chart
     weekly_chart = (
-        db.session.query(Sales, func.sum(Sales.sales).label("total_sales"))
+        db.session.query(func.sum(Sales.sales).label("total_sales"))
         .select_from(Sales)
         .join(Calendar, Calendar.date == Sales.date)
         .group_by(Calendar.week)
+        .order_by(Calendar.week)
         .filter(Sales.date >= start_period, Sales.date <= end_period)
     )
     values2 = []
@@ -131,10 +124,11 @@ def index(targetdate=None):
         values2.append(v.total_sales)
 
     weekly_chart_ly = (
-        db.session.query(Sales, func.sum(Sales.sales).label("total_sales"))
+        db.session.query(func.sum(Sales.sales).label("total_sales"))
         .select_from(Sales)
         .join(Calendar, Calendar.date == Sales.date)
         .group_by(Calendar.week)
+        .order_by(Calendar.week)
         .filter(Sales.date >= start_period_ly, Sales.date <= end_period_ly)
     )
     values2_ly = []
@@ -143,10 +137,11 @@ def index(targetdate=None):
 
     # Yearly Chart
     period_chart = (
-        db.session.query(Sales, func.sum(Sales.sales).label("total_sales"))
+        db.session.query(func.sum(Sales.sales).label("total_sales"))
         .select_from(Sales)
         .join(Calendar, Calendar.date == Sales.date)
         .group_by(Calendar.period)
+        .order_by(Calendar.period)
         .filter(Sales.date >= start_year, Sales.date <= end_year)
     )
     values3 = []
@@ -154,10 +149,11 @@ def index(targetdate=None):
         values3.append(v.total_sales)
 
     period_chart_ly = (
-        db.session.query(Sales, func.sum(Sales.sales).label("total_sales"))
+        db.session.query(func.sum(Sales.sales).label("total_sales"))
         .select_from(Sales)
         .join(Calendar, Calendar.date == Sales.date)
         .group_by(Calendar.period)
+        .order_by(Calendar.period)
         .filter(Sales.date >= start_year_ly, Sales.date <= end_year_ly)
     )
     values3_ly = []
@@ -168,8 +164,7 @@ def index(targetdate=None):
     sales_day = (
         db.session.query(
             Sales.name,
-            func.sum(Sales.sales).label("total_sales"),
-            func.sum(Sales.guests).label("total_guests"),
+            func.sum(Sales.sales).label("total_sales")
         )
         .filter(Sales.date == start_day)
         .group_by(Sales.name)
@@ -179,8 +174,7 @@ def index(targetdate=None):
     sales_day_ly = (
         db.session.query(
             Sales.name,
-            func.sum(Sales.sales).label("total_sales_ly"),
-            func.sum(Sales.guests).label("total_guests_ly"),
+            func.sum(Sales.sales).label("total_sales_ly")
         )
         .filter(Sales.date == start_day_ly)
         .group_by(Sales.name)
@@ -188,10 +182,10 @@ def index(targetdate=None):
     )
 
     df_sales_day = pd.DataFrame.from_records(
-        sales_day, columns=["name", "sales", "guests"]
+        sales_day, columns=["name", "sales"]
     )
     df_sales_day_ly = pd.DataFrame.from_records(
-        sales_day_ly, columns=["name", "sales_ly", "guests_ly"]
+        sales_day_ly, columns=["name", "sales_ly"]
     )
     sales_table = df_sales_day.merge(df_sales_day_ly, how="outer", sort=True)
 
@@ -244,8 +238,7 @@ def index(targetdate=None):
     sales_week = (
         db.session.query(
             Sales.name,
-            func.sum(Sales.sales).label("total_sales"),
-            func.sum(Sales.guests).label("total_guests"),
+            func.sum(Sales.sales).label("total_sales")
         )
         .filter(Sales.date >= start_week, Sales.date <= end_week)
         .group_by(Sales.name)
@@ -255,8 +248,7 @@ def index(targetdate=None):
     sales_week_ly = (
         db.session.query(
             Sales.name,
-            func.sum(Sales.sales).label("total_sales_ly"),
-            func.sum(Sales.guests).label("total_guests_ly"),
+            func.sum(Sales.sales).label("total_sales_ly")
         )
         .filter(
             Sales.date >= start_week_ly,
@@ -267,10 +259,10 @@ def index(targetdate=None):
     )
 
     df_sales_week = pd.DataFrame.from_records(
-        sales_week, columns=["name", "sales", "guests"]
+        sales_week, columns=["name", "sales"]
     )
     df_sales_week_ly = pd.DataFrame.from_records(
-        sales_week_ly, columns=["name", "sales_ly", "guests_ly"]
+        sales_week_ly, columns=["name", "sales_ly"]
     )
     sales_table_wk = df_sales_week.merge(df_sales_week_ly, how="outer", sort=True)
 
@@ -323,8 +315,7 @@ def index(targetdate=None):
     sales_period = (
         db.session.query(
             Sales.name,
-            func.sum(Sales.sales).label("total_sales"),
-            func.sum(Sales.guests).label("total_guests"),
+            func.sum(Sales.sales).label("total_sales")
         )
         .filter(Sales.date >= start_period, Sales.date <= end_period)
         .group_by(Sales.name)
@@ -334,8 +325,7 @@ def index(targetdate=None):
     sales_period_ly = (
         db.session.query(
             Sales.name,
-            func.sum(Sales.sales).label("total_sales_ly"),
-            func.sum(Sales.guests).label("total_guests_ly"),
+            func.sum(Sales.sales).label("total_sales_ly")
         )
         .filter(Sales.date >= start_period_ly, Sales.date <= period_to_date)
         .group_by(Sales.name)
@@ -343,10 +333,10 @@ def index(targetdate=None):
     )
 
     df_sales_period = pd.DataFrame.from_records(
-        sales_period, columns=["name", "sales", "guests"]
+        sales_period, columns=["name", "sales"]
     )
     df_sales_period_ly = pd.DataFrame.from_records(
-        sales_period_ly, columns=["name", "sales_ly", "guests_ly"]
+        sales_period_ly, columns=["name", "sales_ly"]
     )
     sales_table_pd = df_sales_period.merge(df_sales_period_ly, how="outer", sort=True)
 
@@ -399,8 +389,7 @@ def index(targetdate=None):
     sales_yearly = (
         db.session.query(
             Sales.name,
-            func.sum(Sales.sales).label("total_sales"),
-            func.sum(Sales.guests).label("total_guests"),
+            func.sum(Sales.sales).label("total_sales")
         )
         .filter(Sales.date >= start_year, Sales.date <= end_year)
         .group_by(Sales.name)
@@ -410,8 +399,7 @@ def index(targetdate=None):
     sales_yearly_ly = (
         db.session.query(
             Sales.name,
-            func.sum(Sales.sales).label("total_sales_ly"),
-            func.sum(Sales.guests).label("total_guests_ly"),
+            func.sum(Sales.sales).label("total_sales_ly")
         )
         .filter(Sales.date >= start_year_ly, Sales.date <= year_to_date)
         .group_by(Sales.name)
@@ -419,10 +407,10 @@ def index(targetdate=None):
     )
 
     df_sales_yearly = pd.DataFrame.from_records(
-        sales_yearly, columns=["name", "sales", "guests"]
+        sales_yearly, columns=["name", "sales"]
     )
     df_sales_yearly_ly = pd.DataFrame.from_records(
-        sales_yearly_ly, columns=["name", "sales_ly", "guests_ly"]
+        sales_yearly_ly, columns=["name", "sales_ly"]
     )
     sales_table_yr = df_sales_yearly.merge(df_sales_yearly_ly, how="outer", sort=True)
 
@@ -477,6 +465,8 @@ def index(targetdate=None):
         "home/index.html",
         form=form,
         segment="index",
+        current_user=current_user,
+        roles=current_user.roles,
         fiscal_dates=fiscal_dates,
         values1=values1,
         values2=values2,
@@ -501,39 +491,39 @@ def index(targetdate=None):
     )
 
 
-@blueprint.route("/<template>")
-@login_required
-def route_template(template):
-
-    try:
-
-        if not template.endswith(".html"):
-            template += ".html"
-
-        # Detect the current page
-        segment = get_segment(request)
-
-        # Serve the file (if exists) from app/templates/home/FILE.html
-        return render_template("home/" + template, segment=segment)
-
-    except TemplateNotFound:
-        return render_template("home/page-404.html"), 404
-
-    except:
-        return render_template("home/page-500.html"), 500
-
-
-# Helper - Extract current page name from request
-def get_segment(request):
-
-    try:
-
-        segment = request.path.split("/")[-1]
-
-        if segment == "":
-            segment = "index"
-
-        return segment
-
-    except:
-        return None
+#@blueprint.route("/<template>")
+#@login_required
+#def route_template(template):
+#
+#    try:
+#
+#        if not template.endswith(".html"):
+#            template += ".html"
+#
+#        # Detect the current page
+#        segment = get_segment(request)
+#
+#        # Serve the file (if exists) from app/templates/home/FILE.html
+#        return render_template("home/" + template, segment=segment)
+#
+#    except TemplateNotFound:
+#        return render_template("home/page-404.html"), 404
+#
+#    except:
+#        return render_template("home/page-500.html"), 500
+#
+#
+## Helper - Extract current page name from request
+#def get_segment(request):
+#
+#    try:
+#
+#        segment = request.path.split("/")[-1]
+#
+#        if segment == "":
+#            segment = "index"
+#
+#        return segment
+#
+#    except:
+#        return None

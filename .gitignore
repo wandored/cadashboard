@@ -1,11 +1,7 @@
 dashapp/*.db
 *.sql
-*.csv
-test*
 /output
-vetdiscount.py
-laborBuilder.py
-salesBuilder.py
+/scripts
 
 
 # Byte-compiled / optimized / DLL files

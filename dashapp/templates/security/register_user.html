@@ -20,7 +20,7 @@
               <div class="card card-plain">
                 <div class="card-header">
                   <h4 class="font-weight-bolder">
-                    CentraArchy RMC
+                    CentraArchy
                   </h4>
                   <p class="mb-0">
                     {% if msg %}
@@ -41,7 +41,6 @@
                       {% if register_user_form.password_confirm %}
                         {{ render_field_with_errors(register_user_form.password_confirm,class_="form-control", placeholder="Confirm Password") }}
                       {% endif %}
-                      {{ render_field(register_user_form.submit,class="btn btn-lg btn-secondary btn-block") }}
                     </div>
                     <div class="text-center">
                       {{ render_field(register_user_form.next) }}

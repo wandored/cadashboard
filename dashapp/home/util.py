@@ -106,12 +106,12 @@ def sales_employee(start, end):
     )
     df_merge = df_loc.merge(df, on="location")
     df_merge.rename(
-        columns={"netSales": "sales", "numberofGuests": "guests"}, inplace=True
+        columns={"netSales": "sales", "dayPart": "daypart"}, inplace=True
     )
 
     # pivot data and write to database
     df_pivot = df_merge.pivot_table(
-        index=["name", "dayPart"], values=["sales", "guests"], aggfunc=np.sum
+        index=["name", "daypart"], values=["sales"], aggfunc=np.sum
     )
     df_pivot["date"] = start
     df_pivot.to_sql("Sales", con=db.engine, if_exists="append")

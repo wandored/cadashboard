@@ -175,7 +175,6 @@ class Sales(db.Model):
     daypart = db.Column(db.String(64))
     name = db.Column(db.String(64))
     sales = db.Column(db.Integer)
-    guests = db.Column(db.Integer)
 
 
 class Labor(db.Model):

@@ -203,8 +203,6 @@
                       <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Restaurant</th>
                       <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Sales</th>
                       <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Sales SPLY</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Guest Count</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Guest SPLY</th>
                       <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor $</th>
                       <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor SPLY</th>
                     </tr>
@@ -238,28 +236,6 @@
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex flex-column justify-content-right">
                             <h6 class="mb-0 text-sm">{{ "${:,.0f}".format(v.sales_ly) }}</h6>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        {% if v.guests >= v.guests_ly %}
-                        <div class="d-flex px-2 py-1">
-                          <div class="d-flex flex-column justify-content-right">
-                            <h6 class="mb-0 text-sm"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i> {{ "{:,.0f}".format(v.guests) }}</h6>
-                          </div>
-                        </div>
-                        {% else %}
-                        <div class="d-flex px-2 py-1">
-                          <div class="d-flex flex-column justify-content-right">
-                            <h6 class="mb-0 text-sm"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i> {{ "{:,.0f}".format(v.guests) }}</h6>
-                          </div>
-                        </div>
-                        {% endif %}
-                      </td>
-                      <td>
-                        <div class="d-flex px-2 py-1">
-                          <div class="d-flex flex-column justify-content-right">
-                            <h6 class="mb-0 text-sm">{{ v.guests_ly|int }}</h6>
                           </div>
                         </div>
                       </td>
