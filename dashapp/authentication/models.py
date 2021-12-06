@@ -56,7 +56,7 @@ class Users(db.Model, UserMixin):
     email = db.Column(db.String(255), unique=True)
     password = db.Column(db.String(255))
     active = db.Column(db.Boolean())
-    confirmed_at = db.Column(db.DateTime())
+    fs_uniquifier = db.Column(db.String(64), unique=True)
     roles = db.relationship('Roles',
                             secondary=roles_users,
                             backref='users', lazy='dynamic')
