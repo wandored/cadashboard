@@ -58,7 +58,17 @@ def index(targetdate=None):
 
     # Check for no sales
     if not Sales.query.filter_by(date=start_day).first():
-        refresh_data(start_day, end_day)
+        baddates = refresh_data(start_day, end_day)
+        if baddates == 1 and start_day == session['targetdate']:
+            flash(
+                f"Sales have not pulled for yesterday yet.  Please try again later or change the date!",
+                "warning",
+            )
+            TODAY = datetime.date(datetime.now())
+            YSTDAY = TODAY - timedelta(days=2)
+            session["targetdate"] = YSTDAY.strftime("%Y-%m-%d")
+            return redirect(url_for("home_blueprint.index"))
+
         session["targetdate"] = start_day
         return redirect(url_for("home_blueprint.index"))
 
@@ -85,6 +95,7 @@ def index(targetdate=None):
             YSTDAY = TODAY - timedelta(days=1)
             session["targetdate"] = YSTDAY.strftime("%Y-%m-%d")
             return redirect(url_for("home_blueprint.route_default"))
+
 
         session["targetdate"] = start_day
         return redirect(url_for("home_blueprint.index"))
@@ -489,6 +500,17 @@ def index(targetdate=None):
         pd_top_sales=pd_top_sales,
         pd_avg_sales=pd_avg_sales,
     )
+
+
+#@blueprint.route("/<str:store_name>/store", methods=["GET", "POST"])
+#@login_required
+#def store(store_name)
+#
+#
+#    return render_template(
+#        "home/stores.html"
+#    )
+
 
 
 #@blueprint.route("/<template>")
