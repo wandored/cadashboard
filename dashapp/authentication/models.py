@@ -144,6 +144,9 @@ class Restaurants(db.Model):
     location = db.Column(db.String(64), unique=True)
     name = db.Column(db.String(64), unique=True)
 
+    def as_dict(self):
+        return {'id': self.id, 'name': self.name, 'location': self.location}
+
 
 class Calendar(db.Model):
 
@@ -164,6 +167,9 @@ class Calendar(db.Model):
     year_end = db.Column(db.String(64))
     dow = db.Column(db.Integer)
     day = db.Column(db.String(64))
+
+    def as_dict(self):
+        return {'date': self.date, 'week': self.week, 'period': self.period, 'quarter': self.quarter, 'year': self.year, 'dow': self.dow, 'day': self.day}
 
 
 class Sales(db.Model):
