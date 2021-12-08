@@ -1,13 +1,14 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} Dashboard {% endblock %} 
+{% block title %} {{ store_name }} {% endblock %} 
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}{% endblock stylesheets %}
 
 {% block content %}
 
-    <div class="container-fluid py-4">
+  <div class="container-fluid py-4">
+
       <div class="row">
         <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
           <div class="card">
@@ -178,7 +179,7 @@
               <div class="row">
                 {% for x in fiscal_dates %}
                 <div class="col-lg-6 col-7">
-                  <h6>Daily Sales - {{ x.day }}, {{ x.date }}</h6>
+                  <h6>Period - {{ x.period }}, {{ x.year }}</h6>
                 </div>
                 {% endfor %}
                 <div class="col-lg-6 col-5 my-auto text-end">
@@ -198,95 +199,94 @@
             <div class="card-body px-0 pb-2">
               <div class="table-responsive">
                 <table class="table align-items-center mb-0">
+                  {% for x in fiscal_dates %}
                   <thead>
                     <tr>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Restaurant</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Sales</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Sales SPLY</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Guest Count</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">SPLY</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor %</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor SPLY</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Week</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Wedensday</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Thursday</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Friday</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Saturday</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Sunday</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Monday</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tuesday</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Total</th>
                     </tr>
                   </thead>
+                  {% endfor %}
                   <tbody>
-                    {% for k, v in daily_table.iterrows() %}
                     <tr> 
                       <td>
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex flex-column justify-content-left">
-                            <a class="me-2" href="{{ url_for('home_blueprint.store', store_id=v.id) }}"><h6 class="mb-0 text-sm">{{ v.name }}</h6></a>
+                            <h6 class="mb-0 text-sm">Week 1</h6>
                           </div>
                         </div>
                       </td>
-                      <td>
-                        {% if v.sales >= v.sales_ly %}
-                        <div class="d-flex px-2 py-1">
-                          <div class="d-flex flex-column justify-content-right">
-                            <h6 class="mb-0 text-sm"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i> {{ "${:,.0f}".format(v.sales) }}</h6>
-                          </div>
-                        </div>
-                        {% else %}
-                        <div class="d-flex px-2 py-1">
-                          <div class="d-flex flex-column justify-content-right">
-                            <h6 class="mb-0 text-sm"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i> {{ "${:,.0f}".format(v.sales) }}</h6>
-                          </div>
-                        </div>
-                        {% endif %}
-                      </td>
+                    {% for k, v in period_table_w1.iterrows() %}
                       <td>
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex flex-column justify-content-right">
-                            <h6 class="mb-0 text-sm">{{ "${:,.0f}".format(v.sales_ly) }}</h6>
+                            <h6 class="mb-0 text-sm">{{ "${:,.0f}".format(v.sales) }}</h6>
                           </div>
                         </div>
                       </td>
-                      <td>
-                        {% if v.sales >= v.sales_ly %}
-                        <div class="d-flex px-2 py-1">
-                          <div class="d-flex flex-column justify-content-right">
-                            <h6 class="mb-0 text-sm"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i> 0</h6>
-                          </div>
-                        </div>
-                        {% else %}
-                        <div class="d-flex px-2 py-1">
-                          <div class="d-flex flex-column justify-content-right">
-                            <h6 class="mb-0 text-sm"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>0</h6>
-                          </div>
-                        </div>
-                        {% endif %}
-                      </td>
-                      <td>
-                        <div class="d-flex px-2 py-1">
-                          <div class="d-flex flex-column justify-content-right">
-                            <h6 class="mb-0 text-sm">0</h6>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        {% if v.labor_pct <= v.labor_pct_ly %}
-                        <div class="d-flex px-2 py-1">
-                          <div class="d-flex flex-column justify-content-right">
-                            <h6 class="mb-0 text-sm"><i class="fa fa-arrow-down text-success" aria-hidden="true"></i> {{ "%{:,.1f}".format(v.labor_pct*100) }}</h6>
-                          </div>
-                        </div>
-                        {% else %}
-                        <div class="d-flex px-2 py-1">
-                          <div class="d-flex flex-column justify-content-right">
-                            <h6 class="mb-0 text-sm"><i class="fa fa-arrow-up text-danger" aria-hidden="true"></i> {{ "%{:,.1f}".format(v.labor_pct*100) }}</h6>
-                          </div>
-                        </div>
-                        {% endif %}
-                      </td>
-                      <td>
-                        <div class="d-flex px-2 py-1">
-                          <div class="d-flex flex-column justify-content-right">
-                            <h6 class="mb-0 text-sm">{{ "%{:,.1f}".format(v.labor_pct_ly*100) }}</h6>
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
                     {% endfor %}
+                    </tr>
+                    <tr> 
+                      <td>
+                        <div class="d-flex px-2 py-1">
+                          <div class="d-flex flex-column justify-content-left">
+                            <h6 class="mb-0 text-sm">Week 2</h6>
+                          </div>
+                        </div>
+                      </td>
+                    {% for k, v in period_table_w2.iterrows() %}
+                      <td>
+                        <div class="d-flex px-2 py-1">
+                          <div class="d-flex flex-column justify-content-right">
+                            <h6 class="mb-0 text-sm">{{ "${:,.0f}".format(v.sales) }}</h6>
+                          </div>
+                        </div>
+                      </td>
+                    {% endfor %}
+                    </tr>
+                    <tr> 
+                      <td>
+                        <div class="d-flex px-2 py-1">
+                          <div class="d-flex flex-column justify-content-left">
+                            <h6 class="mb-0 text-sm">Week 3</h6>
+                          </div>
+                        </div>
+                      </td>
+                    {% for k, v in period_table_w3.iterrows() %}
+                      <td>
+                        <div class="d-flex px-2 py-1">
+                          <div class="d-flex flex-column justify-content-right">
+                            <h6 class="mb-0 text-sm">{{ "${:,.0f}".format(v.sales) }}</h6>
+                          </div>
+                        </div>
+                      </td>
+                    {% endfor %}
+                    </tr>
+                    <tr> 
+                      <td>
+                        <div class="d-flex px-2 py-1">
+                          <div class="d-flex flex-column justify-content-left">
+                            <h6 class="mb-0 text-sm">Week 4</h6>
+                          </div>
+                        </div>
+                      </td>
+                    {% for k, v in period_table_w4.iterrows() %}
+                      <td>
+                        <div class="d-flex px-2 py-1">
+                          <div class="d-flex flex-column justify-content-right">
+                            <h6 class="mb-0 text-sm">{{ "${:,.0f}".format(v.sales) }}</h6>
+                          </div>
+                        </div>
+                      </td>
+                    {% endfor %}
+                    </tr>
                   </tbody>
                 </table>
               </div>
@@ -302,21 +302,11 @@
                 <span class="font-weight-bold">Top 5 List</span>
               </p>
             </div>
-            <div class="alert alert-info" role="alert">
-              <legend class="text-dark mb-1">Daily Sales Over LY</legend>
-              <div class="card card-light mb-1" role="card">
-                {% for i, v in dy_top_sales.items() %}
-                <p class="mb-0 ms-1">{{ i }} - {{ "${:,.0f}".format(v) }}</p>
-                {% endfor %}
-              </div>
+            <div class="alert alert-primary" role="alert">
             </div>
             <div class="alert alert-success" role="alert">
-              <legend class="text-dark mb-1">Daily Percent Increase Over LY</legend>
-              <div class="card card-light mb-1" role="card">
-                {% for i, v in dy_avg_sales.items() %}
-                <p class="mb-0 ms-1">{{ i }} - {{ "%{:,.0f}".format(v) }}</p>
-                {% endfor %}
-              </div>
+            </div>
+            <div class="alert alert-info" role="alert">
             </div>
             <div class="card-body p-3">
             </div>
@@ -324,8 +314,9 @@
         </div>
       </div>
 
-      {% include 'includes/footer.html' %}
-    </div>
+    {% include 'includes/footer.html' %}
+
+  </div>
 
 {% endblock content %}
 
@@ -400,10 +391,6 @@
                 lineHeight: 2
               },
               color: "#fff",
-              // Abbreviate the millions
-              callback: function(value, index, values) {
-                return value / 1e3 + ' T';
-              },
             },
           },
           x: {
@@ -503,10 +490,6 @@
                 style: 'normal',
                 lineHeight: 2
               },
-              // Abbreviate the millions
-              callback: function(value, index, values) {
-                return value / 1e6 + ' M';
-              },
             }
           },
           x: {
@@ -604,7 +587,7 @@
               },
               // Abbreviate the millions
               callback: function(value, index, values) {
-                return value / 1e6 + ' M';
+                return value / 1e3 + ' T';
               },
             },
           },

@@ -86,7 +86,7 @@ security = Security()
 class UserAdmin(sqla.ModelView):
 
     # Don't display the password on the list of Users
-    column_exclude_list = ('password',)
+    column_exclude_list = ('password', 'fs_uniquifier')
 
     # Don't include the standard password field when creating or editing a User (but see below)
     form_excluded_columns = ('password',)
@@ -113,14 +113,14 @@ class UserAdmin(sqla.ModelView):
 
     # This callback executes when the user saves changes to a newly-created or edited User -- before the changes are
     # committed to the database.
-    def on_model_change(self, form, model, is_created):
-
-        # If the password field isn't blank...
-        if len(model.password2):
-
-            # ... then encrypt the new password prior to storing it in the database. If the password field is blank,
-            # the existing password in the database will be retained.
-            model.password = hash_pass(model.password2)
+#    def on_model_change(self, form, model, is_created):
+#
+#        # If the password field isn't blank...
+#        if len(model.password2):
+#
+#            # ... then encrypt the new password prior to storing it in the database. If the password field is blank,
+#            # the existing password in the database will be retained.
+#            model.password = hash_pass(model.password2)
 
 
 # Customized Role model for SQL-Admin
@@ -144,6 +144,9 @@ class Restaurants(db.Model):
     location = db.Column(db.String(64), unique=True)
     name = db.Column(db.String(64), unique=True)
 
+    def as_dict(self):
+        return {'id': self.id, 'name': self.name, 'location': self.location}
+
 
 class Calendar(db.Model):
 
@@ -164,6 +167,9 @@ class Calendar(db.Model):
     year_end = db.Column(db.String(64))
     dow = db.Column(db.Integer)
     day = db.Column(db.String(64))
+
+    def as_dict(self):
+        return {'date': self.date, 'week': self.week, 'period': self.period, 'quarter': self.quarter, 'year': self.year, 'dow': self.dow, 'day': self.day}
 
 
 class Sales(db.Model):
