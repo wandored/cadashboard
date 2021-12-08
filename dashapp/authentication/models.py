@@ -59,7 +59,7 @@ class Users(db.Model, UserMixin):
     fs_uniquifier = db.Column(db.String(64), unique=True)
     roles = db.relationship('Roles',
                             secondary=roles_users,
-                            backref='users', lazy='select')
+                            backref='users')
 
 #    def __init__(self, **kwargs):
 #        for property, value in kwargs.items():

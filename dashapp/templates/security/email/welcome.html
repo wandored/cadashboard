@@ -1,13 +1,13 @@
-<h4>CentraArchy Support</h4>
 <p>{{ _('Welcome %(email)s!', email=user.email) }}</p>
 
 <p>You have been registered for the CentraArchy Dashboard.  Use the link below to sign in.</p>
 
 <p> "http://172.105.134.90/" </p>
 
-<h4> This email is intended for employees of CentraArchy RMC only</h4>
+<h6> This email is intended for employees of CentraArchy RMC only</h6>
 {% if security.confirmable %}
 <p>{{ _('You can confirm your email through the link below:') }}</p>
 
 <p><a href="{{ confirmation_link }}">{{ _('Confirm my account') }}</a></p>
+<h4>CentraArchy Support</h4>
 {% endif %}
