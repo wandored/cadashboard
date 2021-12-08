@@ -35,7 +35,6 @@ def index(targetdate=None):
         day_start = datetime.strptime(i.date, "%Y-%m-%d")
         day_end = day_start + timedelta(days=1)
         end_day = day_end.strftime("%Y-%m-%d")
-
         start_day = i.date
         start_week = i.week_start
         end_week = i.week_end
@@ -250,6 +249,8 @@ def index(targetdate=None):
     dy_avg_sales = dy_sales_avg.nlargest(5)
 
     daily_table.loc["TOTALS"] = daily_table.sum()
+    daily_table['labor_pct'] = daily_table.dollars / daily_table.sales
+    daily_table['labor_pct_ly'] = daily_table.dollars_ly / daily_table.sales_ly
     daily_totals = daily_table.loc["TOTALS"]
 
     # Weekly Sales Table
@@ -258,7 +259,8 @@ def index(targetdate=None):
             Sales.name,
             func.sum(Sales.sales).label("total_sales")
         )
-        .filter(Sales.date >= start_week, Sales.date <= end_week)
+        .filter(Sales.date >= start_week,
+                Sales.date <= end_week)
         .group_by(Sales.name)
         .all()
     )
@@ -327,6 +329,8 @@ def index(targetdate=None):
     wk_avg_sales = wk_sales_avg.nlargest(5)
 
     weekly_table.loc["TOTALS"] = weekly_table.sum()
+    weekly_table['labor_pct'] = weekly_table.dollars / weekly_table.sales
+    weekly_table['labor_pct_ly'] = weekly_table.dollars_ly / weekly_table.sales_ly
     weekly_totals = weekly_table.loc["TOTALS"]
 
     # Period Sales Table
@@ -401,7 +405,10 @@ def index(targetdate=None):
     pd_avg_sales = pd_sales_avg.nlargest(5)
 
     period_table.loc["TOTALS"] = period_table.sum()
+    period_table['labor_pct'] = period_table.dollars / period_table.sales
+    period_table['labor_pct_ly'] = period_table.dollars_ly / period_table.sales_ly
     period_totals = period_table.loc["TOTALS"]
+
 
     # Yearly Sales Table
     sales_yearly = (
@@ -475,12 +482,15 @@ def index(targetdate=None):
     yr_avg_sales = yr_sales_avg.nlargest(5)
 
     yearly_table.loc["TOTALS"] = yearly_table.sum()
+    yearly_table['labor_pct'] = yearly_table.dollars / yearly_table.sales
+    yearly_table['labor_pct_ly'] = yearly_table.dollars_ly / yearly_table.sales_ly
     yearly_totals = yearly_table.loc["TOTALS"]
 
     # Scorecard
 
     return render_template(
         "home/index.html",
+        title='CentraArchy',
         form=form,
         segment="index",
         current_user=current_user,
@@ -541,6 +551,34 @@ def store(store_id):
     start_year_ly = get_lastyear(start_year)
     end_year_ly = get_lastyear(end_year)
     year_to_date = get_lastyear(start_day)
+
+
+    # Get Data
+    form = DateForm()
+    if form.validate_on_submit():
+        """
+        When new date submitted, the data for that date will be replaced with new data from R365
+        We check if there are infact sales for that day, if not, it resets to yesterday, if
+        there are sales, then labor is polled
+        """
+        start_day = form.selectdate.data.strftime("%Y-%m-%d")
+        day_end = form.selectdate.data + timedelta(days=1)
+        end_day = day_end.strftime("%Y-%m-%d")
+
+        baddates = refresh_data(start_day, end_day)
+        if baddates == 1:
+            flash(
+                f"I cannot find sales for the day you selected.  Please select another date!",
+                "warning",
+            )
+            TODAY = datetime.date(datetime.now())
+            YSTDAY = TODAY - timedelta(days=1)
+            session["targetdate"] = YSTDAY.strftime("%Y-%m-%d")
+            return redirect(url_for("home_blueprint.route_default"))
+
+
+        session["targetdate"] = start_day
+        return redirect(url_for("home_blueprint.store", store_id=store.id))
 
 
     # Daily Chart
@@ -700,6 +738,25 @@ def store(store_id):
 
     daily_table.set_index("name", inplace=True)
 
+    if daily_table.sales.empty:
+        print('table empty')
+
+        baddates = refresh_data(start_day, end_day)
+        if baddates == 1 and start_day == session['targetdate']:
+            flash(
+                f"Sales have not pulled for yesterday yet.  Please try again later or change the date!",
+                "warning",
+            )
+            TODAY = datetime.date(datetime.now())
+            YSTDAY = TODAY - timedelta(days=2)
+            session["targetdate"] = YSTDAY.strftime("%Y-%m-%d")
+            return redirect(url_for("home_blueprint.index"))
+
+        session["targetdate"] = start_day
+        return redirect(url_for("home_blueprint.index"))
+
+    daily_table['labor_pct'] = daily_table.dollars / daily_table.sales
+    daily_table['labor_pct_ly'] = daily_table.dollars_ly / daily_table.sales_ly
     daily_table.loc["TOTALS"] = daily_table.sum()
     daily_totals = daily_table.loc["TOTALS"]
 
@@ -729,7 +786,7 @@ def store(store_id):
         )
         .filter(
             Sales.date >= start_week_ly,
-            Sales.date <= end_week_ly,
+            Sales.date <= week_to_date,
             Sales.name == store.name
         )
         .group_by(Sales.date)
@@ -743,7 +800,7 @@ def store(store_id):
         sales_week_ly, columns=["date", "sales_ly"]
     )
     sales_table_ty = df_sales_week.merge(dates, how="outer", sort=True)
-    sales_table_ly = df_sales_week_ly.merge(dates_ly, how="left")
+    sales_table_ly = df_sales_week_ly.merge(dates_ly, how="outer")
     sales_table_wk = sales_table_ty.merge(sales_table_ly, on=['day', 'week', 'period'])
     sales_table_wk.drop(columns=['date_y', 'quarter_y', 'year_y', 'dow_y'], inplace=True)
 
@@ -768,7 +825,7 @@ def store(store_id):
             func.sum(Labor.dollars).label("total_dollars_ly"),
         )
         .filter(Labor.date >= start_week_ly,
-                Labor.date <= end_week_ly,
+                Labor.date <= week_to_date,
                 Labor.name == store.name
                 )
         .group_by(Labor.date)
@@ -782,7 +839,7 @@ def store(store_id):
         labor_week_ly, columns=["day", "hours_ly", "dollars_ly"]
     )
     labor_table_ty = df_labor_week.merge(dates, how="outer", sort=True)
-    labor_table_ly = df_labor_week_ly.merge(dates_ly, how="left")
+    labor_table_ly = df_labor_week_ly.merge(dates_ly, how="outer")
     labor_table_wk = labor_table_ty.merge(labor_table_ly, on=['day', 'week', 'period'])
     labor_table_wk.drop(columns=['date_y', 'quarter_y', 'year_y', 'dow_y'], inplace=True)
 
@@ -791,6 +848,8 @@ def store(store_id):
 
     # Grab top sales over last year before we add totals
     weekly_table.loc["TOTALS"] = weekly_table.sum()
+    weekly_table['labor_pct'] = weekly_table.dollars / weekly_table.sales
+    weekly_table['labor_pct_ly'] = weekly_table.dollars_ly / weekly_table.sales_ly
     weekly_totals = weekly_table.loc["TOTALS"]
 
 
@@ -819,7 +878,7 @@ def store(store_id):
         )
         .filter(
             Sales.date >= start_period_ly,
-            Sales.date <= end_period_ly,
+            Sales.date <= period_to_date,
             Sales.name == store.name
         )
         .group_by(Sales.date)
@@ -833,7 +892,7 @@ def store(store_id):
         sales_period_ly, columns=["date", "sales_ly"]
     )
     sales_table_ty = df_sales_period.merge(dates, how="outer", sort=True)
-    sales_table_ly = df_sales_period_ly.merge(dates_ly, how="left")
+    sales_table_ly = df_sales_period_ly.merge(dates_ly, how="outer")
     sales_table_yr = sales_table_ty.merge(sales_table_ly, on=['day', 'week', 'period'])
     sales_table_yr.drop(columns=['date_y', 'quarter_y', 'year_y', 'dow_y'], inplace=True)
 
@@ -858,7 +917,7 @@ def store(store_id):
             func.sum(Labor.dollars).label("total_dollars_ly"),
         )
         .filter(Labor.date >= start_period_ly,
-                Labor.date <= end_period_ly,
+                Labor.date <= period_to_date,
                 Labor.name == store.name
                 )
         .group_by(Labor.date)
@@ -872,14 +931,24 @@ def store(store_id):
         labor_period_ly, columns=["day", "hours_ly", "dollars_ly"]
     )
     labor_table_ty = df_labor_period.merge(dates, how="outer", sort=True)
-    labor_table_ly = df_labor_period_ly.merge(dates_ly, how="left")
+    labor_table_ly = df_labor_period_ly.merge(dates_ly, how="outer")
     labor_table_yr = labor_table_ty.merge(labor_table_ly, on=['day', 'week', 'period'])
     labor_table_yr.drop(columns=['date_y', 'quarter_y', 'year_y', 'dow_y'], inplace=True)
 
     period_table = sales_table_yr.merge(labor_table_yr, how="outer", sort=True)
-    period_table.set_index("day", inplace=True)
+#    period_table.set_index("day", inplace=True)
 
     # Grab top sales over last year before we add totals
+    period_table['labor_pct'] = period_table.dollars / period_table.sales
+    period_table['labor_pct_ly'] = period_table.dollars_ly / period_table.sales_ly
+    period_table_w1 = period_table.loc[period_table['week'] == 1 ]
+    period_table_w2 = period_table.loc[period_table['week'] == 2 ]
+    period_table_w3 = period_table.loc[period_table['week'] == 3 ]
+    period_table_w4 = period_table.loc[period_table['week'] == 4 ]
+    period_table_w1.loc["TOTALS"] = period_table_w1.sum()
+    period_table_w2.loc["TOTALS"] = period_table_w2.sum()
+    period_table_w3.loc["TOTALS"] = period_table_w3.sum()
+    period_table_w4.loc["TOTALS"] = period_table_w4.sum()
     period_table.loc["TOTALS"] = period_table.sum()
     period_totals = period_table.loc["TOTALS"]
 
@@ -909,7 +978,7 @@ def store(store_id):
         )
         .filter(
             Sales.date >= start_year_ly,
-            Sales.date <= end_year_ly,
+            Sales.date <= year_to_date,
             Sales.name == store.name
         )
         .group_by(Sales.date)
@@ -923,7 +992,7 @@ def store(store_id):
         sales_yearly_ly, columns=["date", "sales_ly"]
     )
     sales_table_ty = df_sales_yearly.merge(dates, how="outer", sort=True)
-    sales_table_ly = df_sales_yearly_ly.merge(dates_ly, how="left")
+    sales_table_ly = df_sales_yearly_ly.merge(dates_ly, how="outer")
     sales_table_yr = sales_table_ty.merge(sales_table_ly, on=['day', 'week', 'period'])
     sales_table_yr.drop(columns=['date_y', 'quarter_y', 'year_y', 'dow_y'], inplace=True)
 
@@ -948,7 +1017,7 @@ def store(store_id):
             func.sum(Labor.dollars).label("total_dollars_ly"),
         )
         .filter(Labor.date >= start_year_ly,
-                Labor.date <= end_year_ly,
+                Labor.date <= year_to_date,
                 Labor.name == store.name
                 )
         .group_by(Labor.date)
@@ -962,7 +1031,7 @@ def store(store_id):
         labor_yearly_ly, columns=["day", "hours_ly", "dollars_ly"]
     )
     labor_table_ty = df_labor_yearly.merge(dates, how="outer", sort=True)
-    labor_table_ly = df_labor_yearly_ly.merge(dates_ly, how="left")
+    labor_table_ly = df_labor_yearly_ly.merge(dates_ly, how="outer")
     labor_table_yr = labor_table_ty.merge(labor_table_ly, on=['day', 'week', 'period'])
     labor_table_yr.drop(columns=['date_y', 'quarter_y', 'year_y', 'dow_y'], inplace=True)
 
@@ -971,16 +1040,18 @@ def store(store_id):
 
     # Grab top sales over last year before we add totals
     yearly_table.loc["TOTALS"] = yearly_table.sum()
+    yearly_table['labor_pct'] = yearly_table.dollars / yearly_table.sales
+    yearly_table['labor_pct_ly'] = yearly_table.dollars_ly / yearly_table.sales_ly
     yearly_totals = yearly_table.loc["TOTALS"]
 
-    print('yearly_table')
-    print(yearly_table)
-    print('yearly_totals')
-    print(yearly_totals)
+    print('period_table')
+    print(period_table_w1)
+    print('period_totals')
 
 
     return render_template(
         "home/store.html",
+        title=store.name,
         form=form,
         current_user=current_user,
         roles=current_user.roles,
@@ -997,6 +1068,10 @@ def store(store_id):
         weekly_totals=weekly_totals,
         period_table=period_table,
         period_totals=period_totals,
+        period_table_w1=period_table_w1,
+        period_table_w2=period_table_w2,
+        period_table_w3=period_table_w3,
+        period_table_w4=period_table_w4,
         yearly_table=yearly_table,
         yearly_totals=yearly_totals,
     )

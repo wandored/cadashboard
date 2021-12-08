@@ -203,7 +203,9 @@
                       <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Restaurant</th>
                       <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Sales</th>
                       <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Sales SPLY</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor $</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Guest Count</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">SPLY</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor %</th>
                       <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor SPLY</th>
                     </tr>
                   </thead>
@@ -240,16 +242,16 @@
                         </div>
                       </td>
                       <td>
-                        {% if v.dollars <= v.dollars_ly %}
+                        {% if v.sales >= v.sales_ly %}
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex flex-column justify-content-right">
-                            <h6 class="mb-0 text-sm"><i class="fa fa-arrow-down text-success" aria-hidden="true"></i> {{ "${:,.0f}".format(v.dollars) }}</h6>
+                            <h6 class="mb-0 text-sm"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i> 0</h6>
                           </div>
                         </div>
                         {% else %}
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex flex-column justify-content-right">
-                            <h6 class="mb-0 text-sm"><i class="fa fa-arrow-up text-danger" aria-hidden="true"></i> {{ "${:,.0f}".format(v.dollars) }}</h6>
+                            <h6 class="mb-0 text-sm"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>0</h6>
                           </div>
                         </div>
                         {% endif %}
@@ -257,7 +259,29 @@
                       <td>
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex flex-column justify-content-right">
-                            <h6 class="mb-0 text-sm">{{ "${:,.0f}".format(v.dollars_ly) }}</h6>
+                            <h6 class="mb-0 text-sm">0</h6>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        {% if v.labor_pct <= v.labor_pct_ly %}
+                        <div class="d-flex px-2 py-1">
+                          <div class="d-flex flex-column justify-content-right">
+                            <h6 class="mb-0 text-sm"><i class="fa fa-arrow-down text-success" aria-hidden="true"></i> {{ "%{:,.1f}".format(v.labor_pct*100) }}</h6>
+                          </div>
+                        </div>
+                        {% else %}
+                        <div class="d-flex px-2 py-1">
+                          <div class="d-flex flex-column justify-content-right">
+                            <h6 class="mb-0 text-sm"><i class="fa fa-arrow-up text-danger" aria-hidden="true"></i> {{ "%{:,.1f}".format(v.labor_pct*100) }}</h6>
+                          </div>
+                        </div>
+                        {% endif %}
+                      </td>
+                      <td>
+                        <div class="d-flex px-2 py-1">
+                          <div class="d-flex flex-column justify-content-right">
+                            <h6 class="mb-0 text-sm">{{ "%{:,.1f}".format(v.labor_pct_ly*100) }}</h6>
                           </div>
                         </div>
                       </td>
