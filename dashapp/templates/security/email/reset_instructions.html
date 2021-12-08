@@ -1,0 +1,11 @@
+<p>{{ _('Welcome %(email)s!', email=user.email) }}</p>
+
+<p>You have been registered for access to the CentraArchy Dashboard.  The below link will open the password reset page for you to enter a secure password.
+After you enter and confirm your new password, you may sign into the CentraArchy Dashboard.
+</p>
+<div>
+<p><a href="{{ reset_link }}">{{ _('Click here to reset your password') }}</a></p>
+</div>
+
+<h6> This email is intended for employees of CentraArchy RMC only.  If you received this email in error, please delete.</h6>
+<p>CentraArchy Support</p>
