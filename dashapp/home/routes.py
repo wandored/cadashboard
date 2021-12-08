@@ -525,6 +525,16 @@ def store(store_id):
 
     form = DateForm()
     store = Restaurants.query.filter_by(id=store_id).first()
+    if not store:
+        flash(
+            f"Please don't click on Totals",
+            "warning",
+        )
+        TODAY = datetime.date(datetime.now())
+        YSTDAY = TODAY - timedelta(days=1)
+        session["targetdate"] = YSTDAY.strftime("%Y-%m-%d")
+        return redirect(url_for("home_blueprint.index"))
+
     print(store.name)
     start_day = start_week = end_week = start_period = end_period = start_year = end_year = ""
     fiscal_dates = get_period(datetime.strptime(session["targetdate"], "%Y-%m-%d"))
