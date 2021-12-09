@@ -241,12 +241,13 @@ def index(targetdate=None):
 
     # Grab top sales over last year before we add totals
     daily_table.fillna(0, inplace=True)
-    dy_sales = daily_table.sales - daily_table.sales_ly
-    dy_top_sales = dy_sales.nlargest(5)
-    dy_sales_avg = (
+    daily_table['doly'] = daily_table.sales - daily_table.sales_ly
+    daily_table['poly'] = (
         (daily_table.sales - daily_table.sales_ly) / daily_table.sales_ly * 100
     )
-    dy_avg_sales = dy_sales_avg.nlargest(5)
+    daily_top = daily_table[['doly', 'poly']]
+    daily_top = daily_top.nlargest(5, 'poly', keep='all')
+    print(daily_top)
 
     daily_table.loc["TOTALS"] = daily_table.sum()
     daily_table['labor_pct'] = daily_table.dollars / daily_table.sales
@@ -321,12 +322,13 @@ def index(targetdate=None):
 
     # Grab top sales over last year before we add totals
     weekly_table.fillna(0, inplace=True)
-    wk_sales = weekly_table.sales - weekly_table.sales_ly
-    wk_top_sales = wk_sales.nlargest(5)
-    wk_sales_avg = (
+    weekly_table['doly'] = weekly_table.sales - weekly_table.sales_ly
+    weekly_table['poly'] = (
         (weekly_table.sales - weekly_table.sales_ly) / weekly_table.sales_ly * 100
     )
-    wk_avg_sales = wk_sales_avg.nlargest(5)
+    weekly_top = weekly_table[['doly', 'poly']]
+    weekly_top = weekly_top.nlargest(5, 'poly', keep='all')
+    print(weekly_top)
 
     weekly_table.loc["TOTALS"] = weekly_table.sum()
     weekly_table['labor_pct'] = weekly_table.dollars / weekly_table.sales
@@ -397,12 +399,13 @@ def index(targetdate=None):
 
     # Grab top sales over last year before we add totals
     period_table.fillna(0, inplace=True)
-    pd_sales = period_table.sales - period_table.sales_ly
-    pd_top_sales = pd_sales.nlargest(5)
-    pd_sales_avg = (
+    period_table['doly'] = period_table.sales - period_table.sales_ly
+    period_table['poly'] = (
         (period_table.sales - period_table.sales_ly) / period_table.sales_ly * 100
     )
-    pd_avg_sales = pd_sales_avg.nlargest(5)
+    period_top = period_table[['doly', 'poly']]
+    period_top = period_top.nlargest(5, 'poly', keep='all')
+    print(period_top)
 
     period_table.loc["TOTALS"] = period_table.sum()
     period_table['labor_pct'] = period_table.dollars / period_table.sales
@@ -474,12 +477,13 @@ def index(targetdate=None):
 
     # Grab top sales over last year before we add totals
     yearly_table.fillna(0, inplace=True)
-    yr_sales = yearly_table.sales - yearly_table.sales_ly
-    yr_top_sales = yr_sales.nlargest(5)
-    yr_sales_avg = (
+    yearly_table['doly'] = yearly_table.sales - yearly_table.sales_ly
+    yearly_table['poly'] = (
         (yearly_table.sales - yearly_table.sales_ly) / yearly_table.sales_ly * 100
     )
-    yr_avg_sales = yr_sales_avg.nlargest(5)
+    yearly_top = yearly_table[['doly', 'poly']]
+    yearly_top = yearly_top.nlargest(5, 'poly', keep='all')
+    print(yearly_top)
 
     yearly_table.loc["TOTALS"] = yearly_table.sum()
     yearly_table['labor_pct'] = yearly_table.dollars / yearly_table.sales
@@ -510,12 +514,10 @@ def index(targetdate=None):
         period_totals=period_totals,
         yearly_table=yearly_table,
         yearly_totals=yearly_totals,
-        dy_top_sales=dy_top_sales,
-        dy_avg_sales=dy_avg_sales,
-        wk_top_sales=wk_top_sales,
-        wk_avg_sales=wk_avg_sales,
-        pd_top_sales=pd_top_sales,
-        pd_avg_sales=pd_avg_sales,
+        daily_top=daily_top,
+        weekly_top=weekly_top,
+        period_top=period_top,
+        yearly_top=yearly_top
     )
 
 

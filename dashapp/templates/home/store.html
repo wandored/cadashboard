@@ -190,7 +190,7 @@
                     <ul class="dropdown-menu px-2 py-3 ms-sm-n4 ms-n5" aria-labelledby="dropdownTable">
                       <li><a class="dropdown-item border-radius-md" href="javascript:;">Action</a></li>
                       <li><a class="dropdown-item border-radius-md" href="javascript:;">Another action</a></li>
-                      <li><a class="dropdown-item border-radius-md" href="javascript:;">Something else here</a></li>
+                      <li><a class="dropdown-item border-radius-md" href="javascript:;">What would you like this to do?</a></li>
                     </ul>
                   </div>
                 </div>
@@ -227,7 +227,7 @@
                       <td>
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex flex-column justify-content-right">
-                            <h6 class="mb-0 text-sm">{{ "${:,.0f}".format(v.sales) }}</h6>
+                            <h6 class="mb-0 text-sm">{{ "${:,.0f}".format(v.sales) }}{{ v.daypart }}</h6>
                           </div>
                         </div>
                       </td>
