@@ -15,7 +15,6 @@ from flask_mail import Mail
 
 db = SQLAlchemy()
 mail = Mail()
-# login_manager = LoginManager()
 admin = Admin()
 
 
@@ -59,7 +58,7 @@ class Users(db.Model, UserMixin):
     fs_uniquifier = db.Column(db.String(64), unique=True)
     roles = db.relationship('Roles',
                             secondary=roles_users,
-                            backref='users')
+                            backref='users', lazy='dynamic')
 
 #    def __init__(self, **kwargs):
 #        for property, value in kwargs.items():
@@ -181,6 +180,7 @@ class Sales(db.Model):
     daypart = db.Column(db.String(64))
     name = db.Column(db.String(64))
     sales = db.Column(db.Integer)
+    guests = db.Column(db.Integer)
 
 
 class Labor(db.Model):
