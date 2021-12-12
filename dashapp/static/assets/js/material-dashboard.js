@@ -650,7 +650,7 @@ function sidenavTypeOnResize() {
     });
   }
 }
-
+element.setAttribute.darkMode
 
 // Light Mode / Dark Mode
 function darkMode(el) {

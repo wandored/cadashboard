@@ -195,6 +195,29 @@ class Labor(db.Model):
     dollars = db.Column(db.Integer)
 
 
+class Categories(db.Model):
+
+    __tablename__ = "Categories"
+
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.String(64))
+    category = db.Column(db.String(64))
+    name = db.Column(db.String(64))
+    amount = db.Column(db.Integer)
+
+
+class Menuitems(db.Model):
+
+    __tablename__ = "Menuitems"
+
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.String(64))
+    menuitem = db.Column(db.String(64))
+    name = db.Column(db.String(64))
+    amount = db.Column(db.Integer)
+    quantity = db.Column(db.Integer)
+
+
 #@login_manager.user_loader
 #def user_loader(id):
 #    return Users.query.filter_by(id=id).first()

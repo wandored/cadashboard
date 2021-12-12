@@ -267,13 +267,13 @@
                         {% if v.labor_pct <= v.labor_pct_ly %}
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex flex-column">
-                            <h6 class="mb-0 text-sm text-end"><i class="fa fa-arrow-down text-success" aria-hidden="true"></i> {{ "%{:,.1f}".format(v.labor_pct*100) }}</h6>
+                            <h6 class="mb-0 text-sm text-end"><i class="fa fa-arrow-down text-success" aria-hidden="true"></i> {{ "{:,.1f}%".format(v.labor_pct*100) }}</h6>
                           </div>
                         </div>
                         {% else %}
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex flex-column">
-                            <h6 class="mb-0 text-sm text-end"><i class="fa fa-arrow-up text-danger" aria-hidden="true"></i> {{ "%{:,.1f}".format(v.labor_pct*100) }}</h6>
+                            <h6 class="mb-0 text-sm text-end"><i class="fa fa-arrow-up text-danger" aria-hidden="true"></i> {{ "{:,.1f}%".format(v.labor_pct*100) }}</h6>
                           </div>
                         </div>
                         {% endif %}
@@ -281,7 +281,7 @@
                       <td>
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex flex-column">
-                            <h6 class="mb-0 text-sm text-end">{{ "%{:,.1f}".format(v.labor_pct_ly*100) }}</h6>
+                            <h6 class="mb-0 text-sm text-end">{{ "{:,.1f}%".format(v.labor_pct_ly*100) }}</h6>
                           </div>
                         </div>
                       </td>
@@ -302,7 +302,6 @@
               <p class="text-sm">
                 <span class="font-weight-bold">Top 5 Sales Over Last Year</span>
               </p>
-            <div>
             <div class="alert alert-primary" role="alert">
               <table class="table-responsive table-sm text-light">
                 <thead>
