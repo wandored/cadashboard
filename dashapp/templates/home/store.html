@@ -190,7 +190,7 @@
                     <ul class="dropdown-menu px-2 py-3 ms-sm-n4 ms-n5" aria-labelledby="dropdownTable">
                       <li><a class="dropdown-item border-radius-md" href="javascript:;">Action</a></li>
                       <li><a class="dropdown-item border-radius-md" href="javascript:;">Another action</a></li>
-                      <li><a class="dropdown-item border-radius-md" href="javascript:;">Something else here</a></li>
+                      <li><a class="dropdown-item border-radius-md" href="javascript:;">What would you like this to do?</a></li>
                     </ul>
                   </div>
                 </div>
@@ -220,14 +220,22 @@
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex flex-column justify-content-left">
                             <h6 class="mb-0 text-sm">Week 1</h6>
+                            <h6 class="mb-0 text-sm">Food</h6>
+                            <h6 class="mb-0 text-sm">Beer</h6>
+                            <h6 class="mb-0 text-sm">Liquor</h6>
+                            <h6 class="mb-0 text-sm">Wine</h6>
                           </div>
                         </div>
                       </td>
-                    {% for k, v in period_table_w1.iterrows() %}
+                    {% for k, v in cats_table_w1.iterrows() %}
                       <td>
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex flex-column justify-content-right">
-                            <h6 class="mb-0 text-sm">{{ "${:,.0f}".format(v.sales) }}</h6>
+                            <h6 class="mb-0 text-sm">{{ v.date }}</h6>
+                            <h6 class="mb-0 text-sm">{{ "${:,.0f}".format(v.Food) }}</h6>
+                            <h6 class="mb-0 text-sm">{{ "${:,.0f}".format(v.Beer) }}</h6>
+                            <h6 class="mb-0 text-sm">{{ "${:,.0f}".format(v.Liquor) }}</h6>
+                            <h6 class="mb-0 text-sm">{{ "${:,.0f}".format(v.Wine) }}</h6>
                           </div>
                         </div>
                       </td>
@@ -238,14 +246,22 @@
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex flex-column justify-content-left">
                             <h6 class="mb-0 text-sm">Week 2</h6>
+                            <h6 class="mb-0 text-sm">Food</h6>
+                            <h6 class="mb-0 text-sm">Beer</h6>
+                            <h6 class="mb-0 text-sm">Liquor</h6>
+                            <h6 class="mb-0 text-sm">Wine</h6>
                           </div>
                         </div>
                       </td>
-                    {% for k, v in period_table_w2.iterrows() %}
+                    {% for k, v in cats_table_w2.iterrows() %}
                       <td>
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex flex-column justify-content-right">
-                            <h6 class="mb-0 text-sm">{{ "${:,.0f}".format(v.sales) }}</h6>
+                            <h6 class="mb-0 text-sm">{{ v.date }}</h6>
+                            <h6 class="mb-0 text-sm">{{ "${:,.0f}".format(v.Food) }}</h6>
+                            <h6 class="mb-0 text-sm">{{ "${:,.0f}".format(v.Beer) }}</h6>
+                            <h6 class="mb-0 text-sm">{{ "${:,.0f}".format(v.Liquor) }}</h6>
+                            <h6 class="mb-0 text-sm">{{ "${:,.0f}".format(v.Wine) }}</h6>
                           </div>
                         </div>
                       </td>
@@ -256,14 +272,22 @@
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex flex-column justify-content-left">
                             <h6 class="mb-0 text-sm">Week 3</h6>
+                            <h6 class="mb-0 text-sm">Food</h6>
+                            <h6 class="mb-0 text-sm">Beer</h6>
+                            <h6 class="mb-0 text-sm">Liquor</h6>
+                            <h6 class="mb-0 text-sm">Wine</h6>
                           </div>
                         </div>
                       </td>
-                    {% for k, v in period_table_w3.iterrows() %}
+                    {% for k, v in cats_table_w3.iterrows() %}
                       <td>
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex flex-column justify-content-right">
-                            <h6 class="mb-0 text-sm">{{ "${:,.0f}".format(v.sales) }}</h6>
+                            <h6 class="mb-0 text-sm">{{ v.date }}</h6>
+                            <h6 class="mb-0 text-sm">{{ "${:,.0f}".format(v.Food) }}</h6>
+                            <h6 class="mb-0 text-sm">{{ "${:,.0f}".format(v.Beer) }}</h6>
+                            <h6 class="mb-0 text-sm">{{ "${:,.0f}".format(v.Liquor) }}</h6>
+                            <h6 class="mb-0 text-sm">{{ "${:,.0f}".format(v.Wine) }}</h6>
                           </div>
                         </div>
                       </td>
@@ -274,14 +298,22 @@
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex flex-column justify-content-left">
                             <h6 class="mb-0 text-sm">Week 4</h6>
+                            <h6 class="mb-0 text-sm">Food</h6>
+                            <h6 class="mb-0 text-sm">Beer</h6>
+                            <h6 class="mb-0 text-sm">Liquor</h6>
+                            <h6 class="mb-0 text-sm">Wine</h6>
                           </div>
                         </div>
                       </td>
-                    {% for k, v in period_table_w4.iterrows() %}
+                    {% for k, v in cats_table_w4.iterrows() %}
                       <td>
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex flex-column justify-content-right">
-                            <h6 class="mb-0 text-sm">{{ "${:,.0f}".format(v.sales) }}</h6>
+                            <h6 class="mb-0 text-sm">{{ v.date }}</h6>
+                            <h6 class="mb-0 text-sm">{{ "${:,.0f}".format(v.Food) }}</h6>
+                            <h6 class="mb-0 text-sm">{{ "${:,.0f}".format(v.Beer) }}</h6>
+                            <h6 class="mb-0 text-sm">{{ "${:,.0f}".format(v.Liquor) }}</h6>
+                            <h6 class="mb-0 text-sm">{{ "${:,.0f}".format(v.Wine) }}</h6>
                           </div>
                         </div>
                       </td>
@@ -289,8 +321,42 @@
                     </tr>
                   </tbody>
                 </table>
-              </div>
-            </div>
+              </div><!-- table -->
+                <div class="row g-2">
+                  <div class="col-md-3 col-md-0">
+                    <div class="card text-white bg-primary" style"max-width: 18rem;">
+                        <div class="card-body">
+                          <h5 class="card-title">PTD FOOD SALES</h5>
+                          <p class="card-text-light font-weight-bold">{{ "${:,.0f}".format(cats_totals.Food) }}</p>
+                        </div>
+                    </div>
+                  </div>
+                  <div class="col-md-3 col-md-0">
+                    <div class="card text-white bg-success" style"max-width: 18rem;">
+                        <div class="card-body">
+                          <h5 class="card-title">PTD BEER SALES</h5>
+                          <p class="card-text-light font-weight-bold">{{ "${:,.0f}".format(cats_totals.Beer) }}</p>
+                        </div>
+                    </div>
+                  </div>
+                  <div class="col-md-3 col-md-0">
+                    <div class="card text-white bg-info" style"max-width: 18rem;">
+                        <div class="card-body">
+                          <h5 class="card-title">PTD LIQUOR SALES</h5>
+                          <p class="card-text-light font-weight-bold">{{ "${:,.0f}".format(cats_totals.Liquor) }}</p>
+                        </div>
+                    </div>
+                  </div>
+                  <div class="col-md-3 col-md-0">
+                    <div class="card text-white bg-warning" style"max-width: 18rem;">
+                        <div class="card-body">
+                          <h5 class="card-title">PTD WINE SALES</h5>
+                          <p class="card-text-light font-weight-bold">{{ "${:,.0f}".format(cats_totals.Wine) }}</p>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+            </div><!-- card -->
           </div>
         </div>
         <!-- scorecard -->
@@ -303,10 +369,133 @@
               </p>
             </div>
             <div class="alert alert-primary" role="alert">
+              {% for x in fiscal_dates %}
+                <h4 class="alert-heading text-light">{{ x.day }} Labor</h4>
+              {% endfor %}
+              <table class="table-responsive table-sm text-light">
+                <thead>
+                  <tr>
+                    <th scope="col"></th>
+                    <th scope="col">TODAY</th>
+                    <th scope="col">SDLY</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                      <th scope="row">Hours</th>
+                      <td>
+                        <p class="mb-0 ms-1 text-end">{{ "{:,.0f}".format(daily_totals.hours) }}</p>
+                      </td>
+                      <td>
+                        <p class="mb-0 ms-1 text-end">{{ "{:,.0f}".format(daily_totals.hours_ly) }}</p>
+                      </td>
+                  </tr>
+                  <tr>
+                      <th scope="row">Dollars</th>
+                      <td>
+                        <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(daily_totals.dollars) }}</p>
+                      </td>
+                      <td>
+                        <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(daily_totals.dollars_ly) }}</p>
+                      </td>
+                  </tr>
+                  <tr>
+                      <th scope="row">Percent</th>
+                      <td>
+                        <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format(daily_totals.labor_pct*100) }}</p>
+                      </td>
+                      <td>
+                        <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format(daily_totals.labor_pct_ly*100) }}</p>
+                      </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
             <div class="alert alert-success" role="alert">
+              {% for x in fiscal_dates %}
+                <h4 class="alert-heading text-light">Week-{{ x.week }} Labor</h4>
+              {% endfor %}
+              <table class="table-responsive table-sm text-light">
+                <thead>
+                  <tr>
+                    <th scope="col"></th>
+                    <th scope="col">WEEK</th>
+                    <th scope="col">SWLY</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                      <th scope="row">Hours</th>
+                      <td>
+                        <p class="mb-0 ms-1 text-end">{{ "{:,.0f}".format(weekly_totals.hours) }}</p>
+                      </td>
+                      <td>
+                        <p class="mb-0 ms-1 text-end">{{ "{:,.0f}".format(weekly_totals.hours_ly) }}</p>
+                      </td>
+                  </tr>
+                  <tr>
+                      <th scope="row">Dollars</th>
+                      <td>
+                        <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(weekly_totals.dollars) }}</p>
+                      </td>
+                      <td>
+                        <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(weekly_totals.dollars_ly) }}</p>
+                      </td>
+                  </tr>
+                  <tr>
+                      <th scope="row">Percent</th>
+                      <td>
+                        <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format(weekly_totals.labor_pct*100) }}</p>
+                      </td>
+                      <td>
+                        <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format(weekly_totals.labor_pct_ly*100) }}</p>
+                      </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
             <div class="alert alert-info" role="alert">
+              {% for x in fiscal_dates %}
+                <h4 class="alert-heading text-light">Period-{{ x.period }} Labor</h4>
+              {% endfor %}
+              <table class="table-responsive table-sm text-light">
+                <thead>
+                  <tr>
+                    <th scope="col"></th>
+                    <th scope="col">PERIOD</th>
+                    <th scope="col">SPLY</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                      <th scope="row">Hours</th>
+                      <td>
+                        <p class="mb-0 ms-1 text-end">{{ "{:,.0f}".format(period_totals.hours) }}</p>
+                      </td>
+                      <td>
+                        <p class="mb-0 ms-1 text-end">{{ "{:,.0f}".format(period_totals.hours_ly) }}</p>
+                      </td>
+                  </tr>
+                  <tr>
+                      <th scope="row">Dollars</th>
+                      <td>
+                        <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(period_totals.dollars) }}</p>
+                      </td>
+                      <td>
+                        <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(period_totals.dollars_ly) }}</p>
+                      </td>
+                  </tr>
+                  <tr>
+                      <th scope="row">Percent</th>
+                      <td>
+                        <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format(period_totals.labor_pct*100) }}</p>
+                      </td>
+                      <td>
+                        <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format(period_totals.labor_pct_ly*100) }}</p>
+                      </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
             <div class="card-body p-3">
             </div>
@@ -389,6 +578,10 @@
                 family: "Roboto",
                 style: 'normal',
                 lineHeight: 2
+              },
+              // Abbreviate the thousands
+              callback: function(value, index, values) {
+                return value / 1e3 + ' T';
               },
               color: "#fff",
             },
@@ -490,6 +683,10 @@
                 style: 'normal',
                 lineHeight: 2
               },
+              // Abbreviate the thousands
+              callback: function(value, index, values) {
+                return value / 1e3 + ' T';
+              },
             }
           },
           x: {
@@ -585,7 +782,7 @@
                 style: 'normal',
                 lineHeight: 2
               },
-              // Abbreviate the millions
+              // Abbreviate the thousands
               callback: function(value, index, values) {
                 return value / 1e3 + ' T';
               },

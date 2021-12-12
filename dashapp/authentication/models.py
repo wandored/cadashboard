@@ -58,7 +58,7 @@ class Users(db.Model, UserMixin):
     fs_uniquifier = db.Column(db.String(64), unique=True)
     roles = db.relationship('Roles',
                             secondary=roles_users,
-                            backref='users', lazy='dynamic')
+                            backref='users', lazy=True)
 
 #    def __init__(self, **kwargs):
 #        for property, value in kwargs.items():
@@ -193,6 +193,29 @@ class Labor(db.Model):
     name = db.Column(db.String(64))
     hours = db.Column(db.Integer)
     dollars = db.Column(db.Integer)
+
+
+class Categories(db.Model):
+
+    __tablename__ = "Categories"
+
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.String(64))
+    category = db.Column(db.String(64))
+    name = db.Column(db.String(64))
+    amount = db.Column(db.Integer)
+
+
+class Menuitems(db.Model):
+
+    __tablename__ = "Menuitems"
+
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.String(64))
+    menuitem = db.Column(db.String(64))
+    name = db.Column(db.String(64))
+    amount = db.Column(db.Integer)
+    quantity = db.Column(db.Integer)
 
 
 #@login_manager.user_loader

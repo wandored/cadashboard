@@ -8,13 +8,13 @@ from flask_security.decorators import auth_required
 import pandas as pd
 from dashapp.home import blueprint
 from flask import flash, render_template, session, request, redirect, url_for
-from dashapp.home.util import get_period, get_lastyear, refresh_data, refresh_data
+from dashapp.home.util import get_period, get_lastyear, refresh_data, sales_detail
 from flask_security import login_required, current_user
 from jinja2 import TemplateNotFound
 from datetime import datetime, timedelta
 from dashapp.authentication.forms import DateForm
-from dashapp.authentication.models import db, Calendar, Sales, Labor, Restaurants
-from sqlalchemy import and_, func
+from dashapp.authentication.models import Categories, Menuitems, db, Calendar, Sales, Labor, Restaurants
+from sqlalchemy import and_, or_, func
 
 
 @blueprint.route("/")
@@ -241,12 +241,12 @@ def index(targetdate=None):
 
     # Grab top sales over last year before we add totals
     daily_table.fillna(0, inplace=True)
-    dy_sales = daily_table.sales - daily_table.sales_ly
-    dy_top_sales = dy_sales.nlargest(5)
-    dy_sales_avg = (
+    daily_table['doly'] = daily_table.sales - daily_table.sales_ly
+    daily_table['poly'] = (
         (daily_table.sales - daily_table.sales_ly) / daily_table.sales_ly * 100
     )
-    dy_avg_sales = dy_sales_avg.nlargest(5)
+    daily_top = daily_table[['doly', 'poly']]
+    daily_top = daily_top.nlargest(5, 'poly', keep='all')
 
     daily_table.loc["TOTALS"] = daily_table.sum()
     daily_table['labor_pct'] = daily_table.dollars / daily_table.sales
@@ -321,12 +321,12 @@ def index(targetdate=None):
 
     # Grab top sales over last year before we add totals
     weekly_table.fillna(0, inplace=True)
-    wk_sales = weekly_table.sales - weekly_table.sales_ly
-    wk_top_sales = wk_sales.nlargest(5)
-    wk_sales_avg = (
+    weekly_table['doly'] = weekly_table.sales - weekly_table.sales_ly
+    weekly_table['poly'] = (
         (weekly_table.sales - weekly_table.sales_ly) / weekly_table.sales_ly * 100
     )
-    wk_avg_sales = wk_sales_avg.nlargest(5)
+    weekly_top = weekly_table[['doly', 'poly']]
+    weekly_top = weekly_top.nlargest(5, 'poly', keep='all')
 
     weekly_table.loc["TOTALS"] = weekly_table.sum()
     weekly_table['labor_pct'] = weekly_table.dollars / weekly_table.sales
@@ -397,12 +397,12 @@ def index(targetdate=None):
 
     # Grab top sales over last year before we add totals
     period_table.fillna(0, inplace=True)
-    pd_sales = period_table.sales - period_table.sales_ly
-    pd_top_sales = pd_sales.nlargest(5)
-    pd_sales_avg = (
+    period_table['doly'] = period_table.sales - period_table.sales_ly
+    period_table['poly'] = (
         (period_table.sales - period_table.sales_ly) / period_table.sales_ly * 100
     )
-    pd_avg_sales = pd_sales_avg.nlargest(5)
+    period_top = period_table[['doly', 'poly']]
+    period_top = period_top.nlargest(5, 'poly', keep='all')
 
     period_table.loc["TOTALS"] = period_table.sum()
     period_table['labor_pct'] = period_table.dollars / period_table.sales
@@ -474,19 +474,18 @@ def index(targetdate=None):
 
     # Grab top sales over last year before we add totals
     yearly_table.fillna(0, inplace=True)
-    yr_sales = yearly_table.sales - yearly_table.sales_ly
-    yr_top_sales = yr_sales.nlargest(5)
-    yr_sales_avg = (
+    yearly_table['doly'] = yearly_table.sales - yearly_table.sales_ly
+    yearly_table['poly'] = (
         (yearly_table.sales - yearly_table.sales_ly) / yearly_table.sales_ly * 100
     )
-    yr_avg_sales = yr_sales_avg.nlargest(5)
+    yearly_top = yearly_table[['doly', 'poly']]
+    yearly_top = yearly_top.nlargest(5, 'poly', keep='all')
 
     yearly_table.loc["TOTALS"] = yearly_table.sum()
     yearly_table['labor_pct'] = yearly_table.dollars / yearly_table.sales
     yearly_table['labor_pct_ly'] = yearly_table.dollars_ly / yearly_table.sales_ly
     yearly_totals = yearly_table.loc["TOTALS"]
 
-    # Scorecard
 
     return render_template(
         "home/index.html",
@@ -510,12 +509,10 @@ def index(targetdate=None):
         period_totals=period_totals,
         yearly_table=yearly_table,
         yearly_totals=yearly_totals,
-        dy_top_sales=dy_top_sales,
-        dy_avg_sales=dy_avg_sales,
-        wk_top_sales=wk_top_sales,
-        wk_avg_sales=wk_avg_sales,
-        pd_top_sales=pd_top_sales,
-        pd_avg_sales=pd_avg_sales,
+        daily_top=daily_top,
+        weekly_top=weekly_top,
+        period_top=period_top,
+        yearly_top=yearly_top
     )
 
 
@@ -949,6 +946,7 @@ def store(store_id):
 #    period_table.set_index("day", inplace=True)
 
     # Grab top sales over last year before we add totals
+    period_table.loc["TOTALS"] = period_table.sum()
     period_table['labor_pct'] = period_table.dollars / period_table.sales
     period_table['labor_pct_ly'] = period_table.dollars_ly / period_table.sales_ly
     period_table_w1 = period_table.loc[period_table['week'] == 1 ]
@@ -959,7 +957,7 @@ def store(store_id):
     period_table_w2.loc["TOTALS"] = period_table_w2.sum()
     period_table_w3.loc["TOTALS"] = period_table_w3.sum()
     period_table_w4.loc["TOTALS"] = period_table_w4.sum()
-    period_table.loc["TOTALS"] = period_table.sum()
+
     period_totals = period_table.loc["TOTALS"]
 
 
@@ -1054,14 +1052,87 @@ def store(store_id):
     yearly_table['labor_pct_ly'] = yearly_table.dollars_ly / yearly_table.sales_ly
     yearly_totals = yearly_table.loc["TOTALS"]
 
-    print('period_table')
-    print(period_table_w1)
-    print('period_totals')
 
+    # Category Sales by week
+    dates = Calendar.query.filter(Calendar.date >= start_period, Calendar.date <= end_period).all()
+    dates = pd.DataFrame([x.as_dict() for x in dates])
+
+    data_food = (db.session.query(Categories)
+             .filter(
+                Categories.date >= start_period,
+                Categories.date <= end_period,
+                Categories.name == store.name,
+                Categories.category == "FOOD")
+            .all()
+    )
+    food_sales = pd.DataFrame([(x.date, x.amount) for x in data_food], columns=['date', 'amount']
+    )
+    food_sales.rename(columns={'amount': 'Food'}, inplace=True)
+
+    data_beer = (db.session.query(Categories)
+             .filter(
+                Categories.date >= start_period,
+                Categories.date <= end_period,
+                Categories.name == store.name,
+                Categories.category == "BEER")
+            .all()
+    )
+    beer_sales = pd.DataFrame([(x.date, x.amount) for x in data_beer], columns=['date', 'amount']
+    )
+    beer_sales.rename(columns={'amount': 'Beer'}, inplace=True)
+
+    data_liquor = (db.session.query(Categories)
+             .filter(
+                Categories.date >= start_period,
+                Categories.date <= end_period,
+                Categories.name == store.name,
+                Categories.category == "LIQUOR")
+            .all()
+    )
+    liquor_sales = pd.DataFrame([(x.date, x.amount) for x in data_liquor], columns=['date', 'amount']
+    )
+    liquor_sales.rename(columns={'amount': 'Liquor'}, inplace=True)
+
+    data_wine = (db.session.query(Categories)
+             .filter(
+                Categories.date >= start_period,
+                Categories.date <= end_period,
+                Categories.name == store.name,
+                Categories.category == "WINE")
+            .all()
+    )
+    wine_sales = pd.DataFrame([(x.date, x.amount) for x in data_wine], columns=['date', 'amount']
+    )
+    wine_sales.rename(columns={'amount': 'Wine'}, inplace=True)
+
+    cats_table = food_sales.merge(beer_sales, how="left", sort=True)
+    cats_table = cats_table.merge(liquor_sales, how="left", sort=True)
+    cats_table = cats_table.merge(wine_sales, how="left", sort=True)
+    cats_table = cats_table.merge(dates, how="outer", sort=True)
+    cats_table.loc["TOTALS"] = cats_table.sum()
+    cats_table_w1 = cats_table.loc[cats_table['week'] == 1 ]
+    cats_table_w1.fillna(value=0, inplace=True)
+    cats_table_w2 = cats_table.loc[cats_table['week'] == 2 ]
+    cats_table_w2.fillna(value=0, inplace=True)
+    cats_table_w3 = cats_table.loc[cats_table['week'] == 3 ]
+    cats_table_w3.fillna(value=0, inplace=True)
+    cats_table_w4 = cats_table.loc[cats_table['week'] == 4 ]
+    cats_table_w4.fillna(value=0, inplace=True)
+    cats_table_w1.loc["TOTALS"] = cats_table_w1.sum()
+    cats_table_w1.at['TOTALS', 'date'] = '-'
+    cats_table_w2.loc["TOTALS"] = cats_table_w2.sum()
+    cats_table_w2.at['TOTALS', 'date'] = '-'
+    cats_table_w3.loc["TOTALS"] = cats_table_w3.sum()
+    cats_table_w3.at['TOTALS', 'date'] = '-'
+    cats_table_w4.loc["TOTALS"] = cats_table_w4.sum()
+    cats_table_w4.at['TOTALS', 'date'] = '-'
+
+    cats_totals = cats_table.loc["TOTALS"]
 
     return render_template(
         "home/store.html",
         title=store.name,
+        segment='store',
         form=form,
         current_user=current_user,
         roles=current_user.roles,
@@ -1072,20 +1143,115 @@ def store(store_id):
         values1_ly=values1_ly,
         values2_ly=values2_ly,
         values3_ly=values3_ly,
-        daily_table=daily_table,
+#        daily_table=daily_table,
         daily_totals=daily_totals,
-        weekly_table=weekly_table,
+#        weekly_table=weekly_table,
         weekly_totals=weekly_totals,
-        period_table=period_table,
+#        period_table=period_table,
         period_totals=period_totals,
         period_table_w1=period_table_w1,
         period_table_w2=period_table_w2,
         period_table_w3=period_table_w3,
         period_table_w4=period_table_w4,
-        yearly_table=yearly_table,
+#        yearly_table=yearly_table,
         yearly_totals=yearly_totals,
+        cats_totals=cats_totals,
+        cats_table_w1=cats_table_w1,
+        cats_table_w2=cats_table_w2,
+        cats_table_w3=cats_table_w3,
+        cats_table_w4=cats_table_w4,
     )
 
+
+@blueprint.route("/marketing", methods=["GET", "POST"])
+@login_required
+def marketing(targetdate=None):
+
+    start_day = end_day = start_week = end_week = start_period = end_period = start_year = end_year = ""
+    fiscal_dates = get_period(datetime.strptime(session["targetdate"], "%Y-%m-%d"))
+    for i in fiscal_dates:
+        day_start = datetime.strptime(i.date, "%Y-%m-%d")
+        day_end = day_start + timedelta(days=1)
+        end_day = day_end.strftime("%Y-%m-%d")
+        start_day = i.date
+        start_week = i.week_start
+        end_week = i.week_end
+        start_period = i.period_start
+        end_period = i.period_end
+        start_year = i.year_start
+        end_year = i.year_end
+
+    # Get matching day, week and period start and end dates
+    start_day_ly = get_lastyear(start_day)
+    #    end_day_ly = get_lastyear(end_day)
+    start_week_ly = get_lastyear(start_week)
+    end_week_ly = get_lastyear(end_week)
+    week_to_date = get_lastyear(start_day)
+    start_period_ly = get_lastyear(start_period)
+    end_period_ly = get_lastyear(end_period)
+    period_to_date = get_lastyear(start_day)
+    start_year_ly = get_lastyear(start_year)
+    end_year_ly = get_lastyear(end_year)
+    year_to_date = get_lastyear(start_day)
+
+    form = DateForm()
+    if form.validate_on_submit():
+        """
+        When new date submitted, the data for that date will be replaced with new data from R365
+        We check if there are infact sales for that day, if not, it resets to yesterday, if
+        there are sales, then labor is polled
+        """
+        start_day = form.selectdate.data.strftime("%Y-%m-%d")
+        day_end = form.selectdate.data + timedelta(days=1)
+        end_day = day_end.strftime("%Y-%m-%d")
+
+        baddates = refresh_data(start_day, end_day)
+        if baddates == 1:
+            flash(
+                f"I cannot find sales for the day you selected.  Please select another date!",
+                "warning",
+            )
+            TODAY = datetime.date(datetime.now())
+            YSTDAY = TODAY - timedelta(days=1)
+            session["targetdate"] = YSTDAY.strftime("%Y-%m-%d")
+            return redirect(url_for("home_blueprint.route_default"))
+
+
+        session["targetdate"] = start_day
+        return redirect(url_for("home_blueprint.marketing"))
+
+    # Gift Card Sales
+    gift_cards = (
+        db.session.query(Menuitems.name,
+                         func.sum(Menuitems.amount).label("sales"),
+                         func.sum(Menuitems.quantity).label("count"),
+                         )
+            .filter(Menuitems.date >= '2021-11-01',
+                    Menuitems.date <= '2021-12-31',
+                    or_(
+                    Menuitems.menuitem == 'GIFT CARD',
+                    Menuitems.menuitem == 'Gift Card')
+                    )
+            .group_by(Menuitems.name)
+        ).all()
+    gift_card_sales = pd.DataFrame.from_records(
+        gift_cards, columns=["store", "amount", "quantity"]
+    )
+    gift_card_sales.sort_values(by=['amount'], ascending=False, inplace=True)
+    gift_card_sales.loc["TOTALS"] = gift_card_sales.sum(numeric_only=True)
+
+    gift_card_sales.fillna('Totals', inplace=True)
+
+    return render_template(
+        "home/marketing.html",
+        title='Marketing',
+        segment='marketing',
+        form=form,
+        current_user=current_user,
+        roles=current_user.roles,
+        fiscal_dates=fiscal_dates,
+        gift_card_sales=gift_card_sales,
+    )
 
 
 #@blueprint.route("/<template>")
