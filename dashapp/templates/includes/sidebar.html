@@ -28,9 +28,6 @@
       <div class="form-group">
         {{ form.submit(class="btn btn-info") }}
       </div>
-    <div class="progress">
-      <div id="progressbar" class="progress-bar " role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="0%">0%</div>
-    </div>
     </form>
     <div class="collapse navbar-collapse  w-auto  max-height-vh-100" id="sidenav-collapse-main">
       <ul class="navbar-nav">
@@ -98,7 +95,15 @@
             <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
               <i class="material-icons opacity-10">person</i>
             </div>
-            <span class="nav-link-text ms-1">Manage Users</span>
+            <span class="nav-link-text ms-1">Admin Page</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white" href="/support">
+            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="material-icons opacity-10">person</i>
+            </div>
+            <span class="nav-link-text ms-1">Support Page</span>
           </a>
         </li>
         {% endif %}

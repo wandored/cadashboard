@@ -26,3 +26,8 @@ class CreateAccountForm(FlaskForm):
 class DateForm(FlaskForm):
     selectdate = DateField("Change Date: ", format="%Y-%m-%d")
     submit = SubmitField("Submit")
+
+
+class UpdateForm(FlaskForm):
+    selectdate = DateField("Data Update", format="%Y-%m-%d")
+    submit = SubmitField("Submit")
