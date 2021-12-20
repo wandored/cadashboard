@@ -1,0 +1,52 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Template {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <div class="container-fluid py-4">
+      <div class="row">
+        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+          <div class="card">
+            <div class="card-header p-3 pt-2">
+              <form method="POST" action="" style="text-align:center">
+                {{ form2.hidden_tag() }}
+                <fieldset id="" class="form-group mb-1">
+                  <div class="form-group mb-1">
+                    {{ form2.selectdate.label(class="form=control-label") }}
+                    {% if form2.selectdate.errors %}
+                        {{ form2.selectdate(class="form=control form-control-md is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form2.selectdate.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form2.selectdate(class="form=control form-control-md") }}
+                    {% endif %}
+                  </div>
+                </fieldset>
+                <div class="form-group">
+                  {{ form2.submit2(class="btn btn-info") }}
+                </div>
+                <div class="progress">
+                  <div id="progressbar" class="progress-bar " role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="0%">0%</div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    {% include 'includes/footer.html' %}
+
+  </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+  <script src="/static/assets/js/plugins/progress.js"></script>
+{% block javascripts %}{% endblock javascripts %}

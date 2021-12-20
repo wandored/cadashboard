@@ -1,0 +1,61 @@
+{% extends "layouts/base-fullscreen.html" %}
+{% from "security/_macros.html" import render_field_with_errors, render_field %}
+
+{% block title %} Sign UP {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <section>
+      <div class="page-header min-vh-100">
+        <div class="container">
+          <div class="row">
+            <div class="col-6 d-lg-flex d-none h-100 my-auto pe-0 position-absolute top-0 start-0 text-center justify-content-center flex-column">
+              <div class="position-relative bg-gradient-primary h-100 m-3 px-7 border-radius-lg d-flex flex-column justify-content-center" style="background-image: url('/static/assets/img/illustrations/illustration-signup.jpg'); background-size: cover;">
+              </div>
+            </div>
+            <div class="col-xl-4 col-lg-5 col-md-7 d-flex flex-column ms-auto me-auto ms-lg-auto me-lg-5">
+              <div class="card card-plain">
+                <div class="card-header">
+                  <h4 class="font-weight-bolder">
+                    CentraArchy
+                  </h4>
+                  <p class="mb-0">
+                    {% if msg %}
+                      <span class="text-danger">{{ msg | safe }}</span>
+                    {% else %}
+                      Enter your email and password to register
+                    {% endif %}                    
+                  </p>
+                </div>
+                <div class="card-body">
+                  <form role="form" method="post" action="{{ url_for_security("register") }}">
+                    {{ register_user_form.hidden_tag() }} 
+                    <div class="input-group input-group-outline mb-3">
+                      {{ render_field_with_errors(register_user_form.email, class="form-control", placeholder="Email address") }}
+                    </div>
+                    <div class="input-group input-group-outline mb-3">
+                      {{ render_field_with_errors(register_user_form.password, class="form-control", placeholder="password") }}
+                      {% if register_user_form.password_confirm %}
+                        {{ render_field_with_errors(register_user_form.password_confirm,class_="form-control", placeholder="Confirm Password") }}
+                      {% endif %}
+                    </div>
+                    <div class="text-center">
+                      {{ render_field(register_user_form.next) }}
+                      {{ render_field(register_user_form.submit, class="btn btn-lg bg-gradient-primary btn-lg w-100 mt-4 mb-0") }}
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

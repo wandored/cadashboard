@@ -4,28 +4,37 @@ Copyright (c) 2019 - present AppSeed.us
 """
 
 from flask.helpers import url_for
-from flask_security.decorators import auth_required
+from flask_security.decorators import roles_accepted
 import pandas as pd
 from dashapp.home import blueprint
-from flask import flash, render_template, session, request, redirect, url_for
-from dashapp.home.util import get_period, get_lastyear, refresh_data, sales_detail
+from flask import flash, render_template, session, redirect, url_for
+from dashapp.home.util import get_period, get_lastyear, refresh_data
 from flask_security import login_required, current_user
-from jinja2 import TemplateNotFound
 from datetime import datetime, timedelta
-from dashapp.authentication.forms import DateForm
-from dashapp.authentication.models import Categories, Menuitems, db, Calendar, Sales, Labor, Restaurants
-from sqlalchemy import and_, or_, func
+from dashapp.authentication.forms import DateForm, StoreForm, UpdateForm
+from dashapp.authentication.models import Menuitems, db, Calendar, Sales, Labor, Restaurants
+from sqlalchemy import or_, func
 
 
 @blueprint.route("/")
+@login_required
 def route_default():
     TODAY = datetime.date(datetime.now())
     YSTDAY = TODAY - timedelta(days=1)
     session["targetdate"] = YSTDAY.strftime("%Y-%m-%d")
+    if not Sales.query.filter_by(date=session['targetdate']).first():
+        flash(
+            f"Sales are not available for the selected day.  Please try again later or select a different date!",
+            "warning",
+        )
+        TODAY = datetime.date(datetime.now())
+        YSTDAY = TODAY - timedelta(days=2)
+        session["targetdate"] = YSTDAY.strftime("%Y-%m-%d")
+        return redirect(url_for("home_blueprint.index"))
     return redirect(url_for("home_blueprint.index"))
 
 
-@blueprint.route("/index", methods=["GET", "POST"])
+@blueprint.route("/index/", methods=["GET", "POST"])
 @login_required
 def index(targetdate=None):
 
@@ -58,47 +67,30 @@ def index(targetdate=None):
 
     # Check for no sales
     if not Sales.query.filter_by(date=start_day).first():
-        baddates = refresh_data(start_day, end_day)
-        if baddates == 1 and start_day == session['targetdate']:
-            flash(
-                f"Sales have not pulled for yesterday yet.  Please try again later or change the date!",
-                "warning",
-            )
-            TODAY = datetime.date(datetime.now())
-            YSTDAY = TODAY - timedelta(days=2)
-            session["targetdate"] = YSTDAY.strftime("%Y-%m-%d")
-            return redirect(url_for("home_blueprint.index"))
-
-        session["targetdate"] = start_day
-        return redirect(url_for("home_blueprint.index"))
+        return redirect(url_for("home_blueprint.route_default"))
 
 
     # Get Data
-    form = DateForm()
-    if form.validate_on_submit():
+    form1 = DateForm()
+    form3 = StoreForm()
+    if form1.submit1.data and form1.validate():
         """
-        When new date submitted, the data for that date will be replaced with new data from R365
-        We check if there are infact sales for that day, if not, it resets to yesterday, if
-        there are sales, then labor is polled
+        Change targetdate
         """
-        start_day = form.selectdate.data.strftime("%Y-%m-%d")
-        day_end = form.selectdate.data + timedelta(days=1)
-        end_day = day_end.strftime("%Y-%m-%d")
-
-        baddates = refresh_data(start_day, end_day)
-        if baddates == 1:
-            flash(
-                f"I cannot find sales for the day you selected.  Please select another date!",
-                "warning",
-            )
-            TODAY = datetime.date(datetime.now())
-            YSTDAY = TODAY - timedelta(days=1)
-            session["targetdate"] = YSTDAY.strftime("%Y-%m-%d")
-            return redirect(url_for("home_blueprint.route_default"))
-
-
+        start_day = form1.selectdate.data.strftime("%Y-%m-%d")
         session["targetdate"] = start_day
         return redirect(url_for("home_blueprint.index"))
+
+
+    if form3.submit3.data and form3.validate():
+
+        session["targetdate"] = start_day
+        store_id = form3.store.data.id
+
+        return redirect(url_for("home_blueprint.store", store_id=store_id))
+
+
+
 
     # Daily Chart
     daily_chart = (
@@ -490,7 +482,8 @@ def index(targetdate=None):
     return render_template(
         "home/index.html",
         title='CentraArchy',
-        form=form,
+        form1=form1,
+        form3=form3,
         segment="index",
         current_user=current_user,
         roles=current_user.roles,
@@ -503,34 +496,26 @@ def index(targetdate=None):
         values3_ly=values3_ly,
         daily_table=daily_table,
         daily_totals=daily_totals,
-        weekly_table=weekly_table,
+#        weekly_table=weekly_table,
         weekly_totals=weekly_totals,
-        period_table=period_table,
+#        period_table=period_table,
         period_totals=period_totals,
-        yearly_table=yearly_table,
+#        yearly_table=yearly_table,
         yearly_totals=yearly_totals,
         daily_top=daily_top,
         weekly_top=weekly_top,
         period_top=period_top,
-        yearly_top=yearly_top
+#        yearly_top=yearly_top
     )
 
 
-@blueprint.route("/<int:store_id>/store", methods=["GET", "POST"])
+@blueprint.route("/<int:store_id>/store/", methods=["GET", "POST"])
 @login_required
 def store(store_id):
 
-    form = DateForm()
+    form1 = DateForm()
+    form3 = StoreForm()
     store = Restaurants.query.filter_by(id=store_id).first()
-    if not store:
-        flash(
-            f"Please don't click on Totals",
-            "warning",
-        )
-        TODAY = datetime.date(datetime.now())
-        YSTDAY = TODAY - timedelta(days=1)
-        session["targetdate"] = YSTDAY.strftime("%Y-%m-%d")
-        return redirect(url_for("home_blueprint.index"))
 
     print(store.name)
     start_day = start_week = end_week = start_period = end_period = start_year = end_year = ""
@@ -561,19 +546,19 @@ def store(store_id):
 
 
     # Get Data
-    form = DateForm()
-    if form.validate_on_submit():
+    form1 = DateForm()
+    if form1.submit1.data and form1.validate():
         """
         When new date submitted, the data for that date will be replaced with new data from R365
         We check if there are infact sales for that day, if not, it resets to yesterday, if
         there are sales, then labor is polled
         """
-        start_day = form.selectdate.data.strftime("%Y-%m-%d")
-        day_end = form.selectdate.data + timedelta(days=1)
+        start_day = form1.selectdate.data.strftime("%Y-%m-%d")
+        day_end = form1.selectdate.data + timedelta(days=1)
         end_day = day_end.strftime("%Y-%m-%d")
 
-        baddates = refresh_data(start_day, end_day)
-        if baddates == 1:
+        # Check for no sales
+        if not Sales.query.filter_by(date=start_day, name=store.name).first():
             flash(
                 f"I cannot find sales for the day you selected.  Please select another date!",
                 "warning",
@@ -581,12 +566,18 @@ def store(store_id):
             TODAY = datetime.date(datetime.now())
             YSTDAY = TODAY - timedelta(days=1)
             session["targetdate"] = YSTDAY.strftime("%Y-%m-%d")
-            return redirect(url_for("home_blueprint.route_default"))
-
+            return redirect(url_for("home_blueprint.store", store_id=store.id))
 
         session["targetdate"] = start_day
         return redirect(url_for("home_blueprint.store", store_id=store.id))
 
+
+    if form3.submit3.data and form3.validate():
+
+        session["targetdate"] = start_day
+        store_id = form3.store.data.id
+
+        return redirect(url_for("home_blueprint.store", store_id=store_id))
 
     # Daily Chart
     daily_chart = (
@@ -744,23 +735,6 @@ def store(store_id):
     daily_table = daily_table.merge(store_list, how="left")
 
     daily_table.set_index("name", inplace=True)
-
-    if daily_table.sales.empty:
-        print('table empty')
-
-        baddates = refresh_data(start_day, end_day)
-        if baddates == 1 and start_day == session['targetdate']:
-            flash(
-                f"Sales have not pulled for yesterday yet.  Please try again later or change the date!",
-                "warning",
-            )
-            TODAY = datetime.date(datetime.now())
-            YSTDAY = TODAY - timedelta(days=2)
-            session["targetdate"] = YSTDAY.strftime("%Y-%m-%d")
-            return redirect(url_for("home_blueprint.index"))
-
-        session["targetdate"] = start_day
-        return redirect(url_for("home_blueprint.index"))
 
     daily_table['labor_pct'] = daily_table.dollars / daily_table.sales
     daily_table['labor_pct_ly'] = daily_table.dollars_ly / daily_table.sales_ly
@@ -1057,51 +1031,63 @@ def store(store_id):
     dates = Calendar.query.filter(Calendar.date >= start_period, Calendar.date <= end_period).all()
     dates = pd.DataFrame([x.as_dict() for x in dates])
 
-    data_food = (db.session.query(Categories)
+    data_food = (db.session.query(
+        Menuitems.date,
+        func.sum(Menuitems.amount).label('total_sales'))
              .filter(
-                Categories.date >= start_period,
-                Categories.date <= end_period,
-                Categories.name == store.name,
-                Categories.category == "FOOD")
+                Menuitems.date >= start_period,
+                Menuitems.date <= end_period,
+                Menuitems.name == store.name,
+                Menuitems.category == 'FOOD')
+            .group_by(Menuitems.date)
             .all()
     )
-    food_sales = pd.DataFrame([(x.date, x.amount) for x in data_food], columns=['date', 'amount']
+    food_sales = pd.DataFrame([(x.date, x.total_sales) for x in data_food], columns=['date', 'amount']
     )
     food_sales.rename(columns={'amount': 'Food'}, inplace=True)
 
-    data_beer = (db.session.query(Categories)
+    data_beer = (db.session.query(
+        Menuitems.date,
+        func.sum(Menuitems.amount).label('total_sales'))
              .filter(
-                Categories.date >= start_period,
-                Categories.date <= end_period,
-                Categories.name == store.name,
-                Categories.category == "BEER")
+                Menuitems.date >= start_period,
+                Menuitems.date <= end_period,
+                Menuitems.name == store.name,
+                Menuitems.category == "BEER")
+            .group_by(Menuitems.date)
             .all()
     )
-    beer_sales = pd.DataFrame([(x.date, x.amount) for x in data_beer], columns=['date', 'amount']
+    beer_sales = pd.DataFrame([(x.date, x.total_sales) for x in data_beer], columns=['date', 'amount']
     )
     beer_sales.rename(columns={'amount': 'Beer'}, inplace=True)
 
-    data_liquor = (db.session.query(Categories)
+    data_liquor = (db.session.query(
+        Menuitems.date,
+        func.sum(Menuitems.amount).label('total_sales'))
              .filter(
-                Categories.date >= start_period,
-                Categories.date <= end_period,
-                Categories.name == store.name,
-                Categories.category == "LIQUOR")
+                Menuitems.date >= start_period,
+                Menuitems.date <= end_period,
+                Menuitems.name == store.name,
+                Menuitems.category == "LIQUOR")
+            .group_by(Menuitems.date)
             .all()
     )
-    liquor_sales = pd.DataFrame([(x.date, x.amount) for x in data_liquor], columns=['date', 'amount']
+    liquor_sales = pd.DataFrame([(x.date, x.total_sales) for x in data_liquor], columns=['date', 'amount']
     )
     liquor_sales.rename(columns={'amount': 'Liquor'}, inplace=True)
 
-    data_wine = (db.session.query(Categories)
+    data_wine = (db.session.query(
+        Menuitems.date,
+        func.sum(Menuitems.amount).label('total_sales'))
              .filter(
-                Categories.date >= start_period,
-                Categories.date <= end_period,
-                Categories.name == store.name,
-                Categories.category == "WINE")
+                Menuitems.date >= start_period,
+                Menuitems.date <= end_period,
+                Menuitems.name == store.name,
+                Menuitems.category == "WINE")
+            .group_by(Menuitems.date)
             .all()
     )
-    wine_sales = pd.DataFrame([(x.date, x.amount) for x in data_wine], columns=['date', 'amount']
+    wine_sales = pd.DataFrame([(x.date, x.total_sales) for x in data_wine], columns=['date', 'amount']
     )
     wine_sales.rename(columns={'amount': 'Wine'}, inplace=True)
 
@@ -1133,7 +1119,8 @@ def store(store_id):
         "home/store.html",
         title=store.name,
         segment='store',
-        form=form,
+        form1=form1,
+        form3=form3,
         current_user=current_user,
         roles=current_user.roles,
         fiscal_dates=fiscal_dates,
@@ -1149,10 +1136,10 @@ def store(store_id):
         weekly_totals=weekly_totals,
 #        period_table=period_table,
         period_totals=period_totals,
-        period_table_w1=period_table_w1,
-        period_table_w2=period_table_w2,
-        period_table_w3=period_table_w3,
-        period_table_w4=period_table_w4,
+#        period_table_w1=period_table_w1,
+#        period_table_w2=period_table_w2,
+#        period_table_w3=period_table_w3,
+#        period_table_w4=period_table_w4,
 #        yearly_table=yearly_table,
         yearly_totals=yearly_totals,
         cats_totals=cats_totals,
@@ -1163,7 +1150,7 @@ def store(store_id):
     )
 
 
-@blueprint.route("/marketing", methods=["GET", "POST"])
+@blueprint.route("/marketing/", methods=["GET", "POST"])
 @login_required
 def marketing(targetdate=None):
 
@@ -1194,31 +1181,22 @@ def marketing(targetdate=None):
     end_year_ly = get_lastyear(end_year)
     year_to_date = get_lastyear(start_day)
 
-    form = DateForm()
-    if form.validate_on_submit():
+    form1 = DateForm()
+    form3 = StoreForm()
+    if form1.submit1.data and form1.validate():
         """
-        When new date submitted, the data for that date will be replaced with new data from R365
-        We check if there are infact sales for that day, if not, it resets to yesterday, if
-        there are sales, then labor is polled
         """
-        start_day = form.selectdate.data.strftime("%Y-%m-%d")
-        day_end = form.selectdate.data + timedelta(days=1)
-        end_day = day_end.strftime("%Y-%m-%d")
-
-        baddates = refresh_data(start_day, end_day)
-        if baddates == 1:
-            flash(
-                f"I cannot find sales for the day you selected.  Please select another date!",
-                "warning",
-            )
-            TODAY = datetime.date(datetime.now())
-            YSTDAY = TODAY - timedelta(days=1)
-            session["targetdate"] = YSTDAY.strftime("%Y-%m-%d")
-            return redirect(url_for("home_blueprint.route_default"))
-
-
+        start_day = form1.selectdate.data.strftime("%Y-%m-%d")
         session["targetdate"] = start_day
         return redirect(url_for("home_blueprint.marketing"))
+
+
+    if form3.submit3.data and form3.validate():
+
+        session["targetdate"] = start_day
+        store_id = form3.store.data.id
+
+        return redirect(url_for("home_blueprint.store", store_id=store_id))
 
     # Gift Card Sales
     gift_cards = (
@@ -1240,19 +1218,99 @@ def marketing(targetdate=None):
     gift_card_sales.sort_values(by=['amount'], ascending=False, inplace=True)
     gift_card_sales.loc["TOTALS"] = gift_card_sales.sum(numeric_only=True)
 
-    gift_card_sales.fillna('Totals', inplace=True)
+    #gift_card_sales.fillna('Totals', inplace=True)
 
     return render_template(
         "home/marketing.html",
         title='Marketing',
         segment='marketing',
-        form=form,
+        form1=form1,
+        form3=form3,
         current_user=current_user,
         roles=current_user.roles,
         fiscal_dates=fiscal_dates,
         gift_card_sales=gift_card_sales,
     )
 
+
+@blueprint.route("/support/", methods=["GET", "POST"])
+@login_required
+@roles_accepted('admin')
+def support(targetdate=None):
+
+    start_day = end_day = start_week = end_week = start_period = end_period = start_year = end_year = ""
+    fiscal_dates = get_period(datetime.strptime(session["targetdate"], "%Y-%m-%d"))
+    for i in fiscal_dates:
+        day_start = datetime.strptime(i.date, "%Y-%m-%d")
+        day_end = day_start + timedelta(days=1)
+        end_day = day_end.strftime("%Y-%m-%d")
+        start_day = i.date
+        start_week = i.week_start
+        end_week = i.week_end
+        start_period = i.period_start
+        end_period = i.period_end
+        start_year = i.year_start
+        end_year = i.year_end
+
+    # Get matching day, week and period start and end dates
+    start_day_ly = get_lastyear(start_day)
+    #    end_day_ly = get_lastyear(end_day)
+    start_week_ly = get_lastyear(start_week)
+    end_week_ly = get_lastyear(end_week)
+    week_to_date = get_lastyear(start_day)
+    start_period_ly = get_lastyear(start_period)
+    end_period_ly = get_lastyear(end_period)
+    period_to_date = get_lastyear(start_day)
+    start_year_ly = get_lastyear(start_year)
+    end_year_ly = get_lastyear(end_year)
+    year_to_date = get_lastyear(start_day)
+
+
+    form1 = DateForm()
+    form2 = UpdateForm()
+    form3 = StoreForm()
+    if form1.submit1.data and form1.validate():
+        """
+        """
+        start_day = form1.selectdate.data.strftime("%Y-%m-%d")
+        session["targetdate"] = start_day
+        return redirect(url_for("home_blueprint.marketing"))
+
+
+    if form2.submit2.data and form2.validate():
+        """
+        """
+        start_day = form2.selectdate.data.strftime("%Y-%m-%d")
+        day_end = form2.selectdate.data + timedelta(days=1)
+        end_day = day_end.strftime("%Y-%m-%d")
+
+        baddates = refresh_data(start_day, end_day)
+        if baddates == 1:
+            flash(
+                f"I cannot find sales for the day you selected.  Please select another date!",
+                "warning",
+            )
+            return redirect(url_for("home_blueprint.route_default"))
+        session["targetdate"] = start_day
+        return redirect(url_for("home_blueprint.support"))
+
+
+    if form3.submit3.data and form3.validate():
+
+        session["targetdate"] = start_day
+        store_id = form3.store.data.id
+
+        return redirect(url_for("home_blueprint.store", store_id=store_id))
+
+
+    return render_template(
+        'home/support.html',
+        title='Support',
+        segment='support',
+        form1=form1,
+        form2=form2,
+        form3=form3,
+    )
 
 #@blueprint.route("/<template>")
 #@login_required
