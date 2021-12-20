@@ -214,8 +214,31 @@ class Menuitems(db.Model):
     date = db.Column(db.String(64))
     menuitem = db.Column(db.String(64))
     name = db.Column(db.String(64))
+    category = db.Column(db.String(64))
     amount = db.Column(db.Integer)
     quantity = db.Column(db.Integer)
+
+
+class Budgets(db.Model):
+
+    __tablename__ = "Budgets"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64))
+    period = db.Column(db.Integer)
+    year = db.Column(db.Integer)
+    alcohol_cost = db.Column(db.Integer)
+    alcohol_sales = db.Column(db.Integer)
+    food_cost = db.Column(db.Integer)
+    food_sales = db.Column(db.Integer)
+    gross_operating_profit = db.Column(db.Integer)
+    gross_profit = db.Column(db.Integer)
+    labor_benefits = db.Column(db.Integer)
+    net_profit = db.Column(db.Integer)
+    operating_expense = db.Column(db.Integer)
+    total_cost_of_sales = db.Column(db.Integer)
+    total_labor_and_operating_expense = db.Column(db.Integer)
+    total_sales = db.Column(db.Integer)
 
 
 #@login_manager.user_loader

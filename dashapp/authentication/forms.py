@@ -4,10 +4,34 @@ Copyright (c) 2019 - present AppSeed.us
 """
 
 from flask_wtf import FlaskForm
-from wtforms import SubmitField, EmailField, StringField, PasswordField, DateField
+from wtforms import SubmitField, EmailField, StringField, PasswordField, DateField, SelectField
+from wtforms_sqlalchemy.fields import QuerySelectField
 from wtforms.validators import Email, DataRequired
+from dashapp.authentication.models import Restaurants
+from sqlalchemy import and_, or_, func
 
 # login and registration
+
+
+def store_query():
+    filters = {or_(
+        Restaurants.id == 3,
+        Restaurants.id == 4,
+        Restaurants.id == 5,
+        Restaurants.id == 6,
+        Restaurants.id == 9,
+        Restaurants.id == 10,
+        Restaurants.id == 11,
+        Restaurants.id == 12,
+        Restaurants.id == 13,
+        Restaurants.id == 14,
+        Restaurants.id == 15,
+        Restaurants.id == 16,
+        Restaurants.id == 17,
+        Restaurants.id == 18)
+               }
+    stores = Restaurants.query.filter(*filters).order_by(Restaurants.name)
+    return stores
 
 
 class LoginForm(FlaskForm):
@@ -24,10 +48,21 @@ class CreateAccountForm(FlaskForm):
 
 
 class DateForm(FlaskForm):
-    selectdate = DateField("Change Date: ", format="%Y-%m-%d")
-    submit = SubmitField("Submit")
+    selectdate = DateField("Change Date", format="%Y-%m-%d")
+    submit1 = SubmitField("Submit")
 
 
 class UpdateForm(FlaskForm):
     selectdate = DateField("Data Update", format="%Y-%m-%d")
-    submit = SubmitField("Submit")
+    submit2 = SubmitField("Submit")
+
+
+class StoreForm(FlaskForm):
+    store = QuerySelectField(
+        "", query_factory=store_query,
+        allow_blank=True,
+        get_label="name",
+        blank_text='Select Store'
+    )
+    submit3 = SubmitField("Submit")
+

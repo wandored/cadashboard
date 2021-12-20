@@ -9,24 +9,24 @@
     </div>
     <hr class="horizontal light mt-0 mb-2">
     <form method="POST" action="" style="text-align:center">
-      {{ form.hidden_tag() }}
+      {{ form1.hidden_tag() }}
       <fieldset id="" class="form-group mb-1">
         <div class="form-group mb-1">
-          {{ form.selectdate.label(class="form=control-label") }}
-          {% if form.selectdate.errors %}
-              {{ form.selectdate(class="form=control form-control-md is-invalid") }}
+          {{ form1.selectdate.label(class="form=control-label") }}
+          {% if form1.selectdate.errors %}
+              {{ form1.selectdate(class="form=control form-control-md is-invalid") }}
               <div class="invalid-feedback">
-                  {% for error in form.selectdate.errors %}
+                  {% for error in form1.selectdate.errors %}
                       <span>{{ error }}</span>
                   {% endfor %}
               </div>
           {% else %}
-              {{ form.selectdate(class="form=control form-control-md") }}
+              {{ form1.selectdate(class="form=control form-control-md") }}
           {% endif %}
         </div>
       </fieldset>
       <div class="form-group">
-        {{ form.submit(class="btn btn-info") }}
+        {{ form1.submit1(class="btn btn-info btn-sm") }}
       </div>
     </form>
     <div class="collapse navbar-collapse  w-auto  max-height-vh-100" id="sidenav-collapse-main">
@@ -50,12 +50,28 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link text-white {% if 'store' in segment %} active bg-gradient-primary {% endif %}" 
-             href="">
-            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-              <i class="material-icons opacity-10">receipt_long</i>
+          <a class="nav-link text-white {% if 'store' in segment %} active bg-gradient-primary {% endif %}">
+          <form method="POST" action="" style="text-align:center">
+            {{ form3.hidden_tag() }}
+            <fieldset id="" class="form-group mb-0">
+              <div class="form-group mb-1">
+                {{ form3.store.label(class="form=control-label") }}
+                {% if form3.store.errors %}
+                    {{ form3.store(class="form=control form-control-md is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form3.store.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form3.store(class="form=control form-control-md") }}
+                {% endif %}
+              </div>
+            </fieldset>
+            <div class="form-group">
+              {{ form3.submit3(class="btn btn-info btn-sm col-0") }}
             </div>
-            <span class="nav-link-text ms-1">Store</span>
+          </form>
           </a>
         </li>
         <li class="nav-item">
