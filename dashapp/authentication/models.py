@@ -189,6 +189,7 @@ class Labor(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.String(64))
+    category = db.Column(db.String(64))
     job = db.Column(db.String(64))
     name = db.Column(db.String(64))
     hours = db.Column(db.Integer)

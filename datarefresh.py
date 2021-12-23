@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import requests
 import pandas as pd
 import json
@@ -152,7 +154,7 @@ if __name__ == "__main__":
 
 #    df_loc = pd.read_csv('./scripts/locations.csv')
 #    df_cal = pd.read_csv('./scripts/calendar.csv')
-    engine = create_engine('postgresql://wandored:midnight67@localhost:5432/dashboard')
+    engine = create_engine(Config.SQLALCHEMY_DATABASE_URI)
     conn = psycopg2.connect(
         host='localhost',
         database='dashboard',
