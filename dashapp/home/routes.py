@@ -701,7 +701,7 @@ def store(store_id):
     sales_table['net_sales'] = (sales_table.total_sales + sales_table.gift_cards)
     sales_table['net_sales_ly'] = (sales_table.total_sales_ly + sales_table.gift_cards_ly)
 
-    # get labor for day
+    # Daily Labor
     bar_labor = get_daily_labor(start_day, start_day, store.name, 'Bar')
     host_labor = get_daily_labor(start_day, start_day, store.name, 'Host')
     restaurant_labor = get_daily_labor(start_day, start_day, store.name, 'Restaurant')
@@ -780,7 +780,7 @@ def store(store_id):
     sales_table['net_sales'] = (sales_table.total_sales + sales_table.gift_cards)
     sales_table['net_sales_ly'] = (sales_table.total_sales_ly + sales_table.gift_cards_ly)
 
-    # get labor for day
+    # Weekly Labor
     bar_labor = get_daily_labor(start_week, end_week, store.name, 'Bar')
     host_labor = get_daily_labor(start_week, end_week, store.name, 'Host')
     restaurant_labor = get_daily_labor(start_week, end_week, store.name, 'Restaurant')
@@ -840,7 +840,7 @@ def store(store_id):
     sales_table.rename(columns={'FOOD': 'food', 'BEER': 'beer', 'LIQUOR': 'liquor', 'WINE': 'wine', 'GIFT CARDS': 'gift_cards'}, inplace=True)
     sales_table.fillna(value=0, inplace=True)
 
-    sales_table = sales_table.merge(dates, how="outer", sort=True)
+#    sales_table = sales_table.merge(dates, how="outer", sort=True)
 
     food_sales_ly = get_daily_sales(start_period_ly, end_period_ly, store.name, 'FOOD')
     beer_sales_ly = get_daily_sales(start_period_ly, end_period_ly, store.name, 'BEER')
@@ -855,7 +855,7 @@ def store(store_id):
     sales_table_ly.rename(columns={'FOOD': 'food_ly', 'BEER': 'beer_ly', 'LIQUOR': 'liquor_ly', 'WINE': 'wine_ly', 'GIFT CARDS': 'gift_cards_ly'}, inplace=True)
     sales_table_ly.fillna(value=0, inplace=True)
 
-    sales_table_ly = sales_table_ly.merge(dates_ly, how="outer")
+#    sales_table_ly = sales_table_ly.merge(dates_ly, how="outer")
 
     col_sales_ly = sales_table_ly[['food_ly', 'beer_ly', 'liquor_ly', 'wine_ly', 'gift_cards_ly']]
     sales_table = sales_table.join(col_sales_ly)
@@ -866,7 +866,7 @@ def store(store_id):
     sales_table['net_sales'] = (sales_table.total_sales + sales_table.gift_cards)
     sales_table['net_sales_ly'] = (sales_table.total_sales_ly + sales_table.gift_cards_ly)
 
-    # get labor for day
+    # Period Labor
     bar_labor = get_daily_labor(start_period, end_period, store.name, 'Bar')
     host_labor = get_daily_labor(start_period, end_period, store.name, 'Host')
     restaurant_labor = get_daily_labor(start_period, end_period, store.name, 'Restaurant')
@@ -902,22 +902,22 @@ def store(store_id):
     period_table['Kitchen_pct'] = period_table.Kitchen / (period_table.food)
     period_table['name'] = store.name
 
-    period_table_w1 = period_table.loc[period_table['week'] == 1 ]
-    period_table_w1.fillna(value=0, inplace=True)
-    period_table_w2 = period_table.loc[period_table['week'] == 2 ]
-    period_table_w2.fillna(value=0, inplace=True)
-    period_table_w3 = period_table.loc[period_table['week'] == 3 ]
-    period_table_w3.fillna(value=0, inplace=True)
-    period_table_w4 = period_table.loc[period_table['week'] == 4 ]
-    period_table_w4.fillna(value=0, inplace=True)
-    period_table_w1.loc["TOTALS"] = period_table_w1.sum(numeric_only=True)
-    period_table_w1.at['TOTALS', 'date'] = '-'
-    period_table_w2.loc["TOTALS"] = period_table_w2.sum(numeric_only=True)
-    period_table_w2.at['TOTALS', 'date'] = '-'
-    period_table_w3.loc["TOTALS"] = period_table_w3.sum(numeric_only=True)
-    period_table_w3.at['TOTALS', 'date'] = '-'
-    period_table_w4.loc["TOTALS"] = period_table_w4.sum(numeric_only=True)
-    period_table_w4.at['TOTALS', 'date'] = '-'
+#    period_table_w1 = period_table.loc[period_table['week'] == 1 ]
+#    period_table_w1.fillna(value=0, inplace=True)
+#    period_table_w2 = period_table.loc[period_table['week'] == 2 ]
+#    period_table_w2.fillna(value=0, inplace=True)
+#    period_table_w3 = period_table.loc[period_table['week'] == 3 ]
+#    period_table_w3.fillna(value=0, inplace=True)
+#    period_table_w4 = period_table.loc[period_table['week'] == 4 ]
+#    period_table_w4.fillna(value=0, inplace=True)
+#    period_table_w1.loc["TOTALS"] = period_table_w1.sum(numeric_only=True)
+#    period_table_w1.at['TOTALS', 'date'] = '-'
+#    period_table_w2.loc["TOTALS"] = period_table_w2.sum(numeric_only=True)
+#    period_table_w2.at['TOTALS', 'date'] = '-'
+#    period_table_w3.loc["TOTALS"] = period_table_w3.sum(numeric_only=True)
+#    period_table_w3.at['TOTALS', 'date'] = '-'
+#    period_table_w4.loc["TOTALS"] = period_table_w4.sum(numeric_only=True)
+#    period_table_w4.at['TOTALS', 'date'] = '-'
 
     period_table = period_table.merge(store_list, how="left")
     period_table.loc["TOTALS"] = period_table.sum(numeric_only=True)
@@ -1002,42 +1002,6 @@ def store(store_id):
 
 
 
-#    cats_table = food_sales.merge(beer_sales, how="left", sort=True)
-#    cats_table = cats_table.merge(liquor_sales, how="left", sort=True)
-#    cats_table = cats_table.merge(wine_sales, how="left", sort=True)
-#    cats_table = cats_table.merge(dates, how="outer", sort=True)
-#    cats_table.rename(columns={'date_x': 'date', 'quarter_x': 'quarter', 'year_x': 'year', 'dow_x': 'dow'}, inplace=True)
-#    cats_table = cats_table.merge(merge_table, sort=True)
-#    cats_table['total_labor'] = cats_table['Bar'] + cats_table['Host'] + cats_table['Restaurant'] + cats_table['Kitchen']
-#    cats_table.loc["TOTALS"] = cats_table.sum(numeric_only=True)
-#    cats_table['labor_pct'] = cats_table.total_labor / cats_table.sales
-#    cats_table['bar_pct'] = cats_table.Bar / (cats_table.Beer + cats_table.Liquor + cats_table.Wine)
-#    cats_table['host_pct'] = cats_table.Host / (cats_table.Food)
-#    cats_table['restaurant_pct'] = cats_table.Restaurant / (cats_table.Food)
-#    cats_table['kitchen_pct'] = cats_table.Kitchen / (cats_table.Food)
-#    cats_table.fillna(value=0, inplace=True)
-#    cats_table_w1 = cats_table.loc[cats_table['week'] == 1 ]
-#    cats_table_w1.fillna(value=0, inplace=True)
-#    cats_table_w2 = cats_table.loc[cats_table['week'] == 2 ]
-#    cats_table_w2.fillna(value=0, inplace=True)
-#    cats_table_w3 = cats_table.loc[cats_table['week'] == 3 ]
-#    cats_table_w3.fillna(value=0, inplace=True)
-#    cats_table_w4 = cats_table.loc[cats_table['week'] == 4 ]
-#    cats_table_w4.fillna(value=0, inplace=True)
-#    cats_table_w1.loc["TOTALS"] = cats_table_w1.sum(numeric_only=True)
-#    cats_table_w1.at['TOTALS', 'date'] = '-'
-#    cats_table_w2.loc["TOTALS"] = cats_table_w2.sum(numeric_only=True)
-#    cats_table_w2.at['TOTALS', 'date'] = '-'
-#    cats_table_w3.loc["TOTALS"] = cats_table_w3.sum(numeric_only=True)
-#    cats_table_w3.at['TOTALS', 'date'] = '-'
-#    cats_table_w4.loc["TOTALS"] = cats_table_w4.sum(numeric_only=True)
-#    cats_table_w4.at['TOTALS', 'date'] = '-'
-#    daily_totals = cats_table[cats_table['date'] == start_day]
-#
-#    period_totals = cats_table.loc["TOTALS"]
-#    print(weekly_totals)
-    print(period_table_w1)
-
     return render_template(
         "home/store.html",
         title=store.name,
@@ -1054,22 +1018,16 @@ def store(store_id):
         values2_ly=values2_ly,
         values3_ly=values3_ly,
         daily_table=daily_table,
-#        daily_totals=daily_totals,
         weekly_table=weekly_table,
         weekly_totals=weekly_totals,
         period_table=period_table,
         period_totals=period_totals,
-        period_table_w1=period_table_w1,
-        period_table_w2=period_table_w2,
-        period_table_w3=period_table_w3,
-        period_table_w4=period_table_w4,
+#        period_table_w1=period_table_w1,
+#        period_table_w2=period_table_w2,
+#        period_table_w3=period_table_w3,
+#        period_table_w4=period_table_w4,
         yearly_table=yearly_table,
         yearly_totals=yearly_totals,
-#        cats_totals=cats_totals,
-#        cats_table_w1=cats_table_w1,
-#        cats_table_w2=cats_table_w2,
-#        cats_table_w3=cats_table_w3,
-#        cats_table_w4=cats_table_w4,
     )
 
 

@@ -203,7 +203,7 @@
                       <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Restaurant</th>
                       <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Sales</th>
                       <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Sales SPLY</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Guest Count</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Budget Sales</th>
                       <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">SPLY</th>
                       <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor %</th>
                       <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor SPLY</th>
@@ -215,7 +215,7 @@
                       <td>
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex flex-column">
-                            <a class="me-2"><h6 class="mb-0 text-sm">{{ v.name }}</h6></a>
+                            <a class="me-2" href="{{ url_for('home_blueprint.store', store_id=v.id) }}"><h6 class="mb-0 text-sm">{{ v.name }}</h6></a>
                           </div>
                         </div>
                       </td>
