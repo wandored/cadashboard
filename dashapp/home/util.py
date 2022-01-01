@@ -8,6 +8,7 @@ import numpy as np
 from dashapp.config import Config
 from datetime import datetime
 from dashapp.authentication.models import Calendar, Sales, Labor, Restaurants, db, Categories, Menuitems
+from sqlalchemy import or_, func
 
 
 pd.option_context('display.max_rows', None,
@@ -143,14 +144,19 @@ def labor_detail(start, end):
     if df.empty:
         return 1
 
+    with open("./labor_categories.json") as labor_file:
+        labor_cats = json.load(labor_file)
+    df_cats = pd.DataFrame(list(labor_cats.items()), columns=['job', 'category'])
+
     data = db.session.query(Restaurants).all()
     df_loc = pd.DataFrame(
         [(x.name, x.location) for x in data], columns=["name", "location"]
     )
     df_merge = df_loc.merge(df, left_on="location", right_on="location_ID")
     df_merge.rename(columns={"jobTitle": "job", "total": "dollars"}, inplace=True)
+    df_merge = df_merge.merge(df_cats, on='job')
     df_pivot = df_merge.pivot_table(
-        index=["name", "job"], values=["hours", "dollars"], aggfunc=np.sum
+        index=["name", "category", "job"], values=["hours", "dollars"], aggfunc=np.sum
     )
     df_pivot["date"] = start
     df_pivot.to_sql("Labor", con=db.engine, if_exists="append")
@@ -193,3 +199,39 @@ def sales_detail(start, end):
     menu_pivot.to_sql("Menuitems", con=db.engine, if_exists="append")
 
     return 0
+
+
+def get_daily_sales(start, end, store, cat):
+
+    if cat == 'GIFT CARDS':
+        data = db.session.query(Menuitems.date,
+                    func.sum(Menuitems.amount).label("total_sales")
+                ).filter(Menuitems.date >= start,
+                        Menuitems.date >= end,
+                        Menuitems.name == store,
+                        Menuitems.menuitem == 'GIFT CARD'
+                ).group_by(Menuitems.date).all()
+    else:
+        data = db.session.query(Menuitems.date,
+                    func.sum(Menuitems.amount).label("total_sales")
+                ).filter(Menuitems.date >= start,
+                        Menuitems.date <= end,
+                        Menuitems.name == store,
+                        Menuitems.category == cat
+                ).group_by(Menuitems.date).all()
+    df = pd.DataFrame([(x.date, x.total_sales) for x in data], columns=['date', cat])
+    return df
+
+
+def get_daily_labor(start, end, store, cat):
+
+    data = db.session.query(
+            Labor.date,
+            func.sum(Labor.dollars).label("total_dollars"),
+                ).filter(Labor.date >= start,
+                        Labor.date <= end,
+                        Labor.name == store,
+                        Labor.category == cat
+                ).group_by(Labor.date).all()
+    df = pd.DataFrame([(x.date, x.total_dollars) for x in data], columns=['date', cat])
+    return df

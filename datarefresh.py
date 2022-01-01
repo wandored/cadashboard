@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import requests
 import pandas as pd
 import json
@@ -128,15 +130,22 @@ def labor_datail(start, end):
     if df.empty:
         print('empty dataframe')
         return
+
+    with open("./labor_categories.json") as labor_file:
+        labor_cats = json.load(labor_file)
+    df_cats = pd.DataFrame(list(labor_cats.items()), columns=['job', 'category'])
+
     cur.execute(rest_query)
     data = cur.fetchall()
     df_loc = pd.DataFrame.from_records(data, columns=['id', 'location', 'name'])
     df_merge = df_loc.merge(df, left_on='location', right_on='location_ID')
     df_merge.rename(columns={'jobTitle': 'job', 'total': 'dollars'}, inplace=True)
+    df_merge = df_merge.merge(df_cats, on='job')
 
     # pivot data and write to database
     df_pivot = df_merge.pivot_table(
         index=['name',
+               'category',
                'job'],
         values=['hours',
                 'dollars'],
@@ -150,14 +159,12 @@ def labor_datail(start, end):
 
 if __name__ == "__main__":
 
-#    df_loc = pd.read_csv('./scripts/locations.csv')
-#    df_cal = pd.read_csv('./scripts/calendar.csv')
-    engine = create_engine('postgresql://wandored:midnight67@localhost:5432/dashboard')
+    engine = create_engine(Config.SQLALCHEMY_DATABASE_URI)
     conn = psycopg2.connect(
         host='localhost',
         database='dashboard',
-        user='wandored',
-        password='midnight67'
+        user=Config.PSYCOPG2_USER,
+        password=Config.PSYCOPG2_PASS,
     )
     cur = conn.cursor()
     rest_query = 'select * from "Restaurants"'
