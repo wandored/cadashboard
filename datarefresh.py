@@ -152,14 +152,12 @@ def labor_datail(start, end):
 
 if __name__ == "__main__":
 
-#    df_loc = pd.read_csv('./scripts/locations.csv')
-#    df_cal = pd.read_csv('./scripts/calendar.csv')
     engine = create_engine(Config.SQLALCHEMY_DATABASE_URI)
     conn = psycopg2.connect(
         host='localhost',
         database='dashboard',
-        user='wandored',
-        password='midnight67'
+        user=Config.PSYCOPG2_USER,
+        password=Config.PSYCOPG2_PASS,
     )
     cur = conn.cursor()
     rest_query = 'select * from "Restaurants"'
