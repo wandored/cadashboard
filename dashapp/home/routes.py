@@ -36,7 +36,7 @@ def route_default():
 
 @blueprint.route("/index/", methods=["GET", "POST"])
 @login_required
-def index(targetdate=None):
+def index():
 
     start_day = end_day = start_week = end_week = start_period = end_period = start_year = end_year = ""
     if not session['targetdate']:
@@ -149,6 +149,7 @@ def index(targetdate=None):
         .order_by(Calendar.period)
         .filter(Sales.date >= start_year, Sales.date <= end_year)
     )
+    print(f'Period Chart {period_chart}')
     values3 = []
     for v in period_chart:
         values3.append(v.total_sales)

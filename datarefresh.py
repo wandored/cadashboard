@@ -1,14 +1,16 @@
-#!/usr/bin/env python
-
-import requests
-import pandas as pd
+'''
+Datarefresh imports the previous days data and
+uploads it to the local database.  This is run
+hourly from a cron job
+'''
 import json
-import numpy as np
-import psycopg2
-from dashapp import Config, db
-from dashapp.authentication.models import Sales, Labor, Menuitems
 from sqlalchemy.engine.create import create_engine
 from datetime import datetime, timedelta
+import requests
+import pandas as pd
+import numpy as np
+import psycopg2
+from dashapp import Config
 
 
 def make_HTTP_request(url):
@@ -120,7 +122,6 @@ def sales_employee(start, end):
 
 def labor_datail(start, end):
 
-    #df_loc = pd.read_csv('/home/wandored/Projects/Dashboard/locations.csv')
     url_filter = '$filter=dateWorked ge {}T00:00:00Z and dateWorked le {}T00:00:00Z'.format(start, end)
     query = '$select=jobTitle,hours,total,location_ID&{}'.format(url_filter)
     url = '{}/LaborDetail?{}'.format(Config.SRVC_ROOT, query)
@@ -178,8 +179,6 @@ if __name__ == "__main__":
     cur.execute('DELETE FROM "Labor" WHERE date = %s', (start_date,))
     cur.execute('DELETE FROM "Menuitems" WHERE date = %s', (start_date,))
     conn.commit()
-
-    print(f'Deleted data for {start_date}')
 
     sales_detail(start_date, end_date)
     sales_employee(start_date, end_date)

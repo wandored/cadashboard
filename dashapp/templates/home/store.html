@@ -343,225 +343,233 @@
               {% for x in fiscal_dates %}
                 <h4 class="alert-heading text-light">{{ x.day }} Labor</h4>
               {% endfor %}
-              <table class="table-responsive table-sm text-light">
-                <thead>
-                  <tr>
-                    <th scope="col"></th>
-                    <th scope="col">BAR</th>
-                    <th scope="col">HOST</th>
-                    <th scope="col">SERVER</th>
-                    <th scope="col">KITCHEN</th>
-                    <th scope="col">TOTAL</th>
-                    <th scope="col">BUDGET</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                      <th scope="row">DOLLARS</th>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(daily_table.Bar) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(daily_table.Host) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(daily_table.Restaurant) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(daily_table.Kitchen) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(daily_table.Total_Labor) }}</p>
-                      </td>
-                  </tr>
-                  <tr>
-                      <th scope="row">PERCENT</th>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((daily_table.Bar / daily_table.alcohol_sales) * 100) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((daily_table.Host / daily_table.food) * 100) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((daily_table.Restaurant / daily_table.food) * 100) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((daily_table.Kitchen / daily_table.food) * 100) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((daily_table.Total_Labor / daily_table.total_sales) * 100) }}</p>
-                      </td>
-                  </tr>
-                </tbody>
-              </table>
+              <div class="table-responsive table-hover">
+                <table class="table-sm text-light">
+                  <thead>
+                    <tr>
+                      <th scope="col"></th>
+                      <th scope="col">BAR</th>
+                      <th scope="col">HOST</th>
+                      <th scope="col">SERVER</th>
+                      <th scope="col">KITCHEN</th>
+                      <th scope="col">TOTAL</th>
+                      <th scope="col">BUDGET</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                        <th scope="row">DOLLARS</th>
+                        <td>
+                          <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(daily_table.Bar) }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(daily_table.Host) }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(daily_table.Restaurant) }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(daily_table.Kitchen) }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(daily_table.Total_Labor) }}</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">PERCENT</th>
+                        <td>
+                          <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((daily_table.Bar / daily_table.alcohol_sales) * 100) }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((daily_table.Host / daily_table.food) * 100) }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((daily_table.Restaurant / daily_table.food) * 100) }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((daily_table.Kitchen / daily_table.food) * 100) }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((daily_table.Total_Labor / daily_table.total_sales) * 100) }}</p>
+                        </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
             <div class="alert alert-success" role="alert">
               {% for x in fiscal_dates %}
                 <h4 class="alert-heading text-light">Week-{{ x.week }} Labor</h4>
               {% endfor %}
-              <table class="table-responsive table-sm text-light">
-                <thead>
-                  <tr>
-                    <th scope="col"></th>
-                    <th scope="col">BAR</th>
-                    <th scope="col">HOST</th>
-                    <th scope="col">SERVER</th>
-                    <th scope="col">KITCHEN</th>
-                    <th scope="col">TOTAL</th>
-                    <th scope="col">BUDGET</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                      <th scope="row">DOLLARS</th>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(weekly_totals.Bar) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(weekly_totals.Host) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(weekly_totals.Restaurant) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(weekly_totals.Kitchen) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(weekly_totals.Total_Labor) }}</p>
-                      </td>
-                  </tr>
-                  <tr>
-                      <th scope="row">PERCENT</th>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((weekly_totals.Bar / weekly_totals.alcohol_sales) * 100) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((weekly_totals.Host / weekly_totals.food) * 100) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((weekly_totals.Restaurant / weekly_totals.food) * 100) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((weekly_totals.Kitchen / weekly_totals.food) * 100) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((weekly_totals.Total_Labor / weekly_totals.total_sales) * 100) }}</p>
-                      </td>
-                  </tr>
-                </tbody>
-              </table>
+              <div class="table-responsive table-hover">
+                <table class="table-sm text-light">
+                  <thead>
+                    <tr>
+                      <th scope="col"></th>
+                      <th scope="col">BAR</th>
+                      <th scope="col">HOST</th>
+                      <th scope="col">SERVER</th>
+                      <th scope="col">KITCHEN</th>
+                      <th scope="col">TOTAL</th>
+                      <th scope="col">BUDGET</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                        <th scope="row">DOLLARS</th>
+                        <td>
+                          <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(weekly_totals.Bar) }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(weekly_totals.Host) }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(weekly_totals.Restaurant) }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(weekly_totals.Kitchen) }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(weekly_totals.Total_Labor) }}</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">PERCENT</th>
+                        <td>
+                          <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((weekly_totals.Bar / weekly_totals.alcohol_sales) * 100) }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((weekly_totals.Host / weekly_totals.food) * 100) }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((weekly_totals.Restaurant / weekly_totals.food) * 100) }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((weekly_totals.Kitchen / weekly_totals.food) * 100) }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((weekly_totals.Total_Labor / weekly_totals.total_sales) * 100) }}</p>
+                        </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
             <div class="alert alert-info" role="alert">
               {% for x in fiscal_dates %}
                 <h4 class="alert-heading text-light">Period-{{ x.period }} Labor</h4>
               {% endfor %}
-              <table class="table-responsive table-sm text-light">
-                <thead>
-                  <tr>
-                    <th scope="col"></th>
-                    <th scope="col">BAR</th>
-                    <th scope="col">HOST</th>
-                    <th scope="col">SERVER</th>
-                    <th scope="col">KITCHEN</th>
-                    <th scope="col">TOTAL</th>
-                    <th scope="col">BUDGET</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                      <th scope="row">DOLLARS</th>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(period_totals.Bar) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(period_totals.Host) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(period_totals.Restaurant) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(period_totals.Kitchen) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(period_totals.Total_Labor) }}</p>
-                      </td>
-                  </tr>
-                  <tr>
-                      <th scope="row">PERCENT</th>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((period_totals.Bar / period_totals.alcohol_sales) * 100) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((period_totals.Host / period_totals.food) * 100) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((period_totals.Restaurant / period_totals.food) * 100) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((period_totals.Kitchen / period_totals.food) * 100) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((period_totals.Total_Labor / period_totals.total_sales) * 100) }}</p>
-                      </td>
-                  </tr>
-                </tbody>
-              </table>
+              <div class="table-responsive table-hover">
+                <table class="table-sm text-light">
+                  <thead>
+                    <tr>
+                      <th scope="col"></th>
+                      <th scope="col">BAR</th>
+                      <th scope="col">HOST</th>
+                      <th scope="col">SERVER</th>
+                      <th scope="col">KITCHEN</th>
+                      <th scope="col">TOTAL</th>
+                      <th scope="col">BUDGET</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                        <th scope="row">DOLLARS</th>
+                        <td>
+                          <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(period_totals.Bar) }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(period_totals.Host) }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(period_totals.Restaurant) }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(period_totals.Kitchen) }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(period_totals.Total_Labor) }}</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">PERCENT</th>
+                        <td>
+                          <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((period_totals.Bar / period_totals.alcohol_sales) * 100) }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((period_totals.Host / period_totals.food) * 100) }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((period_totals.Restaurant / period_totals.food) * 100) }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((period_totals.Kitchen / period_totals.food) * 100) }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((period_totals.Total_Labor / period_totals.total_sales) * 100) }}</p>
+                        </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
             <div class="alert alert-warning" role="alert">
               {% for x in fiscal_dates %}
                 <h4 class="alert-heading text-light">{{ x.year }} Labor</h4>
               {% endfor %}
-              <table class="table-responsive table-sm text-light">
-                <thead>
-                  <tr>
-                    <th scope="col"></th>
-                    <th scope="col">BAR</th>
-                    <th scope="col">HOST</th>
-                    <th scope="col">SERVER</th>
-                    <th scope="col">KITCHEN</th>
-                    <th scope="col">TOTAL</th>
-                    <th scope="col">BUDGET</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                      <th scope="row">DOLLARS</th>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(yearly_totals.Bar) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(yearly_totals.Host) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(yearly_totals.Restaurant) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(yearly_totals.Kitchen) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(yearly_totals.Total_Labor) }}</p>
-                      </td>
-                  </tr>
-                  <tr>
-                      <th scope="row">PERCENT</th>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((yearly_totals.Bar / yearly_totals.alcohol_sales) * 100) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((yearly_totals.Host / yearly_totals.food) * 100) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((yearly_totals.Restaurant / yearly_totals.food) * 100) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((yearly_totals.Kitchen / yearly_totals.food) * 100) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((yearly_totals.Total_Labor / yearly_totals.total_sales) * 100) }}</p>
-                      </td>
-                  </tr>
-                </tbody>
-              </table>
+              <div class="table-responsive table-hover">
+                <table class="table-sm text-light">
+                  <thead>
+                    <tr>
+                      <th scope="col"></th>
+                      <th scope="col">BAR</th>
+                      <th scope="col">HOST</th>
+                      <th scope="col">SERVER</th>
+                      <th scope="col">KITCHEN</th>
+                      <th scope="col">TOTAL</th>
+                      <th scope="col">BUDGET</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                        <th scope="row">DOLLARS</th>
+                        <td>
+                          <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(yearly_totals.Bar) }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(yearly_totals.Host) }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(yearly_totals.Restaurant) }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(yearly_totals.Kitchen) }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(yearly_totals.Total_Labor) }}</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">PERCENT</th>
+                        <td>
+                          <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((yearly_totals.Bar / yearly_totals.alcohol_sales) * 100) }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((yearly_totals.Host / yearly_totals.food) * 100) }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((yearly_totals.Restaurant / yearly_totals.food) * 100) }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((yearly_totals.Kitchen / yearly_totals.food) * 100) }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((yearly_totals.Total_Labor / yearly_totals.total_sales) * 100) }}</p>
+                        </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
             <div class="card-body p-3">
             </div>
