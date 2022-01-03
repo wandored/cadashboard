@@ -27,7 +27,7 @@ greenlet==1.1.2
 idna==3.3
 itsdangerous==2.0.1
 Jinja2==3.0.2
-lxml==4.6.3
+lxml==4.6.5
 Mako==1.1.5
 MarkupSafe==2.0.1
 numpy==1.21.3

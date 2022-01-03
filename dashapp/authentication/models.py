@@ -196,6 +196,7 @@ class Labor(db.Model):
     dollars = db.Column(db.Integer)
 
 
+#this is deprecated
 class Categories(db.Model):
 
     __tablename__ = "Categories"
