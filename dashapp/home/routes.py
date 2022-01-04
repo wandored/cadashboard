@@ -1105,7 +1105,8 @@ def marketing(targetdate=None):
                          func.sum(Menuitems.amount).label("sales"),
                          func.sum(Menuitems.quantity).label("count"),
                          )
-            .filter(Menuitems.date >= '2021-01-01',
+            .filter(Menuitems.date >= start_period,
+                    Menuitems.date <= end_period,
                     or_(
                     Menuitems.menuitem == 'PORTERHOUSE FEAST 2',
                     Menuitems.menuitem == 'PORTERHOUSE FEAST 4',
@@ -1125,11 +1126,11 @@ def marketing(targetdate=None):
         "home/marketing.html",
         title='Marketing',
         segment='marketing',
+        fiscal_dates=fiscal_dates,
         form1=form1,
         form3=form3,
         current_user=current_user,
         roles=current_user.roles,
-        fiscal_dates=fiscal_dates,
         gift_card_sales=gift_card_sales,
         porterhouse_feast=porterhouse_feast,
     )
@@ -1176,7 +1177,7 @@ def support(targetdate=None):
         """
         start_day = form1.selectdate.data.strftime("%Y-%m-%d")
         session["targetdate"] = start_day
-        return redirect(url_for("home_blueprint.marketing"))
+        return redirect(url_for("home_blueprint.support"))
 
 
     if form2.submit2.data and form2.validate():
@@ -1207,17 +1208,19 @@ def support(targetdate=None):
 
     daquery = (
         db.session.query(Menuitems.name,
+                         Menuitems.menuitem,
                          func.sum(Menuitems.amount).label("sales"),
                          func.sum(Menuitems.quantity).label("count"),
                          )
-            .filter(Menuitems.date == start_day,
+            .filter(Menuitems.date == start_period,
                     or_(
-                    Menuitems.menuitem == 'Unassigned'
+                    Menuitems.menuitem == 'Unassigned',
+                    Menuitems.category == 'Unassigned',
                     ))
-            .group_by(Menuitems.name)
+            .group_by(Menuitems.name, Menuitems.menuitem)
         ).all()
     unassigned_sales = pd.DataFrame.from_records(
-        daquery, columns=["store", "amount", "quantity"]
+        daquery, columns=["store", "menuitem", "amount", "quantity"]
     )
     unassigned_sales.sort_values(by=['amount'], ascending=False, inplace=True)
 
@@ -1226,6 +1229,7 @@ def support(targetdate=None):
         'home/support.html',
         title='Support',
         segment='support',
+        fiscal_dates=fiscal_dates,
         form1=form1,
         form2=form2,
         form3=form3,
