@@ -540,6 +540,7 @@ def store(store_id):
 
     print(store.name)
     start_day = end_day = start_week = end_week = start_period = end_period = start_year = end_year = ""
+    period = year = week = 0
     fiscal_dates = get_period(datetime.strptime(session["targetdate"], "%Y-%m-%d"))
     for i in fiscal_dates:
         day_start = datetime.strptime(i.date, "%Y-%m-%d")
@@ -552,6 +553,9 @@ def store(store_id):
         end_period = i.period_end
         start_year = i.year_start
         end_year = i.year_end
+        period = i.period
+        year = i.year
+        week = i.week
 
     # Get matching day, week and period start and end dates
     start_day_ly = get_lastyear(start_day)
@@ -682,6 +686,19 @@ def store(store_id):
     values3_ly = []
     for v in period_chart_ly:
         values3_ly.append(v.total_sales)
+
+
+    budget_chart = (
+        db.session.query(func.sum(Budgets.total_sales).label('total_sales'))
+        .select_from(Budgets)
+        .group_by(Budgets.period)
+        .order_by(Budgets.period)
+        .filter(Budgets.year == year,
+                Budgets.name == store.name)
+        )
+    budgets3 = []
+    for v in budget_chart:
+        budgets3.append(v.total_sales)
 
 
     # Daily Sales Table
@@ -1036,6 +1053,7 @@ def store(store_id):
         values1_ly=values1_ly,
         values2_ly=values2_ly,
         values3_ly=values3_ly,
+        budgets3=budgets3,
         daily_table=daily_table,
         weekly_table=weekly_table,
         weekly_totals=weekly_totals,
