@@ -1086,8 +1086,8 @@ def marketing(targetdate=None):
                          func.sum(Menuitems.amount).label("sales"),
                          func.sum(Menuitems.quantity).label("count"),
                          )
-            .filter(Menuitems.date >= '2021-11-01',
-                    Menuitems.date <= '2021-12-31',
+            .filter(Menuitems.date >= start_period,
+                    Menuitems.date <= end_period,
                     or_(
                     Menuitems.menuitem == 'GIFT CARD',
                     Menuitems.menuitem == 'Gift Card')
@@ -1100,7 +1100,26 @@ def marketing(targetdate=None):
     gift_card_sales.sort_values(by=['amount'], ascending=False, inplace=True)
     gift_card_sales.loc["TOTALS"] = gift_card_sales.sum(numeric_only=True)
 
-    #gift_card_sales.fillna('Totals', inplace=True)
+    porterhouse = (
+        db.session.query(Menuitems.name,
+                         func.sum(Menuitems.amount).label("sales"),
+                         func.sum(Menuitems.quantity).label("count"),
+                         )
+            .filter(Menuitems.date >= '2021-01-01',
+                    or_(
+                    Menuitems.menuitem == 'PORTERHOUSE FEAST 2',
+                    Menuitems.menuitem == 'PORTERHOUSE FEAST 4',
+                    Menuitems.menuitem == 'PORTERHOUSE FEAST 2-3',
+                    Menuitems.menuitem == 'PORTERHOUSE DINNER 2-3')
+                    )
+            .group_by(Menuitems.name)
+        ).all()
+    porterhouse_feast = pd.DataFrame.from_records(
+        porterhouse, columns=["store", "amount", "quantity"]
+    )
+    porterhouse_feast.sort_values(by=['amount'], ascending=False, inplace=True)
+    porterhouse_feast.loc["TOTALS"] = porterhouse_feast.sum(numeric_only=True)
+
 
     return render_template(
         "home/marketing.html",
@@ -1112,6 +1131,7 @@ def marketing(targetdate=None):
         roles=current_user.roles,
         fiscal_dates=fiscal_dates,
         gift_card_sales=gift_card_sales,
+        porterhouse_feast=porterhouse_feast,
     )
 
 
@@ -1185,6 +1205,23 @@ def support(targetdate=None):
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
 
+    daquery = (
+        db.session.query(Menuitems.name,
+                         func.sum(Menuitems.amount).label("sales"),
+                         func.sum(Menuitems.quantity).label("count"),
+                         )
+            .filter(Menuitems.date == start_day,
+                    or_(
+                    Menuitems.menuitem == 'Unassigned'
+                    ))
+            .group_by(Menuitems.name)
+        ).all()
+    unassigned_sales = pd.DataFrame.from_records(
+        daquery, columns=["store", "amount", "quantity"]
+    )
+    unassigned_sales.sort_values(by=['amount'], ascending=False, inplace=True)
+
+
     return render_template(
         'home/support.html',
         title='Support',
@@ -1192,6 +1229,7 @@ def support(targetdate=None):
         form1=form1,
         form2=form2,
         form3=form3,
+        unassigned_sales=unassigned_sales,
     )
 
 #@blueprint.route("/<template>")

@@ -9,12 +9,11 @@
 
   <div class="container-fluid py-4">
     <div class="row min-vh-80 h-100">
-      <div class="col-12">
         <!-- Gift Cards -->
         <div class="col-lg-4 col-md-6">
           <div class="card h-100">
             <div class="card-header bg-primary pb-0">
-              <h4>GIFT CARD SALES NOV-DEC 2021</h4>
+              <h4>GIFT CARD SALES CURRENT PERIOD</h4>
             </div>
             <div class="card">
               <table class="table-responsive table-md">
@@ -42,8 +41,39 @@
             </div>
           </div>
         </div>
-      </div>
-      </div>
+        <!-- porterhouse feast -->
+        <div class="col-lg-4 col-md-6">
+          <div class="card h-100">
+            <div class="card-header bg-success pb-0">
+              <h4>PORTERHOUSE FEAST SALES 2021</h4>
+            </div>
+            <div class="card">
+              <table class="table-responsive table-md">
+                <thead>
+                  <tr>
+                    <th scope="col">STORE</th>
+                    <th scope="col">COUNT</th>
+                    <th scope="col">SALES</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for k, v in porterhouse_feast.iterrows() %}
+                    <tr>
+                      <th scope="row">{{ v.store }}</th>
+                        <td>
+                          <p class="mb-0 ms-1 text-begin">{{ "{:,.0f}".format(v.quantity) }}</p>
+                          <p class="mb-0 ms-1 text-begin">{{ v.menuitem }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-begin">{{ "${:,.0f}".format(v.amount) }}</p>
+                        </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
     </div>
 
     {% include 'includes/footer.html' %}

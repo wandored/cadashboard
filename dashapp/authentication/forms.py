@@ -4,11 +4,11 @@ Copyright (c) 2019 - present AppSeed.us
 """
 
 from flask_wtf import FlaskForm
-from wtforms import SubmitField, EmailField, StringField, PasswordField, DateField, SelectField
+from wtforms import SubmitField, EmailField, StringField, PasswordField, DateField
 from wtforms_sqlalchemy.fields import QuerySelectField
 from wtforms.validators import Email, DataRequired
 from dashapp.authentication.models import Restaurants
-from sqlalchemy import and_, or_, func
+from sqlalchemy import or_
 
 # login and registration
 
