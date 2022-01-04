@@ -12,7 +12,7 @@ from dashapp.home.util import get_period, get_lastyear, refresh_data, get_daily_
 from flask_security import login_required, current_user
 from datetime import datetime, timedelta
 from dashapp.authentication.forms import DateForm, StoreForm, UpdateForm
-from dashapp.authentication.models import Menuitems, db, Calendar, Sales, Labor, Restaurants
+from dashapp.authentication.models import Menuitems, db, Calendar, Sales, Labor, Restaurants, Budgets
 from sqlalchemy import or_, func
 
 
@@ -39,6 +39,7 @@ def route_default():
 def index():
 
     start_day = end_day = start_week = end_week = start_period = end_period = start_year = end_year = ""
+    period = year = 0
     if not session['targetdate']:
         return redirect(url_for('home_blueprint.route_default'))
     fiscal_dates = get_period(datetime.strptime(session["targetdate"], "%Y-%m-%d"))
@@ -53,6 +54,8 @@ def index():
         end_period = i.period_end
         start_year = i.year_start
         end_year = i.year_end
+        period = i.period
+        year = i.year
 
     # Get matching day, week and period start and end dates
     start_day_ly = get_lastyear(start_day)
@@ -92,8 +95,6 @@ def index():
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
 
-
-
     # Daily Chart
     daily_chart = (
         db.session.query(func.sum(Sales.sales).label("total_sales"))
@@ -114,6 +115,10 @@ def index():
     values1_ly = []
     for v in daily_chart_ly:
         values1_ly.append(v.total_sales)
+
+
+    # TODO add daily budget
+
 
     # Weekly Chart
     weekly_chart = (
@@ -140,6 +145,8 @@ def index():
     for v in weekly_chart_ly:
         values2_ly.append(v.total_sales)
 
+    # TODO add weekly budget
+
     # Yearly Chart
     period_chart = (
         db.session.query(func.sum(Sales.sales).label("total_sales"))
@@ -149,7 +156,6 @@ def index():
         .order_by(Calendar.period)
         .filter(Sales.date >= start_year, Sales.date <= end_year)
     )
-    print(f'Period Chart {period_chart}')
     values3 = []
     for v in period_chart:
         values3.append(v.total_sales)
@@ -165,6 +171,17 @@ def index():
     values3_ly = []
     for v in period_chart_ly:
         values3_ly.append(v.total_sales)
+
+    budget_chart = (
+        db.session.query(func.sum(Budgets.total_sales).label('total_sales'))
+        .select_from(Budgets)
+        .group_by(Budgets.period)
+        .order_by(Budgets.period)
+        .filter(Budgets.year == year)
+    )
+    budgets3 = []
+    for v in budget_chart:
+        budgets3.append(v.total_sales)
 
     # Daily Sales Table
     sales_day = (
@@ -497,6 +514,7 @@ def index():
         values1_ly=values1_ly,
         values2_ly=values2_ly,
         values3_ly=values3_ly,
+        budgets3=budgets3,
         daily_table=daily_table,
         daily_totals=daily_totals,
 #        weekly_table=weekly_table,
@@ -1102,8 +1120,9 @@ def marketing(targetdate=None):
 
     porterhouse = (
         db.session.query(Menuitems.name,
-                         func.sum(Menuitems.amount).label("sales"),
+                         Menuitems.menuitem,
                          func.sum(Menuitems.quantity).label("count"),
+                         func.sum(Menuitems.amount).label("sales"),
                          )
             .filter(Menuitems.date >= start_period,
                     Menuitems.date <= end_period,
@@ -1113,13 +1132,13 @@ def marketing(targetdate=None):
                     Menuitems.menuitem == 'PORTERHOUSE FEAST 2-3',
                     Menuitems.menuitem == 'PORTERHOUSE DINNER 2-3')
                     )
-            .group_by(Menuitems.name)
+            .group_by(Menuitems.menuitem, Menuitems.name)
         ).all()
     porterhouse_feast = pd.DataFrame.from_records(
-        porterhouse, columns=["store", "amount", "quantity"]
+        porterhouse, columns=["store", "menuitem", "count", "sales"]
     )
-    porterhouse_feast.sort_values(by=['amount'], ascending=False, inplace=True)
-    porterhouse_feast.loc["TOTALS"] = porterhouse_feast.sum(numeric_only=True)
+    porterhouse_feast['price'] = porterhouse_feast['sales'] / porterhouse_feast['count'].astype(float)
+    porterhouse_feast.sort_values(by=['sales'], ascending=False, inplace=True)
 
 
     return render_template(
