@@ -15,6 +15,9 @@
               <h4>MANUAL DATA UPDATE</h4>
             </div>
             <div class="card">
+              {% for x in fiscal_dates %}
+              CURRENT DATE: {{ x.date }}
+              {% endfor %}
               <form method="POST" action="" style="text-align:center">
                 {{ form2.hidden_tag() }}
                 <fieldset id="" class="form-group mb-1">
@@ -46,7 +49,9 @@
         <div class="col-lg-4 col-md-6">
           <div class="card h-100">
             <div class="card-header bg-primary pb-0">
-              <h4>UNASSIGNED SALES CURRENT DAY</h4>
+              {% for x in fiscal_dates %}
+              <h4>UNASSIGNED SALES PERIOD {{ x.period }}, {{ x.year }}</h4>
+              {% endfor %}
             </div>
             <div class="card">
               <table class="table-responsive table-md">
@@ -60,7 +65,7 @@
                 <tbody>
                   {% for k, v in unassigned_sales.iterrows() %}
                     <tr>
-                      <th scope="row">{{ v.store }}</th>
+                      <th scope="row">{{ v.store }} - {{ v.menuitem }}</th>
                         <td>
                           <p class="mb-0 ms-1 text-begin">{{ "{:,.0f}".format(v.quantity) }}</p>
                         </td>
