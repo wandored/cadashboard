@@ -77,9 +77,9 @@ def sales_detail(start, end):
     dafilter = df_menu["menuitem"].str.contains("VOID")
     df_clean = df_menu[~dafilter]
     df_clean[["x", "menuitem"]] = df_clean["menuitem"].str.split(" - ", expand=True)
-    menuitems = removeSpecial(df_clean)
+    # menuitems = removeSpecial(df_clean)
     # Write the daily menu items to Menuitems table
-    menu_pivot = menuitems.pivot_table(
+    menu_pivot = df_clean.pivot_table(
         index=["name", "menuitem", "category"], values=["amount", "quantity"], aggfunc=np.sum
     )
     menu_pivot["date"] = start

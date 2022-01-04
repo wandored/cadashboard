@@ -57,6 +57,7 @@
                   <tr>
                     <th scope="col">STORE</th>
                     <th scope="col">COUNT</th>
+                    <th scope="col">AVG COST</th>
                     <th scope="col">SALES</th>
                   </tr>
                 </thead>
@@ -65,11 +66,13 @@
                     <tr>
                       <th scope="row">{{ v.store }}</th>
                         <td>
-                          <p class="mb-0 ms-1 text-begin">{{ "{:,.0f}".format(v.quantity) }}</p>
-                          <p class="mb-0 ms-1 text-begin">{{ v.menuitem }}</p>
+                          <p class="mb-0 ms-1 text-begin">{{ "{:,.0f}".format(v.sales/v.price) }}</p>
                         </td>
                         <td>
-                          <p class="mb-0 ms-1 text-begin">{{ "${:,.0f}".format(v.amount) }}</p>
+                          <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v.price) }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v.sales) }}</p>
                         </td>
                     </tr>
                   {% endfor %}
