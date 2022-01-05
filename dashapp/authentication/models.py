@@ -221,6 +221,25 @@ class Menuitems(db.Model):
     quantity = db.Column(db.Integer)
 
 
+class Transactions(db.Model):
+
+    __tablename__ = "Transactions"
+
+    id = db.Column(db.Integer, primary_key=True)
+    store_id = db.Column(db.Integer)
+    name = db.Column(db.String(64))
+    item = db.Column(db.String(256))
+    category1 = db.Column(db.String(64))
+    category2 = db.Column(db.String(64))
+    category3 = db.Column(db.String(64))
+    credit = db.Column(db.Integer)
+    debit = db.Column(db.Integer)
+    amount = db.Column(db.Integer)
+    quantity = db.Column(db.Integer)
+    UofM = db.Column(db.String(64))
+    date = db.Column(db.String(64))
+
+
 class Budgets(db.Model):
 
     __tablename__ = "Budgets"

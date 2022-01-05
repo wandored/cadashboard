@@ -132,7 +132,7 @@ def labor_datail(start, end):
         print('empty dataframe')
         return
 
-    with open("./labor_categories.json") as labor_file:
+    with open("/usr/local/share/labor_categories.json") as labor_file:
         labor_cats = json.load(labor_file)
     df_cats = pd.DataFrame(list(labor_cats.items()), columns=['job', 'category'])
 
