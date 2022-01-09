@@ -277,62 +277,11 @@
                 </div>
               </div>
             </div>
-            <div class="card-header pb-0">
-              <div class="row">
-                {% for x in fiscal_dates %}
-                <div class="col-lg-6 col-7">
-                  <h6>Year - {{ x.year }}</h6>
-                </div>
-                {% endfor %}
-              </div>
-            </div>
-            <div class="row g-2">
-              <div class="col-md-3 col-md-0">
-                <div class="card text-white bg-primary" style"max-width: 18rem;">
-                    <div class="card-body">
-                      <h5 class="card-title">FOOD</h5>
-                      <p class="card-text-light font-weight-bold">SALES - {{ "${:,.0f}".format(yearly_totals.food) }}</p>
-                      <p class="card-text-light font-weight-bold">BUDGET - </p>
-                      <p class="card-text-light font-weight-bold">COSTS - </p>
-                    </div>
-                </div>
-              </div>
-              <div class="col-md-3 col-md-0">
-                <div class="card text-white bg-success" style"max-width: 18rem;">
-                    <div class="card-body">
-                      <h5 class="card-title">BEER</h5>
-                      <p class="card-text-light font-weight-bold">SALES - {{ "${:,.0f}".format(yearly_totals.beer) }}</p>
-                      <p class="card-text-light font-weight-bold">BUDGET - </p>
-                      <p class="card-text-light font-weight-bold">COSTS - </p>
-                    </div>
-                </div>
-              </div>
-              <div class="col-md-3 col-md-0">
-                <div class="card text-white bg-info" style"max-width: 18rem;">
-                    <div class="card-body">
-                      <h5 class="card-title">LIQUOR</h5>
-                      <p class="card-text-light font-weight-bold">SALES - {{ "${:,.0f}".format(yearly_totals.liquor) }}</p>
-                      <p class="card-text-light font-weight-bold">BUDGET - </p>
-                      <p class="card-text-light font-weight-bold">COSTS - </p>
-                    </div>
-                </div>
-              </div>
-              <div class="col-md-3 col-md-0">
-                <div class="card text-white bg-warning" style"max-width: 18rem;">
-                    <div class="card-body">
-                      <h5 class="card-title">WINE</h5>
-                      <p class="card-text-light font-weight-bold">SALES - {{ "${:,.0f}".format(yearly_totals.wine) }}</p>
-                      <p class="card-text-light font-weight-bold">BUDGET - </p>
-                      <p class="card-text-light font-weight-bold">COSTS - </p>
-                    </div>
-                </div>
-              </div>
-            </div>
           </div><!-- card header -->
         </div><!-- card -->
         <!-- scorecard -->
         <div class="col-lg-4 col-md-6">
-          <div class="card h-100">
+          <div class="card">
             <div class="card-header pb-0">
               <h6>Labor Scorecard</h6>
               <p class="text-sm">
@@ -513,69 +462,87 @@
                 </table>
               </div>
             </div>
-            <div class="alert alert-warning" role="alert">
+          </div>
+        </div>
+      </div><!-- row -->
+    <div class="row mb-4">
+      <!-- TODO  add a conditional for casual or steakhouse -->
+        <!-- lobster cost -->
+        <div class="col-lg-6 col-md-4">
+          <div class="card">
+            <div class="card-header bg-success pb-0">
               {% for x in fiscal_dates %}
-                <h4 class="alert-heading text-light">{{ x.year }} Labor</h4>
+              <h4>CURRENT LOBSTER COSTS</h4>
               {% endfor %}
-              <div class="table-responsive table-hover">
-                <table class="table-sm text-light">
-                  <thead>
-                    <tr>
-                      <th scope="col"></th>
-                      <th scope="col">BAR</th>
-                      <th scope="col">HOST</th>
-                      <th scope="col">SERVER</th>
-                      <th scope="col">KITCHEN</th>
-                      <th scope="col">TOTAL</th>
-                      <th scope="col">BUDGET</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                        <th scope="row">DOLLARS</th>
-                        <td>
-                          <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(yearly_totals.Bar) }}</p>
-                        </td>
-                        <td>
-                          <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(yearly_totals.Host) }}</p>
-                        </td>
-                        <td>
-                          <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(yearly_totals.Restaurant) }}</p>
-                        </td>
-                        <td>
-                          <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(yearly_totals.Kitchen) }}</p>
-                        </td>
-                        <td>
-                          <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(yearly_totals.Total_Labor) }}</p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row">PERCENT</th>
-                        <td>
-                          <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((yearly_totals.Bar / yearly_totals.alcohol_sales) * 100) }}</p>
-                        </td>
-                        <td>
-                          <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((yearly_totals.Host / yearly_totals.food) * 100) }}</p>
-                        </td>
-                        <td>
-                          <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((yearly_totals.Restaurant / yearly_totals.food) * 100) }}</p>
-                        </td>
-                        <td>
-                          <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((yearly_totals.Kitchen / yearly_totals.food) * 100) }}</p>
-                        </td>
-                        <td>
-                          <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((yearly_totals.Total_Labor / yearly_totals.total_sales) * 100) }}</p>
-                        </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
             </div>
-            <div class="card-body p-3">
+            <div class="card">
+              <table class="table-responsive table-md">
+                <thead>
+                  <tr>
+                    <th scope="col">LOBSTER</th>
+                    <th scope="col">COST/LB</th>
+                    <th scope="col">PORTION COST</th>
+                    <th scope="col">SUG. PRICE</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for v in lobster_items %}
+                    <tr>
+                      <th scope="row">{{ v.item }}</th>
+                        <td>
+                          <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v.debit/v.quantity) }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format((v.debit/v.quantity)*(v.size/1)) }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-begin">${{ (((v.debit/v.quantity)*(v.size/1)/0.4) | round) - 0.05 }}</p>
+                        </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
-      </div>
+        <!-- stone cost -->
+        <div class="col-lg-6 col-md-4">
+          <div class="card">
+            <div class="card-header bg-warning pb-0">
+              {% for x in fiscal_dates %}
+              <h4>CURRENT STONE CLAW COSTS</h4>
+              {% endfor %}
+            </div>
+            <div class="card">
+              <table class="table-responsive table-md">
+                <thead>
+                  <tr>
+                    <th scope="col">ITEM</th>
+                    <th scope="col">COST/LB</th>
+                    <th scope="col">PORTION COST</th>
+                    <th scope="col">SUG. PRICE</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for v in stone_items %}
+                    <tr>
+                      <th scope="row">{{ v.item }}</th>
+                        <td>
+                          <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v.debit/v.quantity) }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format((v.debit/v.quantity)*(v.size/16)) }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-begin">${{ (((v.debit/v.quantity)*(v.size/16)/0.4) | round) - 0.05 }}</p>
+                        </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
 
     {% include 'includes/footer.html' %}
 

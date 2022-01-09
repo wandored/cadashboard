@@ -179,7 +179,7 @@ class Sales(db.Model):
     date = db.Column(db.String(64))
     daypart = db.Column(db.String(64))
     name = db.Column(db.String(64))
-    sales = db.Column(db.Integer)
+    sales = db.Column(db.Float)
     guests = db.Column(db.Integer)
 
 
@@ -193,7 +193,7 @@ class Labor(db.Model):
     job = db.Column(db.String(64))
     name = db.Column(db.String(64))
     hours = db.Column(db.Integer)
-    dollars = db.Column(db.Integer)
+    dollars = db.Column(db.Float)
 
 
 #this is deprecated
@@ -217,7 +217,7 @@ class Menuitems(db.Model):
     menuitem = db.Column(db.String(64))
     name = db.Column(db.String(64))
     category = db.Column(db.String(64))
-    amount = db.Column(db.Integer)
+    amount = db.Column(db.Float)
     quantity = db.Column(db.Integer)
 
 
@@ -226,18 +226,21 @@ class Transactions(db.Model):
     __tablename__ = "Transactions"
 
     id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.String(64))
+    trans_id = db.Column(db.String(64))
     store_id = db.Column(db.Integer)
     name = db.Column(db.String(64))
     item = db.Column(db.String(256))
     category1 = db.Column(db.String(64))
     category2 = db.Column(db.String(64))
     category3 = db.Column(db.String(64))
-    credit = db.Column(db.Integer)
-    debit = db.Column(db.Integer)
-    amount = db.Column(db.Integer)
     quantity = db.Column(db.Integer)
     UofM = db.Column(db.String(64))
-    date = db.Column(db.String(64))
+    credit = db.Column(db.Float)
+    debit = db.Column(db.Float)
+    amount = db.Column(db.Float)
+    type = db.Column(db.String(64))
+    modified = db.Column(db.String(64))
 
 
 class Budgets(db.Model):

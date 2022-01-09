@@ -26,6 +26,7 @@ def make_HTTP_request(url):
             all_records = all_records + json_data['value']
             if '@odata.nextLink' in json_data:
                 url = json_data['@odata.nextLink']
+                print(url)
             else:
                 break
     return all_records
@@ -49,10 +50,10 @@ def removeSpecial(df):
 
 def transaction(start, end):
 
-    url_filter = "$filter=date ge {}T00:00:00Z and date le {}T00:00:00Z".format(
+    url_filter = "$filter=modifiedOn ge {}T00:00:00Z and modifiedOn le {}T00:00:00Z".format(
         start, end
     )
-    query = "$select=date,name,type,locationName&{}".format(url_filter)
+    query = "$select=date,modifiedOn,name,type,locationId,transactionId&{}".format(url_filter)
     url = "{}/Transaction?{}".format(Config.SRVC_ROOT, query)
     print(url)
     rqst = make_HTTP_request(url)
@@ -61,12 +62,16 @@ def transaction(start, end):
         print('empty dataframe')
         return
 
+    df['date'] = df['date'].dt.strftime('%Y-%m-%d') #convert datetime to string and format
     cur.execute(rest_query)
     data = cur.fetchall()
     df_loc = pd.DataFrame.from_records(data, columns=['id', 'location', 'name'])
-    df_merge = df_loc.merge(df, left_on="name", right_on='locationName')
-    df_merge.drop(columns=['location', 'locationName'], inplace=True)
-    print(df_merge)
+    df_merge = df_loc.merge(df, left_on="location", right_on='locationId')
+    df_merge.rename(columns={'name_x': 'name', 'name_y': 'item'}, inplace=True)
+    df_merge[["modified", "m"]] = df_merge["modifiedOn"].str.split("T", expand=True)
+    df_merge.drop(columns=['location', 'locationId', 'm', 'modifiedOn'], inplace=True)
+
+    return  df_merge
 
 
 def Items():
@@ -79,16 +84,17 @@ def Items():
     if df.empty:
         print('empty dataframe')
         return
+    df.rename(columns={'name': 'item'}, inplace=True)
 
     return df
 
 
 def transactionDetails(start, end):
 
-    url_filter = "$filter=createdOn ge {}T00:00:00Z and createdOn le {}T00:00:00Z".format(
+    url_filter = "$filter=modifiedOn ge {}T00:00:00Z and modifiedOn le {}T00:00:00Z".format(
         start, end
     )
-    query = "$select=locationId,itemId,credit,debit,amount,quantity,unitOfMeasureName,createdOn&{}".format(url_filter)
+    query = "$select=locationId,itemId,credit,debit,amount,quantity,unitOfMeasureName,modifiedOn,transactionId&{}".format(url_filter)
     url = "{}/TransactionDetail?{}".format(Config.SRVC_ROOT, query)
     print(url)
     rqst = make_HTTP_request(url)
@@ -101,18 +107,24 @@ def transactionDetails(start, end):
     data = cur.fetchall()
     df_loc = pd.DataFrame.from_records(data, columns=['id', 'location', 'name'])
     df_merge = df_loc.merge(df, left_on="location", right_on='locationId')
-    df_merge.drop(columns=['location', 'locationId', 'createdOn'], inplace=True)
-    df_merge['date'] = start
+    df_merge[["modified", "m"]] = df_merge["modifiedOn"].str.split("T", expand=True)
+    df_merge.drop(columns=['location', 'locationId', 'm', 'modifiedOn'], inplace=True)
+
+    id_list = df_merge['transactionId'].tolist()
+    id_list = list(dict.fromkeys(id_list))
+    for x in id_list:
+        cur.execute('DELETE FROM "Transactions" WHERE trans_id = %s', (x,))
+        conn.commit()
 
     return df_merge
 
 
-def write_to_database(df1, df2):
+def write_to_database(df1, df2, df3):
 
-    df = df1.merge(df2, on='itemId')
-    df.drop(columns=['itemId'], inplace=True)
-    df.rename(columns={'name_x': 'item', 'unitOfMeasureName': 'UofM', 'name_y': 'name', 'id': 'store_id'}, inplace=True)
-    print(df)
+    df = df3.merge(df1, on=['transactionId', 'modified'])
+    df = df.merge(df2, on='itemId')
+    df.rename(columns={'item_y': 'item', 'unitOfMeasureName': 'UofM', 'name_x': 'name', 'id_x': 'store_id', 'transactionId': 'trans_id'}, inplace=True)
+    df.drop(columns=['itemId', 'name_y', 'id_y', 'item_x'], inplace=True)
     df.to_sql('Transactions', engine, if_exists='append', index=False)
     conn.commit()
 
@@ -129,17 +141,33 @@ if __name__ == "__main__":
     cur = conn.cursor()
     rest_query = 'select * from "Restaurants"'
 
+    # This part is for multi-day loading of data
+    df_cal = pd.read_csv('./scripts/calendar.csv')
+#    select = ['2021-12-29', '2021-12-30', '2021-12-31', '2022-01-01', '2022-01-02', '2022-01-03', '2022-01-04', '2022-01-05']
+#    select = df_cal.loc[1071:1108,'date']
+#    for d in select:
+#        dt = datetime.strptime(d, '%Y-%m-%d')
+#        tmrw = dt + timedelta(days=1)
+#        start_date = dt.strftime('%Y-%m-%d')
+#        end_date = tmrw.strftime('%Y-%m-%d')
+#        df_type = transaction(start_date, end_date)
+#        df_items = Items()
+#        df_trans = transactionDetails(start_date, end_date)
+#        if df_trans['itemId'].any():
+#            # call function only if there are AP items
+#            write_to_database(df_type, df_items, df_trans)
+
     TODAY = datetime.date(datetime.now())
     YSTDAY = TODAY - timedelta(days=1)
-    start_date = YSTDAY.strftime('%Y-%m-%d')
-    end_date = TODAY.strftime('%Y-%m-%d')
+    TOMROW = TODAY + timedelta(days=1)
+    start_date = TODAY.strftime('%Y-%m-%d')
+    end_date = TOMROW.strftime('%Y-%m-%d')
 
-#    cur.execute('DELETE FROM "Sales" WHERE date = %s', (start_date,))
-#    conn.commit()
-
-    # transaction(start_date, end_date)
+    df_type = transaction(start_date, end_date)
     df_items = Items()
     df_trans = transactionDetails(start_date, end_date)
-    write_to_database(df_items, df_trans)
+    if df_trans['itemId'].any():
+        # call function only if there are AP items
+        write_to_database(df_type, df_items, df_trans)
 
     conn.close()

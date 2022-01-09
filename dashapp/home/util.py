@@ -144,7 +144,7 @@ def labor_detail(start, end):
     if df.empty:
         return 1
 
-    with open("./labor_categories.json") as labor_file:
+    with open("/usr/local/share/labor_categories.json") as labor_file:
         labor_cats = json.load(labor_file)
     df_cats = pd.DataFrame(list(labor_cats.items()), columns=['job', 'category'])
 
@@ -206,16 +206,14 @@ def get_daily_sales(start, end, store, cat):
     if cat == 'GIFT CARDS':
         data = db.session.query(Menuitems.date,
                     func.sum(Menuitems.amount).label("total_sales")
-                ).filter(Menuitems.date >= start,
-                        Menuitems.date >= end,
+                ).filter(Menuitems.date.between(start, end),
                         Menuitems.name == store,
                         Menuitems.menuitem == 'GIFT CARD'
                 ).group_by(Menuitems.date).all()
     else:
         data = db.session.query(Menuitems.date,
                     func.sum(Menuitems.amount).label("total_sales")
-                ).filter(Menuitems.date >= start,
-                        Menuitems.date <= end,
+                ).filter(Menuitems.date.between(start, end),
                         Menuitems.name == store,
                         Menuitems.category == cat
                 ).group_by(Menuitems.date).all()
@@ -228,8 +226,7 @@ def get_daily_labor(start, end, store, cat):
     data = db.session.query(
             Labor.date,
             func.sum(Labor.dollars).label("total_dollars"),
-                ).filter(Labor.date >= start,
-                        Labor.date <= end,
+                ).filter(Labor.date.between(start, end),
                         Labor.name == store,
                         Labor.category == cat
                 ).group_by(Labor.date).all()

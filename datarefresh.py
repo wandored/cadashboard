@@ -26,6 +26,7 @@ def make_HTTP_request(url):
             all_records = all_records + json_data['value']
             if '@odata.nextLink' in json_data:
                 url = json_data['@odata.nextLink']
+                print(url)
             else:
                 break
     return all_records
@@ -49,7 +50,6 @@ def removeSpecial(df):
 
 def sales_detail(start, end):
 
-#    df_loc = pd.read_csv('/home/wandored/Projects/Dashboard/scripts/locations.csv')
     url_filter = "$filter=date ge {}T00:00:00Z and date le {}T00:00:00Z".format(
         start, end
     )
@@ -90,7 +90,6 @@ def sales_detail(start, end):
 
 def sales_employee(start, end):
 
-#    df_loc = pd.read_csv('/home/wandored/Projects/Dashboard/locations.csv')
     url_filter = '$filter=date ge {}T00:00:00Z and date le {}T00:00:00Z'.format(start, end)
     query = '$select=dayPart,netSales,numberofGuests,location&{}'.format(url_filter)
     url = '{}/SalesEmployee?{}'.format(Config.SRVC_ROOT, query)
