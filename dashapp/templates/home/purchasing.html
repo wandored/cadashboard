@@ -22,6 +22,7 @@
               <thead>
                 <tr>
                   <th scope="col">LOBSTER</th>
+                  <th scope="col">DATE</th>
                   <th scope="col">COST/LB</th>
                   <th scope="col">PORTION COST</th>
                   <th scope="col">SUG. PRICE</th>
@@ -31,6 +32,9 @@
                 {% for v in lobster_items %}
                   <tr>
                     <th scope="row">{{ v.item }}</th>
+                      <td>
+                        <p class="mb-0 ms-1 text-begin">{{ v.date }}</p>
+                      </td>
                       <td>
                         <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v.debit/v.quantity) }}</p>
                       </td>
@@ -59,7 +63,8 @@
             <table class="table-responsive table-md">
               <thead>
                 <tr>
-                  <th scope="col">ITEM</th>
+                  <th scope="col">CLAW</th>
+                  <th scope="col">DATE</th>
                   <th scope="col">COST/LB</th>
                   <th scope="col">PORTION COST</th>
                   <th scope="col">SUG. PRICE</th>
@@ -69,6 +74,9 @@
                 {% for v in stone_items %}
                   <tr>
                     <th scope="row">{{ v.item }}</th>
+                      <td>
+                        <p class="mb-0 ms-1 text-begin">{{ v.date }}</p>
+                      </td>
                       <td>
                         <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v.debit/v.quantity) }}</p>
                       </td>
@@ -100,6 +108,7 @@
               <thead>
                 <tr>
                   <th scope="col">STEAK</th>
+                  <th scope="col">DATE</th>
                   <th scope="col">COST/LB</th>
                   <th scope="col">PORTION COST</th>
                   <th scope="col">MENU PRICE</th>
@@ -109,6 +118,9 @@
                 {% for v in steak_items %}
                   <tr>
                     <th scope="row">{{ v.item }}</th>
+                      <td>
+                        <p class="mb-0 ms-1 text-begin">{{ v.date }}</p>
+                      </td>
                       <td>
                         <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v.debit/v.quantity) }}</p>
                       </td>

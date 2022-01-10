@@ -1039,12 +1039,14 @@ def store(store_id):
     for i in lobster_list:
         lobster_cost = (
             db.session.query(Transactions.item,
+                             Transactions.date,
                              Transactions.debit,
                              Transactions.quantity,
                              )
                 .filter(Transactions.item == i.item,
                         Transactions.store_id == store_id,
                         Transactions.type == 'AP Invoice')
+                .order_by(Transactions.date.desc())
                 ).first()
         if lobster_cost:
             row_dict = dict(lobster_cost)
@@ -1052,7 +1054,6 @@ def store(store_id):
             size = int(ext[0])
             row_dict['size'] = size
             lobster_items.append(row_dict)
-    print(lobster_items)
 
 
     stone_list = (db.session.query(Transactions.item)
@@ -1063,12 +1064,14 @@ def store(store_id):
     for i in stone_list:
         stone_cost = (
             db.session.query(Transactions.item,
+                             Transactions.date,
                              Transactions.debit,
                              Transactions.quantity,
                              )
                 .filter(Transactions.item == i.item,
                         Transactions.store_id == store_id,
                         Transactions.type == 'AP Invoice')
+                .order_by(Transactions.date.desc())
                 ).first()
         if stone_cost:
             row_dict = dict(stone_cost)
@@ -1076,8 +1079,6 @@ def store(store_id):
             size = int(ext[0])
             row_dict['size'] = size
             stone_items.append(row_dict)
-    print(stone_items)
-
 
 
     return render_template(
@@ -1266,19 +1267,21 @@ def purchasing(targetdate=None):
     for i in lobster_list:
         lobster_cost = (
             db.session.query(Transactions.item,
+                             Transactions.date,
                              Transactions.debit,
                              Transactions.quantity,
                              )
                 .filter(Transactions.item == i.item,
                         Transactions.type == 'AP Invoice')
+                .order_by(Transactions.date.desc())
                 ).first()
         if lobster_cost:
+            # extract the number from name to calculate cost per serving
             row_dict = dict(lobster_cost)
             ext = re.findall(r'\d{1,2}', i.item)
             size = int(ext[0])
             row_dict['size'] = size
             lobster_items.append(row_dict)
-    print(lobster_items)
 
 
     stone_list = (db.session.query(Transactions.item)
@@ -1289,19 +1292,21 @@ def purchasing(targetdate=None):
     for i in stone_list:
         stone_cost = (
             db.session.query(Transactions.item,
+                             Transactions.date,
                              Transactions.debit,
                              Transactions.quantity,
                              )
                 .filter(Transactions.item == i.item,
                         Transactions.type == 'AP Invoice')
+                .order_by(Transactions.date.desc())
                 ).first()
         if stone_cost:
+            # extract the number from name to calculate cost per serving
             row_dict = dict(stone_cost)
             ext = re.findall(r'\d{1,2}', i.item)
             size = int(ext[0])
             row_dict['size'] = size
             stone_items.append(row_dict)
-    print(stone_items)
 
     steak_list = (db.session.query(Transactions.item)
             .filter(Transactions.item.regexp_match('^(BEEF Steak).*(Prime)$'))
@@ -1311,13 +1316,17 @@ def purchasing(targetdate=None):
     for i in steak_list:
         steak_cost = (
             db.session.query(Transactions.item,
+                             Transactions.date,
                              Transactions.debit,
                              Transactions.quantity,
                              )
                 .filter(Transactions.item == i.item,
+                        Transactions.UofM == 'Pound',
                         Transactions.type == 'AP Invoice')
+                .order_by(Transactions.date.desc())
                 ).first()
         if steak_cost:
+            # extract the number from name to calculate cost per serving
             row_dict = dict(steak_cost)
             ext = re.findall(r'\d{1,2}', i.item)
             if ext:
