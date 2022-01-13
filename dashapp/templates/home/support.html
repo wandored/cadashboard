@@ -50,14 +50,15 @@
           <div class="card h-100">
             <div class="card-header bg-primary pb-0">
               {% for x in fiscal_dates %}
-              <h4>UNASSIGNED SALES PERIOD {{ x.period }}, {{ x.year }}</h4>
+              <h4>UNASSIGNED SALES PERIOD</h4>
+              <h4>Period-{{ x.period }}, {{ x.year }}</h4>
               {% endfor %}
             </div>
             <div class="card">
               <table class="table-responsive table-md">
                 <thead>
                   <tr>
-                    <th scope="col">STORE</th>
+                    <th scope="col">STORE-NAME-CATEGORY</th>
                     <th scope="col">COUNT</th>
                     <th scope="col">SALES</th>
                   </tr>
@@ -65,12 +66,43 @@
                 <tbody>
                   {% for k, v in unassigned_sales.iterrows() %}
                     <tr>
-                      <th scope="row">{{ v.store }} - {{ v.menuitem }}</th>
+                      <th scope="row">{{ v.store }} - {{ v.menuitem }} - {{ v.category }}</th>
                         <td>
                           <p class="mb-0 ms-1 text-begin">{{ "{:,.0f}".format(v.quantity) }}</p>
                         </td>
                         <td>
                           <p class="mb-0 ms-1 text-begin">{{ "${:,.0f}".format(v.amount) }}</p>
+                        </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <!-- DO NOT USE -->
+        <div class="col-lg-4 col-md-6">
+          <div class="card h-100">
+            <div class="card-header bg-primary pb-0">
+              {% for x in fiscal_dates %}
+              <h4>DO NOT USE ITEMS BEING USED</h4>
+              <h4>Period {{ x.period }} Week {{ x.week }}</h4>
+              {% endfor %}
+            </div>
+            <div class="card">
+              <table class="table-responsive table-md">
+                <thead>
+                  <tr>
+                    <th scope="col">STORE</th>
+                    <th scope="col">ITEM</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for k, v in do_not_use.iterrows() %}
+                    <tr>
+                      <th scope="row">{{ v.store }}</th>
+                        <td>
+                          <p class="mb-0 ms-1 text-begin">{{ v.menuitem }}</p>
                         </td>
                     </tr>
                   {% endfor %}

@@ -26,6 +26,7 @@ def make_HTTP_request(url):
             all_records = all_records + json_data['value']
             if '@odata.nextLink' in json_data:
                 url = json_data['@odata.nextLink']
+                print(url)
             else:
                 break
     return all_records
@@ -49,7 +50,6 @@ def removeSpecial(df):
 
 def sales_detail(start, end):
 
-#    df_loc = pd.read_csv('/home/wandored/Projects/Dashboard/scripts/locations.csv')
     url_filter = "$filter=date ge {}T00:00:00Z and date le {}T00:00:00Z".format(
         start, end
     )
@@ -68,8 +68,12 @@ def sales_detail(start, end):
     df_merge = df_loc.merge(df, on="location")
     df_merge.drop(columns=['location'], inplace=True)
 
+    with open("/usr/local/share/major_categories.json") as file:
+        major_cats = json.load(file)
+    df_cats = pd.DataFrame(list(major_cats.items()), columns=['menu_category', 'category'])
+
     # the data needs to be cleaned before it can be used
-    df_menu = df_merge
+    df_menu = df_merge.merge(df_cats, left_on='category', right_on='menu_category')
     df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(r"CHOPHOUSE - NOLA", "CHOPHOUSE-NOLA", regex=True)
     df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(r"CAFÉ", "CAFE", regex=True)
     df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(r"^(?:.*?( -)){2}", "-", regex=True)
@@ -77,10 +81,13 @@ def sales_detail(start, end):
     dafilter = df_menu["menuitem"].str.contains("VOID")
     df_clean = df_menu[~dafilter]
     df_clean[["x", "menuitem"]] = df_clean["menuitem"].str.split(" - ", expand=True)
+    df_clean.drop(columns=['category_x', 'x'], inplace=True)
+    df_clean.rename(columns={'category_y': 'category'}, inplace=True)
+    print(df_clean)
     # menuitems = removeSpecial(df_clean)
     # Write the daily menu items to Menuitems table
     menu_pivot = df_clean.pivot_table(
-        index=["name", "menuitem", "category"], values=["amount", "quantity"], aggfunc=np.sum
+        index=["name", "menuitem", "category", "menu_category"], values=["amount", "quantity"], aggfunc=np.sum
     )
     menu_pivot["date"] = start
     menu_pivot.to_sql("Menuitems", engine, if_exists="append")
@@ -90,7 +97,6 @@ def sales_detail(start, end):
 
 def sales_employee(start, end):
 
-#    df_loc = pd.read_csv('/home/wandored/Projects/Dashboard/locations.csv')
     url_filter = '$filter=date ge {}T00:00:00Z and date le {}T00:00:00Z'.format(start, end)
     query = '$select=dayPart,netSales,numberofGuests,location&{}'.format(url_filter)
     url = '{}/SalesEmployee?{}'.format(Config.SRVC_ROOT, query)
@@ -132,7 +138,7 @@ def labor_datail(start, end):
         print('empty dataframe')
         return
 
-    with open("./labor_categories.json") as labor_file:
+    with open("/usr/local/share/labor_categories.json") as labor_file:
         labor_cats = json.load(labor_file)
     df_cats = pd.DataFrame(list(labor_cats.items()), columns=['job', 'category'])
 

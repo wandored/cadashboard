@@ -1,0 +1,146 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} {{ title }} {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+  <div class="container-fluid py-4">
+    <div class="row mb-4">
+      <!-- lobster cost -->
+      <div class="col-lg-6 col-md-6">
+        <div class="card">
+          <div class="card-header bg-primary pb-0">
+            {% for x in fiscal_dates %}
+            <h4>CURRENT LOBSTER COSTS</h4>
+            {% endfor %}
+          </div>
+          <div class="card">
+            <table class="table-responsive table-md">
+              <thead>
+                <tr>
+                  <th scope="col">LOBSTER</th>
+                  <th scope="col">DATE</th>
+                  <th scope="col">COST/LB</th>
+                  <th scope="col">PORTION COST</th>
+                  <th scope="col">SUG. PRICE</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for v in lobster_items %}
+                  <tr>
+                    <th scope="row">{{ v.item }}</th>
+                      <td>
+                        <p class="mb-0 ms-1 text-begin">{{ v.date }}</p>
+                      </td>
+                      <td>
+                        <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v.debit/v.quantity) }}</p>
+                      </td>
+                      <td>
+                        <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format((v.debit/v.quantity)*(v.size/1)) }}</p>
+                      </td>
+                      <td>
+                        <p class="mb-0 ms-1 text-begin">${{ (((v.debit/v.quantity)*(v.size/1)/0.4) | round) - 0.05 }}</p>
+                      </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- stone cost -->
+      <div class="col-lg-6 col-md-4">
+        <div class="card">
+          <div class="card-header bg-warning pb-0">
+            {% for x in fiscal_dates %}
+            <h4>CURRENT STONE CLAW COSTS</h4>
+            {% endfor %}
+          </div>
+          <div class="card">
+            <table class="table-responsive table-md">
+              <thead>
+                <tr>
+                  <th scope="col">CLAW</th>
+                  <th scope="col">DATE</th>
+                  <th scope="col">COST/LB</th>
+                  <th scope="col">PORTION COST</th>
+                  <th scope="col">SUG. PRICE</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for v in stone_items %}
+                  <tr>
+                    <th scope="row">{{ v.item }}</th>
+                      <td>
+                        <p class="mb-0 ms-1 text-begin">{{ v.date }}</p>
+                      </td>
+                      <td>
+                        <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v.debit/v.quantity) }}</p>
+                      </td>
+                      <td>
+                        <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format((v.debit/v.quantity)*(v.size/16)) }}</p>
+                      </td>
+                      <td>
+                        <p class="mb-0 ms-1 text-begin">${{ (((v.debit/v.quantity)*(v.size/16)/0.4) | round) - 0.05 }}</p>
+                      </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+        <!-- steak cost -->
+    <div class="row mb-4">
+      <div class="col-lg-6 col-md-6">
+        <div class="card">
+          <div class="card-header bg-info pb-0">
+            {% for x in fiscal_dates %}
+            <h4>CURRENT PRIME STEAK COSTS</h4>
+            {% endfor %}
+          </div>
+          <div class="card">
+            <table class="table-responsive table-md">
+              <thead>
+                <tr>
+                  <th scope="col">STEAK</th>
+                  <th scope="col">DATE</th>
+                  <th scope="col">COST/LB</th>
+                  <th scope="col">PORTION COST</th>
+                  <th scope="col">MENU PRICE</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for v in steak_items %}
+                  <tr>
+                    <th scope="row">{{ v.item }}</th>
+                      <td>
+                        <p class="mb-0 ms-1 text-begin">{{ v.date }}</p>
+                      </td>
+                      <td>
+                        <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v.debit/v.quantity) }}</p>
+                      </td>
+                      <td>
+                        <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format((v.debit/v.quantity)*(v.size/16)) }}</p>
+                      </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% include 'includes/footer.html' %}
+
+  </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}
