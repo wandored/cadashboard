@@ -616,7 +616,7 @@ def store(store_id):
 
     daily_chart_ly = (
         db.session.query(func.sum(Sales.sales).label("total_sales"))
-        .filter(Sales.date.between(start_week, end_week),
+        .filter(Sales.date.between(start_week_ly, end_week_ly),
                 Sales.name == store.name)
         .group_by(Sales.date)
         .order_by(Sales.date)
@@ -769,7 +769,16 @@ def store(store_id):
     store_list = Restaurants.query.all()
     store_list = pd.DataFrame([x.as_dict() for x in store_list])
     daily_table = daily_table.merge(store_list, how="left")
-    print(daily_table)
+    if daily_table.empty:
+        flash(
+            f"I cannot find sales for {session['targetdate']}, i have to go back another day.",
+            "warning",
+        )
+        currentDate = datetime.strptime(session["targetdate"], "%Y-%m-%d")
+        newDate = currentDate - timedelta(days=1)
+        session["targetdate"] = newDate.strftime("%Y-%m-%d")
+        return redirect(url_for("home_blueprint.store", store_id=store.id))
+
     daily_table = daily_table.iloc[0]
     # TODO crashes with no sales
 
@@ -788,11 +797,11 @@ def store(store_id):
     sales_table.rename(columns={'FOOD': 'food', 'BEER': 'beer', 'LIQUOR': 'liquor', 'WINE': 'wine', 'GIFT CARDS': 'gift_cards'}, inplace=True)
     sales_table.fillna(value=0, inplace=True)
 
-    food_sales_ly = get_daily_sales(start_week_ly, end_week_ly, store.name, 'FOOD')
-    beer_sales_ly = get_daily_sales(start_week_ly, end_week_ly, store.name, 'BEER')
-    liquor_sales_ly = get_daily_sales(start_week_ly, end_week_ly, store.name, 'LIQUOR')
-    wine_sales_ly = get_daily_sales(start_week_ly, end_week_ly, store.name, 'WINE')
-    gift_card_sales_ly = get_daily_sales(start_week_ly, end_week_ly, store.name, 'GIFT CARDS')
+    food_sales_ly = get_daily_sales(start_week_ly, week_to_date, store.name, 'FOOD')
+    beer_sales_ly = get_daily_sales(start_week_ly, week_to_date, store.name, 'BEER')
+    liquor_sales_ly = get_daily_sales(start_week_ly, week_to_date, store.name, 'LIQUOR')
+    wine_sales_ly = get_daily_sales(start_week_ly, week_to_date, store.name, 'WINE')
+    gift_card_sales_ly = get_daily_sales(start_week_ly, week_to_date, store.name, 'GIFT CARDS')
 
     sales_table_ly = food_sales_ly.merge(beer_sales_ly)
     sales_table_ly = sales_table_ly.merge(liquor_sales_ly)
@@ -816,10 +825,10 @@ def store(store_id):
     restaurant_labor = get_daily_labor(start_week, end_week, store.name, 'Restaurant')
     kitchen_labor = get_daily_labor(start_week, end_week, store.name, 'Kitchen')
 
-    bar_labor_ly = get_daily_labor(start_week_ly, end_week_ly, store.name, 'Bar')
-    host_labor_ly = get_daily_labor(start_week_ly, end_week_ly, store.name, 'Host')
-    restaurant_labor_ly = get_daily_labor(start_week_ly, end_week_ly, store.name, 'Restaurant')
-    kitchen_labor_ly = get_daily_labor(start_week_ly, end_week_ly, store.name, 'Kitchen')
+    bar_labor_ly = get_daily_labor(start_week_ly, week_to_date, store.name, 'Bar')
+    host_labor_ly = get_daily_labor(start_week_ly, week_to_date, store.name, 'Host')
+    restaurant_labor_ly = get_daily_labor(start_week_ly, week_to_date, store.name, 'Restaurant')
+    kitchen_labor_ly = get_daily_labor(start_week_ly, week_to_date, store.name, 'Kitchen')
 
     labor_table = bar_labor.merge(host_labor)
     labor_table = labor_table.merge(restaurant_labor)
@@ -872,11 +881,11 @@ def store(store_id):
 
 #    sales_table = sales_table.merge(dates, how="outer", sort=True)
 
-    food_sales_ly = get_daily_sales(start_period_ly, end_period_ly, store.name, 'FOOD')
-    beer_sales_ly = get_daily_sales(start_period_ly, end_period_ly, store.name, 'BEER')
-    liquor_sales_ly = get_daily_sales(start_period_ly, end_period_ly, store.name, 'LIQUOR')
-    wine_sales_ly = get_daily_sales(start_period_ly, end_period_ly, store.name, 'WINE')
-    gift_card_sales_ly = get_daily_sales(start_period_ly, end_period_ly, store.name, 'GIFT CARDS')
+    food_sales_ly = get_daily_sales(start_period_ly, period_to_date, store.name, 'FOOD')
+    beer_sales_ly = get_daily_sales(start_period_ly, period_to_date, store.name, 'BEER')
+    liquor_sales_ly = get_daily_sales(start_period_ly, period_to_date, store.name, 'LIQUOR')
+    wine_sales_ly = get_daily_sales(start_period_ly, period_to_date, store.name, 'WINE')
+    gift_card_sales_ly = get_daily_sales(start_period_ly, period_to_date, store.name, 'GIFT CARDS')
 
     sales_table_ly = food_sales_ly.merge(beer_sales_ly)
     sales_table_ly = sales_table_ly.merge(liquor_sales_ly)
@@ -902,10 +911,10 @@ def store(store_id):
     restaurant_labor = get_daily_labor(start_period, end_period, store.name, 'Restaurant')
     kitchen_labor = get_daily_labor(start_period, end_period, store.name, 'Kitchen')
 
-    bar_labor_ly = get_daily_labor(start_period_ly, end_period_ly, store.name, 'Bar')
-    host_labor_ly = get_daily_labor(start_period_ly, end_period_ly, store.name, 'Host')
-    restaurant_labor_ly = get_daily_labor(start_period_ly, end_period_ly, store.name, 'Restaurant')
-    kitchen_labor_ly = get_daily_labor(start_period_ly, end_period_ly, store.name, 'Kitchen')
+    bar_labor_ly = get_daily_labor(start_period_ly, period_to_date, store.name, 'Bar')
+    host_labor_ly = get_daily_labor(start_period_ly, period_to_date, store.name, 'Host')
+    restaurant_labor_ly = get_daily_labor(start_period_ly, period_to_date, store.name, 'Restaurant')
+    kitchen_labor_ly = get_daily_labor(start_period_ly, period_to_date, store.name, 'Kitchen')
 
     labor_table = bar_labor.merge(host_labor)
     labor_table = labor_table.merge(restaurant_labor)
@@ -968,11 +977,11 @@ def store(store_id):
     sales_table.rename(columns={'FOOD': 'food', 'BEER': 'beer', 'LIQUOR': 'liquor', 'WINE': 'wine', 'GIFT CARDS': 'gift_cards'}, inplace=True)
     sales_table.fillna(value=0, inplace=True)
 
-    food_sales_ly = get_daily_sales(start_year_ly, end_year_ly, store.name, 'FOOD')
-    beer_sales_ly = get_daily_sales(start_year_ly, end_year_ly, store.name, 'BEER')
-    liquor_sales_ly = get_daily_sales(start_year_ly, end_year_ly, store.name, 'LIQUOR')
-    wine_sales_ly = get_daily_sales(start_year_ly, end_year_ly, store.name, 'WINE')
-    gift_card_sales_ly = get_daily_sales(start_year_ly, end_year_ly, store.name, 'GIFT CARDS')
+    food_sales_ly = get_daily_sales(start_year_ly, year_to_date, store.name, 'FOOD')
+    beer_sales_ly = get_daily_sales(start_year_ly, year_to_date, store.name, 'BEER')
+    liquor_sales_ly = get_daily_sales(start_year_ly, year_to_date, store.name, 'LIQUOR')
+    wine_sales_ly = get_daily_sales(start_year_ly, year_to_date, store.name, 'WINE')
+    gift_card_sales_ly = get_daily_sales(start_year_ly, year_to_date, store.name, 'GIFT CARDS')
 
     sales_table_ly = food_sales_ly.merge(beer_sales_ly)
     sales_table_ly = sales_table_ly.merge(liquor_sales_ly)
@@ -996,10 +1005,10 @@ def store(store_id):
     restaurant_labor = get_daily_labor(start_year, end_year, store.name, 'Restaurant')
     kitchen_labor = get_daily_labor(start_year, end_year, store.name, 'Kitchen')
 
-    bar_labor_ly = get_daily_labor(start_year_ly, end_year_ly, store.name, 'Bar')
-    host_labor_ly = get_daily_labor(start_year_ly, end_year_ly, store.name, 'Host')
-    restaurant_labor_ly = get_daily_labor(start_year_ly, end_year_ly, store.name, 'Restaurant')
-    kitchen_labor_ly = get_daily_labor(start_year_ly, end_year_ly, store.name, 'Kitchen')
+    bar_labor_ly = get_daily_labor(start_year_ly, year_to_date, store.name, 'Bar')
+    host_labor_ly = get_daily_labor(start_year_ly, year_to_date, store.name, 'Host')
+    restaurant_labor_ly = get_daily_labor(start_year_ly, year_to_date, store.name, 'Restaurant')
+    kitchen_labor_ly = get_daily_labor(start_year_ly, year_to_date, store.name, 'Kitchen')
 
     labor_table = bar_labor.merge(host_labor)
     labor_table = labor_table.merge(restaurant_labor)

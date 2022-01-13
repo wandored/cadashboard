@@ -101,11 +101,11 @@
             <hr class="dark horizontal my-0">
               {% if yearly_totals.net_sales >= yearly_totals.net_sales_ly %}
               <div class="card-footer p-3">
-                <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((yearly_totals.total_sales - yearly_totals.total_sales_ly) / yearly_totals.total_sales_ly) * 100) }} - {{ "${:,.0f}".format(yearly_totals.total_sales_ly) }}</span> YTD</p>
+                <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((yearly_totals.net_sales - yearly_totals.net_sales_ly) / yearly_totals.net_sales_ly) * 100) }} - {{ "${:,.0f}".format(yearly_totals.net_sales_ly) }}</span> YTD</p>
               </div>
               {% else %}
               <div class="card-footer p-3">
-                <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((yearly_totals.total_sales - yearly_totals.total_sales_ly)|abs / yearly_totals.total_sales_ly) * 100) }} - {{ "${:,.0f}".format(yearly_totals.total_sales_ly) }}</span> YTD</p>
+                <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((yearly_totals.net_sales - yearly_totals.net_sales_ly)|abs / yearly_totals.net_sales_ly) * 100) }} - {{ "${:,.0f}".format(yearly_totals.net_sales_ly) }}</span> YTD</p>
               </div>
               {% endif %}
           </div>

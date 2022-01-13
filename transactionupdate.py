@@ -48,16 +48,20 @@ def removeSpecial(df):
     return df
 
 
-def transaction(start, end):
+def transaction(id_list):
 
-    url_filter = "$filter=modifiedOn ge {}T00:00:00Z and modifiedOn le {}T00:00:00Z".format(
-        start, end
-    )
-    query = "$select=date,modifiedOn,name,type,locationId,transactionId&{}".format(url_filter)
-    url = "{}/Transaction?{}".format(Config.SRVC_ROOT, query)
-    print(url)
-    rqst = make_HTTP_request(url)
-    df = make_dataframe(rqst)
+    rqst_list = []
+    for i in id_list:
+        url_filter = "$filter=transactionId eq {}".format(i)
+        query = "$select=date,name,type,locationId,transactionId&{}".format(url_filter)
+        url = "{}/Transaction?{}".format(Config.SRVC_ROOT, query)
+        rqst = make_HTTP_request(url)
+        try:
+            rqst_list.append(rqst[0])
+        except IndexError:
+            pass
+
+    df = make_dataframe(rqst_list)
     if df.empty:
         print('empty dataframe')
         return
@@ -68,8 +72,7 @@ def transaction(start, end):
     df_loc = pd.DataFrame.from_records(data, columns=['id', 'location', 'name'])
     df_merge = df_loc.merge(df, left_on="location", right_on='locationId')
     df_merge.rename(columns={'name_x': 'name', 'name_y': 'item'}, inplace=True)
-    df_merge[["modified", "m"]] = df_merge["modifiedOn"].str.split("T", expand=True)
-    df_merge.drop(columns=['location', 'locationId', 'm', 'modifiedOn'], inplace=True)
+    df_merge.drop(columns=['location', 'locationId'], inplace=True)
 
     return  df_merge
 
@@ -110,18 +113,12 @@ def transactionDetails(start, end):
     df_merge[["modified", "m"]] = df_merge["modifiedOn"].str.split("T", expand=True)
     df_merge.drop(columns=['location', 'locationId', 'm', 'modifiedOn'], inplace=True)
 
-    id_list = df_merge['transactionId'].tolist()
-    id_list = list(dict.fromkeys(id_list))
-    for x in id_list:
-        cur.execute('DELETE FROM "Transactions" WHERE trans_id = %s', (x,))
-        conn.commit()
-
     return df_merge
 
 
 def write_to_database(df1, df2, df3):
 
-    df = df3.merge(df1, on=['transactionId', 'modified'])
+    df = df3.merge(df1, on=['transactionId'])
     df = df.merge(df2, on='itemId')
     df.rename(columns={'item_y': 'item', 'unitOfMeasureName': 'UofM', 'name_x': 'name', 'id_x': 'store_id', 'transactionId': 'trans_id'}, inplace=True)
     df.drop(columns=['itemId', 'name_y', 'id_y', 'item_x'], inplace=True)
@@ -142,18 +139,25 @@ if __name__ == "__main__":
     rest_query = 'select * from "Restaurants"'
 
     # This part is for multi-day loading of data
-    df_cal = pd.read_csv('./scripts/calendar.csv')
-#    select = ['2021-12-29', '2021-12-30', '2021-12-31', '2022-01-01', '2022-01-02', '2022-01-03', '2022-01-04', '2022-01-05']
-#    select = df_cal.loc[1071:1108,'date']
+#    df_cal = pd.read_csv('./scripts/calendar.csv')
+#    select = df_cal.loc[1099:1113,'date']
+##    select = ['2021-12-29', '2021-12-30', '2021-12-31']
 #    for d in select:
 #        dt = datetime.strptime(d, '%Y-%m-%d')
 #        tmrw = dt + timedelta(days=1)
 #        start_date = dt.strftime('%Y-%m-%d')
 #        end_date = tmrw.strftime('%Y-%m-%d')
-#        df_type = transaction(start_date, end_date)
 #        df_items = Items()
 #        df_trans = transactionDetails(start_date, end_date)
+#        id_list = df_trans['transactionId'].tolist()
+#        id_list = list(dict.fromkeys(id_list))
+#        print(len(id_list))
+#        index = len(id_list) - 1
 #        if df_trans['itemId'].any():
+#            for x in id_list:
+#                cur.execute('DELETE FROM "Transactions" WHERE trans_id = %s', (x,))
+#                conn.commit()
+#            df_type = transaction(id_list)
 #            # call function only if there are AP items
 #            write_to_database(df_type, df_items, df_trans)
 
@@ -163,9 +167,17 @@ if __name__ == "__main__":
     start_date = TODAY.strftime('%Y-%m-%d')
     end_date = TOMROW.strftime('%Y-%m-%d')
 
-    df_type = transaction(start_date, end_date)
     df_items = Items()
     df_trans = transactionDetails(start_date, end_date)
+
+    id_list = df_trans['transactionId'].tolist()
+    print(len(id_list))
+    id_list = list(dict.fromkeys(id_list))
+    print(len(id_list))
+    for x in id_list:
+        cur.execute('DELETE FROM "Transactions" WHERE trans_id = %s', (x,))
+        conn.commit()
+    df_type = transaction(id_list)
     if df_trans['itemId'].any():
         # call function only if there are AP items
         write_to_database(df_type, df_items, df_trans)

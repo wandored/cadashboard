@@ -3,5 +3,13 @@
 Flask web-app dashboard used to display Odata from R365.
 
 * REQUIRED: Odata credentials
-* /usr/local/share/specialty.txt file used as an ignore list for menuitems
-* Restaurant & Calendar database is loaded outside of web-app
+
+## Local Files
+* /usr/local/share/labor_categories.json
+* /usr/local/share/major_categories.json
+
+## datarefresh.py
+datarefresh updates sales and labor data.  It is run from a cron job
+
+## transactionupdate.py
+transactionupdate updates the daily purchases and inventory data.  Periodically run from cron job

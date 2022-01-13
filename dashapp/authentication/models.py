@@ -197,15 +197,15 @@ class Labor(db.Model):
 
 
 #this is deprecated
-class Categories(db.Model):
-
-    __tablename__ = "Categories"
-
-    id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.String(64))
-    category = db.Column(db.String(64))
-    name = db.Column(db.String(64))
-    amount = db.Column(db.Integer)
+#class Categories(db.Model):
+#
+#    __tablename__ = "Categories"
+#
+#    id = db.Column(db.Integer, primary_key=True)
+#    date = db.Column(db.String(64))
+#    category = db.Column(db.String(64))
+#    name = db.Column(db.String(64))
+#    amount = db.Column(db.Integer)
 
 
 class Menuitems(db.Model):
@@ -216,6 +216,7 @@ class Menuitems(db.Model):
     date = db.Column(db.String(64))
     menuitem = db.Column(db.String(64))
     name = db.Column(db.String(64))
+    major_category = db.Column(db.String(64))
     category = db.Column(db.String(64))
     amount = db.Column(db.Float)
     quantity = db.Column(db.Integer)

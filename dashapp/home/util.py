@@ -7,7 +7,7 @@ import pandas as pd
 import numpy as np
 from dashapp.config import Config
 from datetime import datetime
-from dashapp.authentication.models import Calendar, Sales, Labor, Restaurants, db, Categories, Menuitems
+from dashapp.authentication.models import Calendar, Sales, Labor, Restaurants, db, Menuitems
 from sqlalchemy import or_, func
 
 
@@ -25,7 +25,6 @@ def refresh_data(start, end):
         # delete current days data from database and replace with fresh data
         Sales.query.filter_by(date=start).delete()
         Labor.query.filter_by(date=start).delete()
-        Categories.query.filter_by(date=start).delete()
         Menuitems.query.filter_by(date=start).delete()
         db.session.commit()
 
@@ -176,13 +175,21 @@ def sales_detail(start, end):
     if df.empty:
         return 1
 
+    with open("/usr/local/share/major_categories.json") as file:
+        major_cats = json.load(file)
+    df_cats = pd.DataFrame(list(major_cats.items()), columns=['menu_category', 'category'])
+
+    # the data needs to be cleaned before it can be used
+
     data = db.session.query(Restaurants).all()
     df_loc = pd.DataFrame(
         [(x.name, x.location) for x in data], columns=["name", "location"]
     )
     df_merge = df_loc.merge(df, on="location")
     df_merge.drop(columns=['location'], inplace=True)
-    df_menu = df_merge
+
+    df_menu = df_merge.merge(df_cats, left_on='category', right_on='menu_category')
+
     df_menu.loc[:, 'menuitem'] = df_menu['menuitem'].str.replace(r'CHOPHOUSE - NOLA', 'CHOPHOUSE-NOLA', regex=True)
     df_menu.loc[:, 'menuitem'] = df_menu['menuitem'].str.replace(r'CAFÉ', 'CAFE', regex=True)
     df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(r"^(?:.*?( -)){2}", "-", regex=True)
@@ -190,10 +197,12 @@ def sales_detail(start, end):
     dafilter = df_menu['menuitem'].str.contains('VOID')
     df_clean = df_menu[~dafilter]
     df_clean[['x', 'menuitem']] = df_clean['menuitem'].str.split(' - ', expand=True)
+    df_clean.drop(columns=['category_x', 'x'], inplace=True)
+    df_clean.rename(columns={'category_y': 'category'}, inplace=True)
 #    menuitems = removeSpecial(df_clean)  ### fix the file location before making this active
     # Write the daily menu items to Menuitems table
     menu_pivot = df_clean.pivot_table(
-        index=['name', 'menuitem', 'category'], values=['amount', 'quantity'], aggfunc=np.sum
+        index=['name', 'menuitem', 'category', 'menu_category'], values=['amount', 'quantity'], aggfunc=np.sum
     )
     menu_pivot["date"] = start
     menu_pivot.to_sql("Menuitems", con=db.engine, if_exists="append")
