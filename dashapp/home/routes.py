@@ -206,13 +206,43 @@ def index():
         .all()
     )
 
+    entree_count = (db.session.query(
+            Menuitems.name,
+            func.sum(Menuitems.quantity).label('guest_count'),
+        )
+        .filter(Menuitems.date == start_day,
+                Menuitems.menu_category.regexp_match('ENTREE*')
+                )
+        .group_by(Menuitems.name)
+        .all()
+    )
+
+    entree_count_ly = (db.session.query(
+            Menuitems.name,
+            func.sum(Menuitems.quantity).label('guest_count'),
+        )
+        .filter(Menuitems.date == start_day_ly,
+                Menuitems.menu_category.regexp_match('ENTREE*')
+                )
+        .group_by(Menuitems.name)
+        .all()
+    )
+
     df_sales_day = pd.DataFrame.from_records(
         sales_day, columns=["name", "sales"]
     )
     df_sales_day_ly = pd.DataFrame.from_records(
         sales_day_ly, columns=["name", "sales_ly"]
     )
+    df_entree_count = pd.DataFrame.from_records(
+        entree_count, columns=["name", "guest_count"]
+    )
+    df_entree_count_ly = pd.DataFrame.from_records(
+        entree_count_ly, columns=["name", "guest_count_ly"]
+    )
     sales_table = df_sales_day.merge(df_sales_day_ly, how="outer", sort=True)
+    sales_table = sales_table.merge(df_entree_count, how="outer", sort=True)
+    sales_table = sales_table.merge(df_entree_count_ly, how="outer", sort=True)
 
     labor_day = (
         db.session.query(
@@ -1059,8 +1089,10 @@ def store(store_id):
                 ).first()
         if lobster_cost:
             row_dict = dict(lobster_cost)
-            ext = re.findall(r'\d{1,2}', i.item)
-            size = int(ext[0])
+            ext = re.findall(r'\d*\.?\d', i.item)
+            if not ext:
+                ext = re.findall(r'\d{1,2}', i.item)
+            size = float(ext[0])
             row_dict['size'] = size
             lobster_items.append(row_dict)
 
@@ -1089,11 +1121,31 @@ def store(store_id):
             row_dict['size'] = size
             stone_items.append(row_dict)
 
+    sea_bass = (
+        db.session.query(Transactions.item,
+                         Transactions.date,
+                         Transactions.UofM,
+                         func.sum(Transactions.amount).label('cost'),
+                         func.sum(Transactions.quantity).label('count'),
+                         )
+            .filter(Transactions.item.regexp_match('SEAFOOD Sea Bass Chilean'),
+                    Transactions.store_id == store_id,
+                    Transactions.type == 'AP Invoice')
+            .group_by(Transactions.item, Transactions.date, Transactions.UofM)
+            .order_by(Transactions.date.desc())
+        .limit(5).all()
+    )
+    if store_id in [4, 9, 11, 17, 16]:
+        concept = 'steakhouse'
+    else:
+        concept = 'casual'
+
 
     return render_template(
         "home/store.html",
         title=store.name,
         segment='store',
+        concept=concept,
         form1=form1,
         form3=form3,
         current_user=current_user,
@@ -1119,6 +1171,7 @@ def store(store_id):
         yearly_totals=yearly_totals,
         lobster_items=lobster_items,
         stone_items=stone_items,
+        sea_bass=sea_bass,
     )
 
 
@@ -1236,6 +1289,8 @@ def purchasing(targetdate=None):
         end_period = i.period_end
         start_year = i.year_start
         end_year = i.year_end
+        thirty = day_start - timedelta(days=30)
+        last_thirty = thirty.strftime("%Y-%m-%d")
 
     # Get matching day, week and period start and end dates
     start_day_ly = get_lastyear(start_day)
@@ -1249,6 +1304,12 @@ def purchasing(targetdate=None):
     start_year_ly = get_lastyear(start_year)
     end_year_ly = get_lastyear(end_year)
     year_to_date = get_lastyear(start_day)
+
+    # Get list of Restaurants
+    store_list = []
+    data = db.session.query(Restaurants.name).all()
+    for i in data:
+        store_list.append(i.name)
 
     form1 = DateForm()
     form3 = StoreForm()
@@ -1272,78 +1333,157 @@ def purchasing(targetdate=None):
             .filter(Transactions.item.regexp_match('SEAFOOD Lobster Live*'))
             .group_by(Transactions.item)
         ).all()
-    lobster_items = []
-    for i in lobster_list:
-        lobster_cost = (
-            db.session.query(Transactions.item,
-                             Transactions.date,
-                             Transactions.debit,
-                             Transactions.quantity,
-                             )
-                .filter(Transactions.item == i.item,
-                        Transactions.type == 'AP Invoice')
-                .order_by(Transactions.date.desc())
-                ).first()
-        if lobster_cost:
-            # extract the number from name to calculate cost per serving
-            row_dict = dict(lobster_cost)
-            ext = re.findall(r'\d{1,2}', i.item)
-            size = int(ext[0])
-            row_dict['size'] = size
-            lobster_items.append(row_dict)
 
+    lobster_df = pd.DataFrame(columns=['item'])
+    for s in store_list:
+        lobster_items = []
+        for i in lobster_list:
+            lobster_cost = (
+                db.session.query(Transactions.item,
+                                 Transactions.date,
+                                 Transactions.debit,
+                                 Transactions.quantity,
+                                 )
+                    .filter(Transactions.item == i.item,
+                            Transactions.date >= last_thirty,
+                            Transactions.name == s,
+                            Transactions.type == 'AP Invoice')
+                    .order_by(Transactions.date.desc())
+                    ).first()
+            if lobster_cost:
+                # extract the number from name to calculate cost per serving
+                row_dict = dict(lobster_cost)
+                ext = re.findall(r'\d*\.?\d', i.item)
+                if not ext:
+                    ext = re.findall(r'\d{1,2}', i.item)
+                size = float(ext[0])
+                row_dict['size'] = size
+                lobster_items.append(row_dict)
+        df = pd.DataFrame(lobster_items)
+        if not df.empty:
+            df['cost/lb'] = df['debit']/df['quantity']
+            df.rename(columns={'cost/lb': s}, inplace=True)
+            df.drop(columns={'date', 'debit', 'quantity', 'size'}, inplace=True)
+            lobster_df = lobster_df.merge(df, how='outer')
+
+    lobster_df.sort_values(by=['item'], inplace=True)
+    lobster_df.fillna(0, inplace=True)
 
     stone_list = (db.session.query(Transactions.item)
             .filter(Transactions.item.regexp_match('^(SEAFOOD Crab Stone Claw)'))
             .group_by(Transactions.item)
         ).all()
-    stone_items = []
-    for i in stone_list:
-        stone_cost = (
-            db.session.query(Transactions.item,
-                             Transactions.date,
-                             Transactions.debit,
-                             Transactions.quantity,
-                             )
-                .filter(Transactions.item == i.item,
-                        Transactions.type == 'AP Invoice')
-                .order_by(Transactions.date.desc())
-                ).first()
-        if stone_cost:
-            # extract the number from name to calculate cost per serving
-            row_dict = dict(stone_cost)
-            ext = re.findall(r'\d{1,2}', i.item)
-            size = int(ext[0])
-            row_dict['size'] = size
-            stone_items.append(row_dict)
+
+    stone_df = pd.DataFrame(columns=['item'])
+    for s in store_list:
+        stone_items = []
+        for i in stone_list:
+            stone_cost = (
+                db.session.query(Transactions.item,
+                                 Transactions.date,
+                                 Transactions.debit,
+                                 Transactions.quantity,
+                                 )
+                    .filter(Transactions.item == i.item,
+                            Transactions.date >= last_thirty,
+                            Transactions.name == s,
+                            Transactions.type == 'AP Invoice')
+                    .order_by(Transactions.date.desc())
+                    ).first()
+            if stone_cost:
+                # extract the number from name to calculate cost per serving
+                row_dict = dict(stone_cost)
+                ext = re.findall(r'\d{1,2}', i.item)
+                size = int(ext[0])
+                row_dict['size'] = size
+                stone_items.append(row_dict)
+        df = pd.DataFrame(stone_items)
+        if not df.empty:
+            df['cost/lb'] = df['debit']/df['quantity']
+            df.rename(columns={'cost/lb': s}, inplace=True)
+            df.drop(columns={'date', 'debit', 'quantity', 'size'}, inplace=True)
+            stone_df = stone_df.merge(df, how='outer')
+
+    stone_df.sort_values(by=['item'], inplace=True)
+    stone_df.fillna(0, inplace=True)
 
     steak_list = (db.session.query(Transactions.item)
             .filter(Transactions.item.regexp_match('^(BEEF Steak).*(Prime)$'))
             .group_by(Transactions.item)
         ).all()
-    steak_items = []
-    for i in steak_list:
-        steak_cost = (
-            db.session.query(Transactions.item,
-                             Transactions.date,
-                             Transactions.debit,
+
+    steak_df = pd.DataFrame(columns=['item'])
+    for s in store_list:
+        steak_items = []
+        for i in steak_list:
+            steak_cost = (
+                db.session.query(Transactions.item,
+                                 Transactions.date,
+                                 Transactions.debit,
+                                 Transactions.quantity,
+                                 )
+                    .filter(Transactions.item == i.item,
+                            Transactions.date >= last_thirty,
+                            Transactions.name == s,
+                            Transactions.type == 'AP Invoice')
+                    .order_by(Transactions.date.desc())
+                    ).first()
+            if steak_cost:
+                # extract the number from name to calculate cost per serving
+                row_dict = dict(steak_cost)
+                ext = re.findall(r'\d{1,2}', i.item)
+                if ext:
+                    size = int(ext[0])
+                else:
+                    size = 16
+                row_dict['size'] = size
+                steak_items.append(row_dict)
+        df = pd.DataFrame(steak_items)
+        if not df.empty:
+            df['cost/lb'] = df['debit']/df['quantity']
+            df.rename(columns={'cost/lb': s}, inplace=True)
+            df.drop(columns={'date', 'debit', 'quantity', 'size'}, inplace=True)
+            steak_df = steak_df.merge(df, how='outer')
+
+    steak_df.sort_values(by=['item'], inplace=True)
+    steak_df.fillna(0, inplace=True)
+
+    sea_bass = (
+        db.session.query(Transactions.item,
+                         Transactions.name,
+                         Transactions.UofM,
+                         func.sum(Transactions.amount).label('cost'),
+                         func.sum(Transactions.quantity).label('count'),
+                         )
+            .filter(Transactions.item.regexp_match('SEAFOOD Sea Bass Chilean'),
+                    Transactions.date >= last_thirty,
+                    Transactions.type == 'AP Invoice')
+            .group_by(Transactions.item, Transactions.name, Transactions.UofM)
+        .all()
+    )
+
+
+    shrimp10 = (db.session.query(Transactions.name)
+            .filter(Transactions.item.regexp_match('SEAFOOD Shrimp U/10 White Headless'))
+            .group_by(Transactions.name)
+        ).all()
+    shrimp_list = []
+    for i in shrimp10:
+        shrimp_cost = (
+            db.session.query(Transactions.name,
+                             Transactions.UofM,
+                             Transactions.amount,
                              Transactions.quantity,
                              )
-                .filter(Transactions.item == i.item,
-                        Transactions.UofM == 'Pound',
+                .filter(Transactions.name == i.name,
+                        Transactions.item.regexp_match('SEAFOOD Shrimp U/10 White Headless'),
+                        Transactions.date >= last_thirty,
                         Transactions.type == 'AP Invoice')
                 .order_by(Transactions.date.desc())
                 ).first()
-        if steak_cost:
-            # extract the number from name to calculate cost per serving
-            row_dict = dict(steak_cost)
-            ext = re.findall(r'\d{1,2}', i.item)
-            if ext:
-                size = int(ext[0])
-            else:
-                size = 16
-            row_dict['size'] = size
-            steak_items.append(row_dict)
+        if shrimp_cost:
+            shrimp_list.append(shrimp_cost)
+    shrimp_items = pd.DataFrame.from_records(shrimp_list, columns=["store", "UofM", "amount", "quantity"])
 
 
     return render_template(
@@ -1354,9 +1494,11 @@ def purchasing(targetdate=None):
         form1=form1,
         form3=form3,
         current_user=current_user,
-        lobster_items=lobster_items,
-        stone_items=stone_items,
-        steak_items=steak_items,
+        lobster_df=lobster_df,
+        stone_df=stone_df,
+        steak_df=steak_df,
+        sea_bass=sea_bass,
+        shrimp_items=shrimp_items,
     )
 
 
@@ -1437,7 +1579,7 @@ def support(targetdate=None):
                          func.sum(Menuitems.amount).label("sales"),
                          func.sum(Menuitems.quantity).label("count"),
                          )
-            .filter(Menuitems.date >= start_period,
+            .filter(Menuitems.date == start_day,
                     or_(
                     Menuitems.menuitem == 'Unassigned',
                     Menuitems.category == 'Unassigned',
