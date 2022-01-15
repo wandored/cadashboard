@@ -83,7 +83,6 @@ def sales_detail(start, end):
     df_clean[["x", "menuitem"]] = df_clean["menuitem"].str.split(" - ", expand=True)
     df_clean.drop(columns=['category_x', 'x'], inplace=True)
     df_clean.rename(columns={'category_y': 'category'}, inplace=True)
-    print(df_clean)
     # menuitems = removeSpecial(df_clean)
     # Write the daily menu items to Menuitems table
     menu_pivot = df_clean.pivot_table(
