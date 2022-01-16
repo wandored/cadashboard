@@ -192,7 +192,7 @@ class Labor(db.Model):
     category = db.Column(db.String(64))
     job = db.Column(db.String(64))
     name = db.Column(db.String(64))
-    hours = db.Column(db.Integer)
+    hours = db.Column(db.Float)
     dollars = db.Column(db.Float)
 
 
