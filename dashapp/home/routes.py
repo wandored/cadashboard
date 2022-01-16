@@ -3,6 +3,7 @@
 Copyright (c) 2019 - present AppSeed.us
 """
 
+import json
 from flask.helpers import url_for
 from flask_security.decorators import roles_accepted
 import pandas as pd
@@ -1341,6 +1342,7 @@ def purchasing(targetdate=None):
             lobster_cost = (
                 db.session.query(Transactions.item,
                                  Transactions.date,
+                                 Transactions.UofM,
                                  Transactions.debit,
                                  Transactions.quantity,
                                  )
@@ -1361,9 +1363,13 @@ def purchasing(targetdate=None):
                 lobster_items.append(row_dict)
         df = pd.DataFrame(lobster_items)
         if not df.empty:
-            df['cost/lb'] = df['debit']/df['quantity']
+            with open("/usr/local/share/uofm.json") as file:
+                uofm = json.load(file)
+            df_uofm = pd.DataFrame(list(uofm.items()), columns=['case', 'factor'])
+            df = df.merge(df_uofm, left_on='UofM', right_on='case')
+            df['cost/lb'] = df['debit']/df['quantity']/df['factor']
             df.rename(columns={'cost/lb': s}, inplace=True)
-            df.drop(columns={'date', 'debit', 'quantity', 'size'}, inplace=True)
+            df.drop(columns={'date', 'debit', 'quantity', 'size', 'UofM', 'case', 'factor'}, inplace=True)
             lobster_df = lobster_df.merge(df, how='outer')
 
     lobster_df.sort_values(by=['item'], inplace=True)
@@ -1381,6 +1387,7 @@ def purchasing(targetdate=None):
             stone_cost = (
                 db.session.query(Transactions.item,
                                  Transactions.date,
+                                 Transactions.UofM,
                                  Transactions.debit,
                                  Transactions.quantity,
                                  )
@@ -1399,9 +1406,13 @@ def purchasing(targetdate=None):
                 stone_items.append(row_dict)
         df = pd.DataFrame(stone_items)
         if not df.empty:
-            df['cost/lb'] = df['debit']/df['quantity']
+            with open("/usr/local/share/uofm.json") as file:
+                uofm = json.load(file)
+            df_uofm = pd.DataFrame(list(uofm.items()), columns=['case', 'factor'])
+            df = df.merge(df_uofm, left_on='UofM', right_on='case')
+            df['cost/lb'] = df['debit']/df['quantity']/df['factor']
             df.rename(columns={'cost/lb': s}, inplace=True)
-            df.drop(columns={'date', 'debit', 'quantity', 'size'}, inplace=True)
+            df.drop(columns={'date', 'debit', 'quantity', 'size', 'UofM', 'case', 'factor'}, inplace=True)
             stone_df = stone_df.merge(df, how='outer')
 
     stone_df.sort_values(by=['item'], inplace=True)
@@ -1419,6 +1430,7 @@ def purchasing(targetdate=None):
             steak_cost = (
                 db.session.query(Transactions.item,
                                  Transactions.date,
+                                 Transactions.UofM,
                                  Transactions.debit,
                                  Transactions.quantity,
                                  )
@@ -1440,14 +1452,19 @@ def purchasing(targetdate=None):
                 steak_items.append(row_dict)
         df = pd.DataFrame(steak_items)
         if not df.empty:
-            df['cost/lb'] = df['debit']/df['quantity']
+            with open("/usr/local/share/uofm.json") as file:
+                uofm = json.load(file)
+            df_uofm = pd.DataFrame(list(uofm.items()), columns=['case', 'factor'])
+            df = df.merge(df_uofm, left_on='UofM', right_on='case')
+            df['cost/lb'] = df['debit']/df['quantity'] / df['factor']
             df.rename(columns={'cost/lb': s}, inplace=True)
-            df.drop(columns={'date', 'debit', 'quantity', 'size'}, inplace=True)
+            df.drop(columns={'date', 'debit', 'quantity', 'size', 'UofM', 'case', 'factor'}, inplace=True)
             steak_df = steak_df.merge(df, how='outer')
 
     steak_df.sort_values(by=['item'], inplace=True)
     steak_df.fillna(0, inplace=True)
 
+    # TODO add uofm json comparison to the sea bass and shrimp
     sea_bass = (
         db.session.query(Transactions.item,
                          Transactions.name,
@@ -1461,7 +1478,6 @@ def purchasing(targetdate=None):
             .group_by(Transactions.item, Transactions.name, Transactions.UofM)
         .all()
     )
-
 
     shrimp10 = (db.session.query(Transactions.name)
             .filter(Transactions.item.regexp_match('SEAFOOD Shrimp U/10 White Headless'))

@@ -14,10 +14,10 @@
         <div class="card">
           <div class="card-header bg-primary pb-0">
             {% for x in fiscal_dates %}
-            <h4>CURRENT LOBSTER COSTS FROM {{ x.date }}</h4>
+            <h4>LOBSTER COSTS</h4>
+            <h6>Most recent purchase in the last 30 days from {{ x.day }}, {{ x.date }}</h6>
             {% endfor %}
           </div>
-          <div class="card">
             <div class="table-responsive table-hover">
               <table class="table-sm text-dark">
               <thead>
@@ -33,85 +33,58 @@
                 {% for k, v in lobster_df.iterrows() %}
                   <tr>
                     <th scope="row">{{ v['item'] }}</th>
+                    {% if 'CHOPHOUSE 47' in lobster_df %}
                       <td>
                         <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v['CHOPHOUSE 47']) }}</p>
                       </td>
+                      {% else %}
+                      <td>
+                        <p class="mb-0 ms-1 text-begin">${{ 0.00 }}</p>
+                      </td>
+                    {% endif %}
+                    {% if 'NYP-ATLANTA' in lobster_df %}
                       <td>
                         <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v['NYP-ATLANTA']) }}</p>
                       </td>
+                      {% else %}
+                      <td>
+                        <p class="mb-0 ms-1 text-begin">${{ 0.00 }}</p>
+                      </td>
+                    {% endif %}
+                    {% if 'NYP-MYRTLE BEACH' in lobster_df %}
                       <td>
                         <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v['NYP-MYRTLE BEACH']) }}</p>
                       </td>
+                      {% else %}
+                      <td>
+                        <p class="mb-0 ms-1 text-begin">${{ 0.00 }}</p>
+                      </td>
+                    {% endif %}
+                    {% if 'NYP-BOCA' in lobster_df %}
                       <td>
                         <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v['NYP-BOCA']) }}</p>
                       </td>
+                      {% else %}
+                      <td>
+                        <p class="mb-0 ms-1 text-begin">${{ 0.00 }}</p>
+                      </td>
+                    {% endif %}
                   </tr>
                 {% endfor %}
               </tbody>
             </table>
           </div>
-          </div>
         </div>
       </div>
-      <!-- stone cost -->
-      <div class="col-lg-6 col-md-4">
-        <div class="card">
-          <div class="card-header bg-warning pb-0">
-            {% for x in fiscal_dates %}
-            <h4>CURRENT STONE CLAW COSTS FROM {{ x.date }}</h4>
-            {% endfor %}
-          </div>
-          <div class="card">
-            <div class="table-responsive table-hover">
-              <table class="table-sm text-dark">
-              <thead>
-                <tr>
-                  <th scope="col">CLAW</th>
-                  <th scope="col">CHNO</th>
-                  <th scope="col">CH47</th>
-                  <th scope="col">NYP-ATL</th>
-                  <th scope="col">NYP-MB</th>
-                  <th scope="col">NYP-BOCA</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for k, v in stone_df.iterrows() %}
-                  <tr>
-                    <th scope="row">{{ v['item'] }}</th>
-                      <td>
-                        <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v['CHOPHOUSE-NOLA']) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v['CHOPHOUSE 47']) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v['NYP-ATLANTA']) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v['NYP-MYRTLE BEACH']) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v['NYP-BOCA']) }}</p>
-                      </td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-          </div>
-        </div>
-      </div>
-    </div>
         <!-- steak cost -->
-    <div class="row mb-4">
       <div class="col-lg-6 col-md-6">
         <div class="card">
           <div class="card-header bg-info pb-0">
             {% for x in fiscal_dates %}
-            <h4>CURRENT PRIME STEAK COSTS FROM {{ x.date }}</h4>
+            <h4>PRIME STEAK COSTS</h4>
+            <h6>Most recent purchase in the last 30 days from {{ x.day }}, {{ x.date }}</h6>
             {% endfor %}
           </div>
-          <div class="card">
             <div class="table-responsive table-hover">
               <table class="table-sm text-dark">
               <thead>
@@ -128,26 +101,135 @@
                 {% for k, v in steak_df.iterrows() %}
                   <tr>
                     <th scope="row">{{ v['item'] }}</th>
+                      {% if 'CHOPHOUSE-NOLA' in steak_df %}
                       <td>
                         <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v['CHOPHOUSE-NOLA']) }}</p>
                       </td>
+                      {% else %}
+                      <td>
+                        <p class="mb-0 ms-1 text-begin">${{ 0.00 }}</p>
+                      </td>
+                    {% endif %}
+                      {% if 'CHOPHOUSE 47' in steak_df %}
                       <td>
                         <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v['CHOPHOUSE 47']) }}</p>
                       </td>
+                      {% else %}
+                      <td>
+                        <p class="mb-0 ms-1 text-begin">${{ 0.00 }}</p>
+                      </td>
+                    {% endif %}
+                      {% if 'NYP-ATLANTA' in steak_df %}
                       <td>
                         <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v['NYP-ATLANTA']) }}</p>
                       </td>
+                      {% else %}
+                      <td>
+                        <p class="mb-0 ms-1 text-begin">${{ 0.00 }}</p>
+                      </td>
+                    {% endif %}
+                      {% if 'NYP-MYRTLE BEACH' in steak_df %}
                       <td>
                         <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v['NYP-MYRTLE BEACH']) }}</p>
                       </td>
+                      {% else %}
+                      <td>
+                        <p class="mb-0 ms-1 text-begin">${{ 0.00 }}</p>
+                      </td>
+                    {% endif %}
+                      {% if 'NYP-BOCA' in steak_df %}
                       <td>
                         <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v['NYP-BOCA']) }}</p>
                       </td>
+                      {% else %}
+                      <td>
+                        <p class="mb-0 ms-1 text-begin">${{ 0.00 }}</p>
+                      </td>
+                    {% endif %}
                   </tr>
                 {% endfor %}
               </tbody>
             </table>
           </div>
+        </div>
+      </div>
+    </div>
+      <!-- stone cost -->
+    <div class="row mb-4">
+      <div class="col-lg-6 col-md-4">
+        <div class="card">
+          <div class="card-header bg-warning pb-0">
+            {% for x in fiscal_dates %}
+            <h4>STONE CLAW COSTS</h4>
+            <h6>Most recent purchase in the last 30 days from {{ x.day }}, {{ x.date }}</h6>
+            {% endfor %}
+          </div>
+          <div class="table-responsive table-hover">
+            <table class="table-sm text-dark">
+              <thead>
+                <tr>
+                  <th scope="col">CLAW</th>
+                  <th scope="col">CHNO</th>
+                  <th scope="col">CH47</th>
+                  <th scope="col">NYP-ATL</th>
+                  <th scope="col">NYP-MB</th>
+                  <th scope="col">NYP-BOCA</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- TODO add these if statements to rest of tables -->
+                {% for k, v in stone_df.iterrows() %}
+                  <tr>
+                    <th scope="row">{{ v['item'] }}</th>
+                    {% if 'CHOPHOUSE-NOLA' in stone_df %}
+                      <td>
+                        <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v['CHOPHOUSE-NOLA']) }}</p>
+                      </td>
+                      {% else %}
+                      <td>
+                        <p class="mb-0 ms-1 text-begin">${{ 0.00 }}</p>
+                      </td>
+                    {% endif %}
+                    {% if 'CHOPHOUSE 47' in stone_df %}
+                      <td>
+                        <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v['CHOPHOUSE 47']) }}</p>
+                      </td>
+                      {% else %}
+                      <td>
+                        <p class="mb-0 ms-1 text-begin">${{ 0.00 }}</p>
+                      </td>
+                    {% endif %}
+                    {% if 'NYP-ATLANTA' in stone_df %}
+                      <td>
+                        <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v['NYP-ATLANTA']) }}</p>
+                      </td>
+                      {% else %}
+                      <td>
+                        <p class="mb-0 ms-1 text-begin">${{ 0.00 }}</p>
+                      </td>
+                    {% endif %}
+                    {% if 'NYP-MYRTLE BEACH' in stone_df %}
+                      <td>
+                        <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v['NYP-MYRTLE BEACH']) }}</p>
+                      </td>
+                      {% else %}
+                      <td>
+                        <p class="mb-0 ms-1 text-begin">${{ 0.00 }}</p>
+                      </td>
+                    {% endif %}
+                    {% if 'NYP-BOCA' in stone_df %}
+                      <td>
+                        <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v['NYP-BOCA']) }}</p>
+                      </td>
+                      {% else %}
+                      <td>
+                        <p class="mb-0 ms-1 text-begin">${{ 0.00 }}</p>
+                      </td>
+                    {% endif %}
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
@@ -156,12 +238,12 @@
         <div class="card">
           <div class="card-header bg-success pb-0">
             {% for x in fiscal_dates %}
-            <h4>SEA BASS COST FROM {{ x.date }}</h4>
+            <h4>SEA BASS COST</h4>
+            <h6>Most recent purchase in the last 30 days from {{ x.day }}, {{ x.date }}</h6>
             {% endfor %}
           </div>
-          <div class="card">
-            <div class="table-responsive table-hover">
-              <table class="table-sm text-dark">
+          <div class="table-responsive table-hover">
+            <table class="table-sm text-dark">
               <thead>
                 <tr>
                   <th scope="col">STORE</th>
@@ -204,7 +286,6 @@
               </tbody>
             </table>
           </div>
-          </div>
         </div>
       </div>
     </div>
@@ -214,12 +295,12 @@
         <div class="card">
           <div class="card-header bg-secondary pb-0">
             {% for x in fiscal_dates %}
-            <h4>U10 SHRIMP COST FROM {{ x.date }}</h4>
+            <h4>U10 SHRIMP COST</h4>
+            <h6>Most recent purchase in the last 30 days from {{ x.day }}, {{ x.date }}</h6>
             {% endfor %}
           </div>
-          <div class="card">
-            <div class="table-responsive table-hover">
-              <table class="table-sm text-dark">
+          <div class="table-responsive table-hover">
+            <table class="table-sm text-dark">
               <thead>
                 <tr>
                   <th scope="col">STORE</th>
@@ -230,24 +311,23 @@
               <tbody>
                 {% for k, v in shrimp_items.iterrows() %}
                   <tr>
-                    <th scope="row">{{ v.store }}</th>
-                      <td>
-                        <p class="mb-0 ms-1 text-begin">{{ v.UofM }}</p>
-                      </td>
-                      {% if v.UofM == 'Case - 10/Pack (5 LB)' %}
-                      <td>
-                        <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format((v.amount/v.quantity)/50.0) }}</p>
-                      </td>
-                      {% else %}
-                      <td>
-                        <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v.amount/v.quantity) }}</p>
-                      </td>
-                      {% endif %}
+                  <th scope="row">{{ v.store }}</th>
+                    <td>
+                      <p class="mb-0 ms-1 text-begin">{{ v.UofM }}</p>
+                    </td>
+                    {% if v.UofM == 'Case - 10/Pack (5 LB)' %}
+                    <td>
+                      <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format((v.amount/v.quantity)/50.0) }}</p>
+                    </td>
+                    {% else %}
+                    <td>
+                      <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v.amount/v.quantity) }}</p>
+                    </td>
+                    {% endif %}
                   </tr>
                 {% endfor %}
               </tbody>
             </table>
-          </div>
           </div>
         </div>
       </div>
