@@ -217,7 +217,7 @@ def index():
         .group_by(Menuitems.name)
         .all()
     )
-
+    # replace ly with guest check average
     entree_count_ly = (db.session.query(
             Menuitems.name,
             func.sum(Menuitems.quantity).label('guest_count'),
@@ -241,9 +241,11 @@ def index():
     df_entree_count_ly = pd.DataFrame.from_records(
         entree_count_ly, columns=["name", "guest_count_ly"]
     )
+    df_entree_count_ly.fillna(0, inplace=True)
     sales_table = df_sales_day.merge(df_sales_day_ly, how="outer", sort=True)
     sales_table = sales_table.merge(df_entree_count, how="outer", sort=True)
     sales_table = sales_table.merge(df_entree_count_ly, how="outer", sort=True)
+    sales_table['check_avg'] = sales_table['sales']/sales_table['guest_count'].astype(float)
 
     labor_day = (
         db.session.query(
