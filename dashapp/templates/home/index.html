@@ -242,19 +242,11 @@
                         </div>
                       </td>
                       <td>
-                        {% if v.guest_count >= v.guest_count_ly %}
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex flex-column">
-                            <h6 class="mb-0 text-sm text-end"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ v.guest_count }}</h6>
+                            <h6 class="mb-0 text-sm text-end">{{ v.guest_count }}</h6>
                           </div>
                         </div>
-                        {% else %}
-                        <div class="d-flex px-2 py-1">
-                          <div class="d-flex flex-column">
-                            <h6 class="mb-0 text-sm text-end"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ v.guest_count }}</h6>
-                          </div>
-                        </div>
-                        {% endif %}
                       </td>
                       <td>
                         <div class="d-flex px-2 py-1">

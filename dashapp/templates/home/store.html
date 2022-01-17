@@ -189,8 +189,8 @@
                   <div class="card-body">
                     <h5 class="card-title">FOOD</h5>
                     <p class="card-text-light font-weight-bold">SALES - {{ "${:,.0f}".format(weekly_totals.food) }}</p>
-                    <p class="card-text-light font-weight-bold">BUDGET - </p>
-                    <p class="card-text-light font-weight-bold">COSTS - </p>
+                    <p class="card-text-light font-weight-bold">COSTS - {{ "${:,.0f}".format(weekly_cogs['Beef'] + weekly_cogs['Dairy'] + weekly_cogs['Food Other'] + weekly_cogs['Produce'] + weekly_cogs['Pork'] + weekly_cogs['Poultry'] + weekly_cogs['Seafood']) }}</p>
+                    <p class="card-text-light font-weight-bold">COST %- {{ "{:.1f}%".format((weekly_cogs['Beef'] + weekly_cogs['Dairy'] + weekly_cogs['Food Other'] + weekly_cogs['Produce'] + weekly_cogs['Pork'] + weekly_cogs['Poultry'] + weekly_cogs['Seafood'])/weekly_totals['food'] * 100) }} </p>
                   </div>
               </div>
             </div>
@@ -199,8 +199,8 @@
                   <div class="card-body">
                     <h5 class="card-title">BEER</h5>
                     <p class="card-text-light font-weight-bold">SALES - {{ "${:,.0f}".format(weekly_totals.beer) }}</p>
-                    <p class="card-text-light font-weight-bold">BUDGET - </p>
-                    <p class="card-text-light font-weight-bold">COSTS - </p>
+                    <p class="card-text-light font-weight-bold">COSTS - {{ "${:,.0f}".format(weekly_cogs['Beer']) }} </p>
+                    <p class="card-text-light font-weight-bold">COST %- {{ "{:.1f}%".format(weekly_cogs['Beer']/weekly_totals['beer'] * 100) }} </p>
                   </div>
               </div>
             </div>
@@ -209,8 +209,8 @@
                   <div class="card-body">
                     <h5 class="card-title">LIQUOR</h5>
                     <p class="card-text-light font-weight-bold">SALES - {{ "${:,.0f}".format(weekly_totals.liquor) }}</p>
-                    <p class="card-text-light font-weight-bold">BUDGET - </p>
-                    <p class="card-text-light font-weight-bold">COSTS - </p>
+                    <p class="card-text-light font-weight-bold">COSTS - {{ "${:,.0f}".format(weekly_cogs['Liquor']) }} </p>
+                    <p class="card-text-light font-weight-bold">COST %- {{ "{:.1f}%".format(weekly_cogs['Liquor']/weekly_totals['liquor'] * 100) }} </p>
                   </div>
               </div>
             </div>
@@ -219,8 +219,8 @@
                   <div class="card-body">
                     <h5 class="card-title">WINE</h5>
                     <p class="card-text-light font-weight-bold">SALES - {{ "${:,.0f}".format(weekly_totals.wine) }}</p>
-                    <p class="card-text-light font-weight-bold">BUDGET - </p>
-                    <p class="card-text-light font-weight-bold">COSTS - </p>
+                    <p class="card-text-light font-weight-bold">COSTS - {{ "${:,.0f}".format(weekly_cogs['Wine']) }} </p>
+                    <p class="card-text-light font-weight-bold">COST %- {{ "{:.1f}%".format(weekly_cogs['Wine']/weekly_totals['wine'] * 100) }} </p>
                   </div>
               </div>
             </div>
@@ -240,8 +240,8 @@
                   <div class="card-body">
                     <h5 class="card-title">FOOD</h5>
                     <p class="card-text-light font-weight-bold">SALES - {{ "${:,.0f}".format(period_totals.food) }}</p>
-                    <p class="card-text-light font-weight-bold">BUDGET - </p>
-                    <p class="card-text-light font-weight-bold">COSTS - </p>
+                    <p class="card-text-light font-weight-bold">COSTS - {{ "${:,.0f}".format(period_cogs['Beef'] + period_cogs['Dairy'] + period_cogs['Food Other'] + period_cogs['Produce'] + period_cogs['Pork'] + period_cogs['Poultry'] + period_cogs['Seafood']) }}</p>
+                    <p class="card-text-light font-weight-bold">COST %- {{ "{:.1f}%".format((period_cogs['Beef'] + period_cogs['Dairy'] + period_cogs['Food Other'] + period_cogs['Produce'] + period_cogs['Pork'] + period_cogs['Poultry'] + period_cogs['Seafood'])/period_totals['food'] * 100) }} </p>
                   </div>
               </div>
             </div>
@@ -250,8 +250,8 @@
                   <div class="card-body">
                     <h5 class="card-title">BEER</h5>
                     <p class="card-text-light font-weight-bold">SALES - {{ "${:,.0f}".format(period_totals.beer) }}</p>
-                    <p class="card-text-light font-weight-bold">BUDGET - </p>
-                    <p class="card-text-light font-weight-bold">COSTS - </p>
+                    <p class="card-text-light font-weight-bold">COSTS - {{ period_cogs['Beer'] }} </p>
+                    <p class="card-text-light font-weight-bold">COST %- {{ "{:.1f}%".format(period_cogs['Beer']/period_totals['beer'] * 100) }} </p>
                   </div>
               </div>
             </div>
@@ -260,8 +260,8 @@
                   <div class="card-body">
                     <h5 class="card-title">LIQUOR</h5>
                     <p class="card-text-light font-weight-bold">SALES - {{ "${:,.0f}".format(period_totals.liquor) }}</p>
-                    <p class="card-text-light font-weight-bold">BUDGET - </p>
-                    <p class="card-text-light font-weight-bold">COSTS - </p>
+                    <p class="card-text-light font-weight-bold">COSTS - {{ "${:,.0f}".format(period_cogs['Liquor']) }} </p>
+                    <p class="card-text-light font-weight-bold">COST %- {{ "{:.1f}%".format(period_cogs['Liquor']/period_totals['liquor'] * 100) }} </p>
                   </div>
               </div>
             </div>
@@ -270,8 +270,8 @@
                   <div class="card-body">
                     <h5 class="card-title">WINE</h5>
                     <p class="card-text-light font-weight-bold">SALES - {{ "${:,.0f}".format(period_totals.wine) }}</p>
-                    <p class="card-text-light font-weight-bold">BUDGET - </p>
-                    <p class="card-text-light font-weight-bold">COSTS - </p>
+                    <p class="card-text-light font-weight-bold">COSTS - {{ "${:,.0f}".format(period_cogs['Wine']) }} </p>
+                    <p class="card-text-light font-weight-bold">COST %- {{ "{:.1f}%".format(period_cogs['Wine']/period_totals['wine'] * 100) }} </p>
                   </div>
               </div>
             </div>
@@ -301,7 +301,6 @@
                     <th scope="col">SERVER</th>
                     <th scope="col">KITCHEN</th>
                     <th scope="col">TOTAL</th>
-                    <th scope="col">BUDGET</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -359,7 +358,6 @@
                     <th scope="col">SERVER</th>
                     <th scope="col">KITCHEN</th>
                     <th scope="col">TOTAL</th>
-                    <th scope="col">BUDGET</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -417,7 +415,6 @@
                     <th scope="col">SERVER</th>
                     <th scope="col">KITCHEN</th>
                     <th scope="col">TOTAL</th>
-                    <th scope="col">BUDGET</th>
                   </tr>
                 </thead>
                 <tbody>

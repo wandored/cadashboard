@@ -4,9 +4,10 @@ Copyright (c) 2019 - present AppSeed.us
 """
 
 import json
+import re
+import pandas as pd
 from flask.helpers import url_for
 from flask_security.decorators import roles_accepted
-import pandas as pd
 from sqlalchemy.sql.expression import column
 from dashapp.home import blueprint
 from flask import flash, render_template, session, redirect, url_for
@@ -15,8 +16,7 @@ from flask_security import login_required, current_user
 from datetime import datetime, timedelta
 from dashapp.authentication.forms import DateForm, StoreForm, UpdateForm
 from dashapp.authentication.models import Menuitems, db, Calendar, Sales, Labor, Restaurants, Budgets, Transactions
-from sqlalchemy import or_, func
-import re
+from sqlalchemy import and_, or_, func
 
 
 @blueprint.route("/")
@@ -241,11 +241,9 @@ def index():
     df_entree_count_ly = pd.DataFrame.from_records(
         entree_count_ly, columns=["name", "guest_count_ly"]
     )
-    df_entree_count_ly.fillna(0, inplace=True)
     sales_table = df_sales_day.merge(df_sales_day_ly, how="outer", sort=True)
     sales_table = sales_table.merge(df_entree_count, how="outer", sort=True)
     sales_table = sales_table.merge(df_entree_count_ly, how="outer", sort=True)
-    sales_table['check_avg'] = sales_table['sales']/sales_table['guest_count'].astype(float)
 
     labor_day = (
         db.session.query(
@@ -296,8 +294,10 @@ def index():
     daily_top = daily_top.nlargest(5, 'poly', keep='all')
 
     daily_table.loc["TOTALS"] = daily_table.sum(numeric_only=True)
+    daily_table['check_avg'] = daily_table['sales']/daily_table['guest_count'].astype(float)
     daily_table['labor_pct'] = daily_table.dollars / daily_table.sales
     daily_table['labor_pct_ly'] = daily_table.dollars_ly / daily_table.sales_ly
+    daily_table.fillna(0, inplace=True)
     daily_totals = daily_table.loc["TOTALS"]
 
     # Weekly Sales Table
@@ -635,7 +635,7 @@ def store(store_id):
 
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
-    # Daily Chart
+    # Week to Date Chart
     daily_chart = (
         db.session.query(func.sum(Sales.sales).label("total_sales"))
         .filter(Sales.date.between(start_week, end_week),
@@ -658,7 +658,7 @@ def store(store_id):
     for v in daily_chart_ly:
         values1_ly.append(v.total_sales)
 
-    # Weekly Chart
+    # Period to Date Chart
     weekly_chart = (
         db.session.query(func.sum(Sales.sales).label("total_sales"))
         .select_from(Sales)
@@ -685,7 +685,7 @@ def store(store_id):
     for v in weekly_chart_ly:
         values2_ly.append(v.total_sales)
 
-    # Yearly Chart
+    # Year to Date Chart
     period_chart = (
         db.session.query(func.sum(Sales.sales).label("total_sales"))
         .select_from(Sales)
@@ -1138,6 +1138,59 @@ def store(store_id):
             .order_by(Transactions.date.desc())
         .limit(5).all()
     )
+
+
+    cogs_wk = (
+        db.session.query(Transactions.category2,
+                         func.sum(Transactions.credit).label('credit'),
+                         func.sum(Transactions.debit).label('debit')
+                         )
+            .filter(Transactions.name == store.name,
+                    Transactions.date.between(start_week, end_week),
+                    and_(or_(Transactions.type == 'AP Invoice',
+                             Transactions.type == 'AP Credit Memo',
+                             Transactions.type == 'Item Transfer'),
+                         or_(Transactions.category1 == 'Food',
+                             Transactions.category1 == 'LBW')
+                         )
+                    )
+            .group_by(Transactions.category1, Transactions.category2).all()
+    )
+    cost_table = pd.DataFrame(cogs_wk, columns=['category', 'credit', 'debit'])
+    for i in ['Beef', 'Dairy', 'Food Other', 'Pork', 'Poultry', 'Produce', 'Seafood', 'Beer', 'Liquor', 'Wine']:
+        if i not in cost_table.values:
+            cost_table.loc[len(cost_table.index)] = [i, 0, 0]
+
+    cost_table['totals'] = abs(cost_table.credit - cost_table.debit)
+    cost_table.drop(columns={'credit', 'debit'}, inplace=True)
+    weekly_cogs = pd.Series(cost_table['totals'].values, index=cost_table['category'])
+
+    cogs_pd = (
+        db.session.query(Transactions.category2,
+                         func.sum(Transactions.credit).label('credit'),
+                         func.sum(Transactions.debit).label('debit')
+                         )
+            .filter(Transactions.name == store.name,
+                    Transactions.date.between(start_period, end_period),
+                    and_(or_(Transactions.type == 'AP Invoice',
+                             Transactions.type == 'AP Credit Memo',
+                             Transactions.type == 'Item Transfer'),
+                         or_(Transactions.category1 == 'Food',
+                             Transactions.category1 == 'LBW')
+                         )
+                    )
+            .group_by(Transactions.category1, Transactions.category2).all()
+    )
+    cost_table = pd.DataFrame(cogs_pd, columns=['category', 'credit', 'debit'])
+    for i in ['Beef', 'Dairy', 'Food Other', 'Pork', 'Poultry', 'Produce', 'Seafood', 'Beer', 'Liquor', 'Wine']:
+        if i not in cost_table.values:
+            cost_table.loc[len(cost_table.index)] = [i, 0, 0]
+
+    cost_table['totals'] = abs(cost_table.credit - cost_table.debit)
+    cost_table.drop(columns={'credit', 'debit'}, inplace=True)
+    period_cogs = pd.Series(cost_table['totals'].values, index=cost_table['category'])
+
+
     if store_id in [4, 9, 11, 17, 16]:
         concept = 'steakhouse'
     else:
@@ -1162,16 +1215,18 @@ def store(store_id):
         values3_ly=values3_ly,
         budgets3=budgets3,
         daily_table=daily_table,
-        weekly_table=weekly_table,
+#        weekly_table=weekly_table,
         weekly_totals=weekly_totals,
-        period_table=period_table,
+#        period_table=period_table,
         period_totals=period_totals,
 #        period_table_w1=period_table_w1,
 #        period_table_w2=period_table_w2,
 #        period_table_w3=period_table_w3,
 #        period_table_w4=period_table_w4,
-        yearly_table=yearly_table,
+#        yearly_table=yearly_table,
         yearly_totals=yearly_totals,
+        weekly_cogs=weekly_cogs,
+        period_cogs=period_cogs,
         lobster_items=lobster_items,
         stone_items=stone_items,
         sea_bass=sea_bass,
