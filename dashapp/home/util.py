@@ -259,8 +259,8 @@ def get_potato(date, store_id):
             rqst = make_HTTP_request(url)
             df = make_dataframe(rqst)
             if df.empty:
-                print('empty dataframe')
-                break
+                #print(f'empty dataframe {i[0]}')
+                continue
 
             data = db.session.query(Restaurants).filter(Restaurants.id == store_id)
             df_loc = pd.DataFrame(
@@ -268,11 +268,11 @@ def get_potato(date, store_id):
             )
             df_merge = df_loc.merge(df, on="location")
             if df_merge.empty:
-                print(f'no sales at {i[0]}')
+                #print(f'no sales at {i[0]}')
                 if pot_chart.empty:
-                    break
+                    continue
                 pot_chart.loc[i[0]] = [0]
-                break
+                continue
             df_merge.drop(columns=['location'], inplace=True)
             df_merge.loc[:, "menuitem"] = df_merge["menuitem"].str.replace(r"CHOPHOUSE - NOLA", "CHOPHOUSE-NOLA", regex=True)
             df_merge.loc[:, "menuitem"] = df_merge["menuitem"].str.replace(r"CAFÉ", "CAFE", regex=True)

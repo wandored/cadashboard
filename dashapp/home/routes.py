@@ -1707,7 +1707,6 @@ def potato(store_id):
     pot_df = pd.DataFrame()
     TODAY = datetime.date(datetime.now())
     today = TODAY.strftime('%A, %m/%d')
-    print(today)
     for i in [28, 21, 14, 7]:
         target = TODAY - timedelta(days=i)
         start_date = target.strftime('%Y-%m-%d')
@@ -1731,13 +1730,13 @@ def potato(store_id):
     pdf.cell(page_width, 0.0, 'POTATO LOADING CHART', align='C')
     pdf.ln(5)
     pdf.cell(page_width, 0.0, today, align='C')
-    pdf.ln(10)
+    pdf.ln(5)
 
     pdf.set_font('Courier', '', 12)
     col_width = page_width/8
     notes_width = page_width/4
     pdf.ln(1)
-    th = pdf.font_size+2
+    th = pdf.font_size+1
 
     pdf.cell(col_width, th, str('LUNCH'), border=1)
     pdf.ln(th)
@@ -1771,7 +1770,7 @@ def potato(store_id):
     pdf.ln(5)
     pdf.set_font('Times', '', 10.0)
     pdf.cell(page_width, 0.0, '* Calculated from previous 4 weeks same day sales', align='L')
-    pdf.ln(10)
+    pdf.ln(5)
     pdf.cell(page_width, 0.0, '- end of report -', align='C')
 
     return Response(pdf.output(dest='S').encode('latin-1'), mimetype='application/pdf',
