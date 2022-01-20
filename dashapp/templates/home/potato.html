@@ -1,0 +1,91 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Potato Loading Chart {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+  <div class="container-fluid py-4">
+      <!-- Daily Sales Table -->
+      <div class="row mb-4">
+        <div class="col-lg-8 col-md-6 mb-md-0 mb-4">
+          <div class="card">
+            <div class="card-header pb-0">
+              <div class="row">
+                {% for x in fiscal_dates %}
+                <div class="col-lg-6 col-7">
+                  <h6>Potato Loading Chart - {{ x.day }}, {{ x.date }}</h6>
+                </div>
+                {% endfor %}
+                <div class="col-lg-6 col-5 my-auto text-end">
+                </div>
+              </div>
+            </div>
+            <div class="card-body px-0 pb-2">
+              <div class="table-responsive table-hover">
+                <table class="table align-items-center mb-0">
+                  <thead>
+                    <tr>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Load Time</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Avg</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Median</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Max</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for k, v in rotation.iterrows() %}
+                    <tr> 
+                      <td>
+                        <div class="d-flex px-2 py-1">
+                          <div class="d-flex flex-column">
+                            <a class="me-2"><h6 class="mb-0 text-sm">{{ k }}</h6></a>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="d-flex px-2 py-1">
+                          <div class="d-flex flex-column">
+                            <h6 class="mb-0 text-sm text-end">{{ v.AVG }}</h6>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="d-flex px-2 py-1">
+                          <div class="d-flex flex-column">
+                            <h6 class="mb-0 text-sm text-end">{{ v.MEDIAN }}</h6>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="d-flex px-2 py-1">
+                          <div class="d-flex flex-column">
+                            <h6 class="mb-0 text-sm text-end">{{ v.MAX }}</h6>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="d-flex px-2 py-1">
+                          <div class="d-flex flex-column">
+                            <h6 class="mb-0 text-sm">{{ v.out }}</h6>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+    {% include 'includes/footer.html' %}
+
+  </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

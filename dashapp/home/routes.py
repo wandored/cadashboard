@@ -6,15 +6,15 @@ Copyright (c) 2019 - present AppSeed.us
 import json
 import re
 import pandas as pd
+from fpdf import FPDF
 from flask.helpers import url_for
 from flask_security.decorators import roles_accepted
-from sqlalchemy.sql.expression import column
 from dashapp.home import blueprint
-from flask import flash, render_template, session, redirect, url_for
-from dashapp.home.util import get_period, get_lastyear, refresh_data, get_daily_sales, get_daily_labor
+from flask import flash, render_template, session, redirect, url_for, Response
+from dashapp.home.util import get_period, get_lastyear, refresh_data, get_daily_sales, get_daily_labor, get_potato
 from flask_security import login_required, current_user
 from datetime import datetime, timedelta
-from dashapp.authentication.forms import DateForm, StoreForm, UpdateForm
+from dashapp.authentication.forms import DateForm, StoreForm, UpdateForm, PotatoForm
 from dashapp.authentication.models import Menuitems, db, Calendar, Sales, Labor, Restaurants, Budgets, Transactions
 from sqlalchemy import and_, or_, func
 
@@ -568,6 +568,7 @@ def store(store_id):
 
     form1 = DateForm()
     form3 = StoreForm()
+    form4 = PotatoForm()
     store = Restaurants.query.filter_by(id=store_id).first()
 
     print(store.name)
@@ -602,7 +603,6 @@ def store(store_id):
     year_to_date = get_lastyear(start_day)
 
     # Get Data
-    form1 = DateForm()
     if form1.submit1.data and form1.validate():
         """
         When new date submitted, the data for that date will be replaced with new data from R365
@@ -634,6 +634,11 @@ def store(store_id):
         store_id = form3.store.data.id
 
         return redirect(url_for("home_blueprint.store", store_id=store_id))
+
+
+    if form4.validate_on_submit():
+
+        return redirect(url_for("home_blueprint.potato", store_id=store.id))
 
     # Week to Date Chart
     daily_chart = (
@@ -1200,10 +1205,12 @@ def store(store_id):
     return render_template(
         "home/store.html",
         title=store.name,
-        segment='store',
+        store_id=store.id,
+        segment='store.name',
         concept=concept,
         form1=form1,
         form3=form3,
+        form4=form4,
         current_user=current_user,
         roles=current_user.roles,
         fiscal_dates=fiscal_dates,
@@ -1685,6 +1692,105 @@ def support(targetdate=None):
         unassigned_sales=unassigned_sales,
         do_not_use=do_not_use,
     )
+
+
+@blueprint.route("/<int:store_id>/potato/", methods=["GET", "POST"])
+@login_required
+def potato(store_id):
+
+    form1 = DateForm()
+    form2 = UpdateForm()
+    form3 = StoreForm()
+    fiscal_dates = get_period(datetime.strptime(session["targetdate"], "%Y-%m-%d"))
+    store = Restaurants.query.filter_by(id=store_id).first()
+
+    pot_df = pd.DataFrame()
+    TODAY = datetime.date(datetime.now())
+    today = TODAY.strftime('%A, %m/%d')
+    print(today)
+    for i in [28, 21, 14, 7]:
+        target = TODAY - timedelta(days=i)
+        start_date = target.strftime('%Y-%m-%d')
+        df = get_potato(start_date, store_id)
+        pot_df = pot_df.merge(df, left_index=True, right_index=True, how='outer')
+
+    #pot_df.fillna(0, inplace=True)
+    pot_df['AVG'] = pot_df.mean(axis=1)
+    pot_df['MEDIAN'] = pot_df.median(axis=1)
+    pot_df['MAX'] = pot_df.max(axis=1)
+    out_times = pd.read_csv('./potatochart.csv', index_col='time')
+    rotation = pot_df.merge(out_times, left_index=True, right_on='time', how='left')
+
+    # format pdf page
+    pdf = FPDF()
+    pdf.add_page()
+    page_width = pdf.w -2 * pdf.l_margin
+    pdf.set_font('Times', 'B', 14.0)
+    pdf.cell(page_width, 0.0, store.name, align='C')
+    pdf.ln(5)
+    pdf.cell(page_width, 0.0, 'POTATO LOADING CHART', align='C')
+    pdf.ln(5)
+    pdf.cell(page_width, 0.0, today, align='C')
+    pdf.ln(10)
+
+    pdf.set_font('Courier', '', 12)
+    col_width = page_width/8
+    notes_width = page_width/4
+    pdf.ln(1)
+    th = pdf.font_size+2
+
+    pdf.cell(col_width, th, str('LUNCH'), border=1)
+    pdf.ln(th)
+    pdf.cell(col_width, th, str('IN TIME'), border=1)
+    pdf.cell(col_width, th, str('Average'), border=1)
+    pdf.cell(col_width, th, str('Median'), border=1)
+    pdf.cell(col_width, th, str('Max'), border=1)
+    pdf.cell(col_width, th, str('OUT TIME'), border=1)
+    pdf.cell(notes_width, th, str('NOTES'), border=1)
+    pdf.ln(th)
+    for k, v in rotation.iterrows():
+        if k == '15:00':
+            pdf.ln(th)
+            pdf.cell(col_width, th, str('DINNER'), border=1)
+            pdf.ln(th)
+            pdf.cell(col_width, th, str('IN TIME'), border=1)
+            pdf.cell(col_width, th, str('Average'), border=1)
+            pdf.cell(col_width, th, str('Median'), border=1)
+            pdf.cell(col_width, th, str('Max'), border=1)
+            pdf.cell(col_width, th, str('OUT TIME'), border=1)
+            pdf.cell(notes_width, th, str('NOTES'), border=1)
+            pdf.ln(th)
+        pdf.cell(col_width, th, str(v['in']), border=1)
+        pdf.cell(col_width, th, str(round(v['AVG'])), border=1)
+        pdf.cell(col_width, th, str(round(v['MEDIAN'])), border=1)
+        pdf.cell(col_width, th, str(round(v['MAX'])), border=1)
+        pdf.cell(col_width, th, str(v['out']), border=1)
+        pdf.cell(notes_width, th, '', border=1)
+        pdf.ln(th)
+
+    pdf.ln(5)
+    pdf.set_font('Times', '', 10.0)
+    pdf.cell(page_width, 0.0, '* Calculated from previous 4 weeks same day sales', align='L')
+    pdf.ln(10)
+    pdf.cell(page_width, 0.0, '- end of report -', align='C')
+
+    return Response(pdf.output(dest='S').encode('latin-1'), mimetype='application/pdf',
+                    headers={'Content-Disposition':'attachment;filename=potato_loading.pdf'})
+
+
+    return render_template(
+        'home/potato.html',
+        title='Potato',
+        segment='potato',
+        fiscal_dates=fiscal_dates,
+        form1=form1,
+        form2=form2,
+        form3=form3,
+        store_id=store_id,
+        rotation=rotation,
+        potato_table=potato_table
+    )
+
 
 #@blueprint.route("/<template>")
 #@login_required

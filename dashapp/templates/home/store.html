@@ -189,8 +189,8 @@
                   <div class="card-body">
                     <h5 class="card-title">FOOD</h5>
                     <p class="card-text-light font-weight-bold">SALES - {{ "${:,.0f}".format(weekly_totals.food) }}</p>
-                    <p class="card-text-light font-weight-bold">COSTS - {{ "${:,.0f}".format(weekly_cogs['Beef'] + weekly_cogs['Dairy'] + weekly_cogs['Food Other'] + weekly_cogs['Produce'] + weekly_cogs['Pork'] + weekly_cogs['Poultry'] + weekly_cogs['Seafood']) }}</p>
-                    <p class="card-text-light font-weight-bold">COST %- {{ "{:.1f}%".format((weekly_cogs['Beef'] + weekly_cogs['Dairy'] + weekly_cogs['Food Other'] + weekly_cogs['Produce'] + weekly_cogs['Pork'] + weekly_cogs['Poultry'] + weekly_cogs['Seafood'])/weekly_totals['food'] * 100) }} </p>
+                    <p class="card-text-light font-weight-bold">PURCHASES - {{ "${:,.0f}".format(weekly_cogs['Beef'] + weekly_cogs['Dairy'] + weekly_cogs['Food Other'] + weekly_cogs['Produce'] + weekly_cogs['Pork'] + weekly_cogs['Poultry'] + weekly_cogs['Seafood']) }}</p>
+                    <p class="card-text-light font-weight-bold">COST % - {{ "{:.1f}%".format((weekly_cogs['Beef'] + weekly_cogs['Dairy'] + weekly_cogs['Food Other'] + weekly_cogs['Produce'] + weekly_cogs['Pork'] + weekly_cogs['Poultry'] + weekly_cogs['Seafood'])/weekly_totals['food'] * 100) }} </p>
                   </div>
               </div>
             </div>
@@ -199,8 +199,8 @@
                   <div class="card-body">
                     <h5 class="card-title">BEER</h5>
                     <p class="card-text-light font-weight-bold">SALES - {{ "${:,.0f}".format(weekly_totals.beer) }}</p>
-                    <p class="card-text-light font-weight-bold">COSTS - {{ "${:,.0f}".format(weekly_cogs['Beer']) }} </p>
-                    <p class="card-text-light font-weight-bold">COST %- {{ "{:.1f}%".format(weekly_cogs['Beer']/weekly_totals['beer'] * 100) }} </p>
+                    <p class="card-text-light font-weight-bold">PURCHASES - {{ "${:,.0f}".format(weekly_cogs['Beer']) }} </p>
+                    <p class="card-text-light font-weight-bold">COST % - {{ "{:.1f}%".format(weekly_cogs['Beer']/weekly_totals['beer'] * 100) }} </p>
                   </div>
               </div>
             </div>
@@ -209,8 +209,8 @@
                   <div class="card-body">
                     <h5 class="card-title">LIQUOR</h5>
                     <p class="card-text-light font-weight-bold">SALES - {{ "${:,.0f}".format(weekly_totals.liquor) }}</p>
-                    <p class="card-text-light font-weight-bold">COSTS - {{ "${:,.0f}".format(weekly_cogs['Liquor']) }} </p>
-                    <p class="card-text-light font-weight-bold">COST %- {{ "{:.1f}%".format(weekly_cogs['Liquor']/weekly_totals['liquor'] * 100) }} </p>
+                    <p class="card-text-light font-weight-bold">PURCHASES - {{ "${:,.0f}".format(weekly_cogs['Liquor']) }} </p>
+                    <p class="card-text-light font-weight-bold">COST % - {{ "{:.1f}%".format(weekly_cogs['Liquor']/weekly_totals['liquor'] * 100) }} </p>
                   </div>
               </div>
             </div>
@@ -219,7 +219,7 @@
                   <div class="card-body">
                     <h5 class="card-title">WINE</h5>
                     <p class="card-text-light font-weight-bold">SALES - {{ "${:,.0f}".format(weekly_totals.wine) }}</p>
-                    <p class="card-text-light font-weight-bold">COSTS - {{ "${:,.0f}".format(weekly_cogs['Wine']) }} </p>
+                    <p class="card-text-light font-weight-bold">PURCHASES - {{ "${:,.0f}".format(weekly_cogs['Wine']) }} </p>
                     <p class="card-text-light font-weight-bold">COST %- {{ "{:.1f}%".format(weekly_cogs['Wine']/weekly_totals['wine'] * 100) }} </p>
                   </div>
               </div>
@@ -240,8 +240,8 @@
                   <div class="card-body">
                     <h5 class="card-title">FOOD</h5>
                     <p class="card-text-light font-weight-bold">SALES - {{ "${:,.0f}".format(period_totals.food) }}</p>
-                    <p class="card-text-light font-weight-bold">COSTS - {{ "${:,.0f}".format(period_cogs['Beef'] + period_cogs['Dairy'] + period_cogs['Food Other'] + period_cogs['Produce'] + period_cogs['Pork'] + period_cogs['Poultry'] + period_cogs['Seafood']) }}</p>
-                    <p class="card-text-light font-weight-bold">COST %- {{ "{:.1f}%".format((period_cogs['Beef'] + period_cogs['Dairy'] + period_cogs['Food Other'] + period_cogs['Produce'] + period_cogs['Pork'] + period_cogs['Poultry'] + period_cogs['Seafood'])/period_totals['food'] * 100) }} </p>
+                    <p class="card-text-light font-weight-bold">PURCHASES - {{ "${:,.0f}".format(period_cogs['Beef'] + period_cogs['Dairy'] + period_cogs['Food Other'] + period_cogs['Produce'] + period_cogs['Pork'] + period_cogs['Poultry'] + period_cogs['Seafood']) }}</p>
+                    <p class="card-text-light font-weight-bold">COST % - {{ "{:.1f}%".format((period_cogs['Beef'] + period_cogs['Dairy'] + period_cogs['Food Other'] + period_cogs['Produce'] + period_cogs['Pork'] + period_cogs['Poultry'] + period_cogs['Seafood'])/period_totals['food'] * 100) }} </p>
                   </div>
               </div>
             </div>
@@ -250,8 +250,8 @@
                   <div class="card-body">
                     <h5 class="card-title">BEER</h5>
                     <p class="card-text-light font-weight-bold">SALES - {{ "${:,.0f}".format(period_totals.beer) }}</p>
-                    <p class="card-text-light font-weight-bold">COSTS - {{ period_cogs['Beer'] }} </p>
-                    <p class="card-text-light font-weight-bold">COST %- {{ "{:.1f}%".format(period_cogs['Beer']/period_totals['beer'] * 100) }} </p>
+                    <p class="card-text-light font-weight-bold">PURCHASES - {{ "${:,.0f}".format(period_cogs['Beer']) }} </p>
+                    <p class="card-text-light font-weight-bold">COST % - {{ "{:.1f}%".format(period_cogs['Beer']/period_totals['beer'] * 100) }} </p>
                   </div>
               </div>
             </div>
@@ -260,8 +260,8 @@
                   <div class="card-body">
                     <h5 class="card-title">LIQUOR</h5>
                     <p class="card-text-light font-weight-bold">SALES - {{ "${:,.0f}".format(period_totals.liquor) }}</p>
-                    <p class="card-text-light font-weight-bold">COSTS - {{ "${:,.0f}".format(period_cogs['Liquor']) }} </p>
-                    <p class="card-text-light font-weight-bold">COST %- {{ "{:.1f}%".format(period_cogs['Liquor']/period_totals['liquor'] * 100) }} </p>
+                    <p class="card-text-light font-weight-bold">PURCHASES - {{ "${:,.0f}".format(period_cogs['Liquor']) }} </p>
+                    <p class="card-text-light font-weight-bold">COST % - {{ "{:.1f}%".format(period_cogs['Liquor']/period_totals['liquor'] * 100) }} </p>
                   </div>
               </div>
             </div>
@@ -270,8 +270,8 @@
                   <div class="card-body">
                     <h5 class="card-title">WINE</h5>
                     <p class="card-text-light font-weight-bold">SALES - {{ "${:,.0f}".format(period_totals.wine) }}</p>
-                    <p class="card-text-light font-weight-bold">COSTS - {{ "${:,.0f}".format(period_cogs['Wine']) }} </p>
-                    <p class="card-text-light font-weight-bold">COST %- {{ "{:.1f}%".format(period_cogs['Wine']/period_totals['wine'] * 100) }} </p>
+                    <p class="card-text-light font-weight-bold">PURCHASES - {{ "${:,.0f}".format(period_cogs['Wine']) }} </p>
+                    <p class="card-text-light font-weight-bold">COST % - {{ "{:.1f}%".format(period_cogs['Wine']/period_totals['wine'] * 100) }} </p>
                   </div>
               </div>
             </div>
@@ -286,63 +286,6 @@
             <p class="text-sm">
               <span class="font-weight-bold"></span>
             </p>
-          </div>
-          <div class="alert alert-primary" role="alert">
-            {% for x in fiscal_dates %}
-              <h4 class="alert-heading text-light">{{ x.day }} Labor</h4>
-            {% endfor %}
-            <div class="table-responsive table-hover">
-              <table class="table-sm text-light">
-                <thead>
-                  <tr>
-                    <th scope="col"></th>
-                    <th scope="col">BAR</th>
-                    <th scope="col">HOST</th>
-                    <th scope="col">SERVER</th>
-                    <th scope="col">KITCHEN</th>
-                    <th scope="col">TOTAL</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                      <th scope="row">DOLLARS</th>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(daily_table.Bar) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(daily_table.Host) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(daily_table.Restaurant) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(daily_table.Kitchen) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(daily_table.Total_Labor) }}</p>
-                      </td>
-                  </tr>
-                  <tr>
-                      <th scope="row">PERCENT</th>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((daily_table.Bar / daily_table.alcohol_sales) * 100) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((daily_table.Host / daily_table.food) * 100) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((daily_table.Restaurant / daily_table.food) * 100) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((daily_table.Kitchen / daily_table.food) * 100) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((daily_table.Total_Labor / daily_table.total_sales) * 100) }}</p>
-                      </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
           </div>
           <div class="alert alert-success" role="alert">
             {% for x in fiscal_dates %}
@@ -601,6 +544,27 @@
       {% if concept == 'casual' %}
       {% endif %}
     </div><!-- row -->
+        <div class="col-xl-3 col-lg-6 mb-xl-0 mb-4">
+          <div class="card">
+            <div class="card-header bg-secondary pb-0">
+              <h4>POTATO LOADING CHART</h4>
+            </div>
+            <div class="card">
+              {% for x in fiscal_dates %}
+              <p class="mb-0 ms-1 text-center">click Submit to generate a potato loading chart</p>
+              {% endfor %}
+              <form method="POST" action="" style="text-align:center">
+                {{ form4.hidden_tag() }}
+                <div class="form-group">
+                  {{ form4.submit4(class="btn btn-info") }}
+                </div>
+                <div class="progress">
+                  <div id="progressbar" class="progress-bar " role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="0%">0%</div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
 
     {% include 'includes/footer.html' %}
 

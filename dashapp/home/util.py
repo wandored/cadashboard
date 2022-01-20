@@ -2,6 +2,7 @@
 CentraArchy Dashboard by wandored
 """
 import json
+import csv
 import requests
 import pandas as pd
 import numpy as np
@@ -241,3 +242,52 @@ def get_daily_labor(start, end, store, cat):
                 ).group_by(Labor.date).all()
     df = pd.DataFrame([(x.date, x.total_dollars) for x in data], columns=['date', cat])
     return df
+
+
+def get_potato(date, store_id):
+    pot_chart = pd.DataFrame()
+
+    with open('/usr/local/share/potatochart.csv') as f:
+        times = csv.reader(f)
+        next(times)
+        for i in times:
+            url_filter = "$filter=date ge {}T{}Z and date le {}T{}Z".format(
+                date, i[2], date, i[3]
+            )
+            query = "$select=menuitem,quantity,location&{}".format(url_filter)
+            url = "{}/SalesDetail?{}".format(Config.SRVC_ROOT, query)
+            rqst = make_HTTP_request(url)
+            df = make_dataframe(rqst)
+            if df.empty:
+                print('empty dataframe')
+                break
+
+            data = db.session.query(Restaurants).filter(Restaurants.id == store_id)
+            df_loc = pd.DataFrame(
+                [(x.id, x.name, x.location) for x in data], columns=["id", "name", "location"]
+            )
+            df_merge = df_loc.merge(df, on="location")
+            if df_merge.empty:
+                print(f'no sales at {i[0]}')
+                if pot_chart.empty:
+                    break
+                pot_chart.loc[i[0]] = [0]
+                break
+            df_merge.drop(columns=['location'], inplace=True)
+            df_merge.loc[:, "menuitem"] = df_merge["menuitem"].str.replace(r"CHOPHOUSE - NOLA", "CHOPHOUSE-NOLA", regex=True)
+            df_merge.loc[:, "menuitem"] = df_merge["menuitem"].str.replace(r"CAFÉ", "CAFE", regex=True)
+            df_merge.loc[:, "menuitem"] = df_merge["menuitem"].str.replace(r"^(?:.*?( -)){2}", "-", regex=True)
+            df_merge.loc[:, "menuitem"] = df_merge["menuitem"].str.strip()
+            dafilter = df_merge["menuitem"].str.contains("VOID")
+            df_clean = df_merge[~dafilter]
+            df_clean[["x", "menuitem"]] = df_clean["menuitem"].str.split(" - ", expand=True)
+            df = df_clean.loc[df_clean['menuitem'].isin(['BAKED POTATO', 'BAKED POTATO N/C', 'POTATO', 'POT'])]
+            df.drop(columns=['x', 'id', 'name', 'menuitem'], inplace=True)
+            df.loc[i[0]] = df.sum(numeric_only=True)
+            r = (len(df)-1)
+            pot_chart = pot_chart.append(df.iloc[[r]])
+
+
+        pot_chart.rename(columns={'quantity': date}, inplace=True)
+
+    return pot_chart
