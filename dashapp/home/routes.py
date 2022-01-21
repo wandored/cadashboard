@@ -1717,7 +1717,7 @@ def potato(store_id):
     pot_df['AVG'] = pot_df.mean(axis=1)
     pot_df['MEDIAN'] = pot_df.median(axis=1)
     pot_df['MAX'] = pot_df.max(axis=1)
-    out_times = pd.read_csv('./potatochart.csv', index_col='time')
+    out_times = pd.read_csv('/usr/local/share/potatochart.csv', index_col='time')
     rotation = pot_df.merge(out_times, left_index=True, right_on='time', how='left')
 
     # format pdf page
