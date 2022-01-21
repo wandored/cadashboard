@@ -22,6 +22,7 @@ Flask-Security==3.0.0
 Flask-Security-Too==4.1.2
 Flask-SQLAlchemy==2.5.1
 Flask-WTF==1.0.0
+fpdf==1.7.2
 fsspec==2021.11.0
 greenlet==1.1.2
 idna==3.3

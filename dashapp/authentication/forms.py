@@ -5,6 +5,7 @@ Copyright (c) 2019 - present AppSeed.us
 
 from flask_wtf import FlaskForm
 from wtforms import SubmitField, EmailField, StringField, PasswordField, DateField
+from wtforms.fields.simple import HiddenField
 from wtforms_sqlalchemy.fields import QuerySelectField
 from wtforms.validators import Email, DataRequired
 from dashapp.authentication.models import Restaurants
@@ -66,3 +67,5 @@ class StoreForm(FlaskForm):
     )
     submit3 = SubmitField("Submit")
 
+class PotatoForm(FlaskForm):
+    submit4 = SubmitField("Submit")
