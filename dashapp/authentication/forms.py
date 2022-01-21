@@ -4,7 +4,7 @@ Copyright (c) 2019 - present AppSeed.us
 """
 
 from flask_wtf import FlaskForm
-from wtforms import SubmitField, EmailField, StringField, PasswordField, DateField
+from wtforms import SubmitField, StringField, PasswordField, DateField
 from wtforms.fields.simple import HiddenField
 from wtforms_sqlalchemy.fields import QuerySelectField
 from wtforms.validators import Email, DataRequired
@@ -44,7 +44,7 @@ class CreateAccountForm(FlaskForm):
     username = StringField(
         "Username", id="username_create", validators=[DataRequired()]
     )
-    email = EmailField("Email", id="email_create", validators=[DataRequired(), Email()])
+    email = StringField("Email", id="email_create", validators=[DataRequired(), Email()])
     password = PasswordField("Password", id="pwd_create", validators=[DataRequired()])
 
 
