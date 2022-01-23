@@ -318,6 +318,19 @@ class Budgets(db.Model):
     net_profit = db.Column(db.Integer)
 
 
+class Potatoes(db.Model):
+
+    __tablename__ = "Potatoes"
+
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.String(64))
+    time = db.Column(db.String(64))
+    name = db.Column(db.String(64))
+    in_time = db.Column(db.String(64))
+    out_time = db.Column(db.String(64))
+    quantity = db.Column(db.Integer)
+
+
 #@login_manager.user_loader
 #def user_loader(id):
 #    return Users.query.filter_by(id=id).first()

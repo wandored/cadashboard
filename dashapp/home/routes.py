@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# -*- encmding: utf-8 -*-
 """
 Copyright (c) 2019 - present AppSeed.us
 """
@@ -11,12 +11,14 @@ from flask.helpers import url_for
 from flask_security.decorators import roles_accepted
 from dashapp.home import blueprint
 from flask import flash, render_template, session, redirect, url_for, Response
-from dashapp.home.util import get_period, get_lastyear, refresh_data, get_daily_sales, get_daily_labor, get_potato
+from dashapp.home.util import get_period, get_lastyear, refresh_data, get_daily_sales, get_daily_labor
 from flask_security import login_required, current_user
 from datetime import datetime, timedelta
 from dashapp.authentication.forms import DateForm, StoreForm, UpdateForm, PotatoForm
-from dashapp.authentication.models import Menuitems, db, Calendar, Sales, Labor, Restaurants, Budgets, Transactions
+from dashapp.authentication.models import Menuitems, db, Calendar, Sales, Labor, Restaurants, Budgets, Transactions, Potatoes
 from sqlalchemy import and_, or_, func
+
+from datarefresh import potato_sales
 
 
 @blueprint.route("/")
@@ -603,6 +605,7 @@ def store(store_id):
     year_to_date = get_lastyear(start_day)
 
     # Get Data
+    form1 = DateForm()
     if form1.submit1.data and form1.validate():
         """
         When new date submitted, the data for that date will be replaced with new data from R365
@@ -1272,7 +1275,6 @@ def marketing(targetdate=None):
     year_to_date = get_lastyear(start_day)
 
     form1 = DateForm()
-    form3 = StoreForm()
     if form1.submit1.data and form1.validate():
         """
         """
@@ -1281,6 +1283,7 @@ def marketing(targetdate=None):
         return redirect(url_for("home_blueprint.marketing"))
 
 
+    form3 = StoreForm()
     if form3.submit3.data and form3.validate():
 
         session["targetdate"] = start_day
@@ -1704,37 +1707,45 @@ def potato(store_id):
     fiscal_dates = get_period(datetime.strptime(session["targetdate"], "%Y-%m-%d"))
     store = Restaurants.query.filter_by(id=store_id).first()
 
-    pot_df = pd.DataFrame()
+    pot_df = pd.read_csv('/usr/local/share/potatochart.csv', usecols=['time'])
+
     TODAY = datetime.date(datetime.now())
-    today = TODAY.strftime('%A, %m/%d')
     for i in [28, 21, 14, 7]:
         target = TODAY - timedelta(days=i)
-        start_date = target.strftime('%Y-%m-%d')
-        df = get_potato(start_date, store_id)
-        pot_df = pot_df.merge(df, left_index=True, right_index=True, how='outer')
+        start = target.strftime('%Y-%m-%d')
+        #TODO switch queries to "with_entities"
+        query = (Potatoes.query.with_entities(Potatoes.time,
+                                             Potatoes.quantity)
+            .filter(Potatoes.date == start,
+                    Potatoes.name == store.name)).all()
+        df = pd.DataFrame.from_records(
+            query, columns=["time", "quantity"]
+        )
+        pot_df = pot_df.merge(df, on='time', how="outer")
 
-    #pot_df.fillna(0, inplace=True)
+    pot_df.fillna(0, inplace=True)
     pot_df['AVG'] = pot_df.mean(axis=1)
     pot_df['MEDIAN'] = pot_df.median(axis=1)
     pot_df['MAX'] = pot_df.max(axis=1)
-    out_times = pd.read_csv('/usr/local/share/potatochart.csv', index_col='time')
-    rotation = pot_df.merge(out_times, left_index=True, right_on='time', how='left')
+    out_times = pd.read_csv('/usr/local/share/potatochart.csv', usecols=['time', 'in_time', 'out_time'])
+    rotation = pot_df.merge(out_times, on='time', how='left')
 
     # format pdf page
+    pdf_date = TODAY.strftime("%A, %B-%d")
     pdf = FPDF()
     pdf.add_page()
     page_width = pdf.w -2 * pdf.l_margin
     pdf.set_font('Times', 'B', 14.0)
-    pdf.cell(page_width, 0.0, store.name, align='C')
-    pdf.ln(5)
     pdf.cell(page_width, 0.0, 'POTATO LOADING CHART', align='C')
     pdf.ln(5)
-    pdf.cell(page_width, 0.0, today, align='C')
+    pdf.cell(page_width, 0.0, store.name, align='C')
+    pdf.ln(5)
+    pdf.cell(page_width, 0.0, pdf_date, align='C')
     pdf.ln(5)
 
     pdf.set_font('Courier', '', 12)
     col_width = page_width/8
-    notes_width = page_width/4
+    notes_width = page_width/3
     pdf.ln(1)
     th = pdf.font_size+1
 
@@ -1748,7 +1759,7 @@ def potato(store_id):
     pdf.cell(notes_width, th, str('NOTES'), border=1)
     pdf.ln(th)
     for k, v in rotation.iterrows():
-        if k == '15:00':
+        if v['time'] == '15:00':
             pdf.ln(th)
             pdf.cell(col_width, th, str('DINNER'), border=1)
             pdf.ln(th)
@@ -1759,11 +1770,11 @@ def potato(store_id):
             pdf.cell(col_width, th, str('OUT TIME'), border=1)
             pdf.cell(notes_width, th, str('NOTES'), border=1)
             pdf.ln(th)
-        pdf.cell(col_width, th, str(v['in']), border=1)
+        pdf.cell(col_width, th, str(v['in_time']), border=1)
         pdf.cell(col_width, th, str(round(v['AVG'])), border=1)
         pdf.cell(col_width, th, str(round(v['MEDIAN'])), border=1)
         pdf.cell(col_width, th, str(round(v['MAX'])), border=1)
-        pdf.cell(col_width, th, str(v['out']), border=1)
+        pdf.cell(col_width, th, str(v['out_time']), border=1)
         pdf.cell(notes_width, th, '', border=1)
         pdf.ln(th)
 
@@ -1775,20 +1786,6 @@ def potato(store_id):
 
     return Response(pdf.output(dest='S').encode('latin-1'), mimetype='application/pdf',
                     headers={'Content-Disposition':'attachment;filename=potato_loading.pdf'})
-
-
-    return render_template(
-        'home/potato.html',
-        title='Potato',
-        segment='potato',
-        fiscal_dates=fiscal_dates,
-        form1=form1,
-        form2=form2,
-        form3=form3,
-        store_id=store_id,
-        rotation=rotation,
-        potato_table=potato_table
-    )
 
 
 #@blueprint.route("/<template>")
