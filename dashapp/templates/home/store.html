@@ -558,21 +558,18 @@
     </div><!-- row -->
         <div class="col-xl-3 col-lg-6 mb-xl-0 mb-4">
           <div class="card">
-            <div class="card-header bg-secondary pb-0">
+            <div class="card-header bg-secondary pb-0" style="text-align:center">
               <h4>POTATO LOADING CHART</h4>
             </div>
             <div class="card">
               {% for x in fiscal_dates %}
-              <p class="mb-0 ms-1 text-center"><h6>Click Submit to generate a potato loading chart</h6></p>
+              <p class="mb-0 ms-1 text-center"></p>
               {% endfor %}
               <form method="POST" action="" style="text-align:center">
+                <h6>Click Submit to generate a potato loading chart</h6>
                 {{ form4.hidden_tag() }}
                 <div class="form-group">
                   {{ form4.submit4(class="btn btn-info") }}
-                </div>
-                <h6>Dont click more then once.  This can take a few minutes to calculate</h6>
-                <div class="progress">
-                  <div id="progressbar" class="progress-bar " role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="0%">0%</div>
                 </div>
               </form>
             </div>

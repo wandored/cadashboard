@@ -4,6 +4,7 @@ uploads it to the local database.  This is run
 hourly from a cron job
 '''
 import json
+import csv
 from sqlalchemy.engine.create import create_engine
 from datetime import datetime, timedelta
 import requests
@@ -163,6 +164,73 @@ def labor_datail(start, end):
 
     return
 
+
+def potato_sales(start):
+
+    df_pot = pd.DataFrame()
+    with open('/usr/local/share/potatochart.csv') as f:
+        times = csv.reader(f)
+        next(times)
+        for i in times:
+            url_filter = "$filter=date ge {}T{}Z and date le {}T{}Z".format(
+                start, i[2], start, i[3]
+            )
+            query = "$select=menuitem,date,quantity,location&{}".format(url_filter)
+            url = "{}/SalesDetail?{}".format(Config.SRVC_ROOT, query)
+            rqst = make_HTTP_request(url)
+            df = make_dataframe(rqst)
+            if df.empty:
+                print('empty dataframe')
+                continue
+
+            cur.execute(rest_query)
+            data = cur.fetchall()
+            df_loc = pd.DataFrame.from_records(data, columns=['id', 'location', 'name'])
+            df_merge = df_loc.merge(df, on="location")
+            if df_merge.empty:
+                print(f'no sales at {i[0]}')
+                if df_pot.empty:
+                    continue
+                df_pot.loc[i[0]] = [0]
+                continue
+            df_merge.drop(columns=['location'], inplace=True)
+            df_menu = df_merge
+            df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(r"CHOPHOUSE - NOLA", "CHOPHOUSE-NOLA", regex=True)
+            df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(r"CAFÉ", "CAFE", regex=True)
+            df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(r"^(?:.*?( -)){2}", "-", regex=True)
+            df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.strip()
+            dafilter = df_menu["menuitem"].str.contains("VOID")
+            df_clean = df_menu[~dafilter]
+            df_clean[["x", "menuitem"]] = df_clean["menuitem"].str.split(" - ", expand=True)
+            pot_list = ['BAKED POTATO',
+                        'BAKED POTATO N/C',
+                        'POTATO',
+                        'POT',
+                        'BAKED POTATO A SIDE',
+                        'BAKED POTATO SIDE',
+                        'KID SUB POT',
+                        'POT-A',
+                        'S-BAKED POTATO',
+                        'SUB BAKED POTATO IN KIDS',
+                        'SUB KID POT']
+            df = df_clean[df_clean['menuitem'].isin(pot_list)]
+            if df.empty:
+                continue
+            df['time'] = i[0]
+            df['in_time'] = i[1]
+            df['out_time'] = i[4]
+            df_pot = df_pot.append(df)
+
+        # Write the daily menu items to Menuitems table
+        menu_pivot = df_pot.pivot_table(
+            index=["time", "name", "in_time", "out_time"], values=["quantity"], aggfunc=np.sum
+        )
+    menu_pivot['date'] = start
+    menu_pivot.to_sql("Potatoes", engine, if_exists="append")
+    conn.commit()
+
+    return
+
 if __name__ == "__main__":
 
     engine = create_engine(Config.SQLALCHEMY_DATABASE_URI)
@@ -183,10 +251,12 @@ if __name__ == "__main__":
     cur.execute('DELETE FROM "Sales" WHERE date = %s', (start_date,))
     cur.execute('DELETE FROM "Labor" WHERE date = %s', (start_date,))
     cur.execute('DELETE FROM "Menuitems" WHERE date = %s', (start_date,))
+    cur.execute('DELETE FROM "Potatoes" WHERE date = %s', (start_date,))
     conn.commit()
 
     sales_detail(start_date, end_date)
     sales_employee(start_date, end_date)
     labor_datail(start_date, end_date)
+    potato_sales(start_date)
 
     conn.close()
