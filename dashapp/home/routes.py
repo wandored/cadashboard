@@ -1713,23 +1713,21 @@ def potato(store_id):
     for i in [28, 21, 14, 7]:
         target = TODAY - timedelta(days=i)
         start = target.strftime('%Y-%m-%d')
-        print(start)
+        #TODO switch queries to "with_entities"
         query = (Potatoes.query.with_entities(Potatoes.time,
                                              Potatoes.quantity)
-        .filter(Potatoes.date == start,
-                Potatoes.name == store.name)).all()
+            .filter(Potatoes.date == start,
+                    Potatoes.name == store.name)).all()
         df = pd.DataFrame.from_records(
             query, columns=["time", "quantity"]
         )
         pot_df = pot_df.merge(df, on='time', how="outer")
-        
+
     pot_df.fillna(0, inplace=True)
     pot_df['AVG'] = pot_df.mean(axis=1)
     pot_df['MEDIAN'] = pot_df.median(axis=1)
     pot_df['MAX'] = pot_df.max(axis=1)
-    print(pot_df)
     out_times = pd.read_csv('/usr/local/share/potatochart.csv', usecols=['time', 'in_time', 'out_time'])
-    print(out_times)
     rotation = pot_df.merge(out_times, on='time', how='left')
 
     # format pdf page
@@ -1738,16 +1736,16 @@ def potato(store_id):
     pdf.add_page()
     page_width = pdf.w -2 * pdf.l_margin
     pdf.set_font('Times', 'B', 14.0)
-    pdf.cell(page_width, 0.0, store.name, align='C')
-    pdf.ln(5)
     pdf.cell(page_width, 0.0, 'POTATO LOADING CHART', align='C')
+    pdf.ln(5)
+    pdf.cell(page_width, 0.0, store.name, align='C')
     pdf.ln(5)
     pdf.cell(page_width, 0.0, pdf_date, align='C')
     pdf.ln(5)
 
     pdf.set_font('Courier', '', 12)
     col_width = page_width/8
-    notes_width = page_width/4
+    notes_width = page_width/3
     pdf.ln(1)
     th = pdf.font_size+1
 
@@ -1761,7 +1759,7 @@ def potato(store_id):
     pdf.cell(notes_width, th, str('NOTES'), border=1)
     pdf.ln(th)
     for k, v in rotation.iterrows():
-        if k == '15:00':
+        if v['time'] == '15:00':
             pdf.ln(th)
             pdf.cell(col_width, th, str('DINNER'), border=1)
             pdf.ln(th)
@@ -1788,20 +1786,6 @@ def potato(store_id):
 
     return Response(pdf.output(dest='S').encode('latin-1'), mimetype='application/pdf',
                     headers={'Content-Disposition':'attachment;filename=potato_loading.pdf'})
-
-
-    return render_template(
-        'home/potato.html',
-        title='Potato',
-        segment='potato',
-        fiscal_dates=fiscal_dates,
-        form1=form1,
-        form2=form2,
-        form3=form3,
-        store_id=store_id,
-        rotation=rotation,
-        potato_table=potato_table
-    )
 
 
 #@blueprint.route("/<template>")

@@ -1,6 +1,6 @@
 '''
-potatochart.py will calculate the average sales per 20 minutes
-and create a potatchart for the current day
+potatochart.py will request the potato sales per 20 minutes
+and write it to the database.  This is for multi-day building
 '''
 import json
 import csv
@@ -112,24 +112,15 @@ if __name__ == "__main__":
         password=Config.PSYCOPG2_PASS,
     )
     cur = conn.cursor()
-    #store_name = input('enter store number ')
 
     pot_df = pd.DataFrame()
     TODAY = datetime.date(datetime.now())
-    for i in range(2, 25):
+    for i in range(1, 29):
         target = TODAY - timedelta(days=i)
         start_date = target.strftime('%Y-%m-%d')
         cur.execute('DELETE FROM "Potatoes" WHERE date = %s', (start_date,))
         conn.commit()
         get_sales(start_date)
-
-#    pot_df.fillna(0, inplace=True)
-#    pot_df['AVG'] = round(pot_df.mean(axis=1))
-#    pot_df['MEDIAN'] = round(pot_df.median(axis=1))
-#    pot_df['MAX'] = pot_df.max(axis=1)
-#    out_times = pd.read_csv('/usr/local/share/potatochart.csv', index_col='time')
-#    rotation = pot_df.merge(out_times, left_index=True, right_on='in', how='left')
-#    rotation.drop(columns=['start_time', 'stop_time'], inplace=True)
-#    print(rotation)
+        print(f'wrote {start_date}')
 
     conn.close()
