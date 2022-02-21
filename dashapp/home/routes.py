@@ -295,12 +295,13 @@ def index():
     daily_top = daily_table[['doly', 'poly']]
     daily_top = daily_top.nlargest(5, 'poly', keep='all')
 
-    daily_table.loc["TOTALS"] = daily_table.sum(numeric_only=True)
+    #daily_table.loc["TOTALS"] = daily_table.sum(numeric_only=True)
     daily_table['check_avg'] = daily_table['sales']/daily_table['guest_count'].astype(float)
     daily_table['labor_pct'] = daily_table.dollars / daily_table.sales
     daily_table['labor_pct_ly'] = daily_table.dollars_ly / daily_table.sales_ly
     daily_table.fillna(0, inplace=True)
-    daily_totals = daily_table.loc["TOTALS"]
+    daily_totals = daily_table.sum()
+    print(daily_totals)
 
     # Weekly Sales Table
     sales_week = (
@@ -568,9 +569,6 @@ def index():
 @login_required
 def store(store_id):
 
-    form1 = DateForm()
-    form3 = StoreForm()
-    form4 = PotatoForm()
     store = Restaurants.query.filter_by(id=store_id).first()
 
     print(store.name)
@@ -606,6 +604,8 @@ def store(store_id):
 
     # Get Data
     form1 = DateForm()
+    form3 = StoreForm()
+    form4 = PotatoForm()
     if form1.submit1.data and form1.validate():
         """
         When new date submitted, the data for that date will be replaced with new data from R365
@@ -1307,23 +1307,36 @@ def marketing(targetdate=None):
     gift_card_sales.sort_values(by=['amount'], ascending=False, inplace=True)
     gift_card_sales.loc["TOTALS"] = gift_card_sales.sum(numeric_only=True)
 
-
-    porterhouse = (
+    lent = (
         db.session.query(Menuitems.name,
                          Menuitems.menuitem,
-                         func.sum(Menuitems.quantity).label("count"),
-                         func.sum(Menuitems.amount).label("sales"),
+                         func.sum(Menuitems.quantity).label('count'),
+                         func.sum(Menuitems.amount).label('sales'),
                          )
-            .filter(Menuitems.date.between(start_period, end_period),
-                    Menuitems.menuitem.regexp_match('PORTERHOUSE (FEAST*|DINNER*)')
+            .filter(Menuitems.date.between("2022-03-02", "2022-04-17"),
+                    or_(Menuitems.menuitem == 'CRISPY FLOUNDER SANDWICH',
+                        Menuitems.menuitem == 'BLACKENED MAHI SANDWICH')
                     )
-            .group_by(Menuitems.menuitem, Menuitems.name)
+            .group_by(Menuitems.name, Menuitems.menuitem)
+    ).all()
+    lent_features = pd.DataFrame.from_records(lent, columns=['store', 'menuitem', 'count', 'sales'])
+
+
+    fish_fry  = (
+        db.session.query(Menuitems.date,
+                         Menuitems.menuitem,
+                         func.sum(Menuitems.quantity).label("count"),
+                         func.sum(Menuitems.amount).label("sales")
+                         )
+            .filter(Menuitems.date.between("2022-03-02", "2022-04-17"),
+                    Menuitems.menuitem.regexp_match('FISH FRYDAY')
+                    )
+            .group_by(Menuitems.menuitem, Menuitems.date)
         ).all()
-    porterhouse_feast = pd.DataFrame.from_records(
-        porterhouse, columns=["store", "menuitem", "count", "sales"]
+    fish_fryday = pd.DataFrame.from_records(
+        fish_fry, columns=["date", "menuitem", "count", "sales"]
     )
-    porterhouse_feast['price'] = porterhouse_feast['sales'] / porterhouse_feast['count'].astype(float)
-    porterhouse_feast.sort_values(by=['sales'], ascending=False, inplace=True)
+    fish_fryday.sort_values(by=['date'], inplace=True)
 
 
     return render_template(
@@ -1336,7 +1349,8 @@ def marketing(targetdate=None):
         current_user=current_user,
         roles=current_user.roles,
         gift_card_sales=gift_card_sales,
-        porterhouse_feast=porterhouse_feast,
+        lent_features=lent_features,
+        fish_fryday=fish_fryday,
     )
 
 
@@ -1719,7 +1733,7 @@ def potato(store_id):
             .filter(Potatoes.date == start,
                     Potatoes.name == store.name)).all()
         df = pd.DataFrame.from_records(
-            query, columns=["time", "quantity"]
+            query, columns=["time", i]
         )
         pot_df = pot_df.merge(df, on='time', how="outer")
 
@@ -1729,6 +1743,7 @@ def potato(store_id):
     pot_df['MAX'] = pot_df.max(axis=1)
     out_times = pd.read_csv('/usr/local/share/potatochart.csv', usecols=['time', 'in_time', 'out_time'])
     rotation = pot_df.merge(out_times, on='time', how='left')
+    rotation.loc["TOTALS"] = rotation.sum()
 
     # format pdf page
     pdf_date = TODAY.strftime("%A, %B-%d")
@@ -1770,6 +1785,18 @@ def potato(store_id):
             pdf.cell(col_width, th, str('OUT TIME'), border=1)
             pdf.cell(notes_width, th, str('NOTES'), border=1)
             pdf.ln(th)
+        if k == 'TOTALS':
+            pdf.ln(th)
+            pdf.cell(col_width, th, str('TOTALS'), border=1)
+            pdf.ln(th)
+            pdf.cell(col_width, th, '', border=1)
+            pdf.cell(col_width, th, str(round(v['AVG'])), border=1)
+            pdf.cell(col_width, th, str(round(v['MEDIAN'])), border=1)
+            pdf.cell(col_width, th, str(round(v['MAX'])), border=1)
+            pdf.cell(col_width, th, '', border=1)
+            pdf.cell(notes_width, th, '', border=1)
+            pdf.ln(th)
+            continue
         pdf.cell(col_width, th, str(v['in_time']), border=1)
         pdf.cell(col_width, th, str(round(v['AVG'])), border=1)
         pdf.cell(col_width, th, str(round(v['MEDIAN'])), border=1)
