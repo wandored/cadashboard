@@ -295,12 +295,13 @@ def index():
     daily_top = daily_table[['doly', 'poly']]
     daily_top = daily_top.nlargest(5, 'poly', keep='all')
 
-    daily_table.loc["TOTALS"] = daily_table.sum(numeric_only=True)
+    #daily_table.loc["TOTALS"] = daily_table.sum(numeric_only=True)
     daily_table['check_avg'] = daily_table['sales']/daily_table['guest_count'].astype(float)
     daily_table['labor_pct'] = daily_table.dollars / daily_table.sales
     daily_table['labor_pct_ly'] = daily_table.dollars_ly / daily_table.sales_ly
     daily_table.fillna(0, inplace=True)
-    daily_totals = daily_table.loc["TOTALS"]
+    daily_totals = daily_table.sum()
+    print(daily_totals)
 
     # Weekly Sales Table
     sales_week = (
