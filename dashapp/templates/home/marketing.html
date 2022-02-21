@@ -43,12 +43,13 @@
             </div>
           </div>
         </div>
-        <!-- porterhouse feast -->
+        <!-- lent feast -->
         <div class="col-lg-4 col-md-6">
           <div class="card">
-            <div class="card-header bg-success pb-0">
+            <div class="card-header bg-warning pb-0">
               {% for x in fiscal_dates %}
-              <h4>PORTERHOUSE FEAST SALES PERIOD {{ x.period }}, {{ x.year }}</h4>
+              <h4>LENT FISH FEATURES</h4>
+              <h5>March 2 - April 17</h5>
               {% endfor %}
             </div>
             <div class="card">
@@ -56,20 +57,56 @@
                 <thead>
                   <tr>
                     <th scope="col">STORE</th>
+                    <th scope="col">ITEM</th>
                     <th scope="col">COUNT</th>
-                    <th scope="col">AVG COST</th>
                     <th scope="col">SALES</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {% for k, v in porterhouse_feast.iterrows() %}
+                  {% for k, v in lent_features.iterrows() %}
                     <tr>
                       <th scope="row">{{ v.store }}</th>
                         <td>
-                          <p class="mb-0 ms-1 text-begin">{{ "{:,.0f}".format(v.sales/v.price) }}</p>
+                          <p class="mb-0 ms-1 text-begin">{{ "{:,.0f}".format(v.menuitem) }}</p>
                         </td>
                         <td>
-                          <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v.price) }}</p>
+                          <p class="mb-0 ms-1 text-begin">{{ "{:,.0f}".format(v.count) }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v.sales) }}</p>
+                        </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <!-- fish fryday feast -->
+        <div class="col-lg-4 col-md-6">
+          <div class="card">
+            <div class="card-header bg-warning pb-0">
+              <h4>FISH FRYDAY SALES</h4>
+              <h5>GULFSTREAM CAFE</h5>
+            </div>
+            <div class="card">
+              <table class="table-responsive table-md">
+                <thead>
+                  <tr>
+                    <th scope="col">DATE</th>
+                    <th scope="col">COUNT</th>
+                    <th scope="col">SALES</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for k, v in fish_fryday.iterrows() %}
+                    <tr>
+                      <th scope="row">{{ v.store }}</th>
+                        <td>
+                          <p class="mb-0 ms-1 text-begin">{{ "{:,.0f}".format(v.date) }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-begin">{{ "{:,.0f}".format(v.count) }}</p>
                         </td>
                         <td>
                           <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v.sales) }}</p>

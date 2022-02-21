@@ -1307,23 +1307,36 @@ def marketing(targetdate=None):
     gift_card_sales.sort_values(by=['amount'], ascending=False, inplace=True)
     gift_card_sales.loc["TOTALS"] = gift_card_sales.sum(numeric_only=True)
 
-
-    porterhouse = (
+    lent = (
         db.session.query(Menuitems.name,
                          Menuitems.menuitem,
-                         func.sum(Menuitems.quantity).label("count"),
-                         func.sum(Menuitems.amount).label("sales"),
+                         func.sum(Menuitems.quantity).label('count'),
+                         func.sum(Menuitems.amount).label('sales'),
                          )
-            .filter(Menuitems.date.between(start_period, end_period),
-                    Menuitems.menuitem.regexp_match('PORTERHOUSE (FEAST*|DINNER*)')
+            .filter(Menuitems.date.between("2022-03-02", "2022-04-17"),
+                    or_(Menuitems.menuitem == 'CRISPY FLOUNDER SANDWICH',
+                        Menuitems.menuitem == 'BLACKENED MAHI SANDWICH')
                     )
-            .group_by(Menuitems.menuitem, Menuitems.name)
+            .group_by(Menuitems.name, Menuitems.menuitem)
+    ).all()
+    lent_features = pd.DataFrame.from_records(lent, columns=['store', 'menuitem', 'count', 'sales'])
+
+
+    fish_fry  = (
+        db.session.query(Menuitems.date,
+                         Menuitems.menuitem,
+                         func.sum(Menuitems.quantity).label("count"),
+                         func.sum(Menuitems.amount).label("sales")
+                         )
+            .filter(Menuitems.date.between("2022-03-02", "2022-04-17"),
+                    Menuitems.menuitem.regexp_match('FISH FRYDAY')
+                    )
+            .group_by(Menuitems.menuitem, Menuitems.date)
         ).all()
-    porterhouse_feast = pd.DataFrame.from_records(
-        porterhouse, columns=["store", "menuitem", "count", "sales"]
+    fish_fryday = pd.DataFrame.from_records(
+        fish_fry, columns=["date", "menuitem", "count", "sales"]
     )
-    porterhouse_feast['price'] = porterhouse_feast['sales'] / porterhouse_feast['count'].astype(float)
-    porterhouse_feast.sort_values(by=['sales'], ascending=False, inplace=True)
+    fish_fryday.sort_values(by=['date'], inplace=True)
 
 
     return render_template(
@@ -1336,7 +1349,8 @@ def marketing(targetdate=None):
         current_user=current_user,
         roles=current_user.roles,
         gift_card_sales=gift_card_sales,
-        porterhouse_feast=porterhouse_feast,
+        lent_features=lent_features,
+        fish_fryday=fish_fryday,
     )
 
 
