@@ -554,6 +554,55 @@
     </div><!-- row -->
     <div class="row mb-4">
       {% if concept == 'casual' %}
+        <!-- salmon cost -->
+        <div class="col-lg-6 col-md-4">
+          <div class="card">
+            <div class="card-header bg-primary pb-0">
+              {% for x in fiscal_dates %}
+              <h4>SALMON LAST 5 PURCHASES</h4>
+              {% endfor %}
+            </div>
+            <div class="card">
+              <div class="table-responsive">
+                <table class="table-sm">
+                  <thead>
+                    <tr>
+                      <th scope="col">DATE</th>
+                      <th scope="col">UofM</th>
+                      <th scope="col">COST/LB</th>
+                      <th scope="col">8oz PORTION COST</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for v in salmon %}
+                      <tr>
+                        <th scope="row">{{ v.date }}</th>
+                        <td>
+                          <p class="mb-0 ms-1 text-begin">{{ v.UofM }}</p>
+                        </td>
+                        {% if v.UofM == 'Case - 22 LBS' %}
+                        <td>
+                          <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format((v.cost/v.count)/(22)) }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format((v.cost/v.count)/(22)*(0.5)) }}</p>
+                        </td>
+                        {% else %}
+                        <td>
+                          <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v.cost/v.count) }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format((v.cost/v.count)*(0.5)) }}</p>
+                        </td>
+                        {% endif %}
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
       {% endif %}
     </div><!-- row -->
         <div class="col-xl-3 col-lg-6 mb-xl-0 mb-4">

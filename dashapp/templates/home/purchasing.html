@@ -289,8 +289,8 @@
         </div>
       </div>
     </div>
-      <!-- U10 Shrimp cost -->
     <div class="row mb-4">
+      <!-- U10 Shrimp cost -->
       <div class="col-lg-6 col-md-6">
         <div class="card">
           <div class="card-header bg-secondary pb-0">
@@ -324,6 +324,54 @@
                       <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v.amount/v.quantity) }}</p>
                     </td>
                     {% endif %}
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- salmon cost -->
+      <div class="col-lg-6 col-md-6">
+        <div class="card">
+          <div class="card-header bg-primary pb-0">
+            {% for x in fiscal_dates %}
+            <h4>SALMON COST</h4>
+            <h6>Most recent purchase in the last 30 days from {{ x.day }}, {{ x.date }}</h6>
+            {% endfor %}
+          </div>
+          <div class="table-responsive table-hover">
+            <table class="table-sm text-dark">
+              <thead>
+                <tr>
+                  <th scope="col">STORE</th>
+                  <th scope="col">UofM</th>
+                  <th scope="col">COST/LB</th>
+                  <th scope="col">8oz PORTION COST</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for v in salmon %}
+                  <tr>
+                    <th scope="row">{{ v.name }}</th>
+                      <td>
+                        <p class="mb-0 ms-1 text-begin">{{ v.UofM }}</p>
+                      </td>
+                      {% if v.UofM == 'Case - 22 LBS' %}
+                      <td>
+                        <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format((v.cost/v.count)/(22)) }}</p>
+                      </td>
+                      <td>
+                        <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format((v.cost/v.count)/(22)*(0.5)) }}</p>
+                      </td>
+                      {% else %}
+                      <td>
+                        <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v.cost/v.count) }}</p>
+                      </td>
+                      <td>
+                        <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format((v.cost/v.count)*(0.5)) }}</p>
+                      </td>
+                      {% endif %}
                   </tr>
                 {% endfor %}
               </tbody>
