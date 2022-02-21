@@ -1148,6 +1148,22 @@ def store(store_id):
     )
 
 
+    salmon = (
+        db.session.query(Transactions.item,
+                         Transactions.date,
+                         Transactions.UofM,
+                         func.sum(Transactions.amount).label('cost'),
+                         func.sum(Transactions.quantity).label('count'),
+                         )
+            .filter(Transactions.item.regexp_match('SEAFOOD Salmon'),
+                    Transactions.store_id == store_id,
+                    Transactions.type == 'AP Invoice')
+            .group_by(Transactions.item, Transactions.date, Transactions.UofM)
+            .order_by(Transactions.date.desc())
+        .limit(5).all()
+    )
+
+
     cogs_wk = (
         db.session.query(Transactions.category2,
                          func.sum(Transactions.credit).label('credit'),
@@ -1240,6 +1256,7 @@ def store(store_id):
         lobster_items=lobster_items,
         stone_items=stone_items,
         sea_bass=sea_bass,
+        salmon=salmon,
     )
 
 
@@ -1545,6 +1562,53 @@ def purchasing(targetdate=None):
     steak_df.sort_values(by=['item'], inplace=True)
     steak_df.fillna(0, inplace=True)
 
+
+#    crabmeat_list = (db.session.query(Transactions.item)
+#            .filter(Transactions.item.regexp_match('SEAFOOD Crabmeat*'))
+#            .group_by(Transactions.item)
+#        ).all()
+#
+#    crabmeat = pd.DataFrame(columns=['item'])
+#    for s in store_list:
+#        steak_items = []
+#        for i in crabmeat_list:
+#            crabmeat_cost = (
+#                db.session.query(Transactions.item,
+#                                 Transactions.date,
+#                                 Transactions.UofM,
+#                                 Transactions.debit,
+#                                 Transactions.quantity,
+#                                 )
+#                    .filter(Transactions.item == i.item,
+#                            Transactions.date >= last_thirty,
+#                            Transactions.name == s,
+#                            Transactions.type == 'AP Invoice')
+#                    .order_by(Transactions.date.desc())
+#                    ).first()
+#            if crabmeat_cost:
+#                # extract the number from name to calculate cost per serving
+#                row_dict = dict(crabmeat_cost)
+#                ext = re.findall(r'\d{1,2}', i.item)
+#                if ext:
+#                    size = int(ext[0])
+#                else:
+#                    size = 16
+#                row_dict['size'] = size
+#                steak_items.append(row_dict)
+#        df = pd.DataFrame(steak_items)
+#        if not df.empty:
+#            with open("/usr/local/share/uofm.json") as file:
+#                uofm = json.load(file)
+#            df_uofm = pd.DataFrame(list(uofm.items()), columns=['case', 'factor'])
+#            df = df.merge(df_uofm, left_on='UofM', right_on='case')
+#            df['cost/lb'] = df['debit']/df['quantity'] / df['factor']
+#            df.rename(columns={'cost/lb': s}, inplace=True)
+#            df.drop(columns={'date', 'debit', 'quantity', 'size', 'UofM', 'case', 'factor'}, inplace=True)
+#            steak_df = steak_df.merge(df, how='outer')
+#
+#    crabmeat_df.sort_values(by=['item'], inplace=True)
+#    crabmeat_df.fillna(0, inplace=True)
+
     # TODO add uofm json comparison to the sea bass and shrimp
     sea_bass = (
         db.session.query(Transactions.item,
@@ -1554,6 +1618,20 @@ def purchasing(targetdate=None):
                          func.sum(Transactions.quantity).label('count'),
                          )
             .filter(Transactions.item.regexp_match('SEAFOOD Sea Bass Chilean'),
+                    Transactions.date >= last_thirty,
+                    Transactions.type == 'AP Invoice')
+            .group_by(Transactions.item, Transactions.name, Transactions.UofM)
+        .all()
+    )
+
+    salmon = (
+        db.session.query(Transactions.item,
+                         Transactions.name,
+                         Transactions.UofM,
+                         func.sum(Transactions.amount).label('cost'),
+                         func.sum(Transactions.quantity).label('count'),
+                         )
+            .filter(Transactions.item.regexp_match('SEAFOOD Salmon'),
                     Transactions.date >= last_thirty,
                     Transactions.type == 'AP Invoice')
             .group_by(Transactions.item, Transactions.name, Transactions.UofM)
@@ -1595,6 +1673,7 @@ def purchasing(targetdate=None):
         stone_df=stone_df,
         steak_df=steak_df,
         sea_bass=sea_bass,
+        salmon=salmon,
         shrimp_items=shrimp_items,
     )
 
