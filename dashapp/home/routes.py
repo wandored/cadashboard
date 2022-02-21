@@ -568,9 +568,6 @@ def index():
 @login_required
 def store(store_id):
 
-    form1 = DateForm()
-    form3 = StoreForm()
-    form4 = PotatoForm()
     store = Restaurants.query.filter_by(id=store_id).first()
 
     print(store.name)
@@ -606,6 +603,8 @@ def store(store_id):
 
     # Get Data
     form1 = DateForm()
+    form3 = StoreForm()
+    form4 = PotatoForm()
     if form1.submit1.data and form1.validate():
         """
         When new date submitted, the data for that date will be replaced with new data from R365
@@ -1719,7 +1718,7 @@ def potato(store_id):
             .filter(Potatoes.date == start,
                     Potatoes.name == store.name)).all()
         df = pd.DataFrame.from_records(
-            query, columns=["time", "quantity"]
+            query, columns=["time", i]
         )
         pot_df = pot_df.merge(df, on='time', how="outer")
 
@@ -1729,6 +1728,7 @@ def potato(store_id):
     pot_df['MAX'] = pot_df.max(axis=1)
     out_times = pd.read_csv('/usr/local/share/potatochart.csv', usecols=['time', 'in_time', 'out_time'])
     rotation = pot_df.merge(out_times, on='time', how='left')
+    rotation.loc["TOTALS"] = rotation.sum()
 
     # format pdf page
     pdf_date = TODAY.strftime("%A, %B-%d")
@@ -1770,6 +1770,18 @@ def potato(store_id):
             pdf.cell(col_width, th, str('OUT TIME'), border=1)
             pdf.cell(notes_width, th, str('NOTES'), border=1)
             pdf.ln(th)
+        if k == 'TOTALS':
+            pdf.ln(th)
+            pdf.cell(col_width, th, str('TOTALS'), border=1)
+            pdf.ln(th)
+            pdf.cell(col_width, th, '', border=1)
+            pdf.cell(col_width, th, str(round(v['AVG'])), border=1)
+            pdf.cell(col_width, th, str(round(v['MEDIAN'])), border=1)
+            pdf.cell(col_width, th, str(round(v['MAX'])), border=1)
+            pdf.cell(col_width, th, '', border=1)
+            pdf.cell(notes_width, th, '', border=1)
+            pdf.ln(th)
+            continue
         pdf.cell(col_width, th, str(v['in_time']), border=1)
         pdf.cell(col_width, th, str(round(v['AVG'])), border=1)
         pdf.cell(col_width, th, str(round(v['MEDIAN'])), border=1)
