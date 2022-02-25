@@ -557,7 +557,7 @@
     <div class="row mb-4">
       {% if concept == 'casual' %}
         <!-- salmon cost -->
-        <div class="col-lg-6 col-md-4">
+        <div class="col-lg-4 col-md-3">
           <div class="card">
             <div class="card-header bg-primary pb-0">
               {% for x in fiscal_dates %}
@@ -572,7 +572,7 @@
                       <th scope="col">DATE</th>
                       <th scope="col">UofM</th>
                       <th scope="col">COST/LB</th>
-                      <th scope="col">8oz PORTION COST</th>
+                      <th scope="col">8oz COST</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -583,7 +583,7 @@
                           <td>
                             <p class="mb-0 ms-1 text-begin">{{ v.UofM }}</p>
                           </td>
-                          {% if v.UofM == 'Case - 22 LBS' %}
+                          {% if (v.UofM == 'Case - 22 LBS') or (v.UofM == 'Case (22 LB)') or (v.UofM == 'Case (22 LBS)') %}
                           <td>
                             <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format((v.cost/v.count)/(22)) }}</p>
                           </td>
@@ -598,6 +598,52 @@
                             <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format((v.cost/v.count)*(0.5)) }}</p>
                           </td>
                           {% endif %}
+                        </tr>
+                      {% endif %}
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- feature fish cost -->
+        <div class="col-lg-4 col-md-3">
+          <div class="card">
+            <div class="card-header bg-info pb-0">
+              {% for x in fiscal_dates %}
+              <h4>FEATURE FISH LAST 5 PURCHASES</h4>
+              {% endfor %}
+            </div>
+            <div class="card">
+              <div class="table-responsive">
+                <table class="table-sm">
+                  <thead>
+                    <tr>
+                      <th scope="col">DATE</th>
+                      <th scope="col">UofM</th>
+                      <th scope="col">COST/LB</th>
+                      <th scope="col">9oz COST</th>
+                      <th scope="col">SUG. PRICE 32%</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for v in feature %}
+                      {% if v.count != 0 %}
+                        <tr>
+                          <th scope="row">{{ v.date }}</th>
+                          <td>
+                            <p class="mb-0 ms-1 text-begin">{{ v.UofM }}</p>
+                          </td>
+                          <td>
+                            <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v.cost/v.count) }}</p>
+                          </td>
+                          <td>
+                            <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format((v.cost/v.count)*(0.5625)) }}</p>
+                          </td>
+                          <td>
+                            <p class="mb-0 ms-1 text-begin">${{ (((v.cost/v.count)*(0.5625)/0.32) | round) - 0.05 }}</p>
+                          </td>
                         </tr>
                       {% endif %}
                     {% endfor %}

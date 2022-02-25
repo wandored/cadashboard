@@ -301,7 +301,6 @@ def index():
     daily_table['labor_pct_ly'] = daily_table.dollars_ly / daily_table.sales_ly
     daily_table.fillna(0, inplace=True)
     daily_totals = daily_table.sum()
-    print(daily_totals)
 
     # Weekly Sales Table
     sales_week = (
@@ -375,10 +374,9 @@ def index():
     weekly_top = weekly_table[['doly', 'poly']]
     weekly_top = weekly_top.nlargest(5, 'poly', keep='all')
 
-    weekly_table.loc["TOTALS"] = weekly_table.sum(numeric_only=True)
+    weekly_totals = weekly_table.sum()
     weekly_table['labor_pct'] = weekly_table.dollars / weekly_table.sales
     weekly_table['labor_pct_ly'] = weekly_table.dollars_ly / weekly_table.sales_ly
-    weekly_totals = weekly_table.loc["TOTALS"]
 
     # Period Sales Table
     sales_period = (
@@ -451,10 +449,9 @@ def index():
     period_top = period_table[['doly', 'poly']]
     period_top = period_top.nlargest(5, 'poly', keep='all')
 
-    period_table.loc["TOTALS"] = period_table.sum(numeric_only=True)
+    period_totals = period_table.sum()
     period_table['labor_pct'] = period_table.dollars / period_table.sales
     period_table['labor_pct_ly'] = period_table.dollars_ly / period_table.sales_ly
-    period_totals = period_table.loc["TOTALS"]
 
 
     # Yearly Sales Table
@@ -528,10 +525,9 @@ def index():
     yearly_top = yearly_table[['doly', 'poly']]
     yearly_top = yearly_top.nlargest(5, 'poly', keep='all')
 
-    yearly_table.loc["TOTALS"] = yearly_table.sum(numeric_only=True)
+    yearly_totals = yearly_table.sum()
     yearly_table['labor_pct'] = yearly_table.dollars / yearly_table.sales
     yearly_table['labor_pct_ly'] = yearly_table.dollars_ly / yearly_table.sales_ly
-    yearly_totals = yearly_table.loc["TOTALS"]
 
 
     return render_template(
@@ -897,8 +893,7 @@ def store(store_id):
     weekly_table['name'] = store.name
 
     weekly_table = weekly_table.merge(store_list, how="left")
-    weekly_table.loc["TOTALS"] = weekly_table.sum(numeric_only=True)
-    weekly_totals = weekly_table.loc["TOTALS"]
+    weekly_totals = weekly_table.sum()
 
 
     # Period Sales Table
@@ -1000,8 +995,7 @@ def store(store_id):
 #    period_table_w4.at['TOTALS', 'date'] = '-'
 
     period_table = period_table.merge(store_list, how="left")
-    period_table.loc["TOTALS"] = period_table.sum(numeric_only=True)
-    period_totals = period_table.loc["TOTALS"]
+    period_totals = period_table.sum()
 
 
     # Yearly Sales Table
@@ -1077,8 +1071,7 @@ def store(store_id):
     yearly_table['name'] = store.name
 
     yearly_table = yearly_table.merge(store_list, how="left")
-    yearly_table.loc["TOTALS"] = yearly_table.sum(numeric_only=True)
-    yearly_totals = yearly_table.loc["TOTALS"]
+    yearly_totals = yearly_table.sum()
 
 
     lobster_list = (db.session.query(Transactions.item)
@@ -1162,6 +1155,23 @@ def store(store_id):
             .order_by(Transactions.date.desc())
         .limit(5).all()
     )
+
+
+    feature = (
+        db.session.query(Transactions.item,
+                         Transactions.date,
+                         Transactions.UofM,
+                         func.sum(Transactions.amount).label('cost'),
+                         func.sum(Transactions.quantity).label('count'),
+                         )
+            .filter(Transactions.item.regexp_match('SEAFOOD Feature Fish'),
+                    Transactions.store_id == store_id,
+                    Transactions.type == 'AP Invoice')
+            .group_by(Transactions.item, Transactions.date, Transactions.UofM)
+            .order_by(Transactions.date.desc())
+        .limit(5).all()
+    )
+    print(feature)
 
 
     cogs_wk = (
@@ -1257,6 +1267,7 @@ def store(store_id):
         stone_items=stone_items,
         sea_bass=sea_bass,
         salmon=salmon,
+        feature=feature,
     )
 
 
@@ -1388,6 +1399,8 @@ def purchasing(targetdate=None):
         end_period = i.period_end
         start_year = i.year_start
         end_year = i.year_end
+        seven = day_start - timedelta(days=7)
+        last_seven = seven.strftime("%Y-%m-%d")
         thirty = day_start - timedelta(days=30)
         last_thirty = thirty.strftime("%Y-%m-%d")
 
@@ -1632,11 +1645,40 @@ def purchasing(targetdate=None):
                          func.sum(Transactions.quantity).label('count'),
                          )
             .filter(Transactions.item.regexp_match('SEAFOOD Salmon'),
-                    Transactions.date >= last_thirty,
+                    Transactions.date >= last_seven,
                     Transactions.type == 'AP Invoice')
             .group_by(Transactions.item, Transactions.name, Transactions.UofM)
         .all()
     )
+    print(salmon)
+
+    # convert UofM to pounds and calculate total pounds purchased for each store
+#    salmon_df = pd.DataFrame.from_records(salmon_list, columns=["item", "store", "UofM", "amount", "quantity"])
+#    with open("/usr/local/share/UofM.json") as file:
+#        uofm = json.load(file)
+#        for name, value in salmon_df[['UofM']].iteritems():
+#            for attrs in uofm()['data']['array']:
+#                if attrs['Name'] == value:
+#                    baseQty = attrs['BaseQty']
+#                    baseUofM = attrs['BaseUofM']
+#                    break
+#
+#    print(salmon_df)
+
+    feature = (
+        db.session.query(Transactions.item,
+                         Transactions.name,
+                         Transactions.UofM,
+                         func.sum(Transactions.amount).label('cost'),
+                         func.sum(Transactions.quantity).label('count'),
+                         )
+            .filter(Transactions.item.regexp_match('SEAFOOD Feature Fish'),
+                    Transactions.date >= last_seven,
+                    Transactions.type == 'AP Invoice')
+            .group_by(Transactions.item, Transactions.name, Transactions.UofM)
+        .all()
+    )
+    print(feature)
 
     shrimp10 = (db.session.query(Transactions.name)
             .filter(Transactions.item.regexp_match('SEAFOOD Shrimp U/10 White Headless'))
@@ -1675,6 +1717,7 @@ def purchasing(targetdate=None):
         sea_bass=sea_bass,
         salmon=salmon,
         shrimp_items=shrimp_items,
+        feature=feature,
     )
 
 
