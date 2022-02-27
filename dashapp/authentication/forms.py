@@ -4,8 +4,8 @@ Copyright (c) 2019 - present AppSeed.us
 """
 
 from flask_wtf import FlaskForm
-from wtforms import SubmitField, StringField, PasswordField, DateField
-from wtforms.fields.simple import HiddenField
+from wtforms import SubmitField, StringField, PasswordField
+from wtforms.fields.html5 import DateField #wftforms 2.3.3 is necessary until bug fix
 from wtforms_sqlalchemy.fields import QuerySelectField
 from wtforms.validators import Email, DataRequired
 from dashapp.authentication.models import Restaurants
