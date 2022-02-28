@@ -3,15 +3,8 @@
 Copyright (c) 2019 - present AppSeed.us
 """
 
-from flask import render_template, redirect, session, request, url_for
-from flask_login.utils import login_required
-from flask_security import current_user
-from flask_security.decorators import auth_required, roles_accepted
+from flask import render_template
 from dashapp.authentication import blueprint
-from dashapp.authentication.forms import LoginForm, CreateAccountForm
-from dashapp.authentication.models import Users, db, user_datastore, security
-from dashapp.authentication.util import verify_pass
-from datetime import datetime, timedelta
 
 
 

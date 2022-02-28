@@ -10,15 +10,14 @@ from fpdf import FPDF
 from flask.helpers import url_for
 from flask_security.decorators import roles_accepted
 from dashapp.home import blueprint
-from flask import flash, render_template, session, redirect, url_for, Response
+from flask import flash, render_template, session, redirect, url_for
+from flask.wrappers import Response
 from dashapp.home.util import get_period, get_lastyear, refresh_data, get_daily_sales, get_daily_labor
 from flask_security import login_required, current_user
 from datetime import datetime, timedelta
 from dashapp.authentication.forms import DateForm, StoreForm, UpdateForm, PotatoForm
-from dashapp.authentication.models import Menuitems, db, Calendar, Sales, Labor, Restaurants, Budgets, Transactions, Potatoes
+from dashapp.authentication.models import Menuitems, db, Calendar, Sales, Labor, Restaurants, Budgets, Transactions, Potatoes, Unitsofmeasure
 from sqlalchemy import and_, or_, func
-
-from datarefresh import potato_sales
 
 
 @blueprint.route("/")
@@ -1425,19 +1424,16 @@ def purchasing(targetdate=None):
 
     form1 = DateForm()
     form3 = StoreForm()
+
     if form1.submit1.data and form1.validate():
-        """
-        """
         start_day = form1.selectdate.data.strftime("%Y-%m-%d")
         session["targetdate"] = start_day
         return redirect(url_for("home_blueprint.purchasing"))
 
 
     if form3.submit3.data and form3.validate():
-
         session["targetdate"] = start_day
         store_id = form3.store.data.id
-
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
 
@@ -1463,6 +1459,7 @@ def purchasing(targetdate=None):
                             Transactions.type == 'AP Invoice')
                     .order_by(Transactions.date.desc())
                     ).first()
+
             if lobster_cost:
                 # extract the number from name to calculate cost per serving
                 row_dict = dict(lobster_cost)
@@ -1551,6 +1548,7 @@ def purchasing(targetdate=None):
                             Transactions.type == 'AP Invoice')
                     .order_by(Transactions.date.desc())
                     ).first()
+
             if steak_cost:
                 # extract the number from name to calculate cost per serving
                 row_dict = dict(steak_cost)
@@ -1650,7 +1648,20 @@ def purchasing(targetdate=None):
             .group_by(Transactions.item, Transactions.name, Transactions.UofM)
         .all()
     )
-    print(salmon)
+    for s in salmon:
+        pack_size = (db.session.query(Unitsofmeasure)
+                .filter(Unitsofmeasure.name == s.UofM
+                        ).first()
+                     )
+        if pack_size:
+            print(f"{pack_size.name} - {pack_size.base_qty}")
+            weight = pack_size.base_qty/16
+            row_dict = dict(s)
+            row_dict['factor'] = weight
+            print(s)
+        else:
+            print(f'{s.UofM} is not found in UofM list')
+
 
     # convert UofM to pounds and calculate total pounds purchased for each store
 #    salmon_df = pd.DataFrame.from_records(salmon_list, columns=["item", "store", "UofM", "amount", "quantity"])
