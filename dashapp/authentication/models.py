@@ -11,6 +11,7 @@ from flask_admin.contrib import sqla
 from dashapp.authentication.util import hash_pass
 from wtforms.fields import PasswordField
 from flask_mail import Mail
+import uuid
 
 
 db = SQLAlchemy()
@@ -112,14 +113,17 @@ class UserAdmin(sqla.ModelView):
 
     # This callback executes when the user saves changes to a newly-created or edited User -- before the changes are
     # committed to the database.
-#    def on_model_change(self, form, model, is_created):
-#
-#        # If the password field isn't blank...
-#        if len(model.password2):
-#
-#            # ... then encrypt the new password prior to storing it in the database. If the password field is blank,
-#            # the existing password in the database will be retained.
-#            model.password = hash_pass(model.password2)
+    def on_model_change(self, form, model, is_created):
+
+        # If the password field isn't blank...
+        if len(model.password2):
+
+            # ... then encrypt the new password prior to storing it in the database. If the password field is blank,
+            # the existing password in the database will be retained.
+            model.password = hash_pass(model.password2)
+
+        if model.fs_uniquifier is None:
+            model.fs_uniquifier = uuid.uuid4().hex
 
 
 # Customized Role model for SQL-Admin
@@ -331,13 +335,14 @@ class Potatoes(db.Model):
     quantity = db.Column(db.Integer)
 
 
-#@login_manager.user_loader
-#def user_loader(id):
-#    return Users.query.filter_by(id=id).first()
-#
-#
-#@login_manager.request_loader
-#def request_loader(request):
-#    username = request.form.get("username")
-#    user = Users.query.filter_by(username=username).first()
-#    return user if user else None
+class Unitsofmeasure(db.Model):
+
+    __tablename__ = "Unitsofmeasure"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64))
+    equivalent_qty = db.Column(db.Float)
+    equivalent_uofm = db.Column(db.String(64))
+    measure_type = db.Column(db.String(64))
+    base_qty = db.Column(db.Float)
+    base_uofm = db.Column(db.String(64))
