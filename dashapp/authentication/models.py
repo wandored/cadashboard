@@ -246,6 +246,8 @@ class Transactions(db.Model):
     amount = db.Column(db.Float)
     type = db.Column(db.String(64))
     modified = db.Column(db.String(64))
+    companyid = db.Column(db.String(64))
+    company = db.Column(db.String(64))
 
 
 class Budgets(db.Model):
