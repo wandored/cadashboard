@@ -53,7 +53,7 @@ def transaction(id_list):
     rqst_list = []
     for i in id_list:
         url_filter = "$filter=transactionId eq {}".format(i)
-        query = "$select=date,name,type,locationId,transactionId&{}".format(url_filter)
+        query = "$select=date,name,type,locationId,transactionId,companyId&{}".format(url_filter)
         url = "{}/Transaction?{}".format(Config.SRVC_ROOT, query)
         rqst = make_HTTP_request(url)
         try:
@@ -73,6 +73,14 @@ def transaction(id_list):
     df_merge = df_loc.merge(df, left_on="location", right_on='locationId')
     df_merge.rename(columns={'name_x': 'name', 'name_y': 'item'}, inplace=True)
     df_merge.drop(columns=['location', 'locationId'], inplace=True)
+
+    query = "$select=companyId,name"
+    url = "{}/Company?{}".format(Config.SRVC_ROOT, query)
+    print(url)
+    rqst = make_HTTP_request(url)
+    df = make_dataframe(rqst)
+    df.rename(columns={'name': 'company'}, inplace=True)
+    df_merge = df_merge.merge(df, on='companyId', how='left')
 
     return  df_merge
 
@@ -120,7 +128,7 @@ def write_to_database(df1, df2, df3):
 
     df = df3.merge(df1, on=['transactionId'])
     df = df.merge(df2, on='itemId')
-    df.rename(columns={'item_y': 'item', 'unitOfMeasureName': 'UofM', 'name_x': 'name', 'id_x': 'store_id', 'transactionId': 'trans_id'}, inplace=True)
+    df.rename(columns={'item_y': 'item', 'unitOfMeasureName': 'UofM', 'name_x': 'name', 'id_x': 'store_id', 'transactionId': 'trans_id', 'companyId': 'companyid'}, inplace=True)
     df.drop(columns=['itemId', 'name_y', 'id_y', 'item_x'], inplace=True)
     df.to_sql('Transactions', engine, if_exists='append', index=False)
     conn.commit()
