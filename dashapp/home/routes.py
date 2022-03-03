@@ -1450,7 +1450,6 @@ def purchasing(targetdate=None):
         store_id = form3.store.data.id
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
-
     lobster_list = (db.session.query(Transactions.item)
             .filter(Transactions.item.regexp_match('SEAFOOD Lobster Live*'))
             .group_by(Transactions.item)
@@ -1475,23 +1474,25 @@ def purchasing(targetdate=None):
                     ).first()
 
             if lobster_cost:
+                pack_size = (
+                    db.session.query(Unitsofmeasure)
+                        .filter(Unitsofmeasure.name == lobster_cost.UofM)
+                    .first()
+                )
+                weight = pack_size.base_qty/16
                 # extract the number from name to calculate cost per serving
                 row_dict = dict(lobster_cost)
-                ext = re.findall(r'\d*\.?\d', i.item)
-                if not ext:
-                    ext = re.findall(r'\d{1,2}', i.item)
-                size = float(ext[0])
-                row_dict['size'] = size
+                #ext = re.findall(r'\d*\.?\d', i.item)
+                #if not ext:
+                #    ext = re.findall(r'\d{1,2}', i.item)
+                #size = float(ext[0])
+                row_dict['factor'] = weight
                 lobster_items.append(row_dict)
         df = pd.DataFrame(lobster_items)
         if not df.empty:
-            with open("/usr/local/share/uofm.json") as file:
-                uofm = json.load(file)
-            df_uofm = pd.DataFrame(list(uofm.items()), columns=['case', 'factor'])
-            df = df.merge(df_uofm, left_on='UofM', right_on='case')
-            df['cost/lb'] = df['debit']/df['quantity']/df['factor']
+            df['cost/lb'] = df['debit']/(df['quantity']*df['factor'])
             df.rename(columns={'cost/lb': s}, inplace=True)
-            df.drop(columns={'date', 'debit', 'quantity', 'size', 'UofM', 'case', 'factor'}, inplace=True)
+            df.drop(columns={'date', 'debit', 'quantity', 'factor', 'UofM'}, inplace=True)
             lobster_df = lobster_df.merge(df, how='outer')
 
     lobster_df.sort_values(by=['item'], inplace=True)
@@ -1520,21 +1521,23 @@ def purchasing(targetdate=None):
                     .order_by(Transactions.date.desc())
                     ).first()
             if stone_cost:
+                pack_size = (
+                    db.session.query(Unitsofmeasure)
+                        .filter(Unitsofmeasure.name == stone_cost.UofM)
+                    .first()
+                )
+                weight = pack_size.base_qty/16
                 # extract the number from name to calculate cost per serving
                 row_dict = dict(stone_cost)
-                ext = re.findall(r'\d{1,2}', i.item)
-                size = int(ext[0])
-                row_dict['size'] = size
+                #ext = re.findall(r'\d{1,2}', i.item)
+                #size = int(ext[0])
+                row_dict['factor'] = weight
                 stone_items.append(row_dict)
         df = pd.DataFrame(stone_items)
         if not df.empty:
-            with open("/usr/local/share/uofm.json") as file:
-                uofm = json.load(file)
-            df_uofm = pd.DataFrame(list(uofm.items()), columns=['case', 'factor'])
-            df = df.merge(df_uofm, left_on='UofM', right_on='case')
-            df['cost/lb'] = df['debit']/df['quantity']/df['factor']
+            df['cost/lb'] = df['debit']/(df['quantity']*df['factor'])
             df.rename(columns={'cost/lb': s}, inplace=True)
-            df.drop(columns={'date', 'debit', 'quantity', 'size', 'UofM', 'case', 'factor'}, inplace=True)
+            df.drop(columns={'date', 'debit', 'quantity', 'factor', 'UofM'}, inplace=True)
             stone_df = stone_df.merge(df, how='outer')
 
     stone_df.sort_values(by=['item'], inplace=True)
@@ -1564,24 +1567,26 @@ def purchasing(targetdate=None):
                     ).first()
 
             if steak_cost:
+                pack_size = (
+                    db.session.query(Unitsofmeasure)
+                        .filter(Unitsofmeasure.name == steak_cost.UofM)
+                    .first()
+                )
+                weight = pack_size.base_qty/16
                 # extract the number from name to calculate cost per serving
                 row_dict = dict(steak_cost)
-                ext = re.findall(r'\d{1,2}', i.item)
-                if ext:
-                    size = int(ext[0])
-                else:
-                    size = 16
-                row_dict['size'] = size
+                #ext = re.findall(r'\d{1,2}', i.item)
+                #if ext:
+                #    size = int(ext[0])
+                #else:
+                #    size = 16
+                row_dict['factor'] = weight
                 steak_items.append(row_dict)
         df = pd.DataFrame(steak_items)
         if not df.empty:
-            with open("/usr/local/share/uofm.json") as file:
-                uofm = json.load(file)
-            df_uofm = pd.DataFrame(list(uofm.items()), columns=['case', 'factor'])
-            df = df.merge(df_uofm, left_on='UofM', right_on='case')
-            df['cost/lb'] = df['debit']/df['quantity'] / df['factor']
+            df['cost/lb'] = df['debit']/(df['quantity'] * df['factor'])
             df.rename(columns={'cost/lb': s}, inplace=True)
-            df.drop(columns={'date', 'debit', 'quantity', 'size', 'UofM', 'case', 'factor'}, inplace=True)
+            df.drop(columns={'date', 'debit', 'quantity', 'factor', 'UofM'}, inplace=True)
             steak_df = steak_df.merge(df, how='outer')
 
     steak_df.sort_values(by=['item'], inplace=True)
