@@ -56,27 +56,40 @@
               <table class="table-responsive table-md">
                 <thead>
                   <tr>
-                    <th scope="col">STORE</th>
-                    <th scope="col">ITEM</th>
+                    <th scope="col"></th>
                     <th scope="col">COUNT</th>
                     <th scope="col">SALES</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {% for k, v in lent_features.iterrows() %}
-                    <tr>
-                      <th scope="row">{{ v.store }}</th>
+                  <th scope="row">BLACKENED MAHI SANDWICH</th>
+                    {% for k, v in black_mahi.iterrows() %}
+                      <tr>
                         <td>
-                          <p class="mb-0 ms-1 text-begin">{{ "{:,.0f}".format(v.menuitem) }}</p>
+                          <p class="mb-0 ms-1 text-begin">{{ v.store }}</p>
                         </td>
                         <td>
-                          <p class="mb-0 ms-1 text-begin">{{ "{:,.0f}".format(v.count) }}</p>
+                          <p class="mb-0 ms-1 text-begin">{{ "{:,.0f}".format(v['count']) }}</p>
                         </td>
                         <td>
                           <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v.sales) }}</p>
                         </td>
-                    </tr>
-                  {% endfor %}
+                      </tr>
+                    {% endfor %}
+                  <th scope="row">CRISPY FLOUNDER SANDWICH</th>
+                    {% for k, v in crispy_flounder.iterrows() %}
+                      <tr>
+                        <td>
+                          <p class="mb-0 ms-1 text-begin">{{ v.store }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-begin">{{ "{:,.0f}".format(v['count']) }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v.sales) }}</p>
+                        </td>
+                      </tr>
+                    {% endfor %}
                 </tbody>
               </table>
             </div>
@@ -87,13 +100,12 @@
           <div class="card">
             <div class="card-header bg-warning pb-0">
               <h4>FISH FRYDAY SALES</h4>
-              <h5>GULFSTREAM CAFE</h5>
             </div>
             <div class="card">
               <table class="table-responsive table-md">
                 <thead>
                   <tr>
-                    <th scope="col">DATE</th>
+                    <th scope="col">NAME</th>
                     <th scope="col">COUNT</th>
                     <th scope="col">SALES</th>
                   </tr>
@@ -103,7 +115,7 @@
                     <tr>
                       <th scope="row">{{ v.store }}</th>
                         <td>
-                          <p class="mb-0 ms-1 text-begin">{{ "{:,.0f}".format(v.date) }}</p>
+                          <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
                         </td>
                         <td>
                           <p class="mb-0 ms-1 text-begin">{{ "{:,.0f}".format(v.count) }}</p>

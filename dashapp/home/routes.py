@@ -1334,36 +1334,49 @@ def marketing(targetdate=None):
     gift_card_sales.sort_values(by=['amount'], ascending=False, inplace=True)
     gift_card_sales.loc["TOTALS"] = gift_card_sales.sum(numeric_only=True)
 
-    lent = (
+    query = (
         db.session.query(Menuitems.name,
                          Menuitems.menuitem,
-                         func.sum(Menuitems.quantity).label('count'),
-                         func.sum(Menuitems.amount).label('sales'),
+                         func.sum(Menuitems.quantity).label("count"),
+                         func.sum(Menuitems.amount).label("sales"),
                          )
             .filter(Menuitems.date.between("2022-03-02", "2022-04-17"),
-                    or_(Menuitems.menuitem == 'CRISPY FLOUNDER SANDWICH',
-                        Menuitems.menuitem == 'BLACKENED MAHI SANDWICH')
+                    Menuitems.menuitem == "CRISPY FLOUNDER SANDWICH",
                     )
             .group_by(Menuitems.name, Menuitems.menuitem)
     ).all()
-    lent_features = pd.DataFrame.from_records(lent, columns=['store', 'menuitem', 'count', 'sales'])
+    crispy_flounder = pd.DataFrame.from_records(query, columns=["store", "menuitem", "count", "sales"])
+    crispy_flounder.sort_values(by=["count"], ascending=False, inplace=True)
+
+    query = (
+        db.session.query(Menuitems.name,
+                         Menuitems.menuitem,
+                         func.sum(Menuitems.quantity).label("count"),
+                         func.sum(Menuitems.amount).label("sales"),
+                         )
+            .filter(Menuitems.date.between("2022-03-02", "2022-04-17"),
+                    Menuitems.menuitem == "BLACKENED MAHI SANDWICH",
+                    )
+            .group_by(Menuitems.name, Menuitems.menuitem)
+    ).all()
+    black_mahi = pd.DataFrame.from_records(query, columns=["store", "menuitem", "count", "sales"])
+    black_mahi.sort_values(by=["count"], ascending=False, inplace=True)
 
 
     fish_fry  = (
-        db.session.query(Menuitems.date,
+        db.session.query(Menuitems.name,
                          Menuitems.menuitem,
                          func.sum(Menuitems.quantity).label("count"),
                          func.sum(Menuitems.amount).label("sales")
                          )
             .filter(Menuitems.date.between("2022-03-02", "2022-04-17"),
-                    Menuitems.menuitem.regexp_match('FISH FRYDAY')
+                    Menuitems.menuitem.regexp_match("FISH FRYDAY")
                     )
-            .group_by(Menuitems.menuitem, Menuitems.date)
+            .group_by(Menuitems.name, Menuitems.menuitem)
         ).all()
     fish_fryday = pd.DataFrame.from_records(
-        fish_fry, columns=["date", "menuitem", "count", "sales"]
+        fish_fry, columns=["name", "menuitem", "count", "sales"]
     )
-    fish_fryday.sort_values(by=['date'], inplace=True)
 
 
     return render_template(
@@ -1376,7 +1389,8 @@ def marketing(targetdate=None):
         current_user=current_user,
         roles=current_user.roles,
         gift_card_sales=gift_card_sales,
-        lent_features=lent_features,
+        black_mahi=black_mahi,
+        crispy_flounder=crispy_flounder,
         fish_fryday=fish_fryday,
     )
 
@@ -1636,8 +1650,8 @@ def purchasing(targetdate=None):
     )
 
     salmon = (
-        db.session.query(Transactions.item,
-                         Transactions.name,
+        db.session.query(Transactions.company,
+                         Transactions.date,
                          Transactions.UofM,
                          func.sum(Transactions.amount).label('cost'),
                          func.sum(Transactions.quantity).label('count'),
@@ -1645,22 +1659,26 @@ def purchasing(targetdate=None):
             .filter(Transactions.item.regexp_match('SEAFOOD Salmon'),
                     Transactions.date >= last_seven,
                     Transactions.type == 'AP Invoice')
-            .group_by(Transactions.item, Transactions.name, Transactions.UofM)
+            .group_by(Transactions.date, Transactions.company, Transactions.UofM)
         .all()
     )
+    salmon_list = []
     for s in salmon:
         pack_size = (db.session.query(Unitsofmeasure)
                 .filter(Unitsofmeasure.name == s.UofM
                         ).first()
                      )
         if pack_size:
-            print(f"{pack_size.name} - {pack_size.base_qty}")
             weight = pack_size.base_qty/16
             row_dict = dict(s)
             row_dict['factor'] = weight
-            print(s)
+            salmon_list.append(row_dict)
         else:
             print(f'{s.UofM} is not found in UofM list')
+    salmon_df = pd.DataFrame(salmon_list)
+    salmon_df['cost_lb'] = salmon_df['cost']/(salmon_df['count']*salmon_df['factor']).astype(float)
+    salmon_df.dropna(axis=0, how='any', subset=['cost_lb'], inplace=True)
+    salmon_df.sort_values(by=['date'], ascending=False, inplace=True)
 
 
     # convert UofM to pounds and calculate total pounds purchased for each store
@@ -1727,6 +1745,7 @@ def purchasing(targetdate=None):
         steak_df=steak_df,
         sea_bass=sea_bass,
         salmon=salmon,
+        salmon_df=salmon_df,
         shrimp_items=shrimp_items,
         feature=feature,
     )

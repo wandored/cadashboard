@@ -346,37 +346,22 @@
             <table class="table-sm text-dark">
               <thead>
                 <tr>
-                  <th scope="col">STORE</th>
-                  <th scope="col">UofM</th>
+                  <th scope="col">DATE</th>
+                  <th scope="col">VENDOR</th>
                   <th scope="col">COST/LB</th>
-                  <th scope="col">8oz COST</th>
                 </tr>
               </thead>
               <tbody>
-                {% for v in salmon %}
-                  {% if v.count != 0 %}
-                    <tr>
-                      <th scope="row">{{ v.name }}</th>
-                        <td>
-                          <p class="mb-0 ms-1 text-begin">{{ v.UofM }}</p>
-                        </td>
-                        {% if (v.UofM == 'Case - 22 LBS') or (v.UofM == 'Case (22 LB)') or (v.UofM == 'Case (22 LBS)') %}
-                          <td>
-                            <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format((v.cost/v.count)/(22)) }}</p>
-                          </td>
-                          <td>
-                            <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format((v.cost/v.count)/(22)*(0.5)) }}</p>
-                          </td>
-                        {% else %}
-                          <td>
-                            <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v.cost/v.count) }}</p>
-                          </td>
-                          <td>
-                            <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format((v.cost/v.count)*(0.5)) }}</p>
-                          </td>
-                        {% endif %}
-                    </tr>
-                  {% endif %}
+                {% for k, v in salmon_df.iterrows() %}
+                  <tr>
+                    <th scope="row">{{ v.date }}</th>
+                    <td>
+                      <p class="mb-0 ms-1 text-begin">{{ v.company }}</p>
+                    </td>
+                    <td>
+                      <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v['cost_lb']) }}</p>
+                    </td>
+                  </tr>
                 {% endfor %}
               </tbody>
             </table>
