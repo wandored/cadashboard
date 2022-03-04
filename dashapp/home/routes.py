@@ -1479,7 +1479,10 @@ def purchasing(targetdate=None):
                         .filter(Unitsofmeasure.name == lobster_cost.UofM)
                     .first()
                 )
-                weight = pack_size.base_qty/16
+                if pack_size:
+                    weight = pack_size.base_qty/16
+                else:
+                    weight = 1
                 # extract the number from name to calculate cost per serving
                 row_dict = dict(lobster_cost)
                 #ext = re.findall(r'\d*\.?\d', i.item)
@@ -1526,7 +1529,10 @@ def purchasing(targetdate=None):
                         .filter(Unitsofmeasure.name == stone_cost.UofM)
                     .first()
                 )
-                weight = pack_size.base_qty/16
+                if pack_size:
+                    weight = pack_size.base_qty/16
+                else:
+                    weight = 1
                 # extract the number from name to calculate cost per serving
                 row_dict = dict(stone_cost)
                 #ext = re.findall(r'\d{1,2}', i.item)
@@ -1572,7 +1578,10 @@ def purchasing(targetdate=None):
                         .filter(Unitsofmeasure.name == steak_cost.UofM)
                     .first()
                 )
-                weight = pack_size.base_qty/16
+                if pack_size:
+                    weight = pack_size.base_qty/16
+                else:
+                    weight = 1
                 # extract the number from name to calculate cost per serving
                 row_dict = dict(steak_cost)
                 #ext = re.findall(r'\d{1,2}', i.item)
@@ -1678,8 +1687,6 @@ def purchasing(targetdate=None):
             row_dict = dict(s)
             row_dict['factor'] = weight
             salmon_list.append(row_dict)
-        else:
-            print(f'{s.UofM} is not found in UofM list')
     salmon_df = pd.DataFrame(salmon_list)
     salmon_df['cost_lb'] = salmon_df['cost']/(salmon_df['count']*salmon_df['factor']).astype(float)
     salmon_df.dropna(axis=0, how='any', subset=['cost_lb'], inplace=True)
