@@ -1375,8 +1375,9 @@ def marketing(targetdate=None):
             .group_by(Menuitems.name, Menuitems.menuitem)
         ).all()
     fish_fryday = pd.DataFrame.from_records(
-        fish_fry, columns=["name", "menuitem", "count", "sales"]
+        fish_fry, columns=["store", "menuitem", "count", "sales"]
     )
+    print(fish_fryday)
 
 
     return render_template(
