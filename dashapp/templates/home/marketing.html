@@ -98,14 +98,16 @@
         <!-- fish fryday feast -->
         <div class="col-lg-4 col-md-6">
           <div class="card">
-            <div class="card-header bg-warning pb-0">
+            <div class="card-header bg-info pb-0">
               <h4>FISH FRYDAY SALES</h4>
+              <h5>March 2 - April 17</h5>
             </div>
             <div class="card">
               <table class="table-responsive table-md">
                 <thead>
                   <tr>
-                    <th scope="col">NAME</th>
+                    <th scope="col">STORE</th>
+                    <th scope="col">MENUITEM</th>
                     <th scope="col">COUNT</th>
                     <th scope="col">SALES</th>
                   </tr>
@@ -115,10 +117,10 @@
                     <tr>
                       <th scope="row">{{ v.store }}</th>
                         <td>
-                          <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                          <p class="mb-0 ms-1 text-begin">{{ v.menuitem }}</p>
                         </td>
                         <td>
-                          <p class="mb-0 ms-1 text-begin">{{ "{:,.0f}".format(v.count) }}</p>
+                          <p class="mb-0 ms-1 text-begin">{{ "{:,.0f}".format(v['count']) }}</p>
                         </td>
                         <td>
                           <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v.sales) }}</p>
