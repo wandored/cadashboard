@@ -1490,8 +1490,9 @@ def purchasing(targetdate=None):
             row_dict['factor'] = weight
             item_list.append(row_dict)
         df = pd.DataFrame(item_list)
+        df = df[(df != 0).all(1)]
+        df.dropna(axis=0, how='any', subset=['company'], inplace=True)
         df['cost_lb'] = df['cost']/(df['count']*df['factor']).astype(float)
-        df.dropna(axis=0, how='any', subset=['company', 'cost_lb'], inplace=True)
         df.sort_values(by=['date'], ascending=False, inplace=True)
         return df
 
