@@ -9,6 +9,7 @@ import pandas as pd
 from fpdf import FPDF
 from flask.helpers import url_for
 from flask_security.decorators import roles_accepted
+from sqlalchemy.sql.expression import column
 from dashapp.home import blueprint
 from flask import flash, render_template, session, redirect, url_for
 from flask.wrappers import Response
@@ -1170,7 +1171,6 @@ def store(store_id):
             .order_by(Transactions.date.desc())
         .limit(5).all()
     )
-    print(feature)
 
 
     cogs_wk = (
@@ -1377,7 +1377,6 @@ def marketing(targetdate=None):
     fish_fryday = pd.DataFrame.from_records(
         fish_fry, columns=["store", "menuitem", "count", "sales"]
     )
-    print(fish_fryday)
 
 
     return render_template(
@@ -1451,298 +1450,80 @@ def purchasing(targetdate=None):
         store_id = form3.store.data.id
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
-    lobster_list = (db.session.query(Transactions.item)
-            .filter(Transactions.item.regexp_match('SEAFOOD Lobster Live*'))
-            .group_by(Transactions.item)
-        ).all()
 
-    lobster_df = pd.DataFrame(columns=['item'])
-    for s in store_list:
-        lobster_items = []
-        for i in lobster_list:
-            lobster_cost = (
-                db.session.query(Transactions.item,
-                                 Transactions.date,
-                                 Transactions.UofM,
-                                 Transactions.debit,
-                                 Transactions.quantity,
-                                 )
-                    .filter(Transactions.item == i.item,
-                            Transactions.date >= last_thirty,
-                            Transactions.name == s,
-                            Transactions.type == 'AP Invoice')
-                    .order_by(Transactions.date.desc())
-                    ).first()
+    def get_vendors(regex):
+        query = (Transactions.query.with_entities(Transactions.company)
+                .filter(Transactions.item.regexp_match(regex),
+                        Transactions.company != 'None')
+                .group_by(Transactions.company)
+            ).all()
+        return query
 
-            if lobster_cost:
-                pack_size = (
-                    db.session.query(Unitsofmeasure)
-                        .filter(Unitsofmeasure.name == lobster_cost.UofM)
-                    .first()
-                )
-                if pack_size:
-                    weight = pack_size.base_qty/16
-                else:
-                    weight = 1
-                # extract the number from name to calculate cost per serving
-                row_dict = dict(lobster_cost)
-                #ext = re.findall(r'\d*\.?\d', i.item)
-                #if not ext:
-                #    ext = re.findall(r'\d{1,2}', i.item)
-                #size = float(ext[0])
-                row_dict['factor'] = weight
-                lobster_items.append(row_dict)
-        df = pd.DataFrame(lobster_items)
-        if not df.empty:
-            df['cost/lb'] = df['debit']/(df['quantity']*df['factor'])
-            df.rename(columns={'cost/lb': s}, inplace=True)
-            df.drop(columns={'date', 'debit', 'quantity', 'factor', 'UofM'}, inplace=True)
-            lobster_df = lobster_df.merge(df, how='outer')
+    def get_purchases(regex, days):
 
-    lobster_df.sort_values(by=['item'], inplace=True)
-    lobster_df.fillna(0, inplace=True)
-
-    stone_list = (db.session.query(Transactions.item)
-            .filter(Transactions.item.regexp_match('^(SEAFOOD Crab Stone Claw)'))
-            .group_by(Transactions.item)
-        ).all()
-
-    stone_df = pd.DataFrame(columns=['item'])
-    for s in store_list:
-        stone_items = []
-        for i in stone_list:
-            stone_cost = (
-                db.session.query(Transactions.item,
-                                 Transactions.date,
-                                 Transactions.UofM,
-                                 Transactions.debit,
-                                 Transactions.quantity,
-                                 )
-                    .filter(Transactions.item == i.item,
-                            Transactions.date >= last_thirty,
-                            Transactions.name == s,
-                            Transactions.type == 'AP Invoice')
-                    .order_by(Transactions.date.desc())
-                    ).first()
-            if stone_cost:
-                pack_size = (
-                    db.session.query(Unitsofmeasure)
-                        .filter(Unitsofmeasure.name == stone_cost.UofM)
-                    .first()
-                )
-                if pack_size:
-                    weight = pack_size.base_qty/16
-                else:
-                    weight = 1
-                # extract the number from name to calculate cost per serving
-                row_dict = dict(stone_cost)
-                #ext = re.findall(r'\d{1,2}', i.item)
-                #size = int(ext[0])
-                row_dict['factor'] = weight
-                stone_items.append(row_dict)
-        df = pd.DataFrame(stone_items)
-        if not df.empty:
-            df['cost/lb'] = df['debit']/(df['quantity']*df['factor'])
-            df.rename(columns={'cost/lb': s}, inplace=True)
-            df.drop(columns={'date', 'debit', 'quantity', 'factor', 'UofM'}, inplace=True)
-            stone_df = stone_df.merge(df, how='outer')
-
-    stone_df.sort_values(by=['item'], inplace=True)
-    stone_df.fillna(0, inplace=True)
-
-    steak_list = (db.session.query(Transactions.item)
-            .filter(Transactions.item.regexp_match('^(BEEF Steak).*(Prime)$'))
-            .group_by(Transactions.item)
-        ).all()
-
-    steak_df = pd.DataFrame(columns=['item'])
-    for s in store_list:
-        steak_items = []
-        for i in steak_list:
-            steak_cost = (
-                db.session.query(Transactions.item,
-                                 Transactions.date,
-                                 Transactions.UofM,
-                                 Transactions.debit,
-                                 Transactions.quantity,
-                                 )
-                    .filter(Transactions.item == i.item,
-                            Transactions.date >= last_thirty,
-                            Transactions.name == s,
-                            Transactions.type == 'AP Invoice')
-                    .order_by(Transactions.date.desc())
-                    ).first()
-
-            if steak_cost:
-                pack_size = (
-                    db.session.query(Unitsofmeasure)
-                        .filter(Unitsofmeasure.name == steak_cost.UofM)
-                    .first()
-                )
-                if pack_size:
-                    weight = pack_size.base_qty/16
-                else:
-                    weight = 1
-                # extract the number from name to calculate cost per serving
-                row_dict = dict(steak_cost)
-                #ext = re.findall(r'\d{1,2}', i.item)
-                #if ext:
-                #    size = int(ext[0])
-                #else:
-                #    size = 16
-                row_dict['factor'] = weight
-                steak_items.append(row_dict)
-        df = pd.DataFrame(steak_items)
-        if not df.empty:
-            df['cost/lb'] = df['debit']/(df['quantity'] * df['factor'])
-            df.rename(columns={'cost/lb': s}, inplace=True)
-            df.drop(columns={'date', 'debit', 'quantity', 'factor', 'UofM'}, inplace=True)
-            steak_df = steak_df.merge(df, how='outer')
-
-    steak_df.sort_values(by=['item'], inplace=True)
-    steak_df.fillna(0, inplace=True)
-
-
-#    crabmeat_list = (db.session.query(Transactions.item)
-#            .filter(Transactions.item.regexp_match('SEAFOOD Crabmeat*'))
-#            .group_by(Transactions.item)
-#        ).all()
-#
-#    crabmeat = pd.DataFrame(columns=['item'])
-#    for s in store_list:
-#        steak_items = []
-#        for i in crabmeat_list:
-#            crabmeat_cost = (
-#                db.session.query(Transactions.item,
-#                                 Transactions.date,
-#                                 Transactions.UofM,
-#                                 Transactions.debit,
-#                                 Transactions.quantity,
-#                                 )
-#                    .filter(Transactions.item == i.item,
-#                            Transactions.date >= last_thirty,
-#                            Transactions.name == s,
-#                            Transactions.type == 'AP Invoice')
-#                    .order_by(Transactions.date.desc())
-#                    ).first()
-#            if crabmeat_cost:
-#                # extract the number from name to calculate cost per serving
-#                row_dict = dict(crabmeat_cost)
-#                ext = re.findall(r'\d{1,2}', i.item)
-#                if ext:
-#                    size = int(ext[0])
-#                else:
-#                    size = 16
-#                row_dict['size'] = size
-#                steak_items.append(row_dict)
-#        df = pd.DataFrame(steak_items)
-#        if not df.empty:
-#            with open("/usr/local/share/uofm.json") as file:
-#                uofm = json.load(file)
-#            df_uofm = pd.DataFrame(list(uofm.items()), columns=['case', 'factor'])
-#            df = df.merge(df_uofm, left_on='UofM', right_on='case')
-#            df['cost/lb'] = df['debit']/df['quantity'] / df['factor']
-#            df.rename(columns={'cost/lb': s}, inplace=True)
-#            df.drop(columns={'date', 'debit', 'quantity', 'size', 'UofM', 'case', 'factor'}, inplace=True)
-#            steak_df = steak_df.merge(df, how='outer')
-#
-#    crabmeat_df.sort_values(by=['item'], inplace=True)
-#    crabmeat_df.fillna(0, inplace=True)
-
-    # TODO add uofm json comparison to the sea bass and shrimp
-    sea_bass = (
-        db.session.query(Transactions.item,
-                         Transactions.name,
-                         Transactions.UofM,
-                         func.sum(Transactions.amount).label('cost'),
-                         func.sum(Transactions.quantity).label('count'),
-                         )
-            .filter(Transactions.item.regexp_match('SEAFOOD Sea Bass Chilean'),
-                    Transactions.date >= last_thirty,
-                    Transactions.type == 'AP Invoice')
-            .group_by(Transactions.item, Transactions.name, Transactions.UofM)
-        .all()
-    )
-
-    salmon = (
-        db.session.query(Transactions.company,
-                         Transactions.date,
-                         Transactions.UofM,
-                         func.sum(Transactions.amount).label('cost'),
-                         func.sum(Transactions.quantity).label('count'),
-                         )
-            .filter(Transactions.item.regexp_match('SEAFOOD Salmon'),
-                    Transactions.date >= last_seven,
-                    Transactions.type == 'AP Invoice')
-            .group_by(Transactions.date, Transactions.company, Transactions.UofM)
-        .all()
-    )
-    salmon_list = []
-    for s in salmon:
-        pack_size = (db.session.query(Unitsofmeasure)
-                .filter(Unitsofmeasure.name == s.UofM
-                        ).first()
-                     )
-        if pack_size:
-            weight = pack_size.base_qty/16
-            row_dict = dict(s)
-            row_dict['factor'] = weight
-            salmon_list.append(row_dict)
-    salmon_df = pd.DataFrame(salmon_list)
-    salmon_df['cost_lb'] = salmon_df['cost']/(salmon_df['count']*salmon_df['factor']).astype(float)
-    salmon_df.dropna(axis=0, how='any', subset=['cost_lb'], inplace=True)
-    salmon_df.sort_values(by=['date'], ascending=False, inplace=True)
-
-
-    # convert UofM to pounds and calculate total pounds purchased for each store
-#    salmon_df = pd.DataFrame.from_records(salmon_list, columns=["item", "store", "UofM", "amount", "quantity"])
-#    with open("/usr/local/share/UofM.json") as file:
-#        uofm = json.load(file)
-#        for name, value in salmon_df[['UofM']].iteritems():
-#            for attrs in uofm()['data']['array']:
-#                if attrs['Name'] == value:
-#                    baseQty = attrs['BaseQty']
-#                    baseUofM = attrs['BaseUofM']
-#                    break
-#
-#    print(salmon_df)
-
-    feature = (
-        db.session.query(Transactions.item,
-                         Transactions.name,
-                         Transactions.UofM,
-                         func.sum(Transactions.amount).label('cost'),
-                         func.sum(Transactions.quantity).label('count'),
-                         )
-            .filter(Transactions.item.regexp_match('SEAFOOD Feature Fish'),
-                    Transactions.date >= last_seven,
-                    Transactions.type == 'AP Invoice')
-            .group_by(Transactions.item, Transactions.name, Transactions.UofM)
-        .all()
-    )
-    print(feature)
-
-    shrimp10 = (db.session.query(Transactions.name)
-            .filter(Transactions.item.regexp_match('SEAFOOD Shrimp U/10 White Headless'))
-            .group_by(Transactions.name)
-        ).all()
-    shrimp_list = []
-    for i in shrimp10:
-        shrimp_cost = (
-            db.session.query(Transactions.name,
+        items = (
+            db.session.query(Transactions.date,
+                             Transactions.company,
+                             Transactions.name,
                              Transactions.UofM,
-                             Transactions.amount,
-                             Transactions.quantity,
+                             func.sum(Transactions.quantity).label('count'),
+                             func.sum(Transactions.amount).label('cost')
                              )
-                .filter(Transactions.name == i.name,
-                        Transactions.item.regexp_match('SEAFOOD Shrimp U/10 White Headless'),
-                        Transactions.date >= last_thirty,
-                        Transactions.type == 'AP Invoice')
-                .order_by(Transactions.date.desc())
-                ).first()
-        if shrimp_cost:
-            shrimp_list.append(shrimp_cost)
-    shrimp_items = pd.DataFrame.from_records(shrimp_list, columns=["store", "UofM", "amount", "quantity"])
+            .filter(Transactions.item.regexp_match(regex),
+                    Transactions.date >= days,
+                    Transactions.type == 'AP Invoice'
+                    )
+            .group_by(Transactions.date, Transactions.company, Transactions.name, Transactions.UofM)
+        ).all()
+        item_list = []
+        for i in items:
+            pack_size = (
+                db.session.query(Unitsofmeasure)
+                    .filter(Unitsofmeasure.name == i.UofM)
+                .first()
+            )
+            if pack_size:
+                weight = pack_size.base_qty/16
+            else:
+                weight = 1
+            row_dict = dict(i)
+            row_dict['factor'] = weight
+            item_list.append(row_dict)
+        df = pd.DataFrame(item_list)
+        df['cost_lb'] = df['cost']/(df['count']*df['factor']).astype(float)
+        df.dropna(axis=0, how='any', subset=['company', 'cost_lb'], inplace=True)
+        df.sort_values(by=['date'], ascending=False, inplace=True)
+        return df
+
+    lobster_vendor = get_vendors('SEAFOOD Lobster Live*')
+    lobster_df = get_purchases('SEAFOOD Lobster Live*', last_thirty)
+
+    stone_vendor = get_vendors('^(SEAFOOD Crab Stone Claw)')
+    stone_df = get_purchases('^(SEAFOOD Crab Stone Claw)', last_thirty)
+
+    special_vendor = get_vendors('SEAFOOD Crabmeat Special')
+    special_df = get_purchases('SEAFOOD Crabmeat Special', last_thirty)
+
+    backfin_vendor = get_vendors('SEAFOOD Crabmeat Backfin')
+    backfin_df = get_purchases('SEAFOOD Crabmeat Backfin', last_thirty)
+
+    premium_vendor = get_vendors('SEAFOOD Crabmeat Premium')
+    premium_df = get_purchases('SEAFOOD Crabmeat Premium', last_thirty)
+
+    colossal_vendor = get_vendors('SEAFOOD Crabmeat Colossal')
+    colossal_df = get_purchases('SEAFOOD Crabmeat Colossal', last_thirty)
+
+    seabass_vendor = get_vendors('SEAFOOD Sea Bass Chilean')
+    seabass_df = get_purchases('SEAFOOD Sea Bass Chilean', last_thirty)
+
+    salmon_vendor = get_vendors('SEAFOOD Salmon')
+    salmon_df = get_purchases('SEAFOOD Salmon', last_thirty)
+
+    feature_vendor = get_vendors('SEAFOOD Feature Fish')
+    feature_df = get_purchases('SEAFOOD Feature Fish', last_thirty)
+
+    shrimp10_vendor = get_vendors('SEAFOOD Shrimp U/10 White Headless')
+    shrimp10_df = get_purchases('SEAFOOD Shrimp U/10 White Headless', last_thirty)
 
 
     return render_template(
@@ -1754,13 +1535,25 @@ def purchasing(targetdate=None):
         form3=form3,
         current_user=current_user,
         lobster_df=lobster_df,
+        lobster_vendor=lobster_vendor,
+        stone_vendor=stone_vendor,
         stone_df=stone_df,
-        steak_df=steak_df,
-        sea_bass=sea_bass,
-        salmon=salmon,
+        special_df=special_df,
+        special_vendor=special_vendor,
+        backfin_df=backfin_df,
+        backfin_vendor=backfin_vendor,
+        premium_df=premium_df,
+        premium_vendor=premium_vendor,
+        colossal_df=colossal_df,
+        colossal_vendor=colossal_vendor,
+        seabass_vendor=seabass_vendor,
+        seabass_df=seabass_df,
+        salmon_vendor=salmon_vendor,
         salmon_df=salmon_df,
-        shrimp_items=shrimp_items,
-        feature=feature,
+        shrimp10_vendor=shrimp10_vendor,
+        shrimp10_df=shrimp10_df,
+        feature_vendor=feature_vendor,
+        feature_df=feature_df,
     )
 
 
