@@ -1517,14 +1517,74 @@ def purchasing(targetdate=None):
     seabass_vendor = get_vendors('SEAFOOD Sea Bass Chilean')
     seabass_df = get_purchases('SEAFOOD Sea Bass Chilean', last_thirty)
 
-    salmon_vendor = get_vendors('SEAFOOD Salmon')
-    salmon_df = get_purchases('SEAFOOD Salmon', last_thirty)
+    salmon_vendor = get_vendors('^(SEAFOOD) (Salmon)$')
+    salmon_df = get_purchases('^(SEAFOOD) (Salmon)$', last_thirty)
 
     feature_vendor = get_vendors('SEAFOOD Feature Fish')
     feature_df = get_purchases('SEAFOOD Feature Fish', last_thirty)
 
     shrimp10_vendor = get_vendors('SEAFOOD Shrimp U/10 White Headless')
     shrimp10_df = get_purchases('SEAFOOD Shrimp U/10 White Headless', last_thirty)
+
+
+    def period_purchases(regex, start, end):
+        calendar = (
+            Calendar.query.with_entities(Calendar.date,
+                                         Calendar.week,
+                                         Calendar.period,
+                                         Calendar.year
+                                         ).all()
+        )
+        cal_df = pd.DataFrame(calendar, columns=['date', 'week', 'period', 'year'])
+
+        items = (
+            db.session.query(Transactions.date,
+                             Transactions.company,
+                             Transactions.name,
+                             Transactions.UofM,
+                             func.sum(Transactions.quantity).label('count'),
+                             func.sum(Transactions.amount).label('cost')
+                             )
+            .filter(Transactions.item.regexp_match(regex),
+                    Transactions.date.between(start, end),
+                    Transactions.type == 'AP Invoice'
+                    )
+            .group_by(Transactions.date, Transactions.company, Transactions.name, Transactions.UofM)
+        ).all()
+        item_list = []
+        for i in items:
+            pack_size = (
+                db.session.query(Unitsofmeasure)
+                    .filter(Unitsofmeasure.name == i.UofM)
+                .first()
+            )
+            if pack_size:
+                weight = pack_size.base_qty/16
+            else:
+                weight = 1
+            row_dict = dict(i)
+            row_dict['factor'] = weight
+            item_list.append(row_dict)
+        df = pd.DataFrame(item_list)
+        df = df[(df != 0).all(1)]
+        df['pounds'] = df['count']*df['factor']
+        df = df.merge(cal_df, on='date', how='left')
+        df = df.groupby(['period']).sum()
+        df['cost_lb'] = df['cost']/df['pounds']
+        df_list = df['cost_lb'].tolist()
+        return df_list
+
+    prime_chart = period_purchases('^(BEEF Steak).*(Prime)$', start_year, end_year)
+    prime_chart_ly = period_purchases('^(BEEF Steak).*(Prime)$', start_year_ly, end_year_ly)
+
+    choice_chart = period_purchases('^(BEEF Steak).*(Choice)$', start_year, end_year)
+    choice_chart_ly = period_purchases('^(BEEF Steak).*(Choice)$', start_year_ly, end_year_ly)
+
+    crabmeat_chart = period_purchases('SEAFOOD Crabmeat*', start_year, end_year)
+    crabmeat_chart_ly = period_purchases('SEAFOOD Crabmeat*', start_year_ly, end_year_ly)
+
+    salmon_chart = period_purchases('^(SEAFOOD) (Salmon)$', start_year, end_year)
+    salmon_chart_ly = period_purchases('^(SEAFOOD) (Salmon)$', start_year_ly, end_year_ly)
 
 
     return render_template(
@@ -1555,6 +1615,14 @@ def purchasing(targetdate=None):
         shrimp10_df=shrimp10_df,
         feature_vendor=feature_vendor,
         feature_df=feature_df,
+        prime_chart=prime_chart,
+        prime_chart_ly=prime_chart_ly,
+        choice_chart=choice_chart,
+        choice_chart_ly=choice_chart_ly,
+        crabmeat_chart=crabmeat_chart,
+        crabmeat_chart_ly=crabmeat_chart_ly,
+        salmon_chart=salmon_chart,
+        salmon_chart_ly=salmon_chart_ly,
     )
 
 
