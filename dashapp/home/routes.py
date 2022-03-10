@@ -100,82 +100,32 @@ def index():
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
 
-    # Daily Chart
-    daily_chart = (
-        db.session.query(func.sum(Sales.sales).label("total_sales"))
-        .filter(Sales.date.between(start_week, end_week))
-        .group_by(Sales.date)
-        .order_by(Sales.date)
-    )
-    values1 = []
-    for v in daily_chart:
-        values1.append(v.total_sales)
+    # Sales Chart
 
-    daily_chart_ly = (
-        db.session.query(func.sum(Sales.sales).label("total_sales"))
-        .filter(Sales.date.between(start_week_ly, end_week_ly))
-        .group_by(Sales.date)
-        .order_by(Sales.date)
-    )
-    values1_ly = []
-    for v in daily_chart_ly:
-        values1_ly.append(v.total_sales)
+    def get_chart_values(start, end, time):
+        chart = (
+            db.session.query(func.sum(Sales.sales).label("total_sales"))
+            .select_from(Sales)
+            .join(Calendar, Calendar.date == Sales.date)
+            .group_by(time)
+            .order_by(time)
+            .filter(Sales.date.between(start, end))
+        )
+        value = []
+        for v in chart:
+            value.append(v.total_sales)
+
+        return value
 
 
-    # TODO add daily budget
+    values1 = get_chart_values(start_week, end_week, Calendar.date)
+    values1_ly = get_chart_values(start_week_ly, end_week_ly, Calendar.date)
 
+    values2 = get_chart_values(start_period, end_period, Calendar.week)
+    values2_ly = get_chart_values(start_period_ly, end_period_ly, Calendar.week)
 
-    # Weekly Chart
-    weekly_chart = (
-        db.session.query(func.sum(Sales.sales).label("total_sales"))
-        .select_from(Sales)
-        .join(Calendar, Calendar.date == Sales.date)
-        .group_by(Calendar.week)
-        .order_by(Calendar.week)
-        .filter(Sales.date.between(start_period, end_period))
-    )
-    values2 = []
-    for v in weekly_chart:
-        values2.append(v.total_sales)
-
-    weekly_chart_ly = (
-        db.session.query(func.sum(Sales.sales).label("total_sales"))
-        .select_from(Sales)
-        .join(Calendar, Calendar.date == Sales.date)
-        .group_by(Calendar.week)
-        .order_by(Calendar.week)
-        .filter(Sales.date.between(start_period_ly, end_period_ly))
-    )
-    values2_ly = []
-    for v in weekly_chart_ly:
-        values2_ly.append(v.total_sales)
-
-    # TODO add weekly budget
-
-    # Yearly Chart
-    period_chart = (
-        db.session.query(func.sum(Sales.sales).label("total_sales"))
-        .select_from(Sales)
-        .join(Calendar, Calendar.date == Sales.date)
-        .group_by(Calendar.period)
-        .order_by(Calendar.period)
-        .filter(Sales.date.between(start_year, end_year))
-    )
-    values3 = []
-    for v in period_chart:
-        values3.append(v.total_sales)
-
-    period_chart_ly = (
-        db.session.query(func.sum(Sales.sales).label("total_sales"))
-        .select_from(Sales)
-        .join(Calendar, Calendar.date == Sales.date)
-        .group_by(Calendar.period)
-        .order_by(Calendar.period)
-        .filter(Sales.date.between(start_year_ly, end_year_ly))
-    )
-    values3_ly = []
-    for v in period_chart_ly:
-        values3_ly.append(v.total_sales)
+    values3 = get_chart_values(start_year, end_year, Calendar.period)
+    values3_ly = get_chart_values(start_year_ly, end_year_ly, Calendar.period)
 
     budget_chart = (
         db.session.query(func.sum(Budgets.total_sales).label('total_sales'))
@@ -639,83 +589,33 @@ def store(store_id):
 
         return redirect(url_for("home_blueprint.potato", store_id=store.id))
 
-    # Week to Date Chart
-    daily_chart = (
-        db.session.query(func.sum(Sales.sales).label("total_sales"))
-        .filter(Sales.date.between(start_week, end_week),
-                Sales.name == store.name)
-        .group_by(Sales.date)
-        .order_by(Sales.date)
-    )
-    values1 = []
-    for v in daily_chart:
-        values1.append(v.total_sales)
+    # Sales Charts
 
-    daily_chart_ly = (
-        db.session.query(func.sum(Sales.sales).label("total_sales"))
-        .filter(Sales.date.between(start_week_ly, end_week_ly),
-                Sales.name == store.name)
-        .group_by(Sales.date)
-        .order_by(Sales.date)
-    )
-    values1_ly = []
-    for v in daily_chart_ly:
-        values1_ly.append(v.total_sales)
+    def get_chart_values(start, end, time):
+        chart = (
+            db.session.query(func.sum(Sales.sales).label("total_sales"))
+            .select_from(Sales)
+            .join(Calendar, Calendar.date == Sales.date)
+            .group_by(time)
+            .order_by(time)
+            .filter(Sales.date.between(start, end),
+                    Sales.name == store.name)
+        )
+        value = []
+        for v in chart:
+            value.append(v.total_sales)
 
-    # Period to Date Chart
-    weekly_chart = (
-        db.session.query(func.sum(Sales.sales).label("total_sales"))
-        .select_from(Sales)
-        .join(Calendar, Calendar.date == Sales.date)
-        .group_by(Calendar.week)
-        .order_by(Calendar.week)
-        .filter(Sales.date.between(start_period, end_period),
-                Sales.name == store.name)
-    )
-    values2 = []
-    for v in weekly_chart:
-        values2.append(v.total_sales)
+        return value
 
-    weekly_chart_ly = (
-        db.session.query(func.sum(Sales.sales).label("total_sales"))
-        .select_from(Sales)
-        .join(Calendar, Calendar.date == Sales.date)
-        .group_by(Calendar.week)
-        .order_by(Calendar.week)
-        .filter(Sales.date.between(start_period_ly, end_period_ly),
-                Sales.name == store.name)
-    )
-    values2_ly = []
-    for v in weekly_chart_ly:
-        values2_ly.append(v.total_sales)
 
-    # Year to Date Chart
-    period_chart = (
-        db.session.query(func.sum(Sales.sales).label("total_sales"))
-        .select_from(Sales)
-        .join(Calendar, Calendar.date == Sales.date)
-        .group_by(Calendar.period)
-        .order_by(Calendar.period)
-        .filter(Sales.date.between(start_year, end_year),
-                Sales.name == store.name)
-    )
-    values3 = []
-    for v in period_chart:
-        values3.append(v.total_sales)
+    values1 = get_chart_values(start_week, end_week, Calendar.date)
+    values1_ly = get_chart_values(start_week_ly, end_week_ly, Calendar.date)
 
-    period_chart_ly = (
-        db.session.query(func.sum(Sales.sales).label("total_sales"))
-        .select_from(Sales)
-        .join(Calendar, Calendar.date == Sales.date)
-        .group_by(Calendar.period)
-        .order_by(Calendar.period)
-        .filter(Sales.date.between(start_year_ly, end_year_ly),
-                Sales.name == store.name)
-    )
-    values3_ly = []
-    for v in period_chart_ly:
-        values3_ly.append(v.total_sales)
+    values2 = get_chart_values(start_period, end_period, Calendar.week)
+    values2_ly = get_chart_values(start_period_ly, end_period_ly, Calendar.week)
 
+    values3 = get_chart_values(start_year, end_year, Calendar.period)
+    values3_ly = get_chart_values(start_year_ly, end_year_ly, Calendar.period)
 
     budget_chart = (
         db.session.query(func.sum(Budgets.total_sales).label('total_sales'))
@@ -1319,6 +1219,29 @@ def marketing(targetdate=None):
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
     # Gift Card Sales
+
+    def get_giftcard_values(start, end, time):
+        chart = (
+            db.session.query(func.sum(Menuitems.amount).label("sales"))
+            .select_from(Menuitems)
+            .join(Calendar, Calendar.date == Menuitems.date)
+            .group_by(time)
+            .order_by(time)
+            .filter(Menuitems.date.between(start, end),
+                    Menuitems.menuitem.regexp_match('(?i)GIFT CARD*')
+                    )
+        )
+        value = []
+        for v in chart:
+            value.append(int(v.sales))
+
+        return value
+
+    giftcard_values1 = get_giftcard_values(start_year, end_year, Calendar.period)
+    giftcard_values2 = get_giftcard_values(start_year_ly, end_year_ly, Calendar.period)
+    print(giftcard_values1)
+    print(giftcard_values2)
+
     gift_cards = (
         db.session.query(Menuitems.name,
                          func.sum(Menuitems.amount).label("sales"),
@@ -1334,48 +1257,74 @@ def marketing(targetdate=None):
     gift_card_sales.sort_values(by=['amount'], ascending=False, inplace=True)
     gift_card_sales.loc["TOTALS"] = gift_card_sales.sum(numeric_only=True)
 
+    def get_lent_values(start, end, time):
+        chart = (
+            db.session.query(func.sum(Menuitems.quantity).label("count"))
+            .select_from(Menuitems)
+            .join(Calendar, Calendar.date == Menuitems.date)
+            .group_by(time)
+            .order_by(time)
+            .filter(Menuitems.date.between(start, end),
+                    or_(Menuitems.menuitem == "BLACKENED MAHI SANDWICH",
+                        Menuitems.menuitem == "CRISPY FLOUNDER SANDWICH")
+                    )
+        )
+        value = []
+        for v in chart:
+            value.append(int(v.count))
+
+        return value
+
+    lent_values = get_lent_values(start_week, end_week, Calendar.date)
+
     query = (
         db.session.query(Menuitems.name,
-                         Menuitems.menuitem,
                          func.sum(Menuitems.quantity).label("count"),
                          func.sum(Menuitems.amount).label("sales"),
                          )
             .filter(Menuitems.date.between("2022-03-02", "2022-04-17"),
-                    Menuitems.menuitem == "CRISPY FLOUNDER SANDWICH",
+                    or_(Menuitems.menuitem == "BLACKENED MAHI SANDWICH",
+                        Menuitems.menuitem == "CRISPY FLOUNDER SANDWICH")
                     )
-            .group_by(Menuitems.name, Menuitems.menuitem)
+            .group_by(Menuitems.name)
     ).all()
-    crispy_flounder = pd.DataFrame.from_records(query, columns=["store", "menuitem", "count", "sales"])
-    crispy_flounder.sort_values(by=["count"], ascending=False, inplace=True)
+    lent_sales = pd.DataFrame.from_records(query, columns=["store", "count", "sales"])
+    lent_sales.sort_values(by=["count"], ascending=False, inplace=True)
 
-    query = (
-        db.session.query(Menuitems.name,
-                         Menuitems.menuitem,
-                         func.sum(Menuitems.quantity).label("count"),
-                         func.sum(Menuitems.amount).label("sales"),
-                         )
-            .filter(Menuitems.date.between("2022-03-02", "2022-04-17"),
-                    Menuitems.menuitem == "BLACKENED MAHI SANDWICH",
+
+    def get_fishfry_values(store, start, end, time):
+        chart = (
+            db.session.query(func.sum(Menuitems.quantity).label("count"))
+            .select_from(Menuitems)
+            .join(Calendar, Calendar.date == Menuitems.date)
+            .group_by(time)
+            .order_by(time)
+            .filter(Menuitems.date.between(start, end),
+                    Menuitems.menuitem.regexp_match("FISH FRYDAY"),
+                    Menuitems.name == store
                     )
-            .group_by(Menuitems.name, Menuitems.menuitem)
-    ).all()
-    black_mahi = pd.DataFrame.from_records(query, columns=["store", "menuitem", "count", "sales"])
-    black_mahi.sort_values(by=["count"], ascending=False, inplace=True)
+        )
+        value = []
+        for v in chart:
+            value.append(int(v.count))
 
+        return value
+
+    fishfry_values1 = get_fishfry_values('GULFSTREAM CAFE', "2022-03-02", "2022-04-17", Calendar.week)
+    fishfry_values2 = get_fishfry_values('CAROLINA ROADHOUSE', "2022-03-02", "2022-04-17", Calendar.week)
 
     fish_fry  = (
         db.session.query(Menuitems.name,
-                         Menuitems.menuitem,
                          func.sum(Menuitems.quantity).label("count"),
                          func.sum(Menuitems.amount).label("sales")
                          )
             .filter(Menuitems.date.between("2022-03-02", "2022-04-17"),
                     Menuitems.menuitem.regexp_match("FISH FRYDAY")
                     )
-            .group_by(Menuitems.name, Menuitems.menuitem)
+            .group_by(Menuitems.name)
         ).all()
     fish_fryday = pd.DataFrame.from_records(
-        fish_fry, columns=["store", "menuitem", "count", "sales"]
+        fish_fry, columns=["store", "count", "sales"]
     )
 
 
@@ -1389,9 +1338,13 @@ def marketing(targetdate=None):
         current_user=current_user,
         roles=current_user.roles,
         gift_card_sales=gift_card_sales,
-        black_mahi=black_mahi,
-        crispy_flounder=crispy_flounder,
+        giftcard_values1=giftcard_values1,
+        giftcard_values2=giftcard_values2,
+        lent_sales=lent_sales,
+        lent_values=lent_values,
         fish_fryday=fish_fryday,
+        fishfry_values1=fishfry_values1,
+        fishfry_values2=fishfry_values2,
     )
 
 
@@ -1451,10 +1404,11 @@ def purchasing(targetdate=None):
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
 
-    def get_vendors(regex):
+    def get_vendors(regex, days):
         query = (Transactions.query.with_entities(Transactions.company)
                 .filter(Transactions.item.regexp_match(regex),
-                        Transactions.company != 'None')
+                        Transactions.company != 'None',
+                        Transactions.date >= days)
                 .group_by(Transactions.company)
             ).all()
         return query
@@ -1496,34 +1450,34 @@ def purchasing(targetdate=None):
         df.sort_values(by=['date'], ascending=False, inplace=True)
         return df
 
-    lobster_vendor = get_vendors('SEAFOOD Lobster Live*')
+    lobster_vendor = get_vendors('SEAFOOD Lobster Live*', last_thirty)
     lobster_df = get_purchases('SEAFOOD Lobster Live*', last_thirty)
 
-    stone_vendor = get_vendors('^(SEAFOOD Crab Stone Claw)')
+    stone_vendor = get_vendors('^(SEAFOOD Crab Stone Claw)', last_thirty)
     stone_df = get_purchases('^(SEAFOOD Crab Stone Claw)', last_thirty)
 
-    special_vendor = get_vendors('SEAFOOD Crabmeat Special')
+    special_vendor = get_vendors('SEAFOOD Crabmeat Special', last_thirty)
     special_df = get_purchases('SEAFOOD Crabmeat Special', last_thirty)
 
-    backfin_vendor = get_vendors('SEAFOOD Crabmeat Backfin')
+    backfin_vendor = get_vendors('SEAFOOD Crabmeat Backfin', last_thirty)
     backfin_df = get_purchases('SEAFOOD Crabmeat Backfin', last_thirty)
 
-    premium_vendor = get_vendors('SEAFOOD Crabmeat Premium')
+    premium_vendor = get_vendors('SEAFOOD Crabmeat Premium', last_thirty)
     premium_df = get_purchases('SEAFOOD Crabmeat Premium', last_thirty)
 
-    colossal_vendor = get_vendors('SEAFOOD Crabmeat Colossal')
+    colossal_vendor = get_vendors('SEAFOOD Crabmeat Colossal', last_thirty)
     colossal_df = get_purchases('SEAFOOD Crabmeat Colossal', last_thirty)
 
-    seabass_vendor = get_vendors('SEAFOOD Sea Bass Chilean')
+    seabass_vendor = get_vendors('SEAFOOD Sea Bass Chilean', last_thirty)
     seabass_df = get_purchases('SEAFOOD Sea Bass Chilean', last_thirty)
 
-    salmon_vendor = get_vendors('^(SEAFOOD) (Salmon)$')
+    salmon_vendor = get_vendors('^(SEAFOOD) (Salmon)$', last_thirty)
     salmon_df = get_purchases('^(SEAFOOD) (Salmon)$', last_thirty)
 
-    feature_vendor = get_vendors('SEAFOOD Feature Fish')
+    feature_vendor = get_vendors('SEAFOOD Feature Fish', last_thirty)
     feature_df = get_purchases('SEAFOOD Feature Fish', last_thirty)
 
-    shrimp10_vendor = get_vendors('SEAFOOD Shrimp U/10 White Headless')
+    shrimp10_vendor = get_vendors('SEAFOOD Shrimp U/10 White Headless', last_thirty)
     shrimp10_df = get_purchases('SEAFOOD Shrimp U/10 White Headless', last_thirty)
 
 
