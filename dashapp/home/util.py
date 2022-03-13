@@ -8,39 +8,52 @@ import pandas as pd
 import numpy as np
 from dashapp.config import Config
 from datetime import datetime
-from dashapp.authentication.models import Calendar, Sales, Labor, Restaurants, db, Menuitems, Potatoes
+from dashapp.authentication.models import (
+    Calendar,
+    Sales,
+    Labor,
+    Restaurants,
+    db,
+    Menuitems,
+    Potatoes,
+)
 from sqlalchemy import or_, func
 
 
-pd.option_context('display.max_rows', None,
-                   'display.max_columns', None,
-                   'display.precision', 3,
-                   )
+pd.option_context(
+    "display.max_rows",
+    None,
+    "display.max_columns",
+    None,
+    "display.precision",
+    3,
+)
+
 
 def refresh_data(start, end):
-        """
-        When new date submitted, the data for that date will be replaced with new data from R365
-        We check if there are infact sales for that day, if not, it resets to yesterday, if
-        there are sales, then labor is polled
-        """
-        # delete current days data from database and replace with fresh data
-        Sales.query.filter_by(date=start).delete()
-        Labor.query.filter_by(date=start).delete()
-        Menuitems.query.filter_by(date=start).delete()
-        Potatoes.query.filter_by(date=start).delete()
-        db.session.commit()
+    """
+    When new date submitted, the data for that date will be replaced with new data from R365
+    We check if there are infact sales for that day, if not, it resets to yesterday, if
+    there are sales, then labor is polled
+    """
+    # delete current days data from database and replace with fresh data
+    Sales.query.filter_by(date=start).delete()
+    Labor.query.filter_by(date=start).delete()
+    Menuitems.query.filter_by(date=start).delete()
+    Potatoes.query.filter_by(date=start).delete()
+    db.session.commit()
 
-        # refres the sales data and check to make sure there are sales for that day
-        baddates = sales_employee(start, end)
-        if baddates == 1:
-            return 1
+    # refres the sales data and check to make sure there are sales for that day
+    baddates = sales_employee(start, end)
+    if baddates == 1:
+        return 1
 
-        # refresh labor
-        labor_detail(start, end)
-        # refresh categories and menuitems
-        sales_detail(start, end)
-        potato_sales(start)
-        return 0
+    # refresh labor
+    labor_detail(start, end)
+    # refresh categories and menuitems
+    sales_detail(start, end)
+    potato_sales(start)
+    return 0
 
 
 def make_HTTP_request(url):
@@ -118,9 +131,7 @@ def sales_employee(start, end):
         [(x.name, x.location) for x in data], columns=["name", "location"]
     )
     df_merge = df_loc.merge(df, on="location")
-    df_merge.rename(
-        columns={"netSales": "sales", "dayPart": "daypart"}, inplace=True
-    )
+    df_merge.rename(columns={"netSales": "sales", "dayPart": "daypart"}, inplace=True)
 
     # pivot data and write to database
     df_pivot = df_merge.pivot_table(
@@ -148,7 +159,7 @@ def labor_detail(start, end):
 
     with open("/usr/local/share/labor_categories.json") as labor_file:
         labor_cats = json.load(labor_file)
-    df_cats = pd.DataFrame(list(labor_cats.items()), columns=['job', 'category'])
+    df_cats = pd.DataFrame(list(labor_cats.items()), columns=["job", "category"])
 
     data = db.session.query(Restaurants).all()
     df_loc = pd.DataFrame(
@@ -156,7 +167,7 @@ def labor_detail(start, end):
     )
     df_merge = df_loc.merge(df, left_on="location", right_on="location_ID")
     df_merge.rename(columns={"jobTitle": "job", "total": "dollars"}, inplace=True)
-    df_merge = df_merge.merge(df_cats, on='job')
+    df_merge = df_merge.merge(df_cats, on="job")
     df_pivot = df_merge.pivot_table(
         index=["name", "category", "job"], values=["hours", "dollars"], aggfunc=np.sum
     )
@@ -170,7 +181,9 @@ def sales_detail(start, end):
     url_filter = "$filter=date ge {}T00:00:00Z and date le {}T00:00:00Z".format(
         start, end
     )
-    query = "$select=menuitem,amount,date,quantity,category,location&{}".format(url_filter)
+    query = "$select=menuitem,amount,date,quantity,category,location&{}".format(
+        url_filter
+    )
     url = "{}/SalesDetail?{}".format(Config.SRVC_ROOT, query)
     print(url)
     rqst = make_HTTP_request(url)
@@ -180,7 +193,9 @@ def sales_detail(start, end):
 
     with open("/usr/local/share/major_categories.json") as file:
         major_cats = json.load(file)
-    df_cats = pd.DataFrame(list(major_cats.items()), columns=['menu_category', 'category'])
+    df_cats = pd.DataFrame(
+        list(major_cats.items()), columns=["menu_category", "category"]
+    )
 
     # the data needs to be cleaned before it can be used
 
@@ -189,23 +204,31 @@ def sales_detail(start, end):
         [(x.name, x.location) for x in data], columns=["name", "location"]
     )
     df_merge = df_loc.merge(df, on="location")
-    df_merge.drop(columns=['location'], inplace=True)
+    df_merge.drop(columns=["location"], inplace=True)
 
-    df_menu = df_merge.merge(df_cats, left_on='category', right_on='menu_category')
+    df_menu = df_merge.merge(df_cats, left_on="category", right_on="menu_category")
 
-    df_menu.loc[:, 'menuitem'] = df_menu['menuitem'].str.replace(r'CHOPHOUSE - NOLA', 'CHOPHOUSE-NOLA', regex=True)
-    df_menu.loc[:, 'menuitem'] = df_menu['menuitem'].str.replace(r'CAFÉ', 'CAFE', regex=True)
-    df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(r"^(?:.*?( -)){2}", "-", regex=True)
-    df_menu.loc[:, 'menuitem'] = df_menu['menuitem'].str.strip()
-    dafilter = df_menu['menuitem'].str.contains('VOID')
+    df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(
+        r"CHOPHOUSE - NOLA", "CHOPHOUSE-NOLA", regex=True
+    )
+    df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(
+        r"CAFÉ", "CAFE", regex=True
+    )
+    df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(
+        r"^(?:.*?( -)){2}", "-", regex=True
+    )
+    df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.strip()
+    dafilter = df_menu["menuitem"].str.contains("VOID")
     df_clean = df_menu[~dafilter]
-    df_clean[['x', 'menuitem']] = df_clean['menuitem'].str.split(' - ', expand=True)
-    df_clean.drop(columns=['category_x', 'x'], inplace=True)
-    df_clean.rename(columns={'category_y': 'category'}, inplace=True)
-#    menuitems = removeSpecial(df_clean)  ### fix the file location before making this active
+    df_clean[["x", "menuitem"]] = df_clean["menuitem"].str.split(" - ", expand=True)
+    df_clean.drop(columns=["category_x", "x"], inplace=True)
+    df_clean.rename(columns={"category_y": "category"}, inplace=True)
+    #    menuitems = removeSpecial(df_clean)  ### fix the file location before making this active
     # Write the daily menu items to Menuitems table
     menu_pivot = df_clean.pivot_table(
-        index=['name', 'menuitem', 'category', 'menu_category'], values=['amount', 'quantity'], aggfunc=np.sum
+        index=["name", "menuitem", "category", "menu_category"],
+        values=["amount", "quantity"],
+        aggfunc=np.sum,
     )
     menu_pivot["date"] = start
     menu_pivot.to_sql("Menuitems", con=db.engine, if_exists="append")
@@ -215,41 +238,57 @@ def sales_detail(start, end):
 
 def get_daily_sales(start, end, store, cat):
 
-    if cat == 'GIFT CARDS':
-        data = db.session.query(Menuitems.date,
-                    func.sum(Menuitems.amount).label("total_sales")
-                ).filter(Menuitems.date.between(start, end),
-                        Menuitems.name == store,
-                        Menuitems.menuitem == 'GIFT CARD'
-                ).group_by(Menuitems.date).all()
+    if cat == "GIFT CARDS":
+        data = (
+            db.session.query(
+                Menuitems.date, func.sum(Menuitems.amount).label("total_sales")
+            )
+            .filter(
+                Menuitems.date.between(start, end),
+                Menuitems.name == store,
+                Menuitems.menuitem == "GIFT CARD",
+            )
+            .group_by(Menuitems.date)
+            .all()
+        )
     else:
-        data = db.session.query(Menuitems.date,
-                    func.sum(Menuitems.amount).label("total_sales")
-                ).filter(Menuitems.date.between(start, end),
-                        Menuitems.name == store,
-                        Menuitems.category == cat
-                ).group_by(Menuitems.date).all()
-    df = pd.DataFrame([(x.date, x.total_sales) for x in data], columns=['date', cat])
+        data = (
+            db.session.query(
+                Menuitems.date, func.sum(Menuitems.amount).label("total_sales")
+            )
+            .filter(
+                Menuitems.date.between(start, end),
+                Menuitems.name == store,
+                Menuitems.category == cat,
+            )
+            .group_by(Menuitems.date)
+            .all()
+        )
+    df = pd.DataFrame([(x.date, x.total_sales) for x in data], columns=["date", cat])
     return df
 
 
 def get_daily_labor(start, end, store, cat):
 
-    data = db.session.query(
+    data = (
+        db.session.query(
             Labor.date,
             func.sum(Labor.dollars).label("total_dollars"),
-                ).filter(Labor.date.between(start, end),
-                        Labor.name == store,
-                        Labor.category == cat
-                ).group_by(Labor.date).all()
-    df = pd.DataFrame([(x.date, x.total_dollars) for x in data], columns=['date', cat])
+        )
+        .filter(
+            Labor.date.between(start, end), Labor.name == store, Labor.category == cat
+        )
+        .group_by(Labor.date)
+        .all()
+    )
+    df = pd.DataFrame([(x.date, x.total_dollars) for x in data], columns=["date", cat])
     return df
 
 
 def potato_sales(start):
 
     df_pot = pd.DataFrame()
-    with open('/usr/local/share/potatochart.csv') as f:
+    with open("/usr/local/share/potatochart.csv") as f:
         times = csv.reader(f)
         next(times)
         for i in times:
@@ -261,7 +300,7 @@ def potato_sales(start):
             rqst = make_HTTP_request(url)
             df = make_dataframe(rqst)
             if df.empty:
-                print('empty dataframe')
+                print("empty dataframe")
                 continue
 
             data = db.session.query(Restaurants).all()
@@ -270,44 +309,56 @@ def potato_sales(start):
             )
             df_merge = df_loc.merge(df, on="location")
             if df_merge.empty:
-                print(f'no sales at {i[0]}')
+                print(f"no sales at {i[0]}")
                 if df_pot.empty:
                     continue
                 df_pot.loc[i[0]] = [0]
                 continue
-            df_merge.drop(columns=['location'], inplace=True)
+            df_merge.drop(columns=["location"], inplace=True)
             df_menu = df_merge
-            df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(r"CHOPHOUSE - NOLA", "CHOPHOUSE-NOLA", regex=True)
-            df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(r"CAFÉ", "CAFE", regex=True)
-            df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(r"^(?:.*?( -)){2}", "-", regex=True)
+            df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(
+                r"CHOPHOUSE - NOLA", "CHOPHOUSE-NOLA", regex=True
+            )
+            df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(
+                r"CAFÉ", "CAFE", regex=True
+            )
+            df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(
+                r"^(?:.*?( -)){2}", "-", regex=True
+            )
             df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.strip()
             dafilter = df_menu["menuitem"].str.contains("VOID")
             df_clean = df_menu[~dafilter]
-            df_clean[["x", "menuitem"]] = df_clean["menuitem"].str.split(" - ", expand=True)
-            pot_list = ['BAKED POTATO',
-                        'BAKED POTATO N/C',
-                        'POTATO',
-                        'POT',
-                        'BAKED POTATO A SIDE',
-                        'BAKED POTATO SIDE',
-                        'KID SUB POT',
-                        'POT-A',
-                        'S-BAKED POTATO',
-                        'SUB BAKED POTATO IN KIDS',
-                        'SUB KID POT']
-            df = df_clean[df_clean['menuitem'].isin(pot_list)]
+            df_clean[["x", "menuitem"]] = df_clean["menuitem"].str.split(
+                " - ", expand=True
+            )
+            pot_list = [
+                "BAKED POTATO",
+                "BAKED POTATO N/C",
+                "POTATO",
+                "POT",
+                "BAKED POTATO A SIDE",
+                "BAKED POTATO SIDE",
+                "KID SUB POT",
+                "POT-A",
+                "S-BAKED POTATO",
+                "SUB BAKED POTATO IN KIDS",
+                "SUB KID POT",
+            ]
+            df = df_clean[df_clean["menuitem"].isin(pot_list)]
             if df.empty:
                 continue
-            df['time'] = i[0]
-            df['in_time'] = i[1]
-            df['out_time'] = i[4]
+            df["time"] = i[0]
+            df["in_time"] = i[1]
+            df["out_time"] = i[4]
             df_pot = df_pot.append(df)
 
         # Write the daily menu items to Menuitems table
         menu_pivot = df_pot.pivot_table(
-            index=["time", "name", "in_time", "out_time"], values=["quantity"], aggfunc=np.sum
+            index=["time", "name", "in_time", "out_time"],
+            values=["quantity"],
+            aggfunc=np.sum,
         )
-    menu_pivot['date'] = start
+    menu_pivot["date"] = start
     menu_pivot.to_sql("Potatoes", con=db.engine, if_exists="append")
 
     return 0
