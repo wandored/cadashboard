@@ -1745,10 +1745,11 @@ def purchasing(targetdate=None):
             row_dict["factor"] = weight
             item_list.append(row_dict)
         df = pd.DataFrame(item_list)
-        df = df[(df != 0).all(1)]
-        df.dropna(axis=0, how="any", subset=["company"], inplace=True)
-        df["cost_lb"] = df["cost"] / (df["count"] * df["factor"]).astype(float)
-        df.sort_values(by=["date"], ascending=False, inplace=True)
+        if not df.empty:
+            df = df[(df != 0).all(1)]
+            df.dropna(axis=0, how="any", subset=["company"], inplace=True)
+            df["cost_lb"] = df["cost"] / (df["count"] * df["factor"]).astype(float)
+            df.sort_values(by=["date"], ascending=False, inplace=True)
         return df
 
     lobster_vendor = get_vendors("SEAFOOD Lobster Live*", last_seven)
@@ -2006,9 +2007,7 @@ def support(targetdate=None):
 @login_required
 def alcohol(targetdate=None):
 
-    start_day = (
-        end_day
-    ) = start_week = end_week = start_period = end_period = start_year = end_year = ""
+    start_day = end_day = start_week = end_week = start_period = end_period = start_year = end_year = ""
     fiscal_dates = get_period(datetime.strptime(session["targetdate"], "%Y-%m-%d"))
     for i in fiscal_dates:
         day_start = datetime.strptime(i.date, "%Y-%m-%d")
@@ -2061,6 +2060,11 @@ def alcohol(targetdate=None):
     steakhouse = [4, 9, 11, 17, 16]
     casual = [1, 3, 7, 8, 11, 12, 14, 21, 85]
 
+    calendar = Calendar.query.with_entities(
+        Calendar.date, Calendar.week, Calendar.period, Calendar.year
+    ).all()
+    cal_df = pd.DataFrame(calendar, columns=["date", "week", "period", "year"])
+
     def get_vendors(cat, time, concept):
         query = (
             Transactions.query.with_entities(Transactions.company)
@@ -2074,7 +2078,7 @@ def alcohol(targetdate=None):
         ).all()
         return query
 
-    def get_purchases(cat, time, concept):
+    def get_purchases(cat, start, end, concept):
         items = (
             db.session.query(
                 Transactions.date,
@@ -2086,7 +2090,7 @@ def alcohol(targetdate=None):
             )
             .filter(
                 Transactions.category2 == cat,
-                Transactions.date >= time,
+                Transactions.date.between(start, end),
                 Transactions.store_id.in_(concept),
                 Transactions.type == "AP Invoice",
             )
@@ -2113,13 +2117,74 @@ def alcohol(targetdate=None):
             item_list.append(row_dict)
         df = pd.DataFrame(item_list)
         df = df[(df != 0).all(1)]
-        df = df.groupby(["company"]).sum()
-        df.sort_values(by=["cost"], ascending=False, inplace=True)
         return df
 
     wine_vendors = get_vendors("Wine", start_year, steakhouse)
-    steakhouse_wine = get_purchases("Wine", start_year, steakhouse)
-    print(steakhouse_wine)
+    steakhouse_wine = get_purchases("Wine", start_year, end_year, steakhouse)
+    steakhouse_wine_values = steakhouse_wine.merge(cal_df, on="date", how="left")
+    steakhouse_wine_values = steakhouse_wine_values.groupby(["period"]).sum()
+    steakhouse_wine_chart = steakhouse_wine_values['cost'].tolist()
+    steakhouse_wine_vendor = steakhouse_wine.groupby(["company"]).sum()
+    steakhouse_wine_vendor.sort_values(by=["cost"], ascending=False, inplace=True)
+    steakhouse_wine_vendor = steakhouse_wine_vendor.head(10)
+    # steakhouse_wine_bottle = steakhouse_wine.groupby(["item"]).sum()
+    # steakhouse_wine_bottle.sort_values(by=["cost"], ascending=False, inplace=True)
+
+    liquor_vendors = get_vendors("Liquor", start_year, steakhouse)
+    steakhouse_liquor = get_purchases("Liquor", start_year, end_year, steakhouse)
+    steakhouse_liquor_values = steakhouse_liquor.merge(cal_df, on="date", how="left")
+    steakhouse_liquor_values = steakhouse_liquor_values.groupby(["period"]).sum()
+    steakhouse_liquor_chart = steakhouse_liquor_values['cost'].tolist()
+    # steakhouse_liquor_vendor = steakhouse_liquor.groupby(["company"]).sum()
+    # steakhouse_liquor_vendor.sort_values(by=["cost"], ascending=False, inplace=True)
+    steakhouse_liquor_bottle = steakhouse_liquor.groupby(["item"]).sum()
+    steakhouse_liquor_bottle.sort_values(by=["cost"], ascending=False, inplace=True)
+    steakhouse_liquor_bottle = steakhouse_liquor_bottle.head(10)
+
+    beer_vendors = get_vendors("Beer", start_year, steakhouse)
+    steakhouse_beer = get_purchases("Beer", start_year, end_year, steakhouse)
+    steakhouse_beer_values = steakhouse_beer.merge(cal_df, on="date", how="left")
+    steakhouse_beer_values = steakhouse_beer_values.groupby(["period"]).sum()
+    steakhouse_beer_chart = steakhouse_beer_values['cost'].tolist()
+    # steakhouse_beer_vendor = steakhouse_beer.groupby(["company"]).sum()
+    # steakhouse_beer_vendor.sort_values(by=["cost"], ascending=False, inplace=True)
+    steakhouse_beer_bottle = steakhouse_beer.groupby(["item"]).sum()
+    steakhouse_beer_bottle.sort_values(by=["cost"], ascending=False, inplace=True)
+    steakhouse_beer_bottle = steakhouse_beer_bottle.head(10)
+
+    wine_vendors = get_vendors("Wine", start_year, casual)
+    casual_wine = get_purchases("Wine", start_year, end_year, casual)
+    casual_wine_values = casual_wine.merge(cal_df, on="date", how="left")
+    casual_wine_values = casual_wine_values.groupby(["period"]).sum()
+    casual_wine_chart = casual_wine_values['cost'].tolist()
+    casual_wine_vendor = casual_wine.groupby(["company"]).sum()
+    casual_wine_vendor.sort_values(by=["cost"], ascending=False, inplace=True)
+    casual_wine_vendor = casual_wine_vendor.head(10)
+    # casual_wine_bottle = casual_wine.groupby(["item"]).sum()
+    # casual_wine_bottle.sort_values(by=["cost"], ascending=False, inplace=True)
+
+    liquor_vendors = get_vendors("Liquor", start_year, casual)
+    casual_liquor = get_purchases("Liquor", start_year, end_year, casual)
+    casual_liquor_values = casual_liquor.merge(cal_df, on="date", how="left")
+    casual_liquor_values = casual_liquor_values.groupby(["period"]).sum()
+    casual_liquor_chart = casual_liquor_values['cost'].tolist()
+    # casual_liquor_vendor = casual_liquor.groupby(["company"]).sum()
+    # casual_liquor_vendor.sort_values(by=["cost"], ascending=False, inplace=True)
+    casual_liquor_bottle = casual_liquor.groupby(["item"]).sum()
+    casual_liquor_bottle.sort_values(by=["cost"], ascending=False, inplace=True)
+    casual_liquor_bottle = casual_liquor_bottle.head(10)
+
+    beer_vendors = get_vendors("Beer", start_year, casual)
+    casual_beer = get_purchases("Beer", start_year, end_year, casual)
+    casual_beer_values = casual_beer.merge(cal_df, on="date", how="left")
+    casual_beer_values = casual_beer_values.groupby(["period"]).sum()
+    casual_beer_chart = casual_beer_values['cost'].tolist()
+    # casual_beer_vendor = casual_beer.groupby(["company"]).sum()
+    # casual_beer_vendor.sort_values(by=["cost"], ascending=False, inplace=True)
+    casual_beer_bottle = casual_beer.groupby(["item"]).sum()
+    casual_beer_bottle.sort_values(by=["cost"], ascending=False, inplace=True)
+    casual_beer_bottle = casual_beer_bottle.head(10)
+
 
     return render_template(
         "home/alcohol.html",
@@ -2128,6 +2193,30 @@ def alcohol(targetdate=None):
         fiscal_dates=fiscal_dates,
         form1=form1,
         form3=form3,
+        steakhouse_wine_chart=steakhouse_wine_chart,
+        steakhouse_wine_chart_ly=steakhouse_wine_chart,
+        steakhouse_wine_vendor=steakhouse_wine_vendor,
+        # steakhouse_wine_bottle=steakhouse_wine_bottle,
+        steakhouse_liquor_chart=steakhouse_liquor_chart,
+        steakhouse_liquor_chart_ly=steakhouse_liquor_chart,
+        # steakhouse_liquor_vendor=steakhouse_liquor_vendor,
+        steakhouse_liquor_bottle=steakhouse_liquor_bottle,
+        steakhouse_beer_chart=steakhouse_beer_chart,
+        steakhouse_beer_chart_ly=steakhouse_beer_chart,
+        # steakhouse_beer_vendor=steakhouse_beer_vendor,
+        steakhouse_beer_bottle=steakhouse_beer_bottle,
+        casual_wine_chart=casual_wine_chart,
+        casual_wine_chart_ly=casual_wine_chart,
+        casual_wine_vendor=casual_wine_vendor,
+        # casual_wine_bottle=casual_wine_bottle,
+        casual_liquor_chart=casual_liquor_chart,
+        casual_liquor_chart_ly=casual_liquor_chart,
+        # casual_liquor_vendor=casual_liquor_vendor,
+        casual_liquor_bottle=casual_liquor_bottle,
+        casual_beer_chart=casual_beer_chart,
+        casual_beer_chart_ly=casual_beer_chart,
+        # casual_beer_vendor=casual_beer_vendor,
+        casual_beer_bottle=casual_beer_bottle,
     )
 
 
