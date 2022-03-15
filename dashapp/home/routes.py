@@ -670,6 +670,7 @@ def store(store_id):
     sales_table["total_sales_ly"] = sales_table.food_ly + sales_table.alcohol_sales_ly
     sales_table["net_sales"] = sales_table.total_sales + sales_table.gift_cards
     sales_table["net_sales_ly"] = sales_table.total_sales_ly + sales_table.gift_cards_ly
+    print(sales_table)
 
     # Daily Labor
     bar_labor = get_daily_labor(start_day, start_day, store.name, "Bar")
@@ -756,6 +757,7 @@ def store(store_id):
         return redirect(url_for("home_blueprint.store", store_id=store.id))
 
     daily_table = daily_table.iloc[0]
+    print(daily_table)
     # TODO crashes with no sales
 
     # Weekly Sales Table

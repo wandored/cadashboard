@@ -246,7 +246,7 @@ def get_daily_sales(start, end, store, cat):
             .filter(
                 Menuitems.date.between(start, end),
                 Menuitems.name == store,
-                Menuitems.menuitem == "GIFT CARD",
+                Menuitems.menuitem.regexp_match("(?i)GIFT CARD*")
             )
             .group_by(Menuitems.date)
             .all()
