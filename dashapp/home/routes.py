@@ -60,9 +60,7 @@ def route_default():
 @login_required
 def index():
 
-    start_day = (
-        end_day
-    ) = start_week = end_week = start_period = end_period = start_year = end_year = ""
+    start_day = end_day = start_week = end_week = start_period = end_period = start_year = end_year = ""
     period = year = 0
     if not session["targetdate"]:
         return redirect(url_for("home_blueprint.route_default"))
