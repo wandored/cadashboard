@@ -4,7 +4,13 @@ Copyright (c) 2019 - present AppSeed.us
 """
 
 # from flask_login import LoginManager
-from flask_security import UserMixin, current_user, RoleMixin, Security, SQLAlchemySessionUserDatastore
+from flask_security import (
+    UserMixin,
+    current_user,
+    RoleMixin,
+    Security,
+    SQLAlchemySessionUserDatastore,
+)
 from flask_sqlalchemy import SQLAlchemy
 from flask_admin import Admin
 from flask_admin.contrib import sqla
@@ -21,9 +27,9 @@ admin = Admin()
 
 # Create a table to support a many-to-many relationship between Users and Roles
 roles_users = db.Table(
-    'roles_users',
-    db.Column('users_id', db.Integer, db.ForeignKey('Users.id')),
-    db.Column('roles_id', db.Integer, db.ForeignKey('Roles.id'))
+    "roles_users",
+    db.Column("users_id", db.Integer, db.ForeignKey("Users.id")),
+    db.Column("roles_id", db.Integer, db.ForeignKey("Roles.id")),
 )
 
 
@@ -47,7 +53,6 @@ class Roles(db.Model, RoleMixin):
         return hash(self.name)
 
 
-
 class Users(db.Model, UserMixin):
 
     __tablename__ = "Users"
@@ -57,9 +62,8 @@ class Users(db.Model, UserMixin):
     password = db.Column(db.String(255))
     active = db.Column(db.Boolean())
     fs_uniquifier = db.Column(db.String(64), unique=True)
-    roles = db.relationship('Roles',
-                            secondary=roles_users,
-                            backref='users', lazy=True)
+    roles = db.relationship("Roles", secondary=roles_users, backref="users", lazy=True)
+
 
 #    def __init__(self, **kwargs):
 #        for property, value in kwargs.items():
@@ -86,17 +90,17 @@ security = Security()
 class UserAdmin(sqla.ModelView):
 
     # Don't display the password on the list of Users
-    column_exclude_list = ('password', 'fs_uniquifier')
+    column_exclude_list = ("password", "fs_uniquifier")
 
     # Don't include the standard password field when creating or editing a User (but see below)
-    form_excluded_columns = ('password',)
+    form_excluded_columns = ("password",)
 
     # Automatically display human-readable names for the current and available Roles when creating or editing a User
     column_auto_select_related = True
 
     # Prevent administration of Users unless the currently logged-in user has the "admin" role
     def is_accessible(self):
-        return  current_user.has_role('admin')
+        return current_user.has_role("admin")
 
     # On the form for creating or editing a User, don't display a field corresponding to the model's password field.
     # There are two reasons for this. First, we want to encrypt the password before storing in the database. Second,
@@ -108,7 +112,7 @@ class UserAdmin(sqla.ModelView):
         form_class = super(UserAdmin, self).scaffold_form()
 
         # Add a password field, naming it "password2" and labeling it "New Password".
-        form_class.password2 = PasswordField('New Password')
+        form_class.password2 = PasswordField("New Password")
         return form_class
 
     # This callback executes when the user saves changes to a newly-created or edited User -- before the changes are
@@ -131,12 +135,12 @@ class RoleAdmin(sqla.ModelView):
 
     # Prevent administration of Roles unless the currently logged-in user has the "admin" role
     def is_accessible(self):
-        return current_user.has_role('admin')
+        return current_user.has_role("admin")
+
 
 # Add Flask-Admin views for Users and Roles
 admin.add_view(UserAdmin(Users, db.session))
 admin.add_view(RoleAdmin(Roles, db.session))
-
 
 
 class Restaurants(db.Model):
@@ -148,7 +152,7 @@ class Restaurants(db.Model):
     name = db.Column(db.String(64), unique=True)
 
     def as_dict(self):
-        return {'id': self.id, 'name': self.name, 'location': self.location}
+        return {"id": self.id, "name": self.name, "location": self.location}
 
 
 class Calendar(db.Model):
@@ -172,7 +176,15 @@ class Calendar(db.Model):
     day = db.Column(db.String(64))
 
     def as_dict(self):
-        return {'date': self.date, 'week': self.week, 'period': self.period, 'quarter': self.quarter, 'year': self.year, 'dow': self.dow, 'day': self.day}
+        return {
+            "date": self.date,
+            "week": self.week,
+            "period": self.period,
+            "quarter": self.quarter,
+            "year": self.year,
+            "dow": self.dow,
+            "day": self.day,
+        }
 
 
 class Sales(db.Model):
@@ -200,8 +212,8 @@ class Labor(db.Model):
     dollars = db.Column(db.Float)
 
 
-#this is deprecated
-#class Categories(db.Model):
+# this is deprecated
+# class Categories(db.Model):
 #
 #    __tablename__ = "Categories"
 #

@@ -1,6 +1,6 @@
-'''
+"""
 CentraArchy Dashboard app
-'''
+"""
 
 from dashapp import create_app
 

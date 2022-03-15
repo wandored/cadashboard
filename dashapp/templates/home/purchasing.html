@@ -8,9 +8,9 @@
 {% block content %}
 
 <div class="container-fluid py-4">
-    <!-- Second Row -Charts -->
+    <!-- First Row -Charts -->
     <div class="row mt-4">
-      <div class="col-lg-3 col-md-4 mt-4 mb-4">
+      <div class="col-lg-4 col-md-6 mt-4 mb-4">
         <div class="card z-index-2 ">
           <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
             <div class="bg-gradient-primary shadow-primary border-radius-lg py-3 pe-1">
@@ -20,11 +20,11 @@
             </div>
           </div>
           <div class="card-body">
-            <h6 class="mb-0 ">Prime Beef Index</h6>
+            <h6 class="mb-0 ">Prime Steak Index</h6>
           </div>
         </div>
       </div>
-      <div class="col-lg-3 col-md-4 mt-4 mb-4">
+      <div class="col-lg-4 col-md-4 mt-4 mb-4">
         <div class="card z-index-2 ">
           <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
             <div class="bg-gradient-secondary shadow-primary border-radius-lg py-3 pe-1">
@@ -34,11 +34,14 @@
             </div>
           </div>
           <div class="card-body">
-            <h6 class="mb-0 ">Choice Beef Index</h6>
+            <h6 class="mb-0 ">Choice Steak Index</h6>
           </div>
         </div>
       </div>
-      <div class="col-lg-3 col-md-4 mt-4 mb-4">
+    </div>
+    <!-- Second Row -Charts -->
+    <div class="row mt-4">
+      <div class="col-lg-4 col-md-4 mt-4 mb-4">
         <div class="card z-index-2  ">
           <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
             <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
@@ -52,7 +55,7 @@
           </div>
         </div>
       </div>
-      <div class="col-lg-3 mt-4 mb-3">
+      <div class="col-lg-4 mt-4 mb-3">
         <div class="card z-index-2 ">
           <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
             <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
@@ -74,7 +77,7 @@
         <div class="card-header bg-primary pb-0">
           {% for x in fiscal_dates %}
           <h4>SPECIAL CRAB MEAT</h4>
-          <h6>Most recent purchase in the last 30 days</h6>
+          <h6>Most recent purchases</h6>
           {% endfor %}
         </div>
         <div class="table-responsive table-hover">
@@ -118,7 +121,7 @@
         <div class="card-header bg-success pb-0">
           {% for x in fiscal_dates %}
           <h4>BACKFIN CRAB MEAT</h4>
-          <h6>Most recent purchase in the last 30 days</h6>
+          <h6>Most recent purchases</h6>
           {% endfor %}
         </div>
         <div class="table-responsive table-hover">
@@ -162,7 +165,7 @@
         <div class="card-header bg-info pb-0">
           {% for x in fiscal_dates %}
           <h4>PREMIUM CRAB MEAT</h4>
-          <h6>Most recent purchase in the last 30 days</h6>
+          <h6>Most recent purchases</h6>
           {% endfor %}
         </div>
         <div class="table-responsive table-hover">
@@ -206,7 +209,7 @@
         <div class="card-header bg-warning pb-0">
           {% for x in fiscal_dates %}
           <h4>COLOSSAL CRAB MEAT</h4>
-          <h6>Most recent purchase in the last 30 days</h6>
+          <h6>Most recent purchases</h6>
           {% endfor %}
         </div>
         <div class="table-responsive table-hover">
@@ -252,7 +255,7 @@
         <div class="card-header bg-primary pb-0">
           {% for x in fiscal_dates %}
           <h4>LOBSTER COSTS</h4>
-          <h6>Most recent purchase in the last 30 days</h6>
+          <h6>Most recent purchases</h6>
           {% endfor %}
         </div>
           <div class="table-responsive table-hover">
@@ -296,7 +299,7 @@
         <div class="card-header bg-warning pb-0">
           {% for x in fiscal_dates %}
           <h4>STONE CLAW COSTS</h4>
-          <h6>Most recent purchase in the last 30 days</h6>
+          <h6>Most recent purchases</h6>
           {% endfor %}
         </div>
         <div class="table-responsive table-hover">
@@ -340,7 +343,7 @@
         <div class="card-header bg-success pb-0">
           {% for x in fiscal_dates %}
           <h4>SEA BASS COST</h4>
-          <h6>Most recent purchase in the last 30 days</h6>
+          <h6>Most recent purchases</h6>
           {% endfor %}
         </div>
         <div class="table-responsive table-hover">
@@ -386,7 +389,7 @@
         <div class="card-header bg-secondary pb-0">
           {% for x in fiscal_dates %}
           <h4>U10 SHRIMP COST</h4>
-          <h6>Most recent purchase in the last 30 days</h6>
+          <h6>Most recent purchases</h6>
           {% endfor %}
         </div>
         <div class="table-responsive table-hover">
@@ -430,7 +433,7 @@
         <div class="card-header bg-primary pb-0">
           {% for x in fiscal_dates %}
           <h4>SALMON COST</h4>
-          <h6>Most recent purchase in the last 30 days</h6>
+          <h6>Most recent purchases</h6>
           {% endfor %}
         </div>
         <div class="table-responsive table-hover">
@@ -474,7 +477,7 @@
         <div class="card-header bg-info pb-0">
           {% for x in fiscal_dates %}
           <h4>FEATURE FISH COST</h4>
-          <h6>Most recent purchase in the last 30 days</h6>
+          <h6>Most recent purchases</h6>
           {% endfor %}
         </div>
         <div class="table-responsive table-hover">

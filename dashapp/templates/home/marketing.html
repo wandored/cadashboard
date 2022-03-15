@@ -8,44 +8,7 @@
 {% block content %}
 
   <div class="container-fluid py-4">
-    <div class="row min-vh-80 h-100">
-        <!-- giftcard chart -->
-      <div class="col-lg-4 col-md-6 mt-4 mb-4">
-        <div class="card z-index-2 ">
-          <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-            <div class="bg-gradient-primary shadow-success border-radius-lg py-3 pe-1">
-              <div class="chart">
-                <canvas id="chart-giftcard" class="chart-canvas" height="170"></canvas>
-              </div>
-            </div>
-          </div>
-          <div class="card-body">
-          <table class="table-responsive table-md">
-            <thead>
-                <th scope="row">GIFT CARD SALES</th>
-              <tr>
-                <th scope="col">STORE</th>
-                <th scope="col">COUNT</th>
-                <th scope="col">SALES</th>
-              </tr>
-            </thead>
-              <tbody>
-                {% for k, v in gift_card_sales.iterrows() %}
-                  <tr>
-                    <th scope="row">{{ v.store }}</th>
-                      <td>
-                        <p class="mb-0 ms-1 text-begin">{{ "{:,.0f}".format(v.quantity) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-begin">{{ "${:,.0f}".format(v.amount) }}</p>
-                      </td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+    <div class="row min-vh-60 h-100">
         <!-- lent chart -->
       <div class="col-lg-4 col-md-6 mt-4 mb-4">
         <div class="card z-index-2 ">
@@ -117,6 +80,55 @@
                   {% endfor %}
               </tbody>
             </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row min-vh-80 h-100">
+        <!-- giftcard chart -->
+      <div class="col-lg-6 col-md-6 mt-4 mb-4">
+        <div class="card z-index-2 ">
+          <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+            <div class="bg-gradient-primary shadow-success border-radius-lg py-3 pe-1">
+              <div class="chart">
+                <canvas id="chart-giftcard" class="chart-canvas" height="300"></canvas>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table align-items-begin mb-0">
+                <thead>
+                  <th scope="row">GIFT CARD SALES YTD</th>
+                    <tr>
+                      <th scope="col">STORE</th>
+                      <th scope="col">COUNT</th>
+                      <th scope="col">SALES</th>
+                      <th scope="col">COUNT LY</th>
+                      <th scope="col">SALES LY</th>
+                    </tr>
+                </thead>
+                <tbody>
+                  {% for k, v in gift_card_sales.iterrows() %}
+                    <tr>
+                      <th scope="row">{{ v.store }}</th>
+                        <td>
+                          <p class="mb-0 ms-1 text-begin">{{ "{:,.0f}".format(v.quantity_x) }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-begin">{{ "${:,.0f}".format(v.amount_x) }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-begin">{{ "{:,.0f}".format(v.quantity_y) }}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0 ms-1 text-begin">{{ "${:,.0f}".format(v.amount_y) }}</p>
+                        </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
