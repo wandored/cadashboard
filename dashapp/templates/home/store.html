@@ -18,18 +18,18 @@
               {% for x in fiscal_dates %}
               <div class="text-end pt-1">
                 <p class="text-sm mb-0 text-capitalize">{{ x.day }}, {{ x.date }}</p>
-                <h4 class="mb-0">{{ "${:,.0f}".format(daily_table.net_sales) }}</h4>
+                <h4 class="mb-0">{{ "${:,.0f}".format(sales_day) }}</h4>
               </div>
               {% endfor %}
           </div>
           <hr class="dark horizontal my-0">
-          {% if daily_table.net_sales >= daily_table.net_sales_ly %}
+          {% if sales_day >= sales_day_ly %}
             <div class="card-footer p-3">
-              <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((daily_table.net_sales - daily_table.net_sales_ly) / daily_table.net_sales_ly) * 100) }} - {{ "${:,.0f}".format(daily_table.net_sales_ly) }}</span> SDLY</p>
+              <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((sales_day - sales_day_ly) / sales_day_ly) * 100) }} - {{ "${:,.0f}".format(sales_day_ly) }}</span> SDLY</p>
             </div>
             {% else %}
             <div class="card-footer p-3">
-              <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((daily_table.net_sales - daily_table.net_sales_ly)|abs / daily_table.net_sales_ly) * 100) }} - {{ "${:,.0f}".format(daily_table.net_sales_ly) }}</span> SDLY</p>
+              <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((sales_day - sales_day_ly)|abs / sales_day_ly) * 100) }} - {{ "${:,.0f}".format(sales_day_ly) }}</span> SDLY</p>
             </div>
             {% endif %}
         </div>
@@ -43,18 +43,18 @@
               {% for x in fiscal_dates %}
               <div class="text-end pt-1">
                 <p class="text-sm mb-0 text-capitalize">Week {{ x.week }} Sales</p>
-                <h4 class="mb-0">{{ "${:,.0f}".format(weekly_totals.net_sales) }}</h4>
+                <h4 class="mb-0">{{ "${:,.0f}".format(sales_week) }}</h4>
               </div>
               {% endfor %}
           </div>
           <hr class="dark horizontal my-0">
-            {% if weekly_totals.net_sales >= weekly_totals.net_sales_ly %}
+            {% if sales_week >= sales_week_ly %}
             <div class="card-footer p-3">
-              <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((weekly_totals.total_sales - weekly_totals.total_sales_ly) / weekly_totals.total_sales_ly) * 100) }} - {{ "${:,.0f}".format(weekly_totals.total_sales_ly) }}</span> WTD</p>
+              <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((sales_week - sales_week_ly) / sales_week_ly) * 100) }} - {{ "${:,.0f}".format(sales_week_ly) }}</span> WTD</p>
             </div>
             {% else %}
             <div class="card-footer p-3">
-              <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((weekly_totals.total_sales - weekly_totals.total_sales_ly)|abs / weekly_totals.total_sales_ly) * 100) }} - {{ "${:,.0f}".format(weekly_totals.total_sales_ly) }}</span> WTD</p>
+              <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((sales_week - sales_week_ly)|abs / sales_week_ly) * 100) }} - {{ "${:,.0f}".format(sales_week_ly) }}</span> WTD</p>
             </div>
             {% endif %}
         </div>
@@ -68,18 +68,18 @@
               {% for x in fiscal_dates %}
               <div class="text-end pt-1">
                 <p class="text-sm mb-0 text-capitalize">Period {{ x.period }} Sales</p>
-                <h4 class="mb-0">{{ "${:,.0f}".format(period_totals.net_sales) }}</h4>
+                <h4 class="mb-0">{{ "${:,.0f}".format(sales_period) }}</h4>
               </div>
               {% endfor %}
           </div>
           <hr class="dark horizontal my-0">
-            {% if period_totals.net_sales >= period_totals.net_sales_ly %}
+            {% if sales_period >= sales_period_ly %}
             <div class="card-footer p-3">
-              <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((period_totals.net_sales - period_totals.net_sales_ly) / period_totals.net_sales_ly) * 100) }} - {{ "${:,.0f}".format(period_totals.net_sales_ly) }}</span> PTD</p>
+              <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((sales_period - sales_period_ly) / sales_period_ly) * 100) }} - {{ "${:,.0f}".format(sales_period_ly) }}</span> PTD</p>
             </div>
             {% else %}
             <div class="card-footer p-3">
-              <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((period_totals.net_sales - period_totals.net_sales_ly)|abs / period_totals.net_sales_ly) * 100) }} - {{ "${:,.0f}".format(period_totals.net_sales_ly) }}</span> PTD</p>
+              <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((sales_period - sales_period_ly)|abs / sales_period_ly) * 100) }} - {{ "${:,.0f}".format(sales_period_ly) }}</span> PTD</p>
             </div>
             {% endif %}
         </div>
@@ -93,18 +93,18 @@
               {% for x in fiscal_dates %}
               <div class="text-end pt-1">
                 <p class="text-sm mb-0 text-capitalize">Fiscal {{ x.year }} Sales</p>
-                <h4 class="mb-0"> {{ "${:,.0f}".format(yearly_totals.net_sales) }}</h4>
+                <h4 class="mb-0"> {{ "${:,.0f}".format(sales_year) }}</h4>
               </div>
               {% endfor %}
           </div>
           <hr class="dark horizontal my-0">
-            {% if yearly_totals.net_sales >= yearly_totals.net_sales_ly %}
+            {% if sales_year >= sales_year_ly %}
             <div class="card-footer p-3">
-              <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((yearly_totals.net_sales - yearly_totals.net_sales_ly) / yearly_totals.net_sales_ly) * 100) }} - {{ "${:,.0f}".format(yearly_totals.net_sales_ly) }}</span> YTD</p>
+              <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((sales_year - sales_year_ly) / sales_year_ly) * 100) }} - {{ "${:,.0f}".format(sales_year_ly) }}</span> YTD</p>
             </div>
             {% else %}
             <div class="card-footer p-3">
-              <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((yearly_totals.net_sales - yearly_totals.net_sales_ly)|abs / yearly_totals.net_sales_ly) * 100) }} - {{ "${:,.0f}".format(yearly_totals.net_sales_ly) }}</span> YTD</p>
+              <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((sales_year - sales_year_ly)|abs / sales_year_ly) * 100) }} - {{ "${:,.0f}".format(sales_year_ly) }}</span> YTD</p>
             </div>
             {% endif %}
         </div>
@@ -123,10 +123,10 @@
           </div>
           <div class="card-body">
             <h6 class="mb-0 ">Week to Date Sales</h6>
-            {% if weekly_totals.total_sales > weekly_totals.total_sales_ly %}
-            <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.0f}".format(weekly_totals.total_sales - weekly_totals.total_sales_ly) }} over last year</p>
+            {% if sales_week > sales_week_ly %}
+            <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.0f}".format(sales_week - sales_week_ly) }} over last year</p>
             {% else %}
-            <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.0f}".format(weekly_totals.total_sales - weekly_totals.total_sales_ly) }} below last year</p>
+            <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.0f}".format(sales_week - sales_week_ly) }} below last year</p>
             {% endif %}
           </div>
         </div>
@@ -142,10 +142,10 @@
           </div>
           <div class="card-body">
             <h6 class="mb-0 ">Period to Date Sales</h6>
-            {% if period_totals.total_sales > period_totals.total_sales_ly %}
-            <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.0f}".format(period_totals.total_sales - period_totals.total_sales_ly) }} over last year</p>
+            {% if sales_period > sales_period_ly %}
+            <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.0f}".format(sales_period - sales_period_ly) }} over last year</p>
             {% else %}
-            <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.0f}".format(period_totals.total_sales - period_totals.total_sales_ly) }} below last year</p>
+            <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.0f}".format(sales_period - sales_period_ly) }} below last year</p>
             {% endif %}
           </div>
         </div>
@@ -161,10 +161,10 @@
           </div>
           <div class="card-body">
             <h6 class="mb-0 ">Year to Date Sales</h6>
-            {% if yearly_totals.total_sales > yearly_totals.total_sales_ly %}
-            <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.0f}".format(yearly_totals.total_sales - yearly_totals.total_sales_ly) }} over last year</p>
+            {% if sales_year > sales_year_ly %}
+            <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.0f}".format(sales_year - sales_year_ly) }} over last year</p>
             {% else %}
-            <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.0f}".format(yearly_totals.total_sales - yearly_totals.total_sales_ly) }} below last year</p>
+            <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.0f}".format(sales_year - sales_year_ly) }} below last year</p>
             {% endif %}
           </div>
         </div>
@@ -176,11 +176,6 @@
         <div class="card">
           <div class="card-header pb-0">
             <div class="row">
-              {% for x in fiscal_dates %}
-                <div class="col-lg-6 col-7">
-                  <h6>Week - {{ x.week }}</h6>
-                </div>
-              {% endfor %}
             </div>
           </div>
           <div class="row g-2">
@@ -188,9 +183,6 @@
               <div class="card text-white bg-primary" style"max-width: 18rem;">
                   <div class="card-body">
                     <h5 class="card-title">FOOD</h5>
-                    <p class="card-text-light font-weight-bold">SALES - {{ "${:,.0f}".format(weekly_totals.food) }}</p>
-                    <p class="card-text-light font-weight-bold">PURCHASES - {{ "${:,.0f}".format(weekly_cogs['Beef'] + weekly_cogs['Dairy'] + weekly_cogs['Food Other'] + weekly_cogs['Produce'] + weekly_cogs['Pork'] + weekly_cogs['Poultry'] + weekly_cogs['Seafood']) }}</p>
-                    <p class="card-text-light font-weight-bold">COST % - {{ "{:.1f}%".format((weekly_cogs['Beef'] + weekly_cogs['Dairy'] + weekly_cogs['Food Other'] + weekly_cogs['Produce'] + weekly_cogs['Pork'] + weekly_cogs['Poultry'] + weekly_cogs['Seafood'])/weekly_totals['food'] * 100) }} </p>
                   </div>
               </div>
             </div>
@@ -198,9 +190,6 @@
               <div class="card text-white bg-success" style"max-width: 18rem;">
                   <div class="card-body">
                     <h5 class="card-title">BEER</h5>
-                    <p class="card-text-light font-weight-bold">SALES - {{ "${:,.0f}".format(weekly_totals.beer) }}</p>
-                    <p class="card-text-light font-weight-bold">PURCHASES - {{ "${:,.0f}".format(weekly_cogs['Beer']) }} </p>
-                    <p class="card-text-light font-weight-bold">COST % - {{ "{:.1f}%".format(weekly_cogs['Beer']/weekly_totals['beer'] * 100) }} </p>
                   </div>
               </div>
             </div>
@@ -208,9 +197,6 @@
               <div class="card text-white bg-info" style"max-width: 18rem;">
                   <div class="card-body">
                     <h5 class="card-title">LIQUOR</h5>
-                    <p class="card-text-light font-weight-bold">SALES - {{ "${:,.0f}".format(weekly_totals.liquor) }}</p>
-                    <p class="card-text-light font-weight-bold">PURCHASES - {{ "${:,.0f}".format(weekly_cogs['Liquor']) }} </p>
-                    <p class="card-text-light font-weight-bold">COST % - {{ "{:.1f}%".format(weekly_cogs['Liquor']/weekly_totals['liquor'] * 100) }} </p>
                   </div>
               </div>
             </div>
@@ -218,9 +204,6 @@
               <div class="card text-white bg-warning" style"max-width: 18rem;">
                   <div class="card-body">
                     <h5 class="card-title">WINE</h5>
-                    <p class="card-text-light font-weight-bold">SALES - {{ "${:,.0f}".format(weekly_totals.wine) }}</p>
-                    <p class="card-text-light font-weight-bold">PURCHASES - {{ "${:,.0f}".format(weekly_cogs['Wine']) }} </p>
-                    <p class="card-text-light font-weight-bold">COST %- {{ "{:.1f}%".format(weekly_cogs['Wine']/weekly_totals['wine'] * 100) }} </p>
                   </div>
               </div>
             </div>
@@ -239,9 +222,6 @@
               <div class="card text-white bg-primary" style"max-width: 18rem;">
                   <div class="card-body">
                     <h5 class="card-title">FOOD</h5>
-                    <p class="card-text-light font-weight-bold">SALES - {{ "${:,.0f}".format(period_totals.food) }}</p>
-                    <p class="card-text-light font-weight-bold">PURCHASES - {{ "${:,.0f}".format(period_cogs['Beef'] + period_cogs['Dairy'] + period_cogs['Food Other'] + period_cogs['Produce'] + period_cogs['Pork'] + period_cogs['Poultry'] + period_cogs['Seafood']) }}</p>
-                    <p class="card-text-light font-weight-bold">COST % - {{ "{:.1f}%".format((period_cogs['Beef'] + period_cogs['Dairy'] + period_cogs['Food Other'] + period_cogs['Produce'] + period_cogs['Pork'] + period_cogs['Poultry'] + period_cogs['Seafood'])/period_totals['food'] * 100) }} </p>
                   </div>
               </div>
             </div>
@@ -249,9 +229,6 @@
               <div class="card text-white bg-success" style"max-width: 18rem;">
                   <div class="card-body">
                     <h5 class="card-title">BEER</h5>
-                    <p class="card-text-light font-weight-bold">SALES - {{ "${:,.0f}".format(period_totals.beer) }}</p>
-                    <p class="card-text-light font-weight-bold">PURCHASES - {{ "${:,.0f}".format(period_cogs['Beer']) }} </p>
-                    <p class="card-text-light font-weight-bold">COST % - {{ "{:.1f}%".format(period_cogs['Beer']/period_totals['beer'] * 100) }} </p>
                   </div>
               </div>
             </div>
@@ -259,9 +236,6 @@
               <div class="card text-white bg-info" style"max-width: 18rem;">
                   <div class="card-body">
                     <h5 class="card-title">LIQUOR</h5>
-                    <p class="card-text-light font-weight-bold">SALES - {{ "${:,.0f}".format(period_totals.liquor) }}</p>
-                    <p class="card-text-light font-weight-bold">PURCHASES - {{ "${:,.0f}".format(period_cogs['Liquor']) }} </p>
-                    <p class="card-text-light font-weight-bold">COST % - {{ "{:.1f}%".format(period_cogs['Liquor']/period_totals['liquor'] * 100) }} </p>
                   </div>
               </div>
             </div>
@@ -269,9 +243,6 @@
               <div class="card text-white bg-warning" style"max-width: 18rem;">
                   <div class="card-body">
                     <h5 class="card-title">WINE</h5>
-                    <p class="card-text-light font-weight-bold">SALES - {{ "${:,.0f}".format(period_totals.wine) }}</p>
-                    <p class="card-text-light font-weight-bold">PURCHASES - {{ "${:,.0f}".format(period_cogs['Wine']) }} </p>
-                    <p class="card-text-light font-weight-bold">COST % - {{ "{:.1f}%".format(period_cogs['Wine']/period_totals['wine'] * 100) }} </p>
                   </div>
               </div>
             </div>
