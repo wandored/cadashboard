@@ -360,3 +360,30 @@ class Unitsofmeasure(db.Model):
     measure_type = db.Column(db.String(64))
     base_qty = db.Column(db.Float)
     base_uofm = db.Column(db.String(64))
+
+
+class Ingredients(db.Model):
+
+    __tablename__ = "Ingredients"
+
+    id = db.Column(db.Integer, primary_key=True)
+    item = db.Column(db.String(256))
+    recipe = db.Column(db.String(256))
+    qty = db.Column(db.Float)
+    uofm = db.Column(db.String(64))
+
+
+class Recipes(db.Model):
+
+    __tablename__ = "Recipes"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(256))
+    menuitem = db.Column(db.String(256))
+    cost = db.Column(db.Float)
+    recipe = db.Column(db.String(256))
+    category1 = db.Column(db.String(64))
+    category2 = db.Column(db.String(64))
+    posid = db.Column(db.Integer)
+    recipeid = db.Column(db.String(64))
+    menuitemid = db.Column(db.String(64))

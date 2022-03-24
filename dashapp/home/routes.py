@@ -23,6 +23,7 @@ from flask_security import login_required, current_user
 from datetime import datetime, timedelta
 from dashapp.authentication.forms import DateForm, StoreForm, UpdateForm, PotatoForm
 from dashapp.authentication.models import (
+    Ingredients,
     Menuitems,
     db,
     Calendar,
@@ -33,6 +34,7 @@ from dashapp.authentication.models import (
     Transactions,
     Potatoes,
     Unitsofmeasure,
+    Recipes,
 )
 from sqlalchemy import and_, or_, func
 
@@ -240,8 +242,8 @@ def index():
     daily_table = sales_table.merge(labor_table, how="outer", sort=True)
 
     # List of stores to add ID so i can pass to other templates
-    store_list = Restaurants.query.all()
-    store_list = pd.DataFrame([x.as_dict() for x in store_list])
+    data = Restaurants.query.all()
+    store_list = pd.DataFrame([x.as_dict() for x in data])
     daily_table = daily_table.merge(store_list, how="left")
 
     daily_table.set_index("name", inplace=True)
@@ -529,6 +531,19 @@ def store(store_id):
         year = i.year
         week = i.week
 
+        # Used to calculate usages previous week
+        week_start = datetime.strptime(i.week_start, "%Y-%m-%d")
+        lws = week_start - timedelta(days=7)
+        start_previous_week = lws.strftime("%Y-%m-%d")
+        week_end = datetime.strptime(i.week_end, "%Y-%m-%d")
+        lwe = week_end - timedelta(days=7)
+        end_previous_week = lwe.strftime("%Y-%m-%d")
+        
+        seven = day_start - timedelta(days=7)
+        last_seven = seven.strftime("%Y-%m-%d")
+        thirty = day_start - timedelta(days=30)
+        last_thirty = thirty.strftime("%Y-%m-%d")
+
     # Get matching day, week and period start and end dates
     start_day_ly = get_lastyear(start_day)
     start_week_ly = get_lastyear(start_week)
@@ -541,8 +556,8 @@ def store(store_id):
     end_year_ly = get_lastyear(end_year)
     year_to_date = get_lastyear(start_day)
 
-    store_list = Restaurants.query.all()
-    store_list = pd.DataFrame([x.as_dict() for x in store_list])
+    data = Restaurants.query.all()
+    store_list = pd.DataFrame([x.as_dict() for x in data])
 
     # Get Data
     form1 = DateForm()
@@ -621,10 +636,8 @@ def store(store_id):
 
     values1 = get_chart_values(start_week, end_week, Calendar.date)
     values1_ly = get_chart_values(start_week_ly, end_week_ly, Calendar.date)
-
     values2 = get_chart_values(start_period, end_period, Calendar.week)
     values2_ly = get_chart_values(start_period_ly, end_period_ly, Calendar.week)
-
     values3 = get_chart_values(start_year, end_year, Calendar.period)
     values3_ly = get_chart_values(start_year_ly, end_year_ly, Calendar.period)
 
@@ -639,144 +652,78 @@ def store(store_id):
     for v in budget_chart:
         budgets3.append(v.total_sales)
 
-    # Weekly Sales Table
-    food_sales = get_daily_sales(start_week, end_week, store.name, "FOOD")
-    beer_sales = get_daily_sales(start_week, end_week, store.name, "BEER")
-    liquor_sales = get_daily_sales(start_week, end_week, store.name, "LIQUOR")
-    wine_sales = get_daily_sales(start_week, end_week, store.name, "WINE")
-    gift_card_sales = get_daily_sales(start_week, end_week, store.name, "GIFT CARDS")
 
-    sales_table = food_sales.merge(beer_sales)
-    sales_table = sales_table.merge(liquor_sales)
-    sales_table = sales_table.merge(wine_sales)
-    sales_table = sales_table.merge(gift_card_sales, how="outer")
-    sales_table.rename(
-        columns={
-            "FOOD": "food",
-            "BEER": "beer",
-            "LIQUOR": "liquor",
-            "WINE": "wine",
-            "GIFT CARDS": "gift_cards",
-        },
-        inplace=True,
-    )
-    sales_table.fillna(value=0, inplace=True)
-    sales_table["alcohol_sales"] = (
-        sales_table.beer + sales_table.liquor + sales_table.wine
-    )
-    sales_table["total_sales"] = sales_table.food + sales_table.alcohol_sales
-    sales_table["net_sales"] = sales_table.total_sales + sales_table.gift_cards
+    def sales_labor_table(start, end):
+        # Build sales and labor stats for the time period given
 
-    # Weekly Labor
-    bar_labor = get_daily_labor(start_week, end_week, store.name, "Bar")
-    host_labor = get_daily_labor(start_week, end_week, store.name, "Host")
-    restaurant_labor = get_daily_labor(start_week, end_week, store.name, "Restaurant")
-    kitchen_labor = get_daily_labor(start_week, end_week, store.name, "Kitchen")
+        food_sales = get_daily_sales(start, end, store.name, "FOOD")
+        beer_sales = get_daily_sales(start, end, store.name, "BEER")
+        liquor_sales = get_daily_sales(start, end, store.name, "LIQUOR")
+        wine_sales = get_daily_sales(start, end, store.name, "WINE")
+        gift_card_sales = get_daily_sales(start, end, store.name, "GIFT CARDS")
 
-    labor_table = bar_labor.merge(host_labor)
-    labor_table = labor_table.merge(restaurant_labor)
-    labor_table = labor_table.merge(kitchen_labor)
-    labor_table.fillna(value=0, inplace=True)
+        sales_table = food_sales.merge(beer_sales)
+        sales_table = sales_table.merge(liquor_sales)
+        sales_table = sales_table.merge(wine_sales)
+        sales_table = sales_table.merge(gift_card_sales, how="outer")
+        sales_table.rename(
+            columns={
+                "FOOD": "food",
+                "BEER": "beer",
+                "LIQUOR": "liquor",
+                "WINE": "wine",
+                "GIFT CARDS": "gift_cards",
+            },
+            inplace=True,
+        )
+        sales_table.fillna(value=0, inplace=True)
+        sales_table["alcohol_sales"] = (
+            sales_table.beer + sales_table.liquor + sales_table.wine
+        )
+        sales_table["total_sales"] = sales_table.food + sales_table.alcohol_sales
+        sales_table["net_sales"] = sales_table.total_sales + sales_table.gift_cards
 
-    labor_table["Total_Labor"] = (
-        labor_table.Bar
-        + labor_table.Host
-        + labor_table.Restaurant
-        + labor_table.Kitchen
-    )
+        # Labor
+        bar_labor = get_daily_labor(start, end, store.name, "Bar")
+        host_labor = get_daily_labor(start, end, store.name, "Host")
+        restaurant_labor = get_daily_labor(start, end, store.name, "Restaurant")
+        kitchen_labor = get_daily_labor(start, end, store.name, "Kitchen")
 
-    join_data = labor_table[
-        [
-            "Bar",
-            "Host",
-            "Restaurant",
-            "Kitchen",
-            "Total_Labor",
+        labor_table = bar_labor.merge(host_labor)
+        labor_table = labor_table.merge(restaurant_labor)
+        labor_table = labor_table.merge(kitchen_labor)
+        labor_table.fillna(value=0, inplace=True)
+
+        labor_table["Total_Labor"] = (
+            labor_table.Bar
+            + labor_table.Host
+            + labor_table.Restaurant
+            + labor_table.Kitchen
+        )
+
+        join_data = labor_table[
+            [
+                "Bar",
+                "Host",
+                "Restaurant",
+                "Kitchen",
+                "Total_Labor",
+            ]
         ]
-    ]
-    weekly_table = sales_table.join(join_data)
-    weekly_table["Labor_pct"] = weekly_table.Total_Labor / weekly_table.total_sales
-    weekly_table["Bar_pct"] = weekly_table.Bar / (weekly_table.alcohol_sales)
-    weekly_table["Host_pct"] = weekly_table.Host / (weekly_table.food)
-    weekly_table["Restaurant_pct"] = weekly_table.Restaurant / (weekly_table.food)
-    weekly_table["Kitchen_pct"] = weekly_table.Kitchen / (weekly_table.food)
-    weekly_table["name"] = store.name
+        _table = sales_table.join(join_data)
+        _table["Labor_pct"] = _table.Total_Labor / _table.total_sales
+        _table["Bar_pct"] = _table.Bar / (_table.alcohol_sales)
+        _table["Host_pct"] = _table.Host / (_table.food)
+        _table["Restaurant_pct"] = _table.Restaurant / (_table.food)
+        _table["Kitchen_pct"] = _table.Kitchen / (_table.food)
+        _table["name"] = store.name
 
-    weekly_table = weekly_table.merge(store_list, how="left")
-    weekly_totals = weekly_table.sum()
+        _table = _table.merge(store_list, how="left")
+        totals = _table.sum()
+        return totals
 
-    # Period Sales Table
-    dates = Calendar.query.filter(Calendar.date.between(start_period, end_period)).all()
-    dates = pd.DataFrame([x.as_dict() for x in dates])
-
-    food_sales = get_daily_sales(start_period, end_period, store.name, "FOOD")
-    beer_sales = get_daily_sales(start_period, end_period, store.name, "BEER")
-    liquor_sales = get_daily_sales(start_period, end_period, store.name, "LIQUOR")
-    wine_sales = get_daily_sales(start_period, end_period, store.name, "WINE")
-    gift_card_sales = get_daily_sales(
-        start_period, end_period, store.name, "GIFT CARDS"
-    )
-
-    sales_table = food_sales.merge(beer_sales)
-    sales_table = sales_table.merge(liquor_sales)
-    sales_table = sales_table.merge(wine_sales)
-    sales_table = sales_table.merge(gift_card_sales, how="outer")
-    sales_table.rename(
-        columns={
-            "FOOD": "food",
-            "BEER": "beer",
-            "LIQUOR": "liquor",
-            "WINE": "wine",
-            "GIFT CARDS": "gift_cards",
-        },
-        inplace=True,
-    )
-    sales_table.fillna(value=0, inplace=True)
-
-    sales_table["alcohol_sales"] = (
-        sales_table.beer + sales_table.liquor + sales_table.wine
-    )
-    sales_table["total_sales"] = sales_table.food + sales_table.alcohol_sales
-    sales_table["net_sales"] = sales_table.total_sales + sales_table.gift_cards
-
-    # Period Labor
-    bar_labor = get_daily_labor(start_period, end_period, store.name, "Bar")
-    host_labor = get_daily_labor(start_period, end_period, store.name, "Host")
-    restaurant_labor = get_daily_labor(
-        start_period, end_period, store.name, "Restaurant"
-    )
-    kitchen_labor = get_daily_labor(start_period, end_period, store.name, "Kitchen")
-
-    labor_table = bar_labor.merge(host_labor)
-    labor_table = labor_table.merge(restaurant_labor)
-    labor_table = labor_table.merge(kitchen_labor)
-    labor_table.fillna(value=0, inplace=True)
-
-    labor_table["Total_Labor"] = (
-        labor_table.Bar
-        + labor_table.Host
-        + labor_table.Restaurant
-        + labor_table.Kitchen
-    )
-    join_data = labor_table[
-        [
-            "Bar",
-            "Host",
-            "Restaurant",
-            "Kitchen",
-            "Total_Labor",
-        ]
-    ]
-    period_table = sales_table.join(join_data)
-    period_table["Labor_pct"] = period_table.Total_Labor / period_table.total_sales
-    period_table["Bar_pct"] = period_table.Bar / (period_table.alcohol_sales)
-    period_table["Host_pct"] = period_table.Host / (period_table.food)
-    period_table["Restaurant_pct"] = period_table.Restaurant / (period_table.food)
-    period_table["Kitchen_pct"] = period_table.Kitchen / (period_table.food)
-    period_table["name"] = store.name
-
-    period_table = period_table.merge(store_list, how="left")
-    period_totals = period_table.sum()
+    weekly_totals = sales_labor_table(start_week, end_week)
+    period_totals = sales_labor_table(start_period, end_period)
 
     lobster_items = []
     stone_items = []
@@ -849,6 +796,168 @@ def store(store_id):
         feature = get_fish("SEAFOOD Feature Fish")
         salmon = get_fish("^(SEAFOOD) (Salmon)$")
 
+
+    # Chicken & Steak Order
+    def get_purchases(regex, days):
+        #
+        item_list = []
+        items = (
+            Transactions.query.with_entities(
+                Transactions.item,
+            )
+            .distinct(
+                Transactions.item
+            )
+            .filter(
+                Transactions.item.regexp_match(regex),
+                Transactions.name == store.name,
+                Transactions.date >= days,
+                Transactions.type == "AP Invoice",
+            )
+            .order_by(
+                Transactions.item,
+            )
+        ).all()
+        [item_list.append(y) for x in items for y in x]
+        return item_list
+
+    def get_unit_values(start, end, time, regex, items):
+        chart = (
+            db.session.query(func.sum(Menuitems.amount).label("sales"))
+            .select_from(Menuitems)
+            .join(Calendar, Calendar.date == Menuitems.date)
+            .group_by(time)
+            .order_by(time)
+            .filter(
+                Menuitems.date.between(start, end),
+                Menuitems.menuitem.regexp_match(regex),
+                Menuitems.menuitem.in_(items),
+            )
+        )
+        value = []
+        for v in chart:
+            value.append(int(v.sales))
+
+        return value
+
+    def get_unit_sales(start, end, list):
+        query = (
+            db.session.query(
+                Menuitems.menuitem,
+                func.sum(Menuitems.quantity).label("count"),
+            )
+            .filter(
+                Menuitems.date.between(start, end),
+                Menuitems.menuitem.in_(list),
+                Menuitems.name == store.name,
+            )
+            .group_by(Menuitems.menuitem)
+        ).all()
+        sales = pd.DataFrame.from_records(
+            query, columns=["menuitem", "quantity"]
+        )
+        return sales
+
+
+    def get_order_table(regex):
+        '''
+        Get a list of items purchased in last 30 days
+        check if used in any prep recipesselfself.
+        Match each item with POS menuitem for last week
+        and same week last year and calculate average
+        '''
+        prep_item_list = []
+        item_list = []
+        # Get list of items purchased in last 30 days
+        items = (
+            Transactions.query.with_entities(
+                Transactions.item,
+            )
+            .distinct(
+                Transactions.item
+            )
+            .filter(
+                Transactions.item.regexp_match(regex),
+                Transactions.name == store.name,
+                Transactions.date >= last_thirty,
+                Transactions.type == "AP Invoice",
+            )
+            .order_by(
+                Transactions.item,
+            )
+        ).all()
+        [item_list.append(y) for x in items for y in x]
+
+        for i in item_list:
+            print(i)
+            # Get all recipes with ingredient i
+            recipe_lst =(
+                db.session.query(Ingredients.item,
+                                 Ingredients.recipe,
+                                 Ingredients.qty,
+                                 Ingredients.uofm)
+                .filter(
+                    Ingredients.item == i
+                )
+            ).all()
+            for x in recipe_lst:
+                # account for recipes with prep items for ingredients
+                if re.search(r'^PREP', x.recipe):
+                    prep_lst =(
+                        db.session.query(Ingredients.item,
+                                         Ingredients.recipe,
+                                         Ingredients.qty,
+                                         Ingredients.uofm)
+                        .filter(
+                            Ingredients.item == x.recipe
+                        )
+                    ).all()
+                    if not prep_lst:
+                        continue
+                    # Replace the prep item with the original steak
+                    row_dict = dict(prep_lst[0])
+                    row_dict.update(item=i)
+                    prep_item_list.append(row_dict)
+                if re.search(r'^MENU', x.recipe):
+                    prep_item_list.append(x)
+        menu_list = []
+        for p in prep_item_list:
+ #           pack_size = (
+ #               db.session.query(Unitsofmeasure)
+ #               .filter(Unitsofmeasure.name == p['uofm'])
+ #               .first()
+ #           )
+ #           if pack_size:
+ #               weight = pack_size.base_qty / 16
+ #           else:
+ #               weight = 1
+            recipes = (
+                db.session.query(Recipes)
+                .filter(Recipes.recipe == p['recipe'],
+                        Recipes.name == store.name)
+                .first()
+            )
+            if recipes:
+                row_dict = dict(p)
+                row_dict["menuitem"] = recipes.menuitem
+                menu_list.append(row_dict)
+        df = pd.DataFrame(menu_list)
+        unit_list = df.loc[:, 'menuitem']
+        unit_sales = get_unit_sales(start_previous_week, end_previous_week, unit_list)
+        df = df.merge(unit_sales, on='menuitem', how='outer')
+        df['last_week'] = df['qty'] * df['quantity'].astype(float)
+        unit_sales = get_unit_sales(start_week_ly, end_week_ly, unit_list)
+        df = df.merge(unit_sales, on='menuitem', how='outer')
+        df['last_year'] = df['qty'] * df['quantity_y'].astype(float)
+        df.drop(['recipe', 'qty'], axis=1, inplace=True)
+        order = df.groupby(["item", 'uofm']).sum()
+        
+        return order
+
+    steak_order = get_order_table("^(BEEF Steak)")
+    # chicken_order = get_order_table("^(PLTRY Chicken)")
+
+
     return render_template(
         "home/store.html",
         title=store.name,
@@ -876,30 +985,20 @@ def store(store_id):
         values2_ly=values2_ly,
         values3_ly=values3_ly,
         budgets3=budgets3,
-        # daily_table=daily_table,
-        #        weekly_table=weekly_table,
         weekly_totals=weekly_totals,
-        #        period_table=period_table,
         period_totals=period_totals,
-        #        period_table_w1=period_table_w1,
-        #        period_table_w2=period_table_w2,
-        #        period_table_w3=period_table_w3,
-        #        period_table_w4=period_table_w4,
-        #        yearly_table=yearly_table,
-        # yearly_totals=yearly_totals,
-        # weekly_cogs=weekly_cogs,
-        # period_cogs=period_cogs,
         lobster_items=lobster_items,
         stone_items=stone_items,
         sea_bass=sea_bass,
         salmon=salmon,
         feature=feature,
+        steak_order=steak_order,
     )
 
 
 @blueprint.route("/marketing/", methods=["GET", "POST"])
 @login_required
-def marketing(targetdate=None):
+def marketing():
 
     start_day = (
         end_day
@@ -1097,7 +1196,7 @@ def marketing(targetdate=None):
 
 @blueprint.route("/purchasing/", methods=["GET", "POST"])
 @login_required
-def purchasing(targetdate=None):
+def purchasing():
 
     start_day = (
         end_day
@@ -1135,8 +1234,7 @@ def purchasing(targetdate=None):
     # Get list of Restaurants
     store_list = []
     data = db.session.query(Restaurants.name).all()
-    for i in data:
-        store_list.append(i.name)
+    store_list = pd.DataFrame([x.as_dict() for x in data])
 
     form1 = DateForm()
     form3 = StoreForm()
@@ -1350,7 +1448,7 @@ def purchasing(targetdate=None):
 @blueprint.route("/support/", methods=["GET", "POST"])
 @login_required
 @roles_accepted("admin")
-def support(targetdate=None):
+def support():
 
     start_day = (
         end_day
@@ -1461,7 +1559,7 @@ def support(targetdate=None):
 
 @blueprint.route("/alcohol/", methods=["GET", "POST"])
 @login_required
-def alcohol(targetdate=None):
+def alcohol():
 
     start_day = (
         end_day
@@ -1499,8 +1597,7 @@ def alcohol(targetdate=None):
     # Get list of Restaurants
     store_list = []
     data = db.session.query(Restaurants.name).all()
-    for i in data:
-        store_list.append(i.name)
+    store_list = pd.DataFrame([x.as_dict() for x in data])
 
     form1 = DateForm()
     form3 = StoreForm()
@@ -1679,7 +1776,7 @@ def alcohol(targetdate=None):
 
 @blueprint.route("/profile/", methods=["GET", "POST"])
 @login_required
-def profile(targetdate=None):
+def profile():
 
     start_day = (
         end_day
@@ -1717,8 +1814,7 @@ def profile(targetdate=None):
     # Get list of Restaurants
     store_list = []
     data = db.session.query(Restaurants.name).all()
-    for i in data:
-        store_list.append(i.name)
+    store_list = pd.DataFrame([x.as_dict() for x in data])
 
     form1 = DateForm()
     form3 = StoreForm()
@@ -1769,9 +1865,9 @@ def potato(store_id):
         pot_df = pot_df.merge(df, on="time", how="outer")
 
     pot_df.fillna(0, inplace=True)
-    pot_df["AVG"] = pot_df.mean(axis=1)
-    pot_df["MEDIAN"] = pot_df.median(axis=1)
-    pot_df["MAX"] = pot_df.max(axis=1)
+    pot_df.loc[:, "AVG"] = pot_df.mean(axis=1)
+    pot_df.loc[:, "MEDIAN"] = pot_df.median(axis=1)
+    pot_df.loc[:, "MAX"] = pot_df.max(axis=1)
     out_times = pd.read_csv(
         "/usr/local/share/potatochart.csv", usecols=["time", "in_time", "out_time"]
     )

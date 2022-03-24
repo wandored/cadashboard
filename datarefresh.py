@@ -99,7 +99,7 @@ def sales_detail(start, end):
         values=["amount", "quantity"],
         aggfunc=np.sum,
     )
-    menu_pivot["date"] = start
+    menu_pivot.loc[:, "date"] = start
     menu_pivot.to_sql("Menuitems", engine, if_exists="append")
     conn.commit()
 
@@ -132,7 +132,7 @@ def sales_employee(start, end):
     df_pivot = df_merge.pivot_table(
         index=["name", "daypart"], values=["sales", "guests"], aggfunc=np.sum
     )
-    df_pivot["date"] = start
+    df_pivot.loc[:, "date"] = start
     df_pivot.to_sql("Sales", engine, if_exists="append")
     conn.commit()
 
@@ -161,8 +161,8 @@ def labor_datail(start, end):
 
     cur.execute(rest_query)
     data = cur.fetchall()
-    df_loc = pd.DataFrame.from_records(data, columns=["id", "location", "name"])
-    df_merge = df_loc.merge(df, left_on="location", right_on="location_ID")
+    df_location = pd.DataFrame.from_records(data, columns=["id", "location", "name"])
+    df_merge = df_location.merge(df, left_on="location", right_on="location_ID")
     df_merge.rename(columns={"jobTitle": "job", "total": "dollars"}, inplace=True)
     df_merge = df_merge.merge(df_cats, on="job")
 
@@ -170,7 +170,7 @@ def labor_datail(start, end):
     df_pivot = df_merge.pivot_table(
         index=["name", "category", "job"], values=["hours", "dollars"], aggfunc=np.sum
     )
-    df_pivot["date"] = start
+    df_pivot.loc[:, "date"] = start
     df_pivot.to_sql("Labor", engine, if_exists="append")
     conn.commit()
 
@@ -183,9 +183,9 @@ def potato_sales(start):
     with open("/usr/local/share/potatochart.csv") as f:
         times = csv.reader(f)
         next(times)
-        for i in times:
+        for t in times:
             url_filter = "$filter=date ge {}T{}Z and date le {}T{}Z".format(
-                start, i[2], start, i[3]
+                start, t[2], start, t[3]
             )
             query = "$select=menuitem,date,quantity,location&{}".format(url_filter)
             url = "{}/SalesDetail?{}".format(Config.SRVC_ROOT, query)
@@ -200,10 +200,10 @@ def potato_sales(start):
             df_loc = pd.DataFrame.from_records(data, columns=["id", "location", "name"])
             df_merge = df_loc.merge(df, on="location")
             if df_merge.empty:
-                print(f"no sales at {i[0]}")
+                print(f"no sales at {t[0]}")
                 if df_pot.empty:
                     continue
-                df_pot.loc[i[0]] = [0]
+                df_pot.loc[t[0]] = [0]
                 continue
             df_merge.drop(columns=["location"], inplace=True)
             df_menu = df_merge
@@ -238,9 +238,9 @@ def potato_sales(start):
             df = df_clean[df_clean["menuitem"].isin(pot_list)]
             if df.empty:
                 continue
-            df["time"] = i[0]
-            df["in_time"] = i[1]
-            df["out_time"] = i[4]
+            df.loc[:, "time"] = t[0]
+            df.loc[:, "in_time"] = t[1]
+            df.loc[:, "out_time"] = t[4]
             df_pot = df_pot.append(df)
 
         # Write the daily menu items to Menuitems table
@@ -249,7 +249,7 @@ def potato_sales(start):
             values=["quantity"],
             aggfunc=np.sum,
         )
-    menu_pivot["date"] = start
+    menu_pivot.loc[:, "date"] = start
     menu_pivot.to_sql("Potatoes", engine, if_exists="append")
     conn.commit()
 

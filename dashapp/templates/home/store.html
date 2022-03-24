@@ -173,80 +173,53 @@
     <!-- Food & Alcohol Sales -->
     <div class="row mb-4">
       <div class="col-lg-8 col-md-6 mb-md-0 mb-4">
-        <div class="card">
-          <div class="card-header pb-0">
-            <div class="row">
-            </div>
-          </div>
+        <div class="card-header">
+          <h4>Steak Order</h4>
           <div class="row g-2">
-            <div class="col-md-3 col-md-0">
-              <div class="card text-white bg-primary" style"max-width: 18rem;">
-                  <div class="card-body">
-                    <h5 class="card-title">FOOD</h5>
-                  </div>
+            <div class="col-lg-6 mt-4 mb-3">
+              <div class="card-body text-white bg-gradient-info">
+                <div class="table-responsive">
+                  <table class="table-sm">
+                    <thead>
+                      <tr>
+                        <th scope="col">STEAK</th>
+                        <th scope="col">UofM</th>
+                        <th scope="col">LAST YEAR</th>
+                        <th scope="col">LAST WEEK</th>
+                        <th scope="col">AVG/DAY</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for k, v in steak_order.iterrows() %}
+                          <tr>
+                            <th scope="row">{{ k[0] }}</th>
+                            <td>
+                              <p class="mb-0 ms-1 text-begin">{{ k[1] }}</p>
+                            </td>
+                            <td>
+                              <p class="mb-0 ms-1 text-begin">{{ v['last_year'] }}</p>
+                            </td>
+                            <td>
+                              <p class="mb-0 ms-1 text-begin">{{ v['last_week'] }}</p>
+                            </td>
+                            <td>
+                              <p class="mb-0 ms-1 text-begin">{{ "{:,.0f}".format((v['last_week'])/7) }}</p>
+                            </td>
+                          </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
-            <div class="col-md-3 col-md-0">
-              <div class="card text-white bg-success" style"max-width: 18rem;">
-                  <div class="card-body">
-                    <h5 class="card-title">BEER</h5>
-                  </div>
-              </div>
-            </div>
-            <div class="col-md-3 col-md-0">
-              <div class="card text-white bg-info" style"max-width: 18rem;">
-                  <div class="card-body">
-                    <h5 class="card-title">LIQUOR</h5>
-                  </div>
-              </div>
-            </div>
-            <div class="col-md-3 col-md-0">
+            <div class="col-lg-6 mt-4 mb-3">
               <div class="card text-white bg-warning" style"max-width: 18rem;">
                   <div class="card-body">
-                    <h5 class="card-title">WINE</h5>
+                    <h5 class="card-title"></h5>
                   </div>
               </div>
             </div>
           </div><!-- row -->
-          <div class="card-header pb-0">
-            <div class="row">
-              {% for x in fiscal_dates %}
-              <div class="col-lg-6 col-7">
-                <h6>Period - {{ x.period }}</h6>
-              </div>
-              {% endfor %}
-            </div>
-          </div>
-          <div class="row g-2">
-            <div class="col-md-3 col-md-0">
-              <div class="card text-white bg-primary" style"max-width: 18rem;">
-                  <div class="card-body">
-                    <h5 class="card-title">FOOD</h5>
-                  </div>
-              </div>
-            </div>
-            <div class="col-md-3 col-md-0">
-              <div class="card text-white bg-success" style"max-width: 18rem;">
-                  <div class="card-body">
-                    <h5 class="card-title">BEER</h5>
-                  </div>
-              </div>
-            </div>
-            <div class="col-md-3 col-md-0">
-              <div class="card text-white bg-info" style"max-width: 18rem;">
-                  <div class="card-body">
-                    <h5 class="card-title">LIQUOR</h5>
-                  </div>
-              </div>
-            </div>
-            <div class="col-md-3 col-md-0">
-              <div class="card text-white bg-warning" style"max-width: 18rem;">
-                  <div class="card-body">
-                    <h5 class="card-title">WINE</h5>
-                  </div>
-              </div>
-            </div>
-          </div>
         </div><!-- card header -->
       </div><!-- card -->
       <!-- scorecard -->
@@ -588,7 +561,6 @@
               <h4>FEATURE FISH LAST 5 PURCHASES</h4>
               {% endfor %}
             </div>
-            <div class="card">
               <div class="table-responsive">
                 <table class="table-sm">
                   <thead>
@@ -623,20 +595,17 @@
                   </tbody>
                 </table>
               </div>
-            </div>
           </div>
         </div>
       {% endif %}
     </div><!-- row -->
+    <div class="row mb-4">
         <div class="col-xl-3 col-lg-6 mb-xl-0 mb-4">
           <div class="card">
             <div class="card-header bg-secondary pb-0" style="text-align:center">
               <h4>POTATO LOADING CHART</h4>
             </div>
             <div class="card">
-              {% for x in fiscal_dates %}
-              <p class="mb-0 ms-1 text-center"></p>
-              {% endfor %}
               <form method="POST" action="" style="text-align:center">
                 <h6>Click Submit to generate a potato loading chart</h6>
                 {{ form4.hidden_tag() }}
@@ -647,6 +616,48 @@
             </div>
           </div>
         </div>
+        <div class="col-lg-4 mt-4 mb-3">
+          <div class="card">
+            <div class="card-header bg-secondary pb-0">
+              <h4>STEAK ORDER</h4>
+            </div>
+              <div class="table-responsive">
+                <table class="table-sm">
+                  <thead>
+                    <tr>
+                      <th scope="col">STEAK</th>
+                      <th scope="col">UofM</th>
+                      <th scope="col">LAST YEAR</th>
+                      <th scope="col">LAST WEEK</th>
+                      <th scope="col">AVG/DAY</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for k, v in steak_order.iterrows() %}
+                        <tr>
+                          <th scope="row">{{ k[0] }}</th>
+                          <td>
+                            <p class="mb-0 ms-1 text-begin">{{ k[1] }}</p>
+                          </td>
+                          <td>
+                            <p class="mb-0 ms-1 text-begin">{{ v['last_year'] }}</p>
+                          </td>
+                          <td>
+                            <p class="mb-0 ms-1 text-begin">{{ v['last_week'] }}</p>
+                          </td>
+                          <td>
+                            <p class="mb-0 ms-1 text-begin">{{ "{:,.0f}".format((v['last_week'])/7) }}</p>
+                          </td>
+                        </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+          </div>
+        </div>
+        <div class="col-lg-6 mt-4 mb-3">
+        </div>
+    </div><!-- row -->
 
     {% include 'includes/footer.html' %}
 
