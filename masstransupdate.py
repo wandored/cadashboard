@@ -1,14 +1,13 @@
 """
-transactionupdate imports the previous days data and
+transactionupdate imports the previous 7 days data and
 uploads it to the local database.  This is run
 from a cron job
 """
 import json
 from sqlalchemy.engine.create import create_engine
-from datetime import datetime, timedelta
+from datetime import date, timedelta
 import requests
 import pandas as pd
-import numpy as np
 import psycopg2
 from dashapp import Config
 
@@ -35,21 +34,10 @@ def make_dataframe(sales):
     return df
 
 
-def removeSpecial(df):
-    """Removes specialty items from the menuitems dataframe"""
-    file = open("/usr/local/share/specialty.txt")
-    specialty_list = file.read().split("\n")
-    file.close
-    for item in specialty_list:
-        df = df.drop(df[df.menuitem == item].index)
-    return df
-
-
 def transaction(id_list):
 
     rqst_list = []
     for i in id_list:
-        print(".", end="")
         url_filter = "$filter=transactionId eq {}".format(i)
         query = "$select=date,name,type,locationId,transactionId,companyId&{}".format(
             url_filter
@@ -159,21 +147,20 @@ if __name__ == "__main__":
     cur = conn.cursor()
     rest_query = 'select * from "Restaurants"'
 
-    # This part is for multi-day loading of data
-    df_cal = pd.read_csv("./scripts/calendar.csv")
-    select = df_cal.loc[737:989, "date"]
-    #    select = ['2021-12-29', '2021-12-30', '2021-12-31']
-    for d in select:
-        dt = datetime.strptime(d, "%Y-%m-%d")
+    TODAY = date.today()
+    for d in range(7):
+        dt = TODAY - timedelta(days=d)
+        print(f"date {dt}")
         tmrw = dt + timedelta(days=1)
         start_date = dt.strftime("%Y-%m-%d")
         end_date = tmrw.strftime("%Y-%m-%d")
+
         df_items = Items()
         df_trans = transactionDetails(start_date, end_date)
         id_list = df_trans["transactionId"].tolist()
         id_list = list(dict.fromkeys(id_list))
-        print(len(id_list))
-        index = len(id_list) - 1
+        print(f"transaction total: {len(id_list)}")
+        # index = len(id_list) - 1
         if df_trans["itemId"].any():
             for x in id_list:
                 cur.execute('DELETE FROM "Transactions" WHERE trans_id = %s', (x,))
@@ -181,27 +168,6 @@ if __name__ == "__main__":
             df_type = transaction(id_list)
             # call function only if there are AP items
             write_to_database(df_type, df_items, df_trans)
-            print(f"{d} completed")
-
-    #    TODAY = datetime.date(datetime.now())
-    #    YSTDAY = TODAY - timedelta(days=1)
-    #    TOMROW = TODAY + timedelta(days=1)
-    #    start_date = TODAY.strftime('%Y-%m-%d')
-    #    end_date = TOMROW.strftime('%Y-%m-%d')
-    #
-    #    df_items = Items()
-    #    df_trans = transactionDetails(start_date, end_date)
-    #
-    #    id_list = df_trans['transactionId'].tolist()
-    #    print(len(id_list))
-    #    id_list = list(dict.fromkeys(id_list))
-    #    print(len(id_list))
-    #    for x in id_list:
-    #        cur.execute('DELETE FROM "Transactions" WHERE trans_id = %s', (x,))
-    #        conn.commit()
-    #    df_type = transaction(id_list)
-    #    if df_trans['itemId'].any():
-    #        # call function only if there are AP items
-    #        write_to_database(df_type, df_items, df_trans)
+            print(f"{dt} completed")
 
     conn.close()

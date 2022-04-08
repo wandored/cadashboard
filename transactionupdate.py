@@ -8,7 +8,6 @@ from sqlalchemy.engine.create import create_engine
 from datetime import datetime, timedelta
 import requests
 import pandas as pd
-import numpy as np
 import psycopg2
 from dashapp import Config
 
@@ -24,7 +23,6 @@ def make_HTTP_request(url):
             all_records = all_records + json_data["value"]
             if "@odata.nextLink" in json_data:
                 url = json_data["@odata.nextLink"]
-                print(url)
             else:
                 break
     return all_records
@@ -62,8 +60,8 @@ def transaction(id_list):
             pass
 
     df = make_dataframe(rqst_list)
+    # df.dropna(axis=0, how="any", subset=["companyId"], inplace=True)
     if df.empty:
-        print("empty dataframe")
         return
 
     df["date"] = df["date"].dt.strftime(
@@ -78,24 +76,21 @@ def transaction(id_list):
 
     query = "$select=companyId,name"
     url = "{}/Company?{}".format(Config.SRVC_ROOT, query)
-    print(url)
     rqst = make_HTTP_request(url)
     df = make_dataframe(rqst)
     df.rename(columns={"name": "company"}, inplace=True)
-    df_merge = df_merge.merge(df, on="companyId", how="left")
+    df_return = pd.merge(df_merge, df, on="companyId", how="left")
 
-    return df_merge
+    return df_return
 
 
 def Items():
 
     query = "$select=itemId,name,category1,category2,category3"
     url = "{}/Item?{}".format(Config.SRVC_ROOT, query)
-    print(url)
     rqst = make_HTTP_request(url)
     df = make_dataframe(rqst)
     if df.empty:
-        print("empty dataframe")
         return
     df.rename(columns={"name": "item"}, inplace=True)
 
@@ -113,11 +108,9 @@ def transactionDetails(start, end):
         url_filter
     )
     url = "{}/TransactionDetail?{}".format(Config.SRVC_ROOT, query)
-    print(url)
     rqst = make_HTTP_request(url)
     df = make_dataframe(rqst)
     if df.empty:
-        print("empty dataframe")
         return
 
     cur.execute(rest_query)
@@ -162,42 +155,19 @@ if __name__ == "__main__":
     cur = conn.cursor()
     rest_query = 'select * from "Restaurants"'
 
-    # This part is for multi-day loading of data
-    #    df_cal = pd.read_csv('./scripts/calendar.csv')
-    #    select = df_cal.loc[1099:1113,'date']
-    ##    select = ['2021-12-29', '2021-12-30', '2021-12-31']
-    #    for d in select:
-    #        dt = datetime.strptime(d, '%Y-%m-%d')
-    #        tmrw = dt + timedelta(days=1)
-    #        start_date = dt.strftime('%Y-%m-%d')
-    #        end_date = tmrw.strftime('%Y-%m-%d')
-    #        df_items = Items()
-    #        df_trans = transactionDetails(start_date, end_date)
-    #        id_list = df_trans['transactionId'].tolist()
-    #        id_list = list(dict.fromkeys(id_list))
-    #        print(len(id_list))
-    #        index = len(id_list) - 1
-    #        if df_trans['itemId'].any():
-    #            for x in id_list:
-    #                cur.execute('DELETE FROM "Transactions" WHERE trans_id = %s', (x,))
-    #                conn.commit()
-    #            df_type = transaction(id_list)
-    #            # call function only if there are AP items
-    #            write_to_database(df_type, df_items, df_trans)
-
     TODAY = datetime.date(datetime.now())
     YSTDAY = TODAY - timedelta(days=1)
     TOMROW = TODAY + timedelta(days=1)
     start_date = TODAY.strftime("%Y-%m-%d")
     end_date = TOMROW.strftime("%Y-%m-%d")
+    print(f"date {start_date}")
 
     df_items = Items()
     df_trans = transactionDetails(start_date, end_date)
 
     id_list = df_trans["transactionId"].tolist()
-    print(len(id_list))
     id_list = list(dict.fromkeys(id_list))
-    print(len(id_list))
+    print(f"transaction total: {len(id_list)}")
     for x in id_list:
         cur.execute('DELETE FROM "Transactions" WHERE trans_id = %s', (x,))
         conn.commit()
@@ -205,5 +175,6 @@ if __name__ == "__main__":
     if df_trans["itemId"].any():
         # call function only if there are AP items
         write_to_database(df_type, df_items, df_trans)
+        print(f"{start_date} completed")
 
     conn.close()

@@ -18,6 +18,7 @@ from dashapp.home.util import (
     refresh_data,
     get_daily_sales,
     get_daily_labor,
+    convert_uofm,
 )
 from flask_security import login_required, current_user
 from datetime import datetime, timedelta
@@ -265,7 +266,6 @@ def index():
     daily_table["labor_pct_ly"] = daily_table.dollars_ly / daily_table.sales_ly
     daily_table.fillna(0, inplace=True)
     daily_totals = daily_table.sum()
-    print(daily_totals)
 
     # Weekly Sales Table
     sales_week = (
@@ -510,7 +510,6 @@ def store(store_id):
     else:
         concept = "casual"
 
-    print(store.name)
     start_day = (
         end_day
     ) = start_week = end_week = start_period = end_period = start_year = end_year = ""
@@ -538,7 +537,7 @@ def store(store_id):
         week_end = datetime.strptime(i.week_end, "%Y-%m-%d")
         lwe = week_end - timedelta(days=7)
         end_previous_week = lwe.strftime("%Y-%m-%d")
-        
+
         seven = day_start - timedelta(days=7)
         last_seven = seven.strftime("%Y-%m-%d")
         thirty = day_start - timedelta(days=30)
@@ -651,7 +650,6 @@ def store(store_id):
     budgets3 = []
     for v in budget_chart:
         budgets3.append(v.total_sales)
-
 
     def sales_labor_table(start, end):
         # Build sales and labor stats for the time period given
@@ -796,7 +794,6 @@ def store(store_id):
         feature = get_fish("SEAFOOD Feature Fish")
         salmon = get_fish("^(SEAFOOD) (Salmon)$")
 
-
     # Chicken & Steak Order
     def get_purchases(regex, days):
         #
@@ -805,9 +802,7 @@ def store(store_id):
             Transactions.query.with_entities(
                 Transactions.item,
             )
-            .distinct(
-                Transactions.item
-            )
+            .distinct(Transactions.item)
             .filter(
                 Transactions.item.regexp_match(regex),
                 Transactions.name == store.name,
@@ -853,19 +848,16 @@ def store(store_id):
             )
             .group_by(Menuitems.menuitem)
         ).all()
-        sales = pd.DataFrame.from_records(
-            query, columns=["menuitem", "quantity"]
-        )
+        sales = pd.DataFrame.from_records(query, columns=["menuitem", "quantity"])
         return sales
 
-
     def get_order_table(regex):
-        '''
+        """
         Get a list of items purchased in last 30 days
         check if used in any prep recipesselfself.
         Match each item with POS menuitem for last week
         and same week last year and calculate average
-        '''
+        """
         prep_item_list = []
         item_list = []
         # Get list of items purchased in last 30 days
@@ -873,9 +865,7 @@ def store(store_id):
             Transactions.query.with_entities(
                 Transactions.item,
             )
-            .distinct(
-                Transactions.item
-            )
+            .distinct(Transactions.item)
             .filter(
                 Transactions.item.regexp_match(regex),
                 Transactions.name == store.name,
@@ -889,28 +879,25 @@ def store(store_id):
         [item_list.append(y) for x in items for y in x]
 
         for i in item_list:
-            print(i)
             # Get all recipes with ingredient i
-            recipe_lst =(
-                db.session.query(Ingredients.item,
-                                 Ingredients.recipe,
-                                 Ingredients.qty,
-                                 Ingredients.uofm)
-                .filter(
-                    Ingredients.item == i
-                )
+            recipe_lst = (
+                db.session.query(
+                    Ingredients.item,
+                    Ingredients.recipe,
+                    Ingredients.qty,
+                    Ingredients.uofm,
+                ).filter(Ingredients.item == i)
             ).all()
             for x in recipe_lst:
                 # account for recipes with prep items for ingredients
-                if re.search(r'^PREP', x.recipe):
-                    prep_lst =(
-                        db.session.query(Ingredients.item,
-                                         Ingredients.recipe,
-                                         Ingredients.qty,
-                                         Ingredients.uofm)
-                        .filter(
-                            Ingredients.item == x.recipe
-                        )
+                if re.search(r"^PREP", x.recipe):
+                    prep_lst = (
+                        db.session.query(
+                            Ingredients.item,
+                            Ingredients.recipe,
+                            Ingredients.qty,
+                            Ingredients.uofm,
+                        ).filter(Ingredients.item == x.recipe)
                     ).all()
                     if not prep_lst:
                         continue
@@ -918,23 +905,13 @@ def store(store_id):
                     row_dict = dict(prep_lst[0])
                     row_dict.update(item=i)
                     prep_item_list.append(row_dict)
-                if re.search(r'^MENU', x.recipe):
+                if re.search(r"^MENU", x.recipe):
                     prep_item_list.append(x)
         menu_list = []
         for p in prep_item_list:
- #           pack_size = (
- #               db.session.query(Unitsofmeasure)
- #               .filter(Unitsofmeasure.name == p['uofm'])
- #               .first()
- #           )
- #           if pack_size:
- #               weight = pack_size.base_qty / 16
- #           else:
- #               weight = 1
             recipes = (
                 db.session.query(Recipes)
-                .filter(Recipes.recipe == p['recipe'],
-                        Recipes.name == store.name)
+                .filter(Recipes.recipe == p["recipe"], Recipes.name == store.name)
                 .first()
             )
             if recipes:
@@ -942,21 +919,185 @@ def store(store_id):
                 row_dict["menuitem"] = recipes.menuitem
                 menu_list.append(row_dict)
         df = pd.DataFrame(menu_list)
-        unit_list = df.loc[:, 'menuitem']
+        unit_list = df.loc[:, "menuitem"]
         unit_sales = get_unit_sales(start_previous_week, end_previous_week, unit_list)
-        df = df.merge(unit_sales, on='menuitem', how='outer')
-        df['last_week'] = df['qty'] * df['quantity'].astype(float)
+        df = df.merge(unit_sales, on="menuitem", how="outer")
+        df["last_week"] = df["qty"] * df["quantity"].astype(float)
         unit_sales = get_unit_sales(start_week_ly, end_week_ly, unit_list)
-        df = df.merge(unit_sales, on='menuitem', how='outer')
-        df['last_year'] = df['qty'] * df['quantity_y'].astype(float)
-        df.drop(['recipe', 'qty'], axis=1, inplace=True)
-        order = df.groupby(["item", 'uofm']).sum()
-        
+        df = df.merge(unit_sales, on="menuitem", how="outer")
+        df["last_year"] = df["qty"] * df["quantity_y"].astype(float)
+        df.drop(["recipe", "qty"], axis=1, inplace=True)
+        order = df.groupby(["item", "uofm"]).sum()
+
         return order
 
     steak_order = get_order_table("^(BEEF Steak)")
+    # TODO multiple prep items does not work
     # chicken_order = get_order_table("^(PLTRY Chicken)")
 
+    # Item price Change Analysis
+    def get_transactions_by_category(cat, start, end, trans_type):
+        query = (
+            Transactions.query.with_entities(
+                Transactions.item,
+                Transactions.UofM,
+                Transactions.quantity,
+                Transactions.amount,
+            )
+            .distinct(Transactions.item)
+            .filter(
+                Transactions.category1 == cat,
+                Transactions.date.between(start, end),
+                Transactions.name == store.name,
+                Transactions.type == trans_type,
+            )
+            .order_by(
+                Transactions.item,
+            )
+        ).all()
+        item_list = []
+        if not query:
+            row_dict = {
+                "item": "Null",
+                "UofM": "Null",
+                "quantity": 0,
+                "amount": 0,
+                "base_qty": 1,
+                "base_uofm": "Each",
+            }
+            item_list.append(row_dict)
+        for q in query:
+            qty, uofm = convert_uofm(q)
+            row_dict = dict(q)
+            row_dict["base_qty"] = qty
+            row_dict["base_uofm"] = uofm
+            item_list.append(row_dict)
+
+        return item_list
+
+    today_date = TODAY.strftime("%Y-%m-%d")
+    food_begin = get_transactions_by_category(
+        "Food", end_previous_week, end_previous_week, "Stock Count"
+    )
+    df_begin = pd.DataFrame(food_begin)
+    df_begin["inv_cost"] = df_begin["amount"] / (
+        df_begin["base_qty"] * df_begin["quantity"]
+    )
+    df_begin.drop(columns=["quantity", "amount"], inplace=True)
+    food_today = get_transactions_by_category(
+        "Food", start_week, today_date, "AP Invoice"
+    )
+    df_today = pd.DataFrame(food_today)
+    df_today["current_cost"] = df_today["amount"] / (
+        df_today["base_qty"] * df_today["quantity"]
+    )
+    df_today.drop(
+        columns=["UofM", "quantity", "amount", "base_qty", "base_uofm"], inplace=True
+    )
+    df_merge = pd.merge(df_begin, df_today, on="item", how="left")
+    df_merge["cost_diff"] = df_merge["current_cost"] - df_merge["inv_cost"]
+    df_merge["pct_diff"] = (df_merge["cost_diff"] / df_merge["inv_cost"]) * 100
+    df_merge.dropna(axis=0, how="any", subset=["cost_diff"], inplace=True)
+    df_merge.sort_values(by=["pct_diff"], ascending=False, inplace=True)
+    price_increase = df_merge.head(10)
+    price_decrease = df_merge.tail(10).sort_values(by="pct_diff")
+
+    # Costs charts
+    def get_category_costs(start, end, sales, cat):
+        query = (
+            db.session.query(
+                func.sum(Transactions.credit).label("credits"),
+                func.sum(Transactions.amount).label("costs"),
+            )
+            .select_from(Transactions)
+            .join(Calendar, Calendar.date == Transactions.date)
+            .group_by(Calendar.period)
+            .order_by(Calendar.period)
+            .filter(
+                Transactions.date.between(start, end),
+                Transactions.category2.in_(cat),
+                Transactions.name == store.name,
+            )
+        )
+        dol_lst = []
+        pct_lst = []
+        for v in query:
+            amount = v.costs - v.credits
+            dol_lst.append(amount)
+        add_items = len(sales) - len(dol_lst)
+        for i in range(0, add_items):
+            dol_lst.append(0)
+        for i in range(0, len(sales)):
+            pct_lst.append(dol_lst[i] / sales[i])
+        return dol_lst, pct_lst
+
+    # TODO check for no purchases of supplies
+    supply_cost_dol, supply_cost_pct = get_category_costs(
+        start_year,
+        end_year,
+        values3,
+        cat=[
+            "Rest. Supplies",
+            "Kitchen Supplies",
+            "Cleaning Supplies",
+            "Office Supplies",
+            "Bar Supplies",
+        ],
+    )
+    supply_cost_dol_ly, supply_cost_pct_ly = get_category_costs(
+        start_year_ly,
+        end_year_ly,
+        values3_ly,
+        cat=[
+            "Rest. Supplies",
+            "Kitchen Supplies",
+            "Cleaning Supplies",
+            "Office Supplies",
+            "Bar Supplies",
+        ],
+    )
+    query = (
+        Budgets.query.with_entities(Budgets.total_supplies)
+        .order_by(Budgets.period)
+        .filter(Budgets.year == year, Budgets.name == store.name)
+    ).all()
+    supply_budget = []
+    for v in query:
+        supply_budget.append(v.total_supplies)
+    smallware_cost_dol, smallware_cost_pct = get_category_costs(
+        start_year,
+        end_year,
+        values3,
+        cat=["China", "Silverware", "Glassware", "Smallwares"],
+    )
+    smallware_cost_dol_ly, smallware_cost_pct_ly = get_category_costs(
+        start_year_ly,
+        end_year_ly,
+        values3_ly,
+        cat=["China", "Silverware", "Glassware", "Smallwares"],
+    )
+    query = (
+        Budgets.query.with_entities(Budgets.total_smallwares)
+        .order_by(Budgets.period)
+        .filter(Budgets.year == year, Budgets.name == store.name)
+    ).all()
+    smallware_budget = []
+    for v in query:
+        smallware_budget.append(v.total_smallwares)
+
+    current_supply_cost = supply_cost_dol[period - 1]
+    current_supply_budget = supply_budget[period - 1]
+    current_smallware_cost = smallware_cost_dol[period - 1]
+    current_smallware_budget = smallware_budget[period - 1]
+
+    query = (
+        Transactions.query.with_entities(Transactions.item).filter(
+            Transactions.date >= start_week,
+            Transactions.name == store.name,
+            Transactions.item.regexp_match("^DO NOT USE*"),
+        )
+    ).all()
+    do_not_use = pd.DataFrame.from_records(query, columns=["menuitem"])
 
     return render_template(
         "home/store.html",
@@ -967,6 +1108,7 @@ def store(store_id):
         form1=form1,
         form3=form3,
         form4=form4,
+        period=period,
         current_user=current_user,
         roles=current_user.roles,
         fiscal_dates=fiscal_dates,
@@ -985,6 +1127,16 @@ def store(store_id):
         values2_ly=values2_ly,
         values3_ly=values3_ly,
         budgets3=budgets3,
+        supply_cost_dol=supply_cost_dol,
+        supply_cost_dol_ly=supply_cost_dol_ly,
+        supply_budget=supply_budget,
+        smallware_cost_dol=smallware_cost_dol,
+        smallware_cost_dol_ly=smallware_cost_dol_ly,
+        smallware_budget=smallware_budget,
+        current_supply_cost=current_supply_cost,
+        current_supply_budget=current_supply_budget,
+        current_smallware_cost=current_smallware_cost,
+        current_smallware_budget=current_smallware_budget,
         weekly_totals=weekly_totals,
         period_totals=period_totals,
         lobster_items=lobster_items,
@@ -993,6 +1145,10 @@ def store(store_id):
         salmon=salmon,
         feature=feature,
         steak_order=steak_order,
+        # chicken_order=chicken_order,
+        price_increase=price_increase,
+        price_decrease=price_decrease,
+        do_not_use=do_not_use,
     )
 
 
@@ -1232,8 +1388,7 @@ def purchasing():
     year_to_date = get_lastyear(start_day)
 
     # Get list of Restaurants
-    store_list = []
-    data = db.session.query(Restaurants.name).all()
+    data = Restaurants.query.all()
     store_list = pd.DataFrame([x.as_dict() for x in data])
 
     form1 = DateForm()
@@ -1286,17 +1441,11 @@ def purchasing():
         ).all()
         item_list = []
         for i in items:
-            pack_size = (
-                db.session.query(Unitsofmeasure)
-                .filter(Unitsofmeasure.name == i.UofM)
-                .first()
-            )
-            if pack_size:
-                weight = pack_size.base_qty / 16
-            else:
-                weight = 1
+            qty, uofm = convert_uofm(i)
+            # TODO fix the factor calc on purchasing
+            pound = qty / 16
             row_dict = dict(i)
-            row_dict["factor"] = weight
+            row_dict["factor"] = pound
             item_list.append(row_dict)
         df = pd.DataFrame(item_list)
         if not df.empty:
@@ -1365,17 +1514,13 @@ def purchasing():
         ).all()
         item_list = []
         for i in items:
-            pack_size = (
-                db.session.query(Unitsofmeasure)
-                .filter(Unitsofmeasure.name == i.UofM)
-                .first()
-            )
-            if pack_size:
-                weight = pack_size.base_qty / 16
-            else:
-                weight = 1
+            if not i.UofM:
+                continue
+            qty, uofm = convert_uofm(i)
+            # TODO fix the factor calc on purchasing
+            pound = qty / 16.0
             row_dict = dict(i)
-            row_dict["factor"] = weight
+            row_dict["factor"] = pound
             item_list.append(row_dict)
         df = pd.DataFrame(item_list)
         df = df[(df != 0).all(1)]
@@ -1396,6 +1541,11 @@ def purchasing():
         "^(BEEF Steak).*(Choice)$", start_year_ly, end_year_ly
     )
 
+    prime_rib_chart = period_purchases("BEEF Prime Rib Choice", start_year, end_year)
+    prime_rib_chart_ly = period_purchases(
+        "BEEF Prime Rib Choice", start_year_ly, end_year_ly
+    )
+
     crabmeat_chart = period_purchases("SEAFOOD Crabmeat*", start_year, end_year)
     crabmeat_chart_ly = period_purchases(
         "SEAFOOD Crabmeat*", start_year_ly, end_year_ly
@@ -1404,6 +1554,11 @@ def purchasing():
     salmon_chart = period_purchases("^(SEAFOOD) (Salmon)$", start_year, end_year)
     salmon_chart_ly = period_purchases(
         "^(SEAFOOD) (Salmon)$", start_year_ly, end_year_ly
+    )
+
+    seabass_chart = period_purchases("SEAFOOD Sea Bass Chilean", start_year, end_year)
+    seabass_chart_ly = period_purchases(
+        "SEAFOOD Sea Bass Chilean", start_year_ly, end_year_ly
     )
 
     return render_template(
@@ -1438,10 +1593,14 @@ def purchasing():
         prime_chart_ly=prime_chart_ly,
         choice_chart=choice_chart,
         choice_chart_ly=choice_chart_ly,
+        prime_rib_chart=prime_rib_chart,
+        prime_rib_chart_ly=prime_rib_chart_ly,
         crabmeat_chart=crabmeat_chart,
         crabmeat_chart_ly=crabmeat_chart_ly,
         salmon_chart=salmon_chart,
         salmon_chart_ly=salmon_chart_ly,
+        seabass_chart=seabass_chart,
+        seabass_chart_ly=seabass_chart_ly,
     )
 
 
@@ -1595,8 +1754,7 @@ def alcohol():
     year_to_date = get_lastyear(start_day)
 
     # Get list of Restaurants
-    store_list = []
-    data = db.session.query(Restaurants.name).all()
+    data = Restaurants.query.all()
     store_list = pd.DataFrame([x.as_dict() for x in data])
 
     form1 = DateForm()
@@ -1658,15 +1816,9 @@ def alcohol():
         ).all()
         item_list = []
         for i in items:
-            pack_size = (
-                db.session.query(Unitsofmeasure)
-                .filter(Unitsofmeasure.name == i.UofM)
-                .first()
-            )
-            if pack_size:
-                bottle = pack_size.base_qty / 25.360517
-            else:
-                bottle = 25.360517
+            qty, uofm = convert_uofm(i)
+            # TODO fix the factor calc on purchasing
+            bottle = qty / 25.360517  # convert from quarts to 750ml
             row_dict = dict(i)
             row_dict["factor"] = bottle
             item_list.append(row_dict)
@@ -1812,8 +1964,7 @@ def profile():
     year_to_date = get_lastyear(start_day)
 
     # Get list of Restaurants
-    store_list = []
-    data = db.session.query(Restaurants.name).all()
+    data = Restaurants.query.all()
     store_list = pd.DataFrame([x.as_dict() for x in data])
 
     form1 = DateForm()

@@ -16,6 +16,7 @@ from dashapp.authentication.models import (
     db,
     Menuitems,
     Potatoes,
+    Unitsofmeasure,
 )
 from sqlalchemy import or_, func
 
@@ -362,3 +363,16 @@ def potato_sales(start):
     menu_pivot.to_sql("Potatoes", con=db.engine, if_exists="append")
 
     return 0
+
+
+def convert_uofm(unit):
+    # convert the unit uofm to base quantity
+    pack_size = (
+        db.session.query(Unitsofmeasure)
+        .filter(Unitsofmeasure.name == unit.UofM)
+        .first()
+    )
+    if pack_size:
+        return pack_size.base_qty, pack_size.base_uofm
+    else:
+        return 0, 0
