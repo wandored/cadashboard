@@ -16,6 +16,7 @@ from dashapp.authentication.models import (
     db,
     Menuitems,
     Potatoes,
+    Unitsofmeasure,
 )
 from sqlalchemy import or_, func
 
@@ -137,7 +138,7 @@ def sales_employee(start, end):
     df_pivot = df_merge.pivot_table(
         index=["name", "daypart"], values=["sales"], aggfunc=np.sum
     )
-    df_pivot["date"] = start
+    df_pivot.loc[:, "date"] = start
     df_pivot.to_sql("Sales", con=db.engine, if_exists="append")
     return 0
 
@@ -171,7 +172,7 @@ def labor_detail(start, end):
     df_pivot = df_merge.pivot_table(
         index=["name", "category", "job"], values=["hours", "dollars"], aggfunc=np.sum
     )
-    df_pivot["date"] = start
+    df_pivot.loc[:, "date"] = start
     df_pivot.to_sql("Labor", con=db.engine, if_exists="append")
     return 0
 
@@ -230,7 +231,7 @@ def sales_detail(start, end):
         values=["amount", "quantity"],
         aggfunc=np.sum,
     )
-    menu_pivot["date"] = start
+    menu_pivot.loc[:, "date"] = start
     menu_pivot.to_sql("Menuitems", con=db.engine, if_exists="append")
 
     return 0
@@ -246,7 +247,7 @@ def get_daily_sales(start, end, store, cat):
             .filter(
                 Menuitems.date.between(start, end),
                 Menuitems.name == store,
-                Menuitems.menuitem.regexp_match("(?i)GIFT CARD*")
+                Menuitems.menuitem.regexp_match("(?i)GIFT CARD*"),
             )
             .group_by(Menuitems.date)
             .all()
@@ -347,9 +348,9 @@ def potato_sales(start):
             df = df_clean[df_clean["menuitem"].isin(pot_list)]
             if df.empty:
                 continue
-            df["time"] = i[0]
-            df["in_time"] = i[1]
-            df["out_time"] = i[4]
+            df.loc[:, "time"] = i[0]
+            df.loc[:, "in_time"] = i[1]
+            df.loc[:, "out_time"] = i[4]
             df_pot = df_pot.append(df)
 
         # Write the daily menu items to Menuitems table
@@ -358,7 +359,20 @@ def potato_sales(start):
             values=["quantity"],
             aggfunc=np.sum,
         )
-    menu_pivot["date"] = start
+    menu_pivot.loc[:, "date"] = start
     menu_pivot.to_sql("Potatoes", con=db.engine, if_exists="append")
 
     return 0
+
+
+def convert_uofm(unit):
+    # convert the unit uofm to base quantity
+    pack_size = (
+        db.session.query(Unitsofmeasure)
+        .filter(Unitsofmeasure.name == unit.UofM)
+        .first()
+    )
+    if pack_size:
+        return pack_size.base_qty, pack_size.base_uofm
+    else:
+        return 0, 0

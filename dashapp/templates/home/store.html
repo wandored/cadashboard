@@ -18,18 +18,18 @@
               {% for x in fiscal_dates %}
               <div class="text-end pt-1">
                 <p class="text-sm mb-0 text-capitalize">{{ x.day }}, {{ x.date }}</p>
-                <h4 class="mb-0">{{ "${:,.0f}".format(daily_table.net_sales) }}</h4>
+                <h4 class="mb-0">{{ "${:,.0f}".format(sales_day) }}</h4>
               </div>
               {% endfor %}
           </div>
           <hr class="dark horizontal my-0">
-          {% if daily_table.net_sales >= daily_table.net_sales_ly %}
+          {% if sales_day >= sales_day_ly %}
             <div class="card-footer p-3">
-              <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((daily_table.net_sales - daily_table.net_sales_ly) / daily_table.net_sales_ly) * 100) }} - {{ "${:,.0f}".format(daily_table.net_sales_ly) }}</span> SDLY</p>
+              <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((sales_day - sales_day_ly) / sales_day_ly) * 100) }} - {{ "${:,.0f}".format(sales_day_ly) }}</span> SDLY</p>
             </div>
             {% else %}
             <div class="card-footer p-3">
-              <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((daily_table.net_sales - daily_table.net_sales_ly)|abs / daily_table.net_sales_ly) * 100) }} - {{ "${:,.0f}".format(daily_table.net_sales_ly) }}</span> SDLY</p>
+              <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((sales_day - sales_day_ly)|abs / sales_day_ly) * 100) }} - {{ "${:,.0f}".format(sales_day_ly) }}</span> SDLY</p>
             </div>
             {% endif %}
         </div>
@@ -43,18 +43,18 @@
               {% for x in fiscal_dates %}
               <div class="text-end pt-1">
                 <p class="text-sm mb-0 text-capitalize">Week {{ x.week }} Sales</p>
-                <h4 class="mb-0">{{ "${:,.0f}".format(weekly_totals.net_sales) }}</h4>
+                <h4 class="mb-0">{{ "${:,.0f}".format(sales_week) }}</h4>
               </div>
               {% endfor %}
           </div>
           <hr class="dark horizontal my-0">
-            {% if weekly_totals.net_sales >= weekly_totals.net_sales_ly %}
+            {% if sales_week >= sales_week_ly %}
             <div class="card-footer p-3">
-              <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((weekly_totals.total_sales - weekly_totals.total_sales_ly) / weekly_totals.total_sales_ly) * 100) }} - {{ "${:,.0f}".format(weekly_totals.total_sales_ly) }}</span> WTD</p>
+              <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((sales_week - sales_week_ly) / sales_week_ly) * 100) }} - {{ "${:,.0f}".format(sales_week_ly) }}</span> WTD</p>
             </div>
             {% else %}
             <div class="card-footer p-3">
-              <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((weekly_totals.total_sales - weekly_totals.total_sales_ly)|abs / weekly_totals.total_sales_ly) * 100) }} - {{ "${:,.0f}".format(weekly_totals.total_sales_ly) }}</span> WTD</p>
+              <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((sales_week - sales_week_ly)|abs / sales_week_ly) * 100) }} - {{ "${:,.0f}".format(sales_week_ly) }}</span> WTD</p>
             </div>
             {% endif %}
         </div>
@@ -68,18 +68,18 @@
               {% for x in fiscal_dates %}
               <div class="text-end pt-1">
                 <p class="text-sm mb-0 text-capitalize">Period {{ x.period }} Sales</p>
-                <h4 class="mb-0">{{ "${:,.0f}".format(period_totals.net_sales) }}</h4>
+                <h4 class="mb-0">{{ "${:,.0f}".format(sales_period) }}</h4>
               </div>
               {% endfor %}
           </div>
           <hr class="dark horizontal my-0">
-            {% if period_totals.net_sales >= period_totals.net_sales_ly %}
+            {% if sales_period >= sales_period_ly %}
             <div class="card-footer p-3">
-              <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((period_totals.net_sales - period_totals.net_sales_ly) / period_totals.net_sales_ly) * 100) }} - {{ "${:,.0f}".format(period_totals.net_sales_ly) }}</span> PTD</p>
+              <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((sales_period - sales_period_ly) / sales_period_ly) * 100) }} - {{ "${:,.0f}".format(sales_period_ly) }}</span> PTD</p>
             </div>
             {% else %}
             <div class="card-footer p-3">
-              <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((period_totals.net_sales - period_totals.net_sales_ly)|abs / period_totals.net_sales_ly) * 100) }} - {{ "${:,.0f}".format(period_totals.net_sales_ly) }}</span> PTD</p>
+              <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((sales_period - sales_period_ly)|abs / sales_period_ly) * 100) }} - {{ "${:,.0f}".format(sales_period_ly) }}</span> PTD</p>
             </div>
             {% endif %}
         </div>
@@ -93,18 +93,18 @@
               {% for x in fiscal_dates %}
               <div class="text-end pt-1">
                 <p class="text-sm mb-0 text-capitalize">Fiscal {{ x.year }} Sales</p>
-                <h4 class="mb-0"> {{ "${:,.0f}".format(yearly_totals.net_sales) }}</h4>
+                <h4 class="mb-0"> {{ "${:,.0f}".format(sales_year) }}</h4>
               </div>
               {% endfor %}
           </div>
           <hr class="dark horizontal my-0">
-            {% if yearly_totals.net_sales >= yearly_totals.net_sales_ly %}
+            {% if sales_year >= sales_year_ly %}
             <div class="card-footer p-3">
-              <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((yearly_totals.net_sales - yearly_totals.net_sales_ly) / yearly_totals.net_sales_ly) * 100) }} - {{ "${:,.0f}".format(yearly_totals.net_sales_ly) }}</span> YTD</p>
+              <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((sales_year - sales_year_ly) / sales_year_ly) * 100) }} - {{ "${:,.0f}".format(sales_year_ly) }}</span> YTD</p>
             </div>
             {% else %}
             <div class="card-footer p-3">
-              <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((yearly_totals.net_sales - yearly_totals.net_sales_ly)|abs / yearly_totals.net_sales_ly) * 100) }} - {{ "${:,.0f}".format(yearly_totals.net_sales_ly) }}</span> YTD</p>
+              <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((sales_year - sales_year_ly)|abs / sales_year_ly) * 100) }} - {{ "${:,.0f}".format(sales_year_ly) }}</span> YTD</p>
             </div>
             {% endif %}
         </div>
@@ -123,10 +123,10 @@
           </div>
           <div class="card-body">
             <h6 class="mb-0 ">Week to Date Sales</h6>
-            {% if weekly_totals.total_sales > weekly_totals.total_sales_ly %}
-            <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.0f}".format(weekly_totals.total_sales - weekly_totals.total_sales_ly) }} over last year</p>
+            {% if sales_week > sales_week_ly %}
+            <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.0f}".format(sales_week - sales_week_ly) }} over last year</p>
             {% else %}
-            <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.0f}".format(weekly_totals.total_sales - weekly_totals.total_sales_ly) }} below last year</p>
+            <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.0f}".format(sales_week - sales_week_ly) }} below last year</p>
             {% endif %}
           </div>
         </div>
@@ -142,10 +142,10 @@
           </div>
           <div class="card-body">
             <h6 class="mb-0 ">Period to Date Sales</h6>
-            {% if period_totals.total_sales > period_totals.total_sales_ly %}
-            <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.0f}".format(period_totals.total_sales - period_totals.total_sales_ly) }} over last year</p>
+            {% if sales_period > sales_period_ly %}
+            <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.0f}".format(sales_period - sales_period_ly) }} over last year</p>
             {% else %}
-            <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.0f}".format(period_totals.total_sales - period_totals.total_sales_ly) }} below last year</p>
+            <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.0f}".format(sales_period - sales_period_ly) }} below last year</p>
             {% endif %}
           </div>
         </div>
@@ -161,248 +161,246 @@
           </div>
           <div class="card-body">
             <h6 class="mb-0 ">Year to Date Sales</h6>
-            {% if yearly_totals.total_sales > yearly_totals.total_sales_ly %}
-            <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.0f}".format(yearly_totals.total_sales - yearly_totals.total_sales_ly) }} over last year</p>
+            {% if sales_year > sales_year_ly %}
+            <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.0f}".format(sales_year - sales_year_ly) }} over last year</p>
             {% else %}
-            <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.0f}".format(yearly_totals.total_sales - yearly_totals.total_sales_ly) }} below last year</p>
+            <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.0f}".format(sales_year - sales_year_ly) }} below last year</p>
             {% endif %}
           </div>
         </div>
       </div>
     </div>
-    <!-- Food & Alcohol Sales -->
+    <!-- Supplies Costs -->
     <div class="row mb-4">
-      <div class="col-lg-8 col-md-6 mb-md-0 mb-4">
-        <div class="card">
-          <div class="card-header pb-0">
-            <div class="row">
-              {% for x in fiscal_dates %}
-                <div class="col-lg-6 col-7">
-                  <h6>Week - {{ x.week }}</h6>
-                </div>
-              {% endfor %}
-            </div>
-          </div>
-          <div class="row g-2">
-            <div class="col-md-3 col-md-0">
-              <div class="card text-white bg-primary" style"max-width: 18rem;">
-                  <div class="card-body">
-                    <h5 class="card-title">FOOD</h5>
-                    <p class="card-text-light font-weight-bold">SALES - {{ "${:,.0f}".format(weekly_totals.food) }}</p>
-                    <p class="card-text-light font-weight-bold">PURCHASES - {{ "${:,.0f}".format(weekly_cogs['Beef'] + weekly_cogs['Dairy'] + weekly_cogs['Food Other'] + weekly_cogs['Produce'] + weekly_cogs['Pork'] + weekly_cogs['Poultry'] + weekly_cogs['Seafood']) }}</p>
-                    <p class="card-text-light font-weight-bold">COST % - {{ "{:.1f}%".format((weekly_cogs['Beef'] + weekly_cogs['Dairy'] + weekly_cogs['Food Other'] + weekly_cogs['Produce'] + weekly_cogs['Pork'] + weekly_cogs['Poultry'] + weekly_cogs['Seafood'])/weekly_totals['food'] * 100) }} </p>
-                  </div>
-              </div>
-            </div>
-            <div class="col-md-3 col-md-0">
-              <div class="card text-white bg-success" style"max-width: 18rem;">
-                  <div class="card-body">
-                    <h5 class="card-title">BEER</h5>
-                    <p class="card-text-light font-weight-bold">SALES - {{ "${:,.0f}".format(weekly_totals.beer) }}</p>
-                    <p class="card-text-light font-weight-bold">PURCHASES - {{ "${:,.0f}".format(weekly_cogs['Beer']) }} </p>
-                    <p class="card-text-light font-weight-bold">COST % - {{ "{:.1f}%".format(weekly_cogs['Beer']/weekly_totals['beer'] * 100) }} </p>
-                  </div>
-              </div>
-            </div>
-            <div class="col-md-3 col-md-0">
-              <div class="card text-white bg-info" style"max-width: 18rem;">
-                  <div class="card-body">
-                    <h5 class="card-title">LIQUOR</h5>
-                    <p class="card-text-light font-weight-bold">SALES - {{ "${:,.0f}".format(weekly_totals.liquor) }}</p>
-                    <p class="card-text-light font-weight-bold">PURCHASES - {{ "${:,.0f}".format(weekly_cogs['Liquor']) }} </p>
-                    <p class="card-text-light font-weight-bold">COST % - {{ "{:.1f}%".format(weekly_cogs['Liquor']/weekly_totals['liquor'] * 100) }} </p>
-                  </div>
-              </div>
-            </div>
-            <div class="col-md-3 col-md-0">
-              <div class="card text-white bg-warning" style"max-width: 18rem;">
-                  <div class="card-body">
-                    <h5 class="card-title">WINE</h5>
-                    <p class="card-text-light font-weight-bold">SALES - {{ "${:,.0f}".format(weekly_totals.wine) }}</p>
-                    <p class="card-text-light font-weight-bold">PURCHASES - {{ "${:,.0f}".format(weekly_cogs['Wine']) }} </p>
-                    <p class="card-text-light font-weight-bold">COST %- {{ "{:.1f}%".format(weekly_cogs['Wine']/weekly_totals['wine'] * 100) }} </p>
-                  </div>
-              </div>
-            </div>
-          </div><!-- row -->
-          <div class="card-header pb-0">
-            <div class="row">
-              {% for x in fiscal_dates %}
-              <div class="col-lg-6 col-7">
-                <h6>Period - {{ x.period }}</h6>
-              </div>
-              {% endfor %}
-            </div>
-          </div>
-          <div class="row g-2">
-            <div class="col-md-3 col-md-0">
-              <div class="card text-white bg-primary" style"max-width: 18rem;">
-                  <div class="card-body">
-                    <h5 class="card-title">FOOD</h5>
-                    <p class="card-text-light font-weight-bold">SALES - {{ "${:,.0f}".format(period_totals.food) }}</p>
-                    <p class="card-text-light font-weight-bold">PURCHASES - {{ "${:,.0f}".format(period_cogs['Beef'] + period_cogs['Dairy'] + period_cogs['Food Other'] + period_cogs['Produce'] + period_cogs['Pork'] + period_cogs['Poultry'] + period_cogs['Seafood']) }}</p>
-                    <p class="card-text-light font-weight-bold">COST % - {{ "{:.1f}%".format((period_cogs['Beef'] + period_cogs['Dairy'] + period_cogs['Food Other'] + period_cogs['Produce'] + period_cogs['Pork'] + period_cogs['Poultry'] + period_cogs['Seafood'])/period_totals['food'] * 100) }} </p>
-                  </div>
-              </div>
-            </div>
-            <div class="col-md-3 col-md-0">
-              <div class="card text-white bg-success" style"max-width: 18rem;">
-                  <div class="card-body">
-                    <h5 class="card-title">BEER</h5>
-                    <p class="card-text-light font-weight-bold">SALES - {{ "${:,.0f}".format(period_totals.beer) }}</p>
-                    <p class="card-text-light font-weight-bold">PURCHASES - {{ "${:,.0f}".format(period_cogs['Beer']) }} </p>
-                    <p class="card-text-light font-weight-bold">COST % - {{ "{:.1f}%".format(period_cogs['Beer']/period_totals['beer'] * 100) }} </p>
-                  </div>
-              </div>
-            </div>
-            <div class="col-md-3 col-md-0">
-              <div class="card text-white bg-info" style"max-width: 18rem;">
-                  <div class="card-body">
-                    <h5 class="card-title">LIQUOR</h5>
-                    <p class="card-text-light font-weight-bold">SALES - {{ "${:,.0f}".format(period_totals.liquor) }}</p>
-                    <p class="card-text-light font-weight-bold">PURCHASES - {{ "${:,.0f}".format(period_cogs['Liquor']) }} </p>
-                    <p class="card-text-light font-weight-bold">COST % - {{ "{:.1f}%".format(period_cogs['Liquor']/period_totals['liquor'] * 100) }} </p>
-                  </div>
-              </div>
-            </div>
-            <div class="col-md-3 col-md-0">
-              <div class="card text-white bg-warning" style"max-width: 18rem;">
-                  <div class="card-body">
-                    <h5 class="card-title">WINE</h5>
-                    <p class="card-text-light font-weight-bold">SALES - {{ "${:,.0f}".format(period_totals.wine) }}</p>
-                    <p class="card-text-light font-weight-bold">PURCHASES - {{ "${:,.0f}".format(period_cogs['Wine']) }} </p>
-                    <p class="card-text-light font-weight-bold">COST % - {{ "{:.1f}%".format(period_cogs['Wine']/period_totals['wine'] * 100) }} </p>
-                  </div>
+      <div class="col-lg-4 mt-4 mb-3">
+        <div class="card z-index-2 ">
+          <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+            <div class="bg-gradient-primary shadow-primary border-radius-lg py-3 pe-1">
+              <div class="chart">
+                <canvas id="chart-supplies" class="chart-canvas" height="170"></canvas>
               </div>
             </div>
           </div>
-        </div><!-- card header -->
-      </div><!-- card -->
-      <!-- scorecard -->
+          <div class="card-body">
+              <h6 class="mb-0 ">Total Supply Costs Period {{ period }}</h6>
+            {% if current_supply_budget > current_supply_cost %}
+            <p class="text-sm "><i class="fa fa-thumbs-up text-success" aria-hidden="true"></i> {{ "{:,.0f}".format(current_supply_budget - current_supply_cost) }} remaining budget</p>
+            {% else %}
+            <p class="text-sm "><i class="fa fa-thumbs-down text-danger" aria-hidden="true"></i> {{ "{:,.0f}".format(current_supply_cost - current_supply_budget) }} over budget</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4 mt-4 mb-3">
+        <div class="card z-index-2 ">
+          <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+            <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
+              <div class="chart">
+                <canvas id="chart-smallwares" class="chart-canvas" height="170"></canvas>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+              <h6 class="mb-0 ">Total Smallware Costs Period {{ period }}</h6>
+            {% if current_smallware_budget > current_smallware_cost %}
+            <p class="text-sm "><i class="fa fa-thumbs-up text-success" aria-hidden="true"></i> {{ "{:,.0f}".format(current_smallware_budget - current_smallware_cost) }} remaining budget</p>
+            {% else %}
+            <p class="text-sm "><i class="fa fa-thumbs-down text-danger" aria-hidden="true"></i> {{ "{:,.0f}".format(current_smallware_cost - current_smallware_budget) }} over budget</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4 mt-4 mb-3">
+        <div class="card z-index-2 ">
+          <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+            <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
+              <div class="chart">
+                <canvas id="chart-other" class="chart-canvas" height="170"></canvas>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <h6 class="mb-0 ">Cost</h6>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row mb-4">
+        <div class="col-lg-4 col-md-6">
+          <div class="card">
+            <div class="card-header bg-primary pb-0">
+              <h4>STEAK ORDER</h4>
+            </div>
+              <div class="table-responsive">
+                <table class="table-sm">
+                  <thead>
+                    <tr>
+                      <th scope="col">STEAK</th>
+                      <th scope="col">UofM</th>
+                      <th scope="col">LAST YEAR</th>
+                      <th scope="col">LAST WEEK</th>
+                      <th scope="col">AVG/DAY</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for k, v in steak_order.iterrows() %}
+                        <tr>
+                          <th scope="row">{{ k[0] }}</th>
+                          <td>
+                            <p class="mb-0 ms-1 text-begin">{{ k[1] }}</p>
+                          </td>
+                          <td>
+                            <p class="mb-0 ms-1 text-begin">{{ v['last_year'] }}</p>
+                          </td>
+                          <td>
+                            <p class="mb-0 ms-1 text-begin">{{ v['last_week'] }}</p>
+                          </td>
+                          <td>
+                            <p class="mb-0 ms-1 text-begin">{{ "{:,.0f}".format((v['last_week'])/7) }}</p>
+                          </td>
+                        </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+          </div>
+        </div>
       <div class="col-lg-4 col-md-6">
         <div class="card">
-          <div class="card-header pb-0">
-            <h6>Labor Scorecard</h6>
-            <p class="text-sm">
-              <span class="font-weight-bold"></span>
-            </p>
-          </div>
-          <div class="alert alert-success" role="alert">
+          <div class="card-header bg-success pb-0">
             {% for x in fiscal_dates %}
-              <h4 class="alert-heading text-light">Week-{{ x.week }} Labor</h4>
+            <h4>Top Price Increase {{ x.day }} {{ x.date }}</h4>
             {% endfor %}
-            <div class="table-responsive table-hover">
-              <table class="table-sm text-light">
+          </div>
+            <div class="table-responsive">
+              <table class="table-sm">
                 <thead>
                   <tr>
-                    <th scope="col"></th>
-                    <th scope="col">BAR</th>
-                    <th scope="col">HOST</th>
-                    <th scope="col">SERVER</th>
-                    <th scope="col">KITCHEN</th>
-                    <th scope="col">TOTAL</th>
+                    <th scope="col">Item</th>
+                    <th scope="col">UofM</th>
+                    <th scope="col">Inv Cost</th>
+                    <th scope="col">Current Cost</th>
+                    <th scope="col">% Change</th>
                   </tr>
                 </thead>
                 <tbody>
+                    {% for k, v in price_increase.iterrows() %}
                   <tr>
-                      <th scope="row">DOLLARS</th>
                       <td>
-                        <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(weekly_totals.Bar) }}</p>
+                        <p class="mb-0 ms-1">{{ v['item'] }}</p>
                       </td>
                       <td>
-                        <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(weekly_totals.Host) }}</p>
+                        <p class="mb-0 ms-1">{{ v.UofM }}</p>
                       </td>
                       <td>
-                        <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(weekly_totals.Restaurant) }}</p>
+                        <p class="mb-0 ms-1">{{ "${:,.2f}".format(v.inv_cost * v.base_qty) }}</p>
                       </td>
                       <td>
-                        <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(weekly_totals.Kitchen) }}</p>
+                        <p class="mb-0 ms-1">{{ "${:,.2f}".format(v.current_cost * v.base_qty) }}</p>
                       </td>
                       <td>
-                        <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(weekly_totals.Total_Labor) }}</p>
+                        <p class="mb-0 ms-1">{{ "{:,.1f}%".format(v.pct_diff) }}</p>
                       </td>
                   </tr>
-                  <tr>
-                      <th scope="row">PERCENT</th>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((weekly_totals.Bar / weekly_totals.alcohol_sales) * 100) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((weekly_totals.Host / weekly_totals.food) * 100) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((weekly_totals.Restaurant / weekly_totals.food) * 100) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((weekly_totals.Kitchen / weekly_totals.food) * 100) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((weekly_totals.Total_Labor / weekly_totals.total_sales) * 100) }}</p>
-                      </td>
-                  </tr>
+                  {% endfor %}
                 </tbody>
               </table>
             </div>
-          </div>
-          <div class="alert alert-info" role="alert">
+        </div>
+      </div>
+      <div class="col-lg-4 col-md-6">
+        <div class="card">
+          <div class="card-header bg-info pb-0">
             {% for x in fiscal_dates %}
-              <h4 class="alert-heading text-light">Period-{{ x.period }} Labor</h4>
+            <h4>Top Price Decrease {{ x.day }} {{ x.date }}</h4>
             {% endfor %}
-            <div class="table-responsive table-hover">
-              <table class="table-sm text-light">
+          </div>
+            <div class="table-responsive">
+              <table class="table-sm">
                 <thead>
                   <tr>
-                    <th scope="col"></th>
-                    <th scope="col">BAR</th>
-                    <th scope="col">HOST</th>
-                    <th scope="col">SERVER</th>
-                    <th scope="col">KITCHEN</th>
-                    <th scope="col">TOTAL</th>
+                    <th scope="col">Item</th>
+                    <th scope="col">UofM</th>
+                    <th scope="col">Inv Cost</th>
+                    <th scope="col">Current Cost</th>
+                    <th scope="col">% Change</th>
                   </tr>
                 </thead>
                 <tbody>
+                    {% for k, v in price_decrease.iterrows() %}
                   <tr>
-                      <th scope="row">DOLLARS</th>
                       <td>
-                        <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(period_totals.Bar) }}</p>
+                        <p class="mb-0 ms-1">{{ v['item'] }}</p>
                       </td>
                       <td>
-                        <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(period_totals.Host) }}</p>
+                        <p class="mb-0 ms-1">{{ v.UofM }}</p>
                       </td>
                       <td>
-                        <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(period_totals.Restaurant) }}</p>
+                        <p class="mb-0 ms-1">{{ "${:,.2f}".format(v.inv_cost * v.base_qty) }}</p>
                       </td>
                       <td>
-                        <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(period_totals.Kitchen) }}</p>
+                        <p class="mb-0 ms-1">{{ "${:,.2f}".format(v.current_cost * v.base_qty) }}</p>
                       </td>
                       <td>
-                        <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(period_totals.Total_Labor) }}</p>
+                        <p class="mb-0 ms-1">{{ "{:,.1f}%".format(v.pct_diff) }}</p>
                       </td>
                   </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+        </div>
+      </div>
+    </div>
+    <div class="row mb-4">
+        <div class="col-lg-3">
+          <div class="card">
+            <div class="card-header bg-secondary pb-0" style="text-align:center">
+              <h4>POTATO LOADING CHART</h4>
+            </div>
+            <div class="card">
+              <form method="POST" action="" style="text-align:center">
+                <h6>Click Submit to generate a potato loading chart</h6>
+                {{ form4.hidden_tag() }}
+                <div class="form-group">
+                  {{ form4.submit4(class="btn btn-info") }}
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        <!-- DO NOT USE -->
+        <div class="col-lg-3">
+          <div class="card h-100">
+            <div class="card-header bg-warning pb-0">
+              {% for x in fiscal_dates %}
+              <h4>"DO NOT USE" ITEMS</h4>
+              <h6>Remove from inventory template</h6>
+              {% endfor %}
+            </div>
+            <div class="card">
+              <table class="table-responsive table-md">
+                <thead>
                   <tr>
-                      <th scope="row">PERCENT</th>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((period_totals.Bar / period_totals.alcohol_sales) * 100) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((period_totals.Host / period_totals.food) * 100) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((period_totals.Restaurant / period_totals.food) * 100) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((period_totals.Kitchen / period_totals.food) * 100) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-end">{{ "{:,.1f}%".format((period_totals.Total_Labor / period_totals.total_sales) * 100) }}</p>
-                      </td>
+                    <th scope="col">ITEM</th>
                   </tr>
+                </thead>
+                <tbody>
+                  {% for k, v in do_not_use.iterrows() %}
+                    <tr>
+                        <td>
+                          <p class="mb-0 ms-1 text-begin">{{ v.menuitem }}</p>
+                        </td>
+                    </tr>
+                  {% endfor %}
                 </tbody>
               </table>
             </div>
           </div>
         </div>
-      </div>
+    </div>
+    <div class="row mb-4">
+    <!-- scorecard -->
     </div><!-- row -->
     <div class="row mb-4">
       {% if concept == 'steakhouse' %}
@@ -617,7 +615,6 @@
               <h4>FEATURE FISH LAST 5 PURCHASES</h4>
               {% endfor %}
             </div>
-            <div class="card">
               <div class="table-responsive">
                 <table class="table-sm">
                   <thead>
@@ -652,30 +649,11 @@
                   </tbody>
                 </table>
               </div>
-            </div>
           </div>
         </div>
       {% endif %}
     </div><!-- row -->
-        <div class="col-xl-3 col-lg-6 mb-xl-0 mb-4">
-          <div class="card">
-            <div class="card-header bg-secondary pb-0" style="text-align:center">
-              <h4>POTATO LOADING CHART</h4>
-            </div>
-            <div class="card">
-              {% for x in fiscal_dates %}
-              <p class="mb-0 ms-1 text-center"></p>
-              {% endfor %}
-              <form method="POST" action="" style="text-align:center">
-                <h6>Click Submit to generate a potato loading chart</h6>
-                {{ form4.hidden_tag() }}
-                <div class="form-group">
-                  {{ form4.submit4(class="btn btn-info") }}
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
+    </div><!-- row -->
 
     {% include 'includes/footer.html' %}
 
@@ -889,7 +867,6 @@
     });
 
     var ctx3 = document.getElementById("chart-line-tasks").getContext("2d");
-
     new Chart(ctx3, {
       type: "line",
       data: {
@@ -934,6 +911,230 @@
           backgroundColor: "transparent",
           fill: true,
           data: {{ budgets3 | safe }},
+          maxBarThickness: 6
+        }, ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          }
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
+        scales: {
+          y: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              padding: 10,
+              color: '#f8f9fa',
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+              // Abbreviate the thousands
+              callback: function(value, index, values) {
+                return value / 1e3 + ' T';
+              },
+            },
+          },
+          x: {
+            grid: {
+              drawBorder: false,
+              display: false,
+              drawOnChartArea: false,
+              drawTicks: false,
+              borderDash: [5, 5]
+            },
+            ticks: {
+              display: true,
+              color: '#f8f9fa',
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+            }
+          },
+        },
+      },
+    });
+
+    var ctx4 = document.getElementById("chart-supplies").getContext("2d");
+    new Chart(ctx4, {
+      type: "line",
+      data: {
+        labels: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13"],
+        datasets: [{
+          label: "Total Supply Costs",
+          tension: 0,
+          borderWidth: 0,
+          pointRadius: 5,
+          pointBackgroundColor: "rgba(255, 255, 255, .8)",
+          pointBorderColor: "transparent",
+          borderColor: "rgba(255, 255, 255, .8)",
+          borderWidth: 4,
+          backgroundColor: "transparent",
+          fill: true,
+          data: {{ supply_cost_dol | safe }},
+          maxBarThickness: 6
+        }, {
+          label: "Last Year",
+          tension: 0,
+          borderWidth: 0,
+          pointRadius: 5,
+          pointBackgroundColor: "rgba(200, 200, 200, 1)",
+          pointBorderColor: "transparent",
+          borderColor: "rgba(200, 200, 200, 1)",
+          borderWidth: 4,
+          type: "line",
+          backgroundColor: "transparent",
+          fill: true,
+          data: {{ supply_cost_dol_ly | safe }},
+          maxBarThickness: 6
+        }, {
+          label: "budget",
+          tension: 0,
+          borderWidth: 0,
+          pointRadius: 5,
+          pointBackgroundColor: "rgba(100, 100, 100, 1)",
+          pointBorderColor: "transparent",
+          borderColor: "rgba(100, 100, 100, 1)",
+          borderWidth: 4,
+          type: "line",
+          backgroundColor: "transparent",
+          fill: true,
+          data: {{ supply_budget | safe }},
+          maxBarThickness: 6
+        }, ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          }
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
+        scales: {
+          y: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              padding: 10,
+              color: '#f8f9fa',
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+              // Abbreviate the thousands
+              callback: function(value, index, values) {
+                return value / 1e3 + ' T';
+              },
+            },
+          },
+          x: {
+            grid: {
+              drawBorder: false,
+              display: false,
+              drawOnChartArea: false,
+              drawTicks: false,
+              borderDash: [5, 5]
+            },
+            ticks: {
+              display: true,
+              color: '#f8f9fa',
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+            }
+          },
+        },
+      },
+    });
+
+    var ctx5 = document.getElementById("chart-smallwares").getContext("2d");
+    new Chart(ctx5, {
+      type: "line",
+      data: {
+        labels: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13"],
+        datasets: [{
+          label: "Total Supply Costs",
+          tension: 0,
+          borderWidth: 0,
+          pointRadius: 5,
+          pointBackgroundColor: "rgba(255, 255, 255, .8)",
+          pointBorderColor: "transparent",
+          borderColor: "rgba(255, 255, 255, .8)",
+          borderWidth: 4,
+          backgroundColor: "transparent",
+          fill: true,
+          data: {{ smallware_cost_dol | safe }},
+          maxBarThickness: 6
+        }, {
+          label: "Last Year",
+          tension: 0,
+          borderWidth: 0,
+          pointRadius: 5,
+          pointBackgroundColor: "rgba(175, 175, 175, 1)",
+          pointBorderColor: "transparent",
+          borderColor: "rgba(200, 200, 200, 1)",
+          borderWidth: 4,
+          type: "line",
+          backgroundColor: "transparent",
+          fill: true,
+          data: {{ smallware_cost_dol_ly | safe }},
+          maxBarThickness: 6
+        }, {
+          label: "budget",
+          tension: 0,
+          borderWidth: 0,
+          pointRadius: 5,
+          pointBackgroundColor: "rgba(100, 100, 100, 1)",
+          pointBorderColor: "transparent",
+          borderColor: "rgba(100, 100, 100, 1)",
+          borderWidth: 4,
+          type: "line",
+          backgroundColor: "transparent",
+          fill: true,
+          data: {{ smallware_budget | safe }},
           maxBarThickness: 6
         }, ],
       },

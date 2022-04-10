@@ -58,7 +58,6 @@
                 <th scope="row">TOP 10 LIQUORS YTD</th>
               <tr>
                 <th scope="col">PRODUCT</th>
-                <th scope="col">COUNT</th>
                 <th scope="col">COST</th>
               </tr>
             </thead>
@@ -66,9 +65,6 @@
                   {% for k, v in steakhouse_liquor_bottle.iterrows() %}
                     <tr>
                       <th scope="row">{{ k }}</th>
-                      <td>
-                        <p class="mb-0 ms-1 text-begin">{{ "{:,.0f}".format(v['count']) }}</p>
-                      </td>
                       <td>
                         <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v.cost) }}</p>
                       </td>
@@ -94,7 +90,6 @@
                 <th scope="row">TOP 10 BEERS YTD</th>
               <tr>
                 <th scope="col">PRODUCT</th>
-                <th scope="col">COUNT</th>
                 <th scope="col">COST</th>
               </tr>
             </thead>
@@ -102,9 +97,6 @@
                   {% for k, v in steakhouse_beer_bottle.iterrows() %}
                     <tr>
                       <th scope="row">{{ k }}</th>
-                      <td>
-                        <p class="mb-0 ms-1 text-begin">{{ "{:,.0f}".format(v['count']) }}</p>
-                      </td>
                       <td>
                         <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v.cost) }}</p>
                       </td>
@@ -134,7 +126,6 @@
                 <th scope="row">TOP 10 WINE VENDORS YTD</th>
               <tr>
                 <th scope="col">VENDOR</th>
-                <th scope="col">COUNT</th>
                 <th scope="col">COST</th>
               </tr>
             </thead>
@@ -142,9 +133,6 @@
                   {% for k, v in casual_wine_vendor.iterrows() %}
                     <tr>
                       <th scope="row">{{ k }}</th>
-                      <td>
-                        <p class="mb-0 ms-1 text-begin">{{ "{:,.0f}".format(v['count']) }}</p>
-                      </td>
                       <td>
                         <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v.cost) }}</p>
                       </td>
@@ -170,7 +158,6 @@
                 <th scope="row">TOP 10 LIQUORS YTD</th>
               <tr>
                 <th scope="col">PRODUCT</th>
-                <th scope="col">COUNT</th>
                 <th scope="col">COST</th>
               </tr>
             </thead>
@@ -178,9 +165,6 @@
                   {% for k, v in casual_liquor_bottle.iterrows() %}
                     <tr>
                       <th scope="row">{{ k }}</th>
-                      <td>
-                        <p class="mb-0 ms-1 text-begin">{{ "{:,.0f}".format(v['count']) }}</p>
-                      </td>
                       <td>
                         <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v.cost) }}</p>
                       </td>
@@ -206,7 +190,6 @@
                 <th scope="row">TOP 10 BEERS YTD</th>
               <tr>
                 <th scope="col">PRODUCT</th>
-                <th scope="col">COUNT</th>
                 <th scope="col">COST</th>
               </tr>
             </thead>
@@ -214,9 +197,6 @@
                   {% for k, v in casual_beer_bottle.iterrows() %}
                     <tr>
                       <th scope="row">{{ k }}</th>
-                      <td>
-                        <p class="mb-0 ms-1 text-begin">{{ "{:,.0f}".format(v['count']) }}</p>
-                      </td>
                       <td>
                         <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v.cost) }}</p>
                       </td>

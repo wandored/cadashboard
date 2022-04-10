@@ -1,5 +1,5 @@
 """
-Datarefresh imports the previous days data and
+Datarefresh imports the previous 7 days data and
 uploads it to the local database.  This is run
 hourly from a cron job
 """
@@ -25,6 +25,7 @@ def make_HTTP_request(url):
             all_records = all_records + json_data["value"]
             if "@odata.nextLink" in json_data:
                 url = json_data["@odata.nextLink"]
+                print(url)
             else:
                 break
     return all_records
@@ -55,9 +56,11 @@ def sales_detail(start, end):
         url_filter
     )
     url = "{}/SalesDetail?{}".format(Config.SRVC_ROOT, query)
+    print(url)
     rqst = make_HTTP_request(url)
     df = make_dataframe(rqst)
     if df.empty:
+        print("empty dataframe")
         return
 
     cur.execute(rest_query)
@@ -110,9 +113,11 @@ def sales_employee(start, end):
     )
     query = "$select=dayPart,netSales,numberofGuests,location&{}".format(url_filter)
     url = "{}/SalesEmployee?{}".format(Config.SRVC_ROOT, query)
+    print(url)
     rqst = make_HTTP_request(url)
     df = make_dataframe(rqst)
     if df.empty:
+        print("empty dataframe")
         return
     cur.execute(rest_query)
     data = cur.fetchall()
@@ -143,9 +148,11 @@ def labor_datail(start, end):
     )
     query = "$select=jobTitle,hours,total,location_ID&{}".format(url_filter)
     url = "{}/LaborDetail?{}".format(Config.SRVC_ROOT, query)
+    print(url)
     rqst = make_HTTP_request(url)
     df = make_dataframe(rqst)
     if df.empty:
+        print("empty dataframe")
         return
 
     with open("/usr/local/share/labor_categories.json") as labor_file:
@@ -185,6 +192,7 @@ def potato_sales(start):
             rqst = make_HTTP_request(url)
             df = make_dataframe(rqst)
             if df.empty:
+                print("empty dataframe")
                 continue
 
             cur.execute(rest_query)
@@ -192,6 +200,7 @@ def potato_sales(start):
             df_loc = pd.DataFrame.from_records(data, columns=["id", "location", "name"])
             df_merge = df_loc.merge(df, on="location")
             if df_merge.empty:
+                print(f"no sales at {t[0]}")
                 if df_pot.empty:
                     continue
                 df_pot.loc[t[0]] = [0]
@@ -261,18 +270,25 @@ if __name__ == "__main__":
 
     TODAY = datetime.date(datetime.now())
     YSTDAY = TODAY - timedelta(days=1)
-    start_date = YSTDAY.strftime("%Y-%m-%d")
-    end_date = TODAY.strftime("%Y-%m-%d")
 
-    cur.execute('DELETE FROM "Sales" WHERE date = %s', (start_date,))
-    cur.execute('DELETE FROM "Labor" WHERE date = %s', (start_date,))
-    cur.execute('DELETE FROM "Menuitems" WHERE date = %s', (start_date,))
-    cur.execute('DELETE FROM "Potatoes" WHERE date = %s', (start_date,))
-    conn.commit()
+    for d in range(7):
+        dt = YSTDAY - timedelta(days=d)
+        tmrw = dt + timedelta(days=1)
+        start_date = dt.strftime("%Y-%m-%d")
+        end_date = tmrw.strftime("%Y-%m-%d")
+        # end_date = TODAY.strftime("%Y-%m-%d")
+        print(dt)
+        print()
 
-    sales_detail(start_date, end_date)
-    sales_employee(start_date, end_date)
-    labor_datail(start_date, end_date)
-    potato_sales(start_date)
+        cur.execute('DELETE FROM "Sales" WHERE date = %s', (start_date,))
+        cur.execute('DELETE FROM "Labor" WHERE date = %s', (start_date,))
+        cur.execute('DELETE FROM "Menuitems" WHERE date = %s', (start_date,))
+        cur.execute('DELETE FROM "Potatoes" WHERE date = %s', (start_date,))
+        conn.commit()
+
+        sales_detail(start_date, end_date)
+        sales_employee(start_date, end_date)
+        labor_datail(start_date, end_date)
+        potato_sales(start_date)
 
     conn.close()
