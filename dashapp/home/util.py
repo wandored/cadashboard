@@ -376,3 +376,98 @@ def convert_uofm(unit):
         return pack_size.base_qty, pack_size.base_uofm
     else:
         return 0, 0
+
+
+def update_recipe_costs():
+    """
+    write current recipe costs to database
+    imported from downloaded report
+    """
+
+    df = pd.read_csv("/usr/local/share/export.csv", sep=",")
+    df.loc[:, "Name"] = df["Name"].str.replace(
+        r"CHOPHOUSE - NOLA", "CHOPHOUSE-NOLA", regex=True
+    )
+    df.loc[:, "Name"] = df["Name"].str.replace(r"CAFÉ", "CAFE", regex=True)
+    df.loc[:, "Name"] = df["Name"].str.replace(r"^(?:.*?( -)){2}", "-", regex=True)
+    df[["name", "menuitem"]] = df["Name"].str.split(" - ", expand=True)
+    df.drop(columns=["Name", "__count", "Barcode"], inplace=True)
+    df.rename(
+        columns={
+            "RecipeId": "recipeid",
+            "Recipe": "recipe",
+            "Category1": "category1",
+            "Category2": "category2",
+            "POSID": "posid",
+            "MenuItemId": "menuitemid",
+        },
+        inplace=True,
+    )
+    df = df[
+        [
+            "name",
+            "menuitem",
+            "recipe",
+            "category1",
+            "category2",
+            "posid",
+            "recipeid",
+            "menuitemid",
+        ]
+    ]
+
+    df_cost = pd.read_csv(
+        "/usr/local/share/Menu Price Analysis.csv", skiprows=3, sep=",", thousands=","
+    )
+    df_cost.loc[:, "MenuItemName"] = df_cost["MenuItemName"].str.replace(
+        r"CHOPHOUSE - NOLA", "CHOPHOUSE-NOLA", regex=True
+    )
+    df_cost.loc[:, "MenuItemName"] = df_cost["MenuItemName"].str.replace(
+        r"CAFÉ", "CAFE", regex=True
+    )
+    df_cost.loc[:, "MenuItemName"] = df_cost["MenuItemName"].str.replace(
+        r"^(?:.*?( -)){2}", "-", regex=True
+    )
+    df_cost[["name", "menuitem"]] = df_cost["MenuItemName"].str.split(
+        " - ", expand=True
+    )
+
+    df_cost.drop(
+        columns=[
+            "AvgPrice1",
+            "Profit1",
+            "Textbox35",
+            "TargetMargin1",
+            "Textbox43",
+            "PriceNeeded1",
+            "Location",
+            "Cost1",
+            "AvgPrice",
+            "Profit",
+            "ProfitPercent",
+            "TargetMargin",
+            "Variance",
+            "PriceNeeded",
+            "MenuItemName",
+        ],
+        inplace=True,
+    )
+    df_cost.rename(columns={"Cost": "cost"}, inplace=True)
+    df_cost = df_cost[["name", "menuitem", "cost"]]
+
+    recipes = pd.merge(df_cost, df, on=["name", "menuitem"], how="left")
+    # Need to fix names to match the database
+    recipes.loc[:, "name"] = recipes["name"].str.replace(r"'47", "47", regex=True)
+    recipes.loc[:, "name"] = recipes["name"].str.replace(
+        r"NEW YORK PRIME-BOCA", "NYP-BOCA", regex=True
+    )
+    recipes.loc[:, "name"] = recipes["name"].str.replace(
+        r"NEW YORK PRIME-MYRTLE BEACH", "NYP-MYRTLE BEACH", regex=True
+    )
+    recipes.loc[:, "name"] = recipes["name"].str.replace(
+        r"NEW YORK PRIME-ATLANTA", "NYP-ATLANTA", regex=True
+    )
+
+    # TODO may need to delete by recipID if duplicates show up
+    recipes.to_sql("Recipes", con=db.engine, if_exists="replace", index_label="id")
+    return 0

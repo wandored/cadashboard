@@ -77,3 +77,7 @@ class StoreForm(FlaskForm):
 
 class PotatoForm(FlaskForm):
     submit4 = SubmitField("Submit")
+
+
+class RecipeForm(FlaskForm):
+    submit5 = SubmitField("Submit")

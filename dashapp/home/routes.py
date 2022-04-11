@@ -19,10 +19,17 @@ from dashapp.home.util import (
     get_daily_sales,
     get_daily_labor,
     convert_uofm,
+    update_recipe_costs,
 )
 from flask_security import login_required, current_user
 from datetime import datetime, timedelta
-from dashapp.authentication.forms import DateForm, StoreForm, UpdateForm, PotatoForm
+from dashapp.authentication.forms import (
+    DateForm,
+    StoreForm,
+    UpdateForm,
+    PotatoForm,
+    RecipeForm,
+)
 from dashapp.authentication.models import (
     Ingredients,
     Menuitems,
@@ -1641,6 +1648,7 @@ def support():
     form1 = DateForm()
     form2 = UpdateForm()
     form3 = StoreForm()
+    form5 = RecipeForm()
     if form1.submit1.data and form1.validate():
         """ """
         start_day = form1.selectdate.data.strftime("%Y-%m-%d")
@@ -1669,6 +1677,13 @@ def support():
         store_id = form3.store.data.id
 
         return redirect(url_for("home_blueprint.store", store_id=store_id))
+
+    if form5.submit5.data and form5.validate():
+        response = update_recipe_costs()
+        if response == 0:
+            flash(f"Recipe costs updated", "success")
+        session["targetdate"] = start_day
+        return redirect(url_for("home_blueprint.support"))
 
     query = (
         db.session.query(
@@ -1711,6 +1726,7 @@ def support():
         form1=form1,
         form2=form2,
         form3=form3,
+        form5=form5,
         unassigned_sales=unassigned_sales,
         do_not_use=do_not_use,
     )
