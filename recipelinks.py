@@ -25,7 +25,7 @@ if __name__ == "__main__":
     )
     cur = conn.cursor()
 
-    df = pd.read_csv("/tmp/export.csv", sep=",")
+    df = pd.read_csv("/usr/local/share/export.csv", sep=",")
     df.loc[:, "Name"] = df["Name"].str.replace(
         r"CHOPHOUSE - NOLA", "CHOPHOUSE-NOLA", regex=True
     )
@@ -56,8 +56,6 @@ if __name__ == "__main__":
             "menuitemid",
         ]
     ]
-
-    print(df.info())
 
     df_cost = pd.read_csv(
         "/usr/local/share/Menu Price Analysis.csv", skiprows=3, sep=",", thousands=","
@@ -100,18 +98,21 @@ if __name__ == "__main__":
 
     recipes = pd.merge(df_cost, df, on=["name", "menuitem"], how="left")
     # Need to fix names to match the database
+    recipes.loc[:, "name"] = recipes["name"].str.replace(r"'47", "47", regex=True)
     recipes.loc[:, "name"] = recipes["name"].str.replace(
-        r"'47", "47", regex=True
+        r"NEW YORK PRIME-BOCA", "NYP-BOCA", regex=True
     )
-    recipes.loc[:, "name"] = recipes["name"].str.replace(r"NEW YORK PRIME-BOCA", "NYP-BOCA", regex=True)
-    recipes.loc[:, "name"] = recipes["name"].str.replace(r"NEW YORK PRIME-MYRTLE BEACH", "NYP-MYRTLE BEACH", regex=True)
-    recipes.loc[:, "name"] = recipes["name"].str.replace(r"NEW YORK PRIME-ATLANTA", "NYP-ATLANTA", regex=True)
-    print(recipes)
+    recipes.loc[:, "name"] = recipes["name"].str.replace(
+        r"NEW YORK PRIME-MYRTLE BEACH", "NYP-MYRTLE BEACH", regex=True
+    )
+    recipes.loc[:, "name"] = recipes["name"].str.replace(
+        r"NEW YORK PRIME-ATLANTA", "NYP-ATLANTA", regex=True
+    )
 
     #    cur.execute('DELETE FROM "Recipes"')
     #    conn.commit()
-    #
-    recipes.to_sql("Recipes", engine, if_exists="replace", index_label='id')
+    # TODO may need to delete by recipID if duplicates show up
+    recipes.to_sql("Recipes", engine, if_exists="replace", index_label="id")
     conn.commit()
 
     conn.close()

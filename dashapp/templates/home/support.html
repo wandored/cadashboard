@@ -8,11 +8,11 @@
 {% block content %}
 
     <div class="container-fluid py-4">
-      <div class="row">
+      <div class="row mt-4">
         <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
           <div class="card">
-            <div class="card-header bg-warning pb-0">
-              <h4>MANUAL DATA UPDATE</h4>
+            <div class="card-header bg-danger pb-0">
+              <h4>MANUAL SALES UPDATE</h4>
             </div>
             <div class="card">
               {% for x in fiscal_dates %}
@@ -45,6 +45,8 @@
             </div>
           </div>
         </div>
+      </div>
+      <div class="row mt-4">
         <!-- unassigned sales Cards -->
         <div class="col-lg-4 col-md-6">
           <div class="card h-100">
