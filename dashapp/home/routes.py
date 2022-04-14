@@ -54,9 +54,9 @@ YSTDAY = TODAY - timedelta(days=1)
 
 #@login_required
 #def route_default():
-#    session["targetdate"] = YSTDAY.strftime("%Y-%m-%d")
-#    if not Sales.query.filter_by(date=session["targetdate"]).first():
-#        session['targetdate'] = find_day_with_sales(start_day)
+#    session["token"] = YSTDAY.strftime("%Y-%m-%d")
+#    if not Sales.query.filter_by(date=session["token"]).first():
+#        session['token'] = find_day_with_sales(start_day)
 #        return redirect(url_for("home_blueprint.index"))
 #    return redirect(url_for("home_blueprint.index"))
 
@@ -64,17 +64,17 @@ YSTDAY = TODAY - timedelta(days=1)
 @blueprint.route("/", methods=["GET", "POST"])
 @blueprint.route("/index/", methods=["GET", "POST"])
 @login_required
-def index(targetdate=None):
+def index():
 
-    if not session["targetdate"]:
-        print("no targetdate")
-        session["targetdate"] = YSTDAY.strftime("%Y-%m-%d")
+    if not 'token' in session:
+        print("no token")
+        session["token"] = YSTDAY.strftime("%Y-%m-%d")
         return redirect(url_for("home_blueprint.index"))
     start_day = (
         end_day
     ) = start_week = end_week = start_period = end_period = start_year = end_year = ""
     period = year = 0
-    fiscal_dates = get_period(datetime.strptime(session["targetdate"], "%Y-%m-%d"))
+    fiscal_dates = get_period(datetime.strptime(session["token"], "%Y-%m-%d"))
     for i in fiscal_dates:
         day_start = datetime.strptime(i.date, "%Y-%m-%d")
         day_end = day_start + timedelta(days=1)
@@ -104,7 +104,7 @@ def index(targetdate=None):
 
     # Check for no sales
     if not Sales.query.filter_by(date=start_day).first():
-        session['targetdate'] = find_day_with_sales(start_day)
+        session['token'] = find_day_with_sales(start_day)
         return redirect(url_for("home_blueprint.index"))
 
     # Get Data
@@ -112,15 +112,15 @@ def index(targetdate=None):
     form3 = StoreForm()
     if form1.submit1.data and form1.validate():
         """
-        Change targetdate
+        Change token
         """
         start_day = form1.selectdate.data.strftime("%Y-%m-%d")
-        session["targetdate"] = start_day
+        session["token"] = start_day
         return redirect(url_for("home_blueprint.index"))
 
     if form3.submit3.data and form3.validate():
 
-        session["targetdate"] = start_day
+        session["token"] = start_day
         store_id = form3.store.data.id
 
         return redirect(url_for("home_blueprint.store", store_id=store_id))
@@ -519,7 +519,7 @@ def store(store_id):
         end_day
     ) = start_week = end_week = start_period = end_period = start_year = end_year = ""
     period = year = week = 0
-    fiscal_dates = get_period(datetime.strptime(session["targetdate"], "%Y-%m-%d"))
+    fiscal_dates = get_period(datetime.strptime(session["token"], "%Y-%m-%d"))
     for i in fiscal_dates:
         day_start = datetime.strptime(i.date, "%Y-%m-%d")
         day_end = day_start + timedelta(days=1)
@@ -578,15 +578,15 @@ def store(store_id):
         end_day = day_end.strftime("%Y-%m-%d")
 
         if not Sales.query.filter_by(date=start_day, name=store.name).first():
-            session['targetdate'] = find_day_with_sales(start_day)
+            session['token'] = find_day_with_sales(start_day)
             return redirect(url_for("home_blueprint.store", store_id=store.id))
 
-        session["targetdate"] = start_day
+        session["token"] = start_day
         return redirect(url_for("home_blueprint.store", store_id=store.id))
 
     if form3.submit3.data and form3.validate():
 
-        session["targetdate"] = start_day
+        session["token"] = start_day
         store_id = form3.store.data.id
 
         return redirect(url_for("home_blueprint.store", store_id=store_id))
@@ -1161,7 +1161,7 @@ def marketing():
     start_day = (
         end_day
     ) = start_week = end_week = start_period = end_period = start_year = end_year = ""
-    fiscal_dates = get_period(datetime.strptime(session["targetdate"], "%Y-%m-%d"))
+    fiscal_dates = get_period(datetime.strptime(session["token"], "%Y-%m-%d"))
     for i in fiscal_dates:
         day_start = datetime.strptime(i.date, "%Y-%m-%d")
         day_end = day_start + timedelta(days=1)
@@ -1191,13 +1191,13 @@ def marketing():
     if form1.submit1.data and form1.validate():
         """ """
         start_day = form1.selectdate.data.strftime("%Y-%m-%d")
-        session["targetdate"] = start_day
+        session["token"] = start_day
         return redirect(url_for("home_blueprint.marketing"))
 
     form3 = StoreForm()
     if form3.submit3.data and form3.validate():
 
-        session["targetdate"] = start_day
+        session["token"] = start_day
         store_id = form3.store.data.id
 
         return redirect(url_for("home_blueprint.store", store_id=store_id))
@@ -1359,7 +1359,7 @@ def purchasing():
     start_day = (
         end_day
     ) = start_week = end_week = start_period = end_period = start_year = end_year = ""
-    fiscal_dates = get_period(datetime.strptime(session["targetdate"], "%Y-%m-%d"))
+    fiscal_dates = get_period(datetime.strptime(session["token"], "%Y-%m-%d"))
     for i in fiscal_dates:
         day_start = datetime.strptime(i.date, "%Y-%m-%d")
         day_end = day_start + timedelta(days=1)
@@ -1398,11 +1398,11 @@ def purchasing():
 
     if form1.submit1.data and form1.validate():
         start_day = form1.selectdate.data.strftime("%Y-%m-%d")
-        session["targetdate"] = start_day
+        session["token"] = start_day
         return redirect(url_for("home_blueprint.purchasing"))
 
     if form3.submit3.data and form3.validate():
-        session["targetdate"] = start_day
+        session["token"] = start_day
         store_id = form3.store.data.id
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
@@ -1614,7 +1614,7 @@ def support():
     start_day = (
         end_day
     ) = start_week = end_week = start_period = end_period = start_year = end_year = ""
-    fiscal_dates = get_period(datetime.strptime(session["targetdate"], "%Y-%m-%d"))
+    fiscal_dates = get_period(datetime.strptime(session["token"], "%Y-%m-%d"))
     for i in fiscal_dates:
         day_start = datetime.strptime(i.date, "%Y-%m-%d")
         day_end = day_start + timedelta(days=1)
@@ -1647,7 +1647,7 @@ def support():
     if form1.submit1.data and form1.validate():
         """ """
         start_day = form1.selectdate.data.strftime("%Y-%m-%d")
-        session["targetdate"] = start_day
+        session["token"] = start_day
         return redirect(url_for("home_blueprint.support"))
 
     if form2.submit2.data and form2.validate():
@@ -1662,12 +1662,12 @@ def support():
                 f"I cannot find sales for the day you selected.  Please select another date!",
                 "warning",
             )
-        session["targetdate"] = start_day
+        session["token"] = start_day
         return redirect(url_for("home_blueprint.support"))
 
     if form3.submit3.data and form3.validate():
 
-        session["targetdate"] = start_day
+        session["token"] = start_day
         store_id = form3.store.data.id
 
         return redirect(url_for("home_blueprint.store", store_id=store_id))
@@ -1676,7 +1676,7 @@ def support():
         response = update_recipe_costs()
         if response == 0:
             flash(f"Recipe costs updated", "success")
-        session["targetdate"] = start_day
+        session["token"] = start_day
         return redirect(url_for("home_blueprint.support"))
 
     query = (
@@ -1733,7 +1733,7 @@ def alcohol():
     start_day = (
         end_day
     ) = start_week = end_week = start_period = end_period = start_year = end_year = ""
-    fiscal_dates = get_period(datetime.strptime(session["targetdate"], "%Y-%m-%d"))
+    fiscal_dates = get_period(datetime.strptime(session["token"], "%Y-%m-%d"))
     for i in fiscal_dates:
         day_start = datetime.strptime(i.date, "%Y-%m-%d")
         day_end = day_start + timedelta(days=1)
@@ -1772,11 +1772,11 @@ def alcohol():
 
     if form1.submit1.data and form1.validate():
         start_day = form1.selectdate.data.strftime("%Y-%m-%d")
-        session["targetdate"] = start_day
+        session["token"] = start_day
         return redirect(url_for("home_blueprint.alcohol"))
 
     if form3.submit3.data and form3.validate():
-        session["targetdate"] = start_day
+        session["token"] = start_day
         store_id = form3.store.data.id
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
@@ -1943,7 +1943,7 @@ def profile():
     start_day = (
         end_day
     ) = start_week = end_week = start_period = end_period = start_year = end_year = ""
-    fiscal_dates = get_period(datetime.strptime(session["targetdate"], "%Y-%m-%d"))
+    fiscal_dates = get_period(datetime.strptime(session["token"], "%Y-%m-%d"))
     for i in fiscal_dates:
         day_start = datetime.strptime(i.date, "%Y-%m-%d")
         day_end = day_start + timedelta(days=1)
@@ -1982,11 +1982,11 @@ def profile():
 
     if form1.submit1.data and form1.validate():
         start_day = form1.selectdate.data.strftime("%Y-%m-%d")
-        session["targetdate"] = start_day
+        session["token"] = start_day
         return redirect(url_for("home_blueprint.profile"))
 
     if form3.submit3.data and form3.validate():
-        session["targetdate"] = start_day
+        session["token"] = start_day
         store_id = form3.store.data.id
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
@@ -2007,7 +2007,7 @@ def potato(store_id):
     form1 = DateForm()
     form2 = UpdateForm()
     form3 = StoreForm()
-    fiscal_dates = get_period(datetime.strptime(session["targetdate"], "%Y-%m-%d"))
+    fiscal_dates = get_period(datetime.strptime(session["token"], "%Y-%m-%d"))
     store = Restaurants.query.filter_by(id=store_id).first()
 
     pot_df = pd.read_csv("/usr/local/share/potatochart.csv", usecols=["time"])
