@@ -61,8 +61,8 @@ YSTDAY = TODAY - timedelta(days=1)
 #    return redirect(url_for("home_blueprint.index"))
 
 
+@blueprint.route("/", methods=["GET", "POST"])
 @blueprint.route("/index/", methods=["GET", "POST"])
-@blueprint.route("/")
 @login_required
 def index():
 
