@@ -7,7 +7,7 @@ import requests
 import pandas as pd
 import numpy as np
 from dashapp.config import Config
-from datetime import datetime
+from datetime import datetime, timedelta
 from dashapp.authentication.models import (
     Calendar,
     Sales,
@@ -29,6 +29,14 @@ pd.option_context(
     "display.precision",
     3,
 )
+
+
+def find_day_with_sales(day):
+    while not Sales.query.filter_by(date=day).first():
+        date = datetime.strptime(day, "%Y-%m-%d")
+        next_day = date - timedelta(days=1)
+        day = next_day.strftime("%Y-%m-%d")
+    return day
 
 
 def refresh_data(start, end):
@@ -132,11 +140,14 @@ def sales_employee(start, end):
         [(x.name, x.location) for x in data], columns=["name", "location"]
     )
     df_merge = df_loc.merge(df, on="location")
-    df_merge.rename(columns={"netSales": "sales", "dayPart": "daypart"}, inplace=True)
+    df_merge.rename(
+        columns={"netSales": "sales", "numberofGuests": "guests", "dayPart": "daypart"},
+        inplace=True,
+    )
 
     # pivot data and write to database
     df_pivot = df_merge.pivot_table(
-        index=["name", "daypart"], values=["sales"], aggfunc=np.sum
+        index=["name", "daypart"], values=["sales", "guests"], aggfunc=np.sum
     )
     df_pivot.loc[:, "date"] = start
     df_pivot.to_sql("Sales", con=db.engine, if_exists="append")
