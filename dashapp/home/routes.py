@@ -13,16 +13,24 @@ from dashapp.home import blueprint
 from flask import flash, render_template, session, redirect, url_for
 from flask.wrappers import Response
 from dashapp.home.util import (
+    find_day_with_sales,
     get_period,
     get_lastyear,
     refresh_data,
     get_daily_sales,
     get_daily_labor,
     convert_uofm,
+    update_recipe_costs,
 )
 from flask_security import login_required, current_user
 from datetime import datetime, timedelta
-from dashapp.authentication.forms import DateForm, StoreForm, UpdateForm, PotatoForm
+from dashapp.authentication.forms import (
+    DateForm,
+    StoreForm,
+    UpdateForm,
+    PotatoForm,
+    RecipeForm,
+)
 from dashapp.authentication.models import (
     Ingredients,
     Menuitems,
@@ -44,32 +52,27 @@ TODAY = datetime.date(datetime.now())
 YSTDAY = TODAY - timedelta(days=1)
 
 
-@blueprint.route("/")
 @login_required
 def route_default():
     session["targetdate"] = YSTDAY.strftime("%Y-%m-%d")
     if not Sales.query.filter_by(date=session["targetdate"]).first():
-        flash(
-            f"Sales are not available for the selected day.  Please try again later or select a different date!",
-            "warning",
-        )
-
-        new_day = TODAY - timedelta(days=2)
-        session["targetdate"] = new_day.strftime("%Y-%m-%d")
+        session['targetdate'] = find_day_with_sales(start_day)
         return redirect(url_for("home_blueprint.index"))
     return redirect(url_for("home_blueprint.index"))
 
 
+@blueprint.route("/")
 @blueprint.route("/index/", methods=["GET", "POST"])
 @login_required
 def index():
 
+#    if not session["targetdate"]:
+#        session["targetdate"] = YSTDAY.strftime("%Y-%m-%d")
+#        return redirect(url_for("home_blueprint.index"))
     start_day = (
         end_day
     ) = start_week = end_week = start_period = end_period = start_year = end_year = ""
     period = year = 0
-    if not session["targetdate"]:
-        return redirect(url_for("home_blueprint.route_default"))
     fiscal_dates = get_period(datetime.strptime(session["targetdate"], "%Y-%m-%d"))
     for i in fiscal_dates:
         day_start = datetime.strptime(i.date, "%Y-%m-%d")
@@ -100,7 +103,8 @@ def index():
 
     # Check for no sales
     if not Sales.query.filter_by(date=start_day).first():
-        return redirect(url_for("home_blueprint.route_default"))
+        session['targetdate'] = find_day_with_sales(start_day)
+        return redirect(url_for("home_blueprint.index"))
 
     # Get Data
     form1 = DateForm()
@@ -573,13 +577,7 @@ def store(store_id):
         end_day = day_end.strftime("%Y-%m-%d")
 
         if not Sales.query.filter_by(date=start_day, name=store.name).first():
-            # if no sales for date selected try yesterday.
-            flash(
-                f"I cannot find sales for the day you selected.  Please select another date!",
-                "warning",
-            )
-
-            session["targetdate"] = YSTDAY.strftime("%Y-%m-%d")
+            session['targetdate'] = find_day_with_sales(start_day)
             return redirect(url_for("home_blueprint.store", store_id=store.id))
 
         session["targetdate"] = start_day
@@ -606,6 +604,7 @@ def store(store_id):
         )
         for i in lst:
             sales = i.total_sales
+            print(i.total_sales)
         return sales
 
     sales_day = get_sales(start_day, end_day, store.name)
@@ -1089,6 +1088,8 @@ def store(store_id):
     current_supply_budget = supply_budget[period - 1]
     current_smallware_cost = smallware_cost_dol[period - 1]
     current_smallware_budget = smallware_budget[period - 1]
+    print(smallware_cost_dol)
+    print(smallware_budget)
 
     query = (
         Transactions.query.with_entities(Transactions.item).filter(
@@ -1375,17 +1376,17 @@ def purchasing():
         last_thirty = thirty.strftime("%Y-%m-%d")
 
     # Get matching day, week and period start and end dates
-    start_day_ly = get_lastyear(start_day)
-    end_day_ly = get_lastyear(end_day)
-    start_week_ly = get_lastyear(start_week)
-    end_week_ly = get_lastyear(end_week)
-    week_to_date = get_lastyear(start_day)
-    start_period_ly = get_lastyear(start_period)
-    end_period_ly = get_lastyear(end_period)
-    period_to_date = get_lastyear(start_day)
+#    start_day_ly = get_lastyear(start_day)
+#    end_day_ly = get_lastyear(end_day)
+#    start_week_ly = get_lastyear(start_week)
+#    end_week_ly = get_lastyear(end_week)
+#    week_to_date = get_lastyear(start_day)
+#    start_period_ly = get_lastyear(start_period)
+#    end_period_ly = get_lastyear(end_period)
+#    period_to_date = get_lastyear(start_day)
     start_year_ly = get_lastyear(start_year)
     end_year_ly = get_lastyear(end_year)
-    year_to_date = get_lastyear(start_day)
+#    year_to_date = get_lastyear(start_day)
 
     # Get list of Restaurants
     data = Restaurants.query.all()
@@ -1641,6 +1642,7 @@ def support():
     form1 = DateForm()
     form2 = UpdateForm()
     form3 = StoreForm()
+    form5 = RecipeForm()
     if form1.submit1.data and form1.validate():
         """ """
         start_day = form1.selectdate.data.strftime("%Y-%m-%d")
@@ -1659,7 +1661,6 @@ def support():
                 f"I cannot find sales for the day you selected.  Please select another date!",
                 "warning",
             )
-            return redirect(url_for("home_blueprint.route_default"))
         session["targetdate"] = start_day
         return redirect(url_for("home_blueprint.support"))
 
@@ -1669,6 +1670,13 @@ def support():
         store_id = form3.store.data.id
 
         return redirect(url_for("home_blueprint.store", store_id=store_id))
+
+    if form5.submit5.data and form5.validate():
+        response = update_recipe_costs()
+        if response == 0:
+            flash(f"Recipe costs updated", "success")
+        session["targetdate"] = start_day
+        return redirect(url_for("home_blueprint.support"))
 
     query = (
         db.session.query(
@@ -1711,6 +1719,7 @@ def support():
         form1=form1,
         form2=form2,
         form3=form3,
+        form5=form5,
         unassigned_sales=unassigned_sales,
         do_not_use=do_not_use,
     )

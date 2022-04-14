@@ -7,7 +7,7 @@ import requests
 import pandas as pd
 import numpy as np
 from dashapp.config import Config
-from datetime import datetime
+from datetime import datetime, timedelta
 from dashapp.authentication.models import (
     Calendar,
     Sales,
@@ -29,6 +29,14 @@ pd.option_context(
     "display.precision",
     3,
 )
+
+
+def find_day_with_sales(day):
+    while not Sales.query.filter_by(date=day).first():
+        date = datetime.strptime(day, "%Y-%m-%d")
+        next_day = date - timedelta(days=1)
+        day = next_day.strftime("%Y-%m-%d")
+    return day
 
 
 def refresh_data(start, end):
@@ -132,11 +140,14 @@ def sales_employee(start, end):
         [(x.name, x.location) for x in data], columns=["name", "location"]
     )
     df_merge = df_loc.merge(df, on="location")
-    df_merge.rename(columns={"netSales": "sales", "dayPart": "daypart"}, inplace=True)
+    df_merge.rename(
+        columns={"netSales": "sales", "numberofGuests": "guests", "dayPart": "daypart"},
+        inplace=True,
+    )
 
     # pivot data and write to database
     df_pivot = df_merge.pivot_table(
-        index=["name", "daypart"], values=["sales"], aggfunc=np.sum
+        index=["name", "daypart"], values=["sales", "guests"], aggfunc=np.sum
     )
     df_pivot.loc[:, "date"] = start
     df_pivot.to_sql("Sales", con=db.engine, if_exists="append")
@@ -376,3 +387,98 @@ def convert_uofm(unit):
         return pack_size.base_qty, pack_size.base_uofm
     else:
         return 0, 0
+
+
+def update_recipe_costs():
+    """
+    write current recipe costs to database
+    imported from downloaded report
+    """
+
+    df = pd.read_csv("/usr/local/share/export.csv", sep=",")
+    df.loc[:, "Name"] = df["Name"].str.replace(
+        r"CHOPHOUSE - NOLA", "CHOPHOUSE-NOLA", regex=True
+    )
+    df.loc[:, "Name"] = df["Name"].str.replace(r"CAFÉ", "CAFE", regex=True)
+    df.loc[:, "Name"] = df["Name"].str.replace(r"^(?:.*?( -)){2}", "-", regex=True)
+    df[["name", "menuitem"]] = df["Name"].str.split(" - ", expand=True)
+    df.drop(columns=["Name", "__count", "Barcode"], inplace=True)
+    df.rename(
+        columns={
+            "RecipeId": "recipeid",
+            "Recipe": "recipe",
+            "Category1": "category1",
+            "Category2": "category2",
+            "POSID": "posid",
+            "MenuItemId": "menuitemid",
+        },
+        inplace=True,
+    )
+    df = df[
+        [
+            "name",
+            "menuitem",
+            "recipe",
+            "category1",
+            "category2",
+            "posid",
+            "recipeid",
+            "menuitemid",
+        ]
+    ]
+
+    df_cost = pd.read_csv(
+        "/usr/local/share/Menu Price Analysis.csv", skiprows=3, sep=",", thousands=","
+    )
+    df_cost.loc[:, "MenuItemName"] = df_cost["MenuItemName"].str.replace(
+        r"CHOPHOUSE - NOLA", "CHOPHOUSE-NOLA", regex=True
+    )
+    df_cost.loc[:, "MenuItemName"] = df_cost["MenuItemName"].str.replace(
+        r"CAFÉ", "CAFE", regex=True
+    )
+    df_cost.loc[:, "MenuItemName"] = df_cost["MenuItemName"].str.replace(
+        r"^(?:.*?( -)){2}", "-", regex=True
+    )
+    df_cost[["name", "menuitem"]] = df_cost["MenuItemName"].str.split(
+        " - ", expand=True
+    )
+
+    df_cost.drop(
+        columns=[
+            "AvgPrice1",
+            "Profit1",
+            "Textbox35",
+            "TargetMargin1",
+            "Textbox43",
+            "PriceNeeded1",
+            "Location",
+            "Cost1",
+            "AvgPrice",
+            "Profit",
+            "ProfitPercent",
+            "TargetMargin",
+            "Variance",
+            "PriceNeeded",
+            "MenuItemName",
+        ],
+        inplace=True,
+    )
+    df_cost.rename(columns={"Cost": "cost"}, inplace=True)
+    df_cost = df_cost[["name", "menuitem", "cost"]]
+
+    recipes = pd.merge(df_cost, df, on=["name", "menuitem"], how="left")
+    # Need to fix names to match the database
+    recipes.loc[:, "name"] = recipes["name"].str.replace(r"'47", "47", regex=True)
+    recipes.loc[:, "name"] = recipes["name"].str.replace(
+        r"NEW YORK PRIME-BOCA", "NYP-BOCA", regex=True
+    )
+    recipes.loc[:, "name"] = recipes["name"].str.replace(
+        r"NEW YORK PRIME-MYRTLE BEACH", "NYP-MYRTLE BEACH", regex=True
+    )
+    recipes.loc[:, "name"] = recipes["name"].str.replace(
+        r"NEW YORK PRIME-ATLANTA", "NYP-ATLANTA", regex=True
+    )
+
+    # TODO may need to delete by recipID if duplicates show up
+    recipes.to_sql("Recipes", con=db.engine, if_exists="replace", index_label="id")
+    return 0
