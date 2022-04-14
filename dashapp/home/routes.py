@@ -66,9 +66,10 @@ YSTDAY = TODAY - timedelta(days=1)
 @login_required
 def index():
 
-#    if not session["targetdate"]:
-#        session["targetdate"] = YSTDAY.strftime("%Y-%m-%d")
-#        return redirect(url_for("home_blueprint.index"))
+    if not session["targetdate"]:
+        print("no targetdate")
+        session["targetdate"] = YSTDAY.strftime("%Y-%m-%d")
+        return redirect(url_for("home_blueprint.index"))
     start_day = (
         end_day
     ) = start_week = end_week = start_period = end_period = start_year = end_year = ""
