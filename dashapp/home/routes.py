@@ -52,17 +52,17 @@ TODAY = datetime.date(datetime.now())
 YSTDAY = TODAY - timedelta(days=1)
 
 
-@login_required
-def route_default():
-    session["targetdate"] = YSTDAY.strftime("%Y-%m-%d")
-    if not Sales.query.filter_by(date=session["targetdate"]).first():
-        session['targetdate'] = find_day_with_sales(start_day)
-        return redirect(url_for("home_blueprint.index"))
-    return redirect(url_for("home_blueprint.index"))
+#@login_required
+#def route_default():
+#    session["targetdate"] = YSTDAY.strftime("%Y-%m-%d")
+#    if not Sales.query.filter_by(date=session["targetdate"]).first():
+#        session['targetdate'] = find_day_with_sales(start_day)
+#        return redirect(url_for("home_blueprint.index"))
+#    return redirect(url_for("home_blueprint.index"))
 
 
-@blueprint.route("/")
 @blueprint.route("/index/", methods=["GET", "POST"])
+@blueprint.route("/")
 @login_required
 def index():
 
