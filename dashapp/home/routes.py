@@ -64,7 +64,7 @@ YSTDAY = TODAY - timedelta(days=1)
 @blueprint.route("/", methods=["GET", "POST"])
 @blueprint.route("/index/", methods=["GET", "POST"])
 @login_required
-def index():
+def index(targetdate=None):
 
     if not session["targetdate"]:
         print("no targetdate")
@@ -608,7 +608,7 @@ def store(store_id):
             print(i.total_sales)
         return sales
 
-    sales_day = get_sales(start_day, end_day, store.name)
+    sales_day = get_sales(start_day, start_day, store.name)
     sales_day_ly = get_sales(start_day_ly, start_day_ly, store.name)
     sales_week = get_sales(start_week, end_week, store.name)
     sales_week_ly = get_sales(start_week_ly, week_to_date, store.name)
