@@ -8,19 +8,17 @@ import pandas as pd
 from fpdf import FPDF
 from flask.helpers import url_for
 from flask_security.decorators import roles_accepted
-from sqlalchemy.sql.expression import column
 from dashapp.home import blueprint
 from flask import flash, render_template, session, redirect, url_for
 from flask.wrappers import Response
 from dashapp.home.util import (
     find_day_with_sales,
-    get_period,
-    get_lastyear,
     refresh_data,
     get_daily_sales,
     get_daily_labor,
     convert_uofm,
     update_recipe_costs,
+    set_dates,
 )
 from flask_security import login_required, current_user
 from datetime import datetime, timedelta
@@ -49,16 +47,8 @@ from sqlalchemy import and_, or_, func
 
 
 TODAY = datetime.date(datetime.now())
+CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
 YSTDAY = TODAY - timedelta(days=1)
-
-
-#@login_required
-#def route_default():
-#    session["token"] = YSTDAY.strftime("%Y-%m-%d")
-#    if not Sales.query.filter_by(date=session["token"]).first():
-#        session['token'] = find_day_with_sales(start_day)
-#        return redirect(url_for("home_blueprint.index"))
-#    return redirect(url_for("home_blueprint.index"))
 
 
 @blueprint.route("/", methods=["GET", "POST"])
@@ -66,45 +56,15 @@ YSTDAY = TODAY - timedelta(days=1)
 @login_required
 def index():
 
-    if not 'token' in session:
-        print("no token")
+    if not "token" in session:
         session["token"] = YSTDAY.strftime("%Y-%m-%d")
         return redirect(url_for("home_blueprint.index"))
-    start_day = (
-        end_day
-    ) = start_week = end_week = start_period = end_period = start_year = end_year = ""
-    period = year = 0
-    fiscal_dates = get_period(datetime.strptime(session["token"], "%Y-%m-%d"))
-    for i in fiscal_dates:
-        day_start = datetime.strptime(i.date, "%Y-%m-%d")
-        day_end = day_start + timedelta(days=1)
-        end_day = day_end.strftime("%Y-%m-%d")
-        start_day = i.date
-        start_week = i.week_start
-        end_week = i.week_end
-        start_period = i.period_start
-        end_period = i.period_end
-        start_year = i.year_start
-        end_year = i.year_end
-        period = i.period
-        year = i.year
 
-    # Get matching day, week and period start and end dates
-    start_day_ly = get_lastyear(start_day)
-    end_day_ly = get_lastyear(end_day)
-    start_week_ly = get_lastyear(start_week)
-    end_week_ly = get_lastyear(end_week)
-    week_to_date = get_lastyear(start_day)
-    start_period_ly = get_lastyear(start_period)
-    end_period_ly = get_lastyear(end_period)
-    period_to_date = get_lastyear(start_day)
-    start_year_ly = get_lastyear(start_year)
-    end_year_ly = get_lastyear(end_year)
-    year_to_date = get_lastyear(start_day)
+    fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
 
     # Check for no sales
-    if not Sales.query.filter_by(date=start_day).first():
-        session['token'] = find_day_with_sales(start_day)
+    if not Sales.query.filter_by(date=fiscal_dates["start_day"]).first():
+        session["token"] = find_day_with_sales(fiscal_dates["start_day"])
         return redirect(url_for("home_blueprint.index"))
 
     # Get Data
@@ -114,13 +74,13 @@ def index():
         """
         Change token
         """
-        start_day = form1.selectdate.data.strftime("%Y-%m-%d")
-        session["token"] = start_day
+        new_day = form1.selectdate.data.strftime("%Y-%m-%d")
+        session["token"] = new_day
         return redirect(url_for("home_blueprint.index"))
 
     if form3.submit3.data and form3.validate():
 
-        session["token"] = start_day
+        session["token"] = fiscal_dates["start_day"]
         store_id = form3.store.data.id
 
         return redirect(url_for("home_blueprint.store", store_id=store_id))
@@ -141,21 +101,33 @@ def index():
 
         return value
 
-    values1 = get_chart_values(start_week, end_week, Calendar.date)
-    values1_ly = get_chart_values(start_week_ly, end_week_ly, Calendar.date)
+    values1 = get_chart_values(
+        fiscal_dates["start_week"], fiscal_dates["end_week"], Calendar.date
+    )
+    values1_ly = get_chart_values(
+        fiscal_dates["start_week_ly"], fiscal_dates["end_week_ly"], Calendar.date
+    )
 
-    values2 = get_chart_values(start_period, end_period, Calendar.week)
-    values2_ly = get_chart_values(start_period_ly, end_period_ly, Calendar.week)
+    values2 = get_chart_values(
+        fiscal_dates["start_period"], fiscal_dates["end_period"], Calendar.week
+    )
+    values2_ly = get_chart_values(
+        fiscal_dates["start_period_ly"], fiscal_dates["end_period_ly"], Calendar.week
+    )
 
-    values3 = get_chart_values(start_year, end_year, Calendar.period)
-    values3_ly = get_chart_values(start_year_ly, end_year_ly, Calendar.period)
+    values3 = get_chart_values(
+        fiscal_dates["start_year"], fiscal_dates["end_year"], Calendar.period
+    )
+    values3_ly = get_chart_values(
+        fiscal_dates["start_year_ly"], fiscal_dates["end_year_ly"], Calendar.period
+    )
 
     budget_chart = (
         db.session.query(func.sum(Budgets.total_sales).label("total_sales"))
         .select_from(Budgets)
         .group_by(Budgets.period)
         .order_by(Budgets.period)
-        .filter(Budgets.year == year)
+        .filter(Budgets.year == fiscal_dates["year"])
     )
     budgets3 = []
     for v in budget_chart:
@@ -164,14 +136,14 @@ def index():
     # Daily Sales Table
     sales_day = (
         db.session.query(Sales.name, func.sum(Sales.sales).label("total_sales"))
-        .filter(Sales.date == start_day)
+        .filter(Sales.date == fiscal_dates["start_day"])
         .group_by(Sales.name)
         .all()
     )
 
     sales_day_ly = (
         db.session.query(Sales.name, func.sum(Sales.sales).label("total_sales_ly"))
-        .filter(Sales.date == start_day_ly)
+        .filter(Sales.date == fiscal_dates["start_day_ly"])
         .group_by(Sales.name)
         .all()
     )
@@ -182,7 +154,8 @@ def index():
             func.sum(Menuitems.quantity).label("guest_count"),
         )
         .filter(
-            Menuitems.date == start_day, Menuitems.menu_category.regexp_match("ENTREE*")
+            Menuitems.date == fiscal_dates["start_day"],
+            Menuitems.menu_category.regexp_match("ENTREE*"),
         )
         .group_by(Menuitems.name)
         .all()
@@ -194,7 +167,7 @@ def index():
             func.sum(Menuitems.quantity).label("guest_count"),
         )
         .filter(
-            Menuitems.date == start_day_ly,
+            Menuitems.date == fiscal_dates["start_day_ly"],
             Menuitems.menu_category.regexp_match("ENTREE*"),
         )
         .group_by(Menuitems.name)
@@ -221,7 +194,7 @@ def index():
             func.sum(Labor.hours).label("total_hours"),
             func.sum(Labor.dollars).label("total_dollars"),
         )
-        .filter(Labor.date == start_day)
+        .filter(Labor.date == fiscal_dates["start_day"])
         .group_by(Labor.name)
         .all()
     )
@@ -232,7 +205,7 @@ def index():
             func.sum(Labor.hours).label("total_hours_ly"),
             func.sum(Labor.dollars).label("total_dollars_ly"),
         )
-        .filter(Labor.date == start_day_ly)
+        .filter(Labor.date == fiscal_dates["start_day_ly"])
         .group_by(Labor.name)
         .all()
     )
@@ -275,14 +248,20 @@ def index():
     # Weekly Sales Table
     sales_week = (
         db.session.query(Sales.name, func.sum(Sales.sales).label("total_sales"))
-        .filter(Sales.date.between(start_week, end_week))
+        .filter(
+            Sales.date.between(fiscal_dates["start_week"], fiscal_dates["end_week"])
+        )
         .group_by(Sales.name)
         .all()
     )
 
     sales_week_ly = (
         db.session.query(Sales.name, func.sum(Sales.sales).label("total_sales_ly"))
-        .filter(Sales.date.between(start_week_ly, week_to_date))
+        .filter(
+            Sales.date.between(
+                fiscal_dates["start_week_ly"], fiscal_dates["week_to_date"]
+            )
+        )
         .group_by(Sales.name)
         .all()
     )
@@ -299,7 +278,9 @@ def index():
             func.sum(Labor.hours).label("total_hours"),
             func.sum(Labor.dollars).label("total_dollars"),
         )
-        .filter(Labor.date.between(start_week, end_week))
+        .filter(
+            Labor.date.between(fiscal_dates["start_week"], fiscal_dates["end_week"])
+        )
         .group_by(Labor.name)
         .all()
     )
@@ -310,7 +291,11 @@ def index():
             func.sum(Labor.hours).label("total_hours_ly"),
             func.sum(Labor.dollars).label("total_dollars_ly"),
         )
-        .filter(Labor.date.between(start_week_ly, week_to_date))
+        .filter(
+            Labor.date.between(
+                fiscal_dates["start_week_ly"], fiscal_dates["week_to_date"]
+            )
+        )
         .group_by(Labor.name)
         .all()
     )
@@ -342,14 +327,20 @@ def index():
     # Period Sales Table
     sales_period = (
         db.session.query(Sales.name, func.sum(Sales.sales).label("total_sales"))
-        .filter(Sales.date.between(start_period, end_period))
+        .filter(
+            Sales.date.between(fiscal_dates["start_period"], fiscal_dates["end_period"])
+        )
         .group_by(Sales.name)
         .all()
     )
 
     sales_period_ly = (
         db.session.query(Sales.name, func.sum(Sales.sales).label("total_sales_ly"))
-        .filter(Sales.date.between(start_period_ly, period_to_date))
+        .filter(
+            Sales.date.between(
+                fiscal_dates["start_period_ly"], fiscal_dates["period_to_date"]
+            )
+        )
         .group_by(Sales.name)
         .all()
     )
@@ -366,7 +357,9 @@ def index():
             func.sum(Labor.hours).label("total_hours"),
             func.sum(Labor.dollars).label("total_dollars"),
         )
-        .filter(Labor.date.between(start_period, end_period))
+        .filter(
+            Labor.date.between(fiscal_dates["start_period"], fiscal_dates["end_period"])
+        )
         .group_by(Labor.name)
         .all()
     )
@@ -377,7 +370,11 @@ def index():
             func.sum(Labor.hours).label("total_hours_ly"),
             func.sum(Labor.dollars).label("total_dollars_ly"),
         )
-        .filter(Labor.date.between(start_period_ly, period_to_date))
+        .filter(
+            Labor.date.between(
+                fiscal_dates["start_period_ly"], fiscal_dates["period_to_date"]
+            )
+        )
         .group_by(Labor.name)
         .all()
     )
@@ -409,14 +406,20 @@ def index():
     # Yearly Sales Table
     sales_yearly = (
         db.session.query(Sales.name, func.sum(Sales.sales).label("total_sales"))
-        .filter(Sales.date.between(start_year, end_year))
+        .filter(
+            Sales.date.between(fiscal_dates["start_year"], fiscal_dates["end_year"])
+        )
         .group_by(Sales.name)
         .all()
     )
 
     sales_yearly_ly = (
         db.session.query(Sales.name, func.sum(Sales.sales).label("total_sales_ly"))
-        .filter(Sales.date.between(start_year_ly, year_to_date))
+        .filter(
+            Sales.date.between(
+                fiscal_dates["start_year_ly"], fiscal_dates["year_to_date"]
+            )
+        )
         .group_by(Sales.name)
         .all()
     )
@@ -433,7 +436,9 @@ def index():
             func.sum(Labor.hours).label("total_hours"),
             func.sum(Labor.dollars).label("total_dollars"),
         )
-        .filter(Labor.date.between(start_year, end_year))
+        .filter(
+            Labor.date.between(fiscal_dates["start_year"], fiscal_dates["end_year"])
+        )
         .group_by(Labor.name)
         .all()
     )
@@ -444,7 +449,11 @@ def index():
             func.sum(Labor.hours).label("total_hours_ly"),
             func.sum(Labor.dollars).label("total_dollars_ly"),
         )
-        .filter(Labor.date.between(start_year_ly, year_to_date))
+        .filter(
+            Labor.date.between(
+                fiscal_dates["start_year_ly"], fiscal_dates["year_to_date"]
+            )
+        )
         .group_by(Labor.name)
         .all()
     )
@@ -509,59 +518,21 @@ def index():
 def store(store_id):
 
     store = Restaurants.query.filter_by(id=store_id).first()
+    fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
 
     if store_id in [4, 9, 11, 17, 16]:
         concept = "steakhouse"
     else:
         concept = "casual"
 
-    start_day = (
-        end_day
-    ) = start_week = end_week = start_period = end_period = start_year = end_year = ""
-    period = year = week = 0
-    fiscal_dates = get_period(datetime.strptime(session["token"], "%Y-%m-%d"))
-    for i in fiscal_dates:
-        day_start = datetime.strptime(i.date, "%Y-%m-%d")
-        day_end = day_start + timedelta(days=1)
-        end_day = day_end.strftime("%Y-%m-%d")
-        start_day = i.date
-        start_week = i.week_start
-        end_week = i.week_end
-        start_period = i.period_start
-        end_period = i.period_end
-        start_year = i.year_start
-        end_year = i.year_end
-        period = i.period
-        year = i.year
-        week = i.week
-
-        # Used to calculate usages previous week
-        week_start = datetime.strptime(i.week_start, "%Y-%m-%d")
-        lws = week_start - timedelta(days=7)
-        start_previous_week = lws.strftime("%Y-%m-%d")
-        week_end = datetime.strptime(i.week_end, "%Y-%m-%d")
-        lwe = week_end - timedelta(days=7)
-        end_previous_week = lwe.strftime("%Y-%m-%d")
-
-        seven = day_start - timedelta(days=7)
-        last_seven = seven.strftime("%Y-%m-%d")
-        thirty = day_start - timedelta(days=30)
-        last_thirty = thirty.strftime("%Y-%m-%d")
-
-    # Get matching day, week and period start and end dates
-    start_day_ly = get_lastyear(start_day)
-    start_week_ly = get_lastyear(start_week)
-    end_week_ly = get_lastyear(end_week)
-    week_to_date = get_lastyear(start_day)
-    start_period_ly = get_lastyear(start_period)
-    end_period_ly = get_lastyear(end_period)
-    period_to_date = get_lastyear(start_day)
-    start_year_ly = get_lastyear(start_year)
-    end_year_ly = get_lastyear(end_year)
-    year_to_date = get_lastyear(start_day)
-
     data = Restaurants.query.all()
     store_list = pd.DataFrame([x.as_dict() for x in data])
+
+    if not Sales.query.filter_by(
+        date=fiscal_dates["start_day"], name=store.name
+    ).first():
+        session["token"] = find_day_with_sales(fiscal_dates["start_day"])
+        return redirect(url_for("home_blueprint.store", store_id=store.id))
 
     # Get Data
     form1 = DateForm()
@@ -573,22 +544,14 @@ def store(store_id):
         We check if there are infact sales for that day, if not, it resets to yesterday, if
         there are sales, then labor is polled
         """
-        start_day = form1.selectdate.data.strftime("%Y-%m-%d")
-        day_end = form1.selectdate.data + timedelta(days=1)
-        end_day = day_end.strftime("%Y-%m-%d")
-
-        if not Sales.query.filter_by(date=start_day, name=store.name).first():
-            session['token'] = find_day_with_sales(start_day)
-            return redirect(url_for("home_blueprint.store", store_id=store.id))
-
-        session["token"] = start_day
+        new_day = form1.selectdate.data.strftime("%Y-%m-%d")
+        session["token"] = new_day
         return redirect(url_for("home_blueprint.store", store_id=store.id))
 
     if form3.submit3.data and form3.validate():
 
-        session["token"] = start_day
+        session["token"] = fiscal_dates["start_day"]
         store_id = form3.store.data.id
-
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
     if form4.validate_on_submit():
@@ -605,17 +568,32 @@ def store(store_id):
         )
         for i in lst:
             sales = i.total_sales
-            print(i.total_sales)
         return sales
 
-    sales_day = get_sales(start_day, start_day, store.name)
-    sales_day_ly = get_sales(start_day_ly, start_day_ly, store.name)
-    sales_week = get_sales(start_week, end_week, store.name)
-    sales_week_ly = get_sales(start_week_ly, week_to_date, store.name)
-    sales_period = get_sales(start_period, end_period, store.name)
-    sales_period_ly = get_sales(start_period_ly, period_to_date, store.name)
-    sales_year = get_sales(start_year, end_year, store.name)
-    sales_year_ly = get_sales(start_year_ly, year_to_date, store.name)
+    sales_day = get_sales(
+        fiscal_dates["start_day"], fiscal_dates["start_day"], store.name
+    )
+    sales_day_ly = get_sales(
+        fiscal_dates["start_day_ly"], fiscal_dates["start_day_ly"], store.name
+    )
+    sales_week = get_sales(
+        fiscal_dates["start_week"], fiscal_dates["end_week"], store.name
+    )
+    sales_week_ly = get_sales(
+        fiscal_dates["start_week_ly"], fiscal_dates["week_to_date"], store.name
+    )
+    sales_period = get_sales(
+        fiscal_dates["start_period"], fiscal_dates["end_period"], store.name
+    )
+    sales_period_ly = get_sales(
+        fiscal_dates["start_period_ly"], fiscal_dates["period_to_date"], store.name
+    )
+    sales_year = get_sales(
+        fiscal_dates["start_year"], fiscal_dates["end_year"], store.name
+    )
+    sales_year_ly = get_sales(
+        fiscal_dates["start_year_ly"], fiscal_dates["year_to_date"], store.name
+    )
 
     # Sales Charts
     def get_chart_values(start, end, time):
@@ -633,19 +611,31 @@ def store(store_id):
 
         return value
 
-    values1 = get_chart_values(start_week, end_week, Calendar.date)
-    values1_ly = get_chart_values(start_week_ly, end_week_ly, Calendar.date)
-    values2 = get_chart_values(start_period, end_period, Calendar.week)
-    values2_ly = get_chart_values(start_period_ly, end_period_ly, Calendar.week)
-    values3 = get_chart_values(start_year, end_year, Calendar.period)
-    values3_ly = get_chart_values(start_year_ly, end_year_ly, Calendar.period)
+    values1 = get_chart_values(
+        fiscal_dates["start_week"], fiscal_dates["end_week"], Calendar.date
+    )
+    values1_ly = get_chart_values(
+        fiscal_dates["start_week_ly"], fiscal_dates["end_week_ly"], Calendar.date
+    )
+    values2 = get_chart_values(
+        fiscal_dates["start_period"], fiscal_dates["end_period"], Calendar.week
+    )
+    values2_ly = get_chart_values(
+        fiscal_dates["start_period_ly"], fiscal_dates["end_period_ly"], Calendar.week
+    )
+    values3 = get_chart_values(
+        fiscal_dates["start_year"], fiscal_dates["end_year"], Calendar.period
+    )
+    values3_ly = get_chart_values(
+        fiscal_dates["start_year_ly"], fiscal_dates["end_year_ly"], Calendar.period
+    )
 
     budget_chart = (
         db.session.query(func.sum(Budgets.total_sales).label("total_sales"))
         .select_from(Budgets)
         .group_by(Budgets.period)
         .order_by(Budgets.period)
-        .filter(Budgets.year == year, Budgets.name == store.name)
+        .filter(Budgets.year == fiscal_dates["year"], Budgets.name == store.name)
     )
     budgets3 = []
     for v in budget_chart:
@@ -720,8 +710,12 @@ def store(store_id):
         totals = _table.sum()
         return totals
 
-    weekly_totals = sales_labor_table(start_week, end_week)
-    period_totals = sales_labor_table(start_period, end_period)
+    weekly_totals = sales_labor_table(
+        fiscal_dates["start_week"], fiscal_dates["end_week"]
+    )
+    period_totals = sales_labor_table(
+        fiscal_dates["start_period"], fiscal_dates["end_period"]
+    )
 
     lobster_items = []
     stone_items = []
@@ -869,7 +863,7 @@ def store(store_id):
             .filter(
                 Transactions.item.regexp_match(regex),
                 Transactions.name == store.name,
-                Transactions.date >= last_thirty,
+                Transactions.date >= fiscal_dates["last_thirty"],
                 Transactions.type == "AP Invoice",
             )
             .order_by(
@@ -920,10 +914,16 @@ def store(store_id):
                 menu_list.append(row_dict)
         df = pd.DataFrame(menu_list)
         unit_list = df.loc[:, "menuitem"]
-        unit_sales = get_unit_sales(start_previous_week, end_previous_week, unit_list)
+        unit_sales = get_unit_sales(
+            fiscal_dates["start_previous_week"],
+            fiscal_dates["end_previous_week"],
+            unit_list,
+        )
         df = df.merge(unit_sales, on="menuitem", how="outer")
         df["last_week"] = df["qty"] * df["quantity"].astype(float)
-        unit_sales = get_unit_sales(start_week_ly, end_week_ly, unit_list)
+        unit_sales = get_unit_sales(
+            fiscal_dates["start_week_ly"], fiscal_dates["end_week_ly"], unit_list
+        )
         df = df.merge(unit_sales, on="menuitem", how="outer")
         df["last_year"] = df["qty"] * df["quantity_y"].astype(float)
         df.drop(["recipe", "qty"], axis=1, inplace=True)
@@ -975,9 +975,11 @@ def store(store_id):
 
         return item_list
 
-    today_date = TODAY.strftime("%Y-%m-%d")
     food_begin = get_transactions_by_category(
-        "Food", end_previous_week, end_previous_week, "Stock Count"
+        "Food",
+        fiscal_dates["end_previous_week"],
+        fiscal_dates["end_previous_week"],
+        "Stock Count",
     )
     df_begin = pd.DataFrame(food_begin)
     df_begin["inv_cost"] = df_begin["amount"] / (
@@ -985,7 +987,7 @@ def store(store_id):
     )
     df_begin.drop(columns=["quantity", "amount"], inplace=True)
     food_today = get_transactions_by_category(
-        "Food", start_week, today_date, "AP Invoice"
+        "Food", fiscal_dates["start_week"], CURRENT_DATE, "AP Invoice"
     )
     df_today = pd.DataFrame(food_today)
     df_today["current_cost"] = df_today["amount"] / (
@@ -1033,8 +1035,8 @@ def store(store_id):
 
     # TODO check for no purchases of supplies
     supply_cost_dol, supply_cost_pct = get_category_costs(
-        start_year,
-        end_year,
+        fiscal_dates["start_year"],
+        fiscal_dates["end_year"],
         values3,
         cat=[
             "Rest. Supplies",
@@ -1045,8 +1047,8 @@ def store(store_id):
         ],
     )
     supply_cost_dol_ly, supply_cost_pct_ly = get_category_costs(
-        start_year_ly,
-        end_year_ly,
+        fiscal_dates["start_year_ly"],
+        fiscal_dates["end_year_ly"],
         values3_ly,
         cat=[
             "Rest. Supplies",
@@ -1059,42 +1061,40 @@ def store(store_id):
     query = (
         Budgets.query.with_entities(Budgets.total_supplies)
         .order_by(Budgets.period)
-        .filter(Budgets.year == year, Budgets.name == store.name)
+        .filter(Budgets.year == fiscal_dates["year"], Budgets.name == store.name)
     ).all()
     supply_budget = []
     for v in query:
         supply_budget.append(v.total_supplies)
     smallware_cost_dol, smallware_cost_pct = get_category_costs(
-        start_year,
-        end_year,
+        fiscal_dates["start_year"],
+        fiscal_dates["end_year"],
         values3,
         cat=["China", "Silverware", "Glassware", "Smallwares"],
     )
     smallware_cost_dol_ly, smallware_cost_pct_ly = get_category_costs(
-        start_year_ly,
-        end_year_ly,
+        fiscal_dates["start_year_ly"],
+        fiscal_dates["end_year_ly"],
         values3_ly,
         cat=["China", "Silverware", "Glassware", "Smallwares"],
     )
     query = (
         Budgets.query.with_entities(Budgets.total_smallwares)
         .order_by(Budgets.period)
-        .filter(Budgets.year == year, Budgets.name == store.name)
+        .filter(Budgets.year == fiscal_dates["year"], Budgets.name == store.name)
     ).all()
     smallware_budget = []
     for v in query:
         smallware_budget.append(v.total_smallwares)
 
-    current_supply_cost = supply_cost_dol[period - 1]
-    current_supply_budget = supply_budget[period - 1]
-    current_smallware_cost = smallware_cost_dol[period - 1]
-    current_smallware_budget = smallware_budget[period - 1]
-    print(smallware_cost_dol)
-    print(smallware_budget)
+    current_supply_cost = supply_cost_dol[fiscal_dates["period"] - 1]
+    current_supply_budget = supply_budget[fiscal_dates["period"] - 1]
+    current_smallware_cost = smallware_cost_dol[fiscal_dates["period"] - 1]
+    current_smallware_budget = smallware_budget[fiscal_dates["period"] - 1]
 
     query = (
         Transactions.query.with_entities(Transactions.item).filter(
-            Transactions.date >= start_week,
+            Transactions.date >= fiscal_dates["start_week"],
             Transactions.name == store.name,
             Transactions.item.regexp_match("^DO NOT USE*"),
         )
@@ -1110,7 +1110,6 @@ def store(store_id):
         form1=form1,
         form3=form3,
         form4=form4,
-        period=period,
         current_user=current_user,
         roles=current_user.roles,
         fiscal_dates=fiscal_dates,
@@ -1158,48 +1157,19 @@ def store(store_id):
 @login_required
 def marketing():
 
-    start_day = (
-        end_day
-    ) = start_week = end_week = start_period = end_period = start_year = end_year = ""
-    fiscal_dates = get_period(datetime.strptime(session["token"], "%Y-%m-%d"))
-    for i in fiscal_dates:
-        day_start = datetime.strptime(i.date, "%Y-%m-%d")
-        day_end = day_start + timedelta(days=1)
-        end_day = day_end.strftime("%Y-%m-%d")
-        start_day = i.date
-        start_week = i.week_start
-        end_week = i.week_end
-        start_period = i.period_start
-        end_period = i.period_end
-        start_year = i.year_start
-        end_year = i.year_end
-
-    # Get matching day, week and period start and end dates
-    start_day_ly = get_lastyear(start_day)
-    end_day_ly = get_lastyear(end_day)
-    start_week_ly = get_lastyear(start_week)
-    end_week_ly = get_lastyear(end_week)
-    week_to_date = get_lastyear(start_day)
-    start_period_ly = get_lastyear(start_period)
-    end_period_ly = get_lastyear(end_period)
-    period_to_date = get_lastyear(start_day)
-    start_year_ly = get_lastyear(start_year)
-    end_year_ly = get_lastyear(end_year)
-    year_to_date = get_lastyear(start_day)
-
+    fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
     form1 = DateForm()
     if form1.submit1.data and form1.validate():
         """ """
-        start_day = form1.selectdate.data.strftime("%Y-%m-%d")
-        session["token"] = start_day
+        new_day = form1.selectdate.data.strftime("%Y-%m-%d")
+        session["token"] = new_day
         return redirect(url_for("home_blueprint.marketing"))
 
     form3 = StoreForm()
     if form3.submit3.data and form3.validate():
 
-        session["token"] = start_day
+        session["token"] = fiscal_dates["start_day"]
         store_id = form3.store.data.id
-
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
     # Gift Card Sales
@@ -1222,8 +1192,12 @@ def marketing():
 
         return value
 
-    giftcard_values1 = get_giftcard_values(start_year, end_year, Calendar.period)
-    giftcard_values2 = get_giftcard_values(start_year_ly, end_year_ly, Calendar.period)
+    giftcard_values1 = get_giftcard_values(
+        fiscal_dates["start_year"], fiscal_dates["end_year"], Calendar.period
+    )
+    giftcard_values2 = get_giftcard_values(
+        fiscal_dates["start_year_ly"], fiscal_dates["end_year_ly"], Calendar.period
+    )
 
     def get_giftcard_sales(start, end):
         query = (
@@ -1245,8 +1219,12 @@ def marketing():
         sales.loc["TOTALS"] = sales.sum(numeric_only=True)
         return sales
 
-    gift_card_sales = get_giftcard_sales(start_year, end_year)
-    gift_card_sales_ly = get_giftcard_sales(start_year_ly, year_to_date)
+    gift_card_sales = get_giftcard_sales(
+        fiscal_dates["start_year"], fiscal_dates["end_year"]
+    )
+    gift_card_sales_ly = get_giftcard_sales(
+        fiscal_dates["start_year_ly"], fiscal_dates["year_to_date"]
+    )
     gift_card_sales = gift_card_sales.merge(gift_card_sales_ly, on="store")
 
     def get_lent_values(start, end, time):
@@ -1270,7 +1248,9 @@ def marketing():
 
         return value
 
-    lent_values = get_lent_values(start_week, end_week, Calendar.date)
+    lent_values = get_lent_values(
+        fiscal_dates["start_week"], fiscal_dates["end_week"], Calendar.date
+    )
 
     query = (
         db.session.query(
@@ -1356,38 +1336,7 @@ def marketing():
 @login_required
 def purchasing():
 
-    start_day = (
-        end_day
-    ) = start_week = end_week = start_period = end_period = start_year = end_year = ""
-    fiscal_dates = get_period(datetime.strptime(session["token"], "%Y-%m-%d"))
-    for i in fiscal_dates:
-        day_start = datetime.strptime(i.date, "%Y-%m-%d")
-        day_end = day_start + timedelta(days=1)
-        end_day = day_end.strftime("%Y-%m-%d")
-        start_day = i.date
-        start_week = i.week_start
-        end_week = i.week_end
-        start_period = i.period_start
-        end_period = i.period_end
-        start_year = i.year_start
-        end_year = i.year_end
-        seven = day_start - timedelta(days=7)
-        last_seven = seven.strftime("%Y-%m-%d")
-        thirty = day_start - timedelta(days=30)
-        last_thirty = thirty.strftime("%Y-%m-%d")
-
-    # Get matching day, week and period start and end dates
-#    start_day_ly = get_lastyear(start_day)
-#    end_day_ly = get_lastyear(end_day)
-#    start_week_ly = get_lastyear(start_week)
-#    end_week_ly = get_lastyear(end_week)
-#    week_to_date = get_lastyear(start_day)
-#    start_period_ly = get_lastyear(start_period)
-#    end_period_ly = get_lastyear(end_period)
-#    period_to_date = get_lastyear(start_day)
-    start_year_ly = get_lastyear(start_year)
-    end_year_ly = get_lastyear(end_year)
-#    year_to_date = get_lastyear(start_day)
+    fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
 
     # Get list of Restaurants
     data = Restaurants.query.all()
@@ -1397,12 +1346,12 @@ def purchasing():
     form3 = StoreForm()
 
     if form1.submit1.data and form1.validate():
-        start_day = form1.selectdate.data.strftime("%Y-%m-%d")
-        session["token"] = start_day
+        new_day = form1.selectdate.data.strftime("%Y-%m-%d")
+        session["token"] = new_day
         return redirect(url_for("home_blueprint.purchasing"))
 
     if form3.submit3.data and form3.validate():
-        session["token"] = start_day
+        session["token"] = fiscal_dates["start_day"]
         store_id = form3.store.data.id
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
@@ -1457,35 +1406,41 @@ def purchasing():
             df.sort_values(by=["date"], ascending=False, inplace=True)
         return df
 
-    lobster_vendor = get_vendors("SEAFOOD Lobster Live*", last_seven)
-    lobster_df = get_purchases("SEAFOOD Lobster Live*", last_seven)
+    lobster_vendor = get_vendors("SEAFOOD Lobster Live*", fiscal_dates["last_seven"])
+    lobster_df = get_purchases("SEAFOOD Lobster Live*", fiscal_dates["last_seven"])
 
-    stone_vendor = get_vendors("^(SEAFOOD Crab Stone Claw)", last_seven)
-    stone_df = get_purchases("^(SEAFOOD Crab Stone Claw)", last_seven)
+    stone_vendor = get_vendors("^(SEAFOOD Crab Stone Claw)", fiscal_dates["last_seven"])
+    stone_df = get_purchases("^(SEAFOOD Crab Stone Claw)", fiscal_dates["last_seven"])
 
-    special_vendor = get_vendors("SEAFOOD Crabmeat Special", last_seven)
-    special_df = get_purchases("SEAFOOD Crabmeat Special", last_seven)
+    special_vendor = get_vendors("SEAFOOD Crabmeat Special", fiscal_dates["last_seven"])
+    special_df = get_purchases("SEAFOOD Crabmeat Special", fiscal_dates["last_seven"])
 
-    backfin_vendor = get_vendors("SEAFOOD Crabmeat Backfin", last_seven)
-    backfin_df = get_purchases("SEAFOOD Crabmeat Backfin", last_seven)
+    backfin_vendor = get_vendors("SEAFOOD Crabmeat Backfin", fiscal_dates["last_seven"])
+    backfin_df = get_purchases("SEAFOOD Crabmeat Backfin", fiscal_dates["last_seven"])
 
-    premium_vendor = get_vendors("SEAFOOD Crabmeat Premium", last_seven)
-    premium_df = get_purchases("SEAFOOD Crabmeat Premium", last_seven)
+    premium_vendor = get_vendors("SEAFOOD Crabmeat Premium", fiscal_dates["last_seven"])
+    premium_df = get_purchases("SEAFOOD Crabmeat Premium", fiscal_dates["last_seven"])
 
-    colossal_vendor = get_vendors("SEAFOOD Crabmeat Colossal", last_seven)
-    colossal_df = get_purchases("SEAFOOD Crabmeat Colossal", last_seven)
+    colossal_vendor = get_vendors(
+        "SEAFOOD Crabmeat Colossal", fiscal_dates["last_seven"]
+    )
+    colossal_df = get_purchases("SEAFOOD Crabmeat Colossal", fiscal_dates["last_seven"])
 
-    seabass_vendor = get_vendors("SEAFOOD Sea Bass Chilean", last_seven)
-    seabass_df = get_purchases("SEAFOOD Sea Bass Chilean", last_seven)
+    seabass_vendor = get_vendors("SEAFOOD Sea Bass Chilean", fiscal_dates["last_seven"])
+    seabass_df = get_purchases("SEAFOOD Sea Bass Chilean", fiscal_dates["last_seven"])
 
-    salmon_vendor = get_vendors("^(SEAFOOD) (Salmon)$", last_seven)
-    salmon_df = get_purchases("^(SEAFOOD) (Salmon)$", last_seven)
+    salmon_vendor = get_vendors("^(SEAFOOD) (Salmon)$", fiscal_dates["last_seven"])
+    salmon_df = get_purchases("^(SEAFOOD) (Salmon)$", fiscal_dates["last_seven"])
 
-    feature_vendor = get_vendors("SEAFOOD Feature Fish", last_seven)
-    feature_df = get_purchases("SEAFOOD Feature Fish", last_seven)
+    feature_vendor = get_vendors("SEAFOOD Feature Fish", fiscal_dates["last_seven"])
+    feature_df = get_purchases("SEAFOOD Feature Fish", fiscal_dates["last_seven"])
 
-    shrimp10_vendor = get_vendors("SEAFOOD Shrimp U/10 White Headless", last_seven)
-    shrimp10_df = get_purchases("SEAFOOD Shrimp U/10 White Headless", last_seven)
+    shrimp10_vendor = get_vendors(
+        "SEAFOOD Shrimp U/10 White Headless", fiscal_dates["last_seven"]
+    )
+    shrimp10_df = get_purchases(
+        "SEAFOOD Shrimp U/10 White Headless", fiscal_dates["last_seven"]
+    )
 
     def period_purchases(regex, start, end):
         calendar = Calendar.query.with_entities(
@@ -1533,34 +1488,56 @@ def purchasing():
         df_list = df["cost_lb"].tolist()
         return df_list
 
-    prime_chart = period_purchases("^(BEEF Steak).*(Prime)$", start_year, end_year)
+    prime_chart = period_purchases(
+        "^(BEEF Steak).*(Prime)$", fiscal_dates["start_year"], fiscal_dates["end_year"]
+    )
     prime_chart_ly = period_purchases(
-        "^(BEEF Steak).*(Prime)$", start_year_ly, end_year_ly
+        "^(BEEF Steak).*(Prime)$",
+        fiscal_dates["start_year_ly"],
+        fiscal_dates["end_year_ly"],
     )
 
-    choice_chart = period_purchases("^(BEEF Steak).*(Choice)$", start_year, end_year)
+    choice_chart = period_purchases(
+        "^(BEEF Steak).*(Choice)$", fiscal_dates["start_year"], fiscal_dates["end_year"]
+    )
     choice_chart_ly = period_purchases(
-        "^(BEEF Steak).*(Choice)$", start_year_ly, end_year_ly
+        "^(BEEF Steak).*(Choice)$",
+        fiscal_dates["start_year_ly"],
+        fiscal_dates["end_year_ly"],
     )
 
-    prime_rib_chart = period_purchases("BEEF Prime Rib Choice", start_year, end_year)
+    prime_rib_chart = period_purchases(
+        "BEEF Prime Rib Choice", fiscal_dates["start_year"], fiscal_dates["end_year"]
+    )
     prime_rib_chart_ly = period_purchases(
-        "BEEF Prime Rib Choice", start_year_ly, end_year_ly
+        "BEEF Prime Rib Choice",
+        fiscal_dates["start_year_ly"],
+        fiscal_dates["end_year_ly"],
     )
 
-    crabmeat_chart = period_purchases("SEAFOOD Crabmeat*", start_year, end_year)
+    crabmeat_chart = period_purchases(
+        "SEAFOOD Crabmeat*", fiscal_dates["start_year"], fiscal_dates["end_year"]
+    )
     crabmeat_chart_ly = period_purchases(
-        "SEAFOOD Crabmeat*", start_year_ly, end_year_ly
+        "SEAFOOD Crabmeat*", fiscal_dates["start_year_ly"], fiscal_dates["end_year_ly"]
     )
 
-    salmon_chart = period_purchases("^(SEAFOOD) (Salmon)$", start_year, end_year)
+    salmon_chart = period_purchases(
+        "^(SEAFOOD) (Salmon)$", fiscal_dates["start_year"], fiscal_dates["end_year"]
+    )
     salmon_chart_ly = period_purchases(
-        "^(SEAFOOD) (Salmon)$", start_year_ly, end_year_ly
+        "^(SEAFOOD) (Salmon)$",
+        fiscal_dates["start_year_ly"],
+        fiscal_dates["end_year_ly"],
     )
 
-    seabass_chart = period_purchases("SEAFOOD Sea Bass Chilean", start_year, end_year)
+    seabass_chart = period_purchases(
+        "SEAFOOD Sea Bass Chilean", fiscal_dates["start_year"], fiscal_dates["end_year"]
+    )
     seabass_chart_ly = period_purchases(
-        "SEAFOOD Sea Bass Chilean", start_year_ly, end_year_ly
+        "SEAFOOD Sea Bass Chilean",
+        fiscal_dates["start_year_ly"],
+        fiscal_dates["end_year_ly"],
     )
 
     return render_template(
@@ -1611,34 +1588,7 @@ def purchasing():
 @roles_accepted("admin")
 def support():
 
-    start_day = (
-        end_day
-    ) = start_week = end_week = start_period = end_period = start_year = end_year = ""
-    fiscal_dates = get_period(datetime.strptime(session["token"], "%Y-%m-%d"))
-    for i in fiscal_dates:
-        day_start = datetime.strptime(i.date, "%Y-%m-%d")
-        day_end = day_start + timedelta(days=1)
-        end_day = day_end.strftime("%Y-%m-%d")
-        start_day = i.date
-        start_week = i.week_start
-        end_week = i.week_end
-        start_period = i.period_start
-        end_period = i.period_end
-        start_year = i.year_start
-        end_year = i.year_end
-
-    # Get matching day, week and period start and end dates
-    start_day_ly = get_lastyear(start_day)
-    end_day_ly = get_lastyear(end_day)
-    start_week_ly = get_lastyear(start_week)
-    end_week_ly = get_lastyear(end_week)
-    week_to_date = get_lastyear(start_day)
-    start_period_ly = get_lastyear(start_period)
-    end_period_ly = get_lastyear(end_period)
-    period_to_date = get_lastyear(start_day)
-    start_year_ly = get_lastyear(start_year)
-    end_year_ly = get_lastyear(end_year)
-    year_to_date = get_lastyear(start_day)
+    fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
 
     form1 = DateForm()
     form2 = UpdateForm()
@@ -1646,28 +1596,28 @@ def support():
     form5 = RecipeForm()
     if form1.submit1.data and form1.validate():
         """ """
-        start_day = form1.selectdate.data.strftime("%Y-%m-%d")
-        session["token"] = start_day
+        new_day = form1.selectdate.data.strftime("%Y-%m-%d")
+        session["token"] = new_day
         return redirect(url_for("home_blueprint.support"))
 
     if form2.submit2.data and form2.validate():
         """ """
-        start_day = form2.selectdate.data.strftime("%Y-%m-%d")
+        new_start_day = form2.selectdate.data.strftime("%Y-%m-%d")
         day_end = form2.selectdate.data + timedelta(days=1)
-        end_day = day_end.strftime("%Y-%m-%d")
+        new_end_day = day_end.strftime("%Y-%m-%d")
 
-        baddates = refresh_data(start_day, end_day)
+        baddates = refresh_data(new_start_day, new_end_day)
         if baddates == 1:
             flash(
                 f"I cannot find sales for the day you selected.  Please select another date!",
                 "warning",
             )
-        session["token"] = start_day
+        session["token"] = new_start_day
         return redirect(url_for("home_blueprint.support"))
 
     if form3.submit3.data and form3.validate():
 
-        session["token"] = start_day
+        session["token"] = fiscal_dates["start_day"]
         store_id = form3.store.data.id
 
         return redirect(url_for("home_blueprint.store", store_id=store_id))
@@ -1676,7 +1626,7 @@ def support():
         response = update_recipe_costs()
         if response == 0:
             flash(f"Recipe costs updated", "success")
-        session["token"] = start_day
+        session["token"] = fiscal_dates["start_day"]
         return redirect(url_for("home_blueprint.support"))
 
     query = (
@@ -1688,7 +1638,7 @@ def support():
             func.sum(Menuitems.quantity).label("count"),
         )
         .filter(
-            Menuitems.date == start_day,
+            Menuitems.date == fiscal_dates["start_day"],
             or_(
                 Menuitems.menuitem == "Unassigned",
                 Menuitems.category == "Unassigned",
@@ -1704,7 +1654,7 @@ def support():
     query = (
         db.session.query(Transactions.name, Transactions.item)
         .filter(
-            Transactions.date >= start_week,
+            Transactions.date >= fiscal_dates["start_week"],
             Transactions.item.regexp_match("^DO NOT USE*"),
         )
         .group_by(Transactions.name, Transactions.item)
@@ -1730,53 +1680,18 @@ def support():
 @login_required
 def alcohol():
 
-    start_day = (
-        end_day
-    ) = start_week = end_week = start_period = end_period = start_year = end_year = ""
-    fiscal_dates = get_period(datetime.strptime(session["token"], "%Y-%m-%d"))
-    for i in fiscal_dates:
-        day_start = datetime.strptime(i.date, "%Y-%m-%d")
-        day_end = day_start + timedelta(days=1)
-        end_day = day_end.strftime("%Y-%m-%d")
-        start_day = i.date
-        start_week = i.week_start
-        end_week = i.week_end
-        start_period = i.period_start
-        end_period = i.period_end
-        start_year = i.year_start
-        end_year = i.year_end
-        seven = day_start - timedelta(days=7)
-        last_seven = seven.strftime("%Y-%m-%d")
-        thirty = day_start - timedelta(days=30)
-        last_thirty = thirty.strftime("%Y-%m-%d")
-
-    # Get matching day, week and period start and end dates
-    start_day_ly = get_lastyear(start_day)
-    end_day_ly = get_lastyear(end_day)
-    start_week_ly = get_lastyear(start_week)
-    end_week_ly = get_lastyear(end_week)
-    week_to_date = get_lastyear(start_day)
-    start_period_ly = get_lastyear(start_period)
-    end_period_ly = get_lastyear(end_period)
-    period_to_date = get_lastyear(start_day)
-    start_year_ly = get_lastyear(start_year)
-    end_year_ly = get_lastyear(end_year)
-    year_to_date = get_lastyear(start_day)
-
-    # Get list of Restaurants
-    data = Restaurants.query.all()
-    store_list = pd.DataFrame([x.as_dict() for x in data])
+    fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
 
     form1 = DateForm()
     form3 = StoreForm()
 
     if form1.submit1.data and form1.validate():
-        start_day = form1.selectdate.data.strftime("%Y-%m-%d")
-        session["token"] = start_day
+        new_day = form1.selectdate.data.strftime("%Y-%m-%d")
+        session["token"] = new_day
         return redirect(url_for("home_blueprint.alcohol"))
 
     if form3.submit3.data and form3.validate():
-        session["token"] = start_day
+        session["token"] = fiscal_dates["start_day"]
         store_id = form3.store.data.id
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
@@ -1836,8 +1751,10 @@ def alcohol():
         df = df[(df != 0).all(1)]
         return df
 
-    wine_vendors = get_vendors("Wine", start_year, steakhouse)
-    steakhouse_wine = get_purchases("Wine", start_year, end_year, steakhouse)
+    wine_vendors = get_vendors("Wine", fiscal_dates["start_year"], steakhouse)
+    steakhouse_wine = get_purchases(
+        "Wine", fiscal_dates["start_year"], fiscal_dates["end_year"], steakhouse
+    )
     steakhouse_wine_values = steakhouse_wine.merge(cal_df, on="date", how="left")
     steakhouse_wine_values = steakhouse_wine_values.groupby(["period"]).sum()
     steakhouse_wine_chart = steakhouse_wine_values["cost"].tolist()
@@ -1847,8 +1764,10 @@ def alcohol():
     # steakhouse_wine_bottle = steakhouse_wine.groupby(["item"]).sum()
     # steakhouse_wine_bottle.sort_values(by=["cost"], ascending=False, inplace=True)
 
-    liquor_vendors = get_vendors("Liquor", start_year, steakhouse)
-    steakhouse_liquor = get_purchases("Liquor", start_year, end_year, steakhouse)
+    liquor_vendors = get_vendors("Liquor", fiscal_dates["start_year"], steakhouse)
+    steakhouse_liquor = get_purchases(
+        "Liquor", fiscal_dates["start_year"], fiscal_dates["end_year"], steakhouse
+    )
     steakhouse_liquor_values = steakhouse_liquor.merge(cal_df, on="date", how="left")
     steakhouse_liquor_values = steakhouse_liquor_values.groupby(["period"]).sum()
     steakhouse_liquor_chart = steakhouse_liquor_values["cost"].tolist()
@@ -1858,8 +1777,10 @@ def alcohol():
     steakhouse_liquor_bottle.sort_values(by=["cost"], ascending=False, inplace=True)
     steakhouse_liquor_bottle = steakhouse_liquor_bottle.head(10)
 
-    beer_vendors = get_vendors("Beer", start_year, steakhouse)
-    steakhouse_beer = get_purchases("Beer", start_year, end_year, steakhouse)
+    beer_vendors = get_vendors("Beer", fiscal_dates["start_year"], steakhouse)
+    steakhouse_beer = get_purchases(
+        "Beer", fiscal_dates["start_year"], fiscal_dates["end_year"], steakhouse
+    )
     steakhouse_beer_values = steakhouse_beer.merge(cal_df, on="date", how="left")
     steakhouse_beer_values = steakhouse_beer_values.groupby(["period"]).sum()
     steakhouse_beer_chart = steakhouse_beer_values["cost"].tolist()
@@ -1869,8 +1790,10 @@ def alcohol():
     steakhouse_beer_bottle.sort_values(by=["cost"], ascending=False, inplace=True)
     steakhouse_beer_bottle = steakhouse_beer_bottle.head(10)
 
-    wine_vendors = get_vendors("Wine", start_year, casual)
-    casual_wine = get_purchases("Wine", start_year, end_year, casual)
+    wine_vendors = get_vendors("Wine", fiscal_dates["start_year"], casual)
+    casual_wine = get_purchases(
+        "Wine", fiscal_dates["start_year"], fiscal_dates["end_year"], casual
+    )
     casual_wine_values = casual_wine.merge(cal_df, on="date", how="left")
     casual_wine_values = casual_wine_values.groupby(["period"]).sum()
     casual_wine_chart = casual_wine_values["cost"].tolist()
@@ -1880,8 +1803,10 @@ def alcohol():
     # casual_wine_bottle = casual_wine.groupby(["item"]).sum()
     # casual_wine_bottle.sort_values(by=["cost"], ascending=False, inplace=True)
 
-    liquor_vendors = get_vendors("Liquor", start_year, casual)
-    casual_liquor = get_purchases("Liquor", start_year, end_year, casual)
+    liquor_vendors = get_vendors("Liquor", fiscal_dates["start_year"], casual)
+    casual_liquor = get_purchases(
+        "Liquor", fiscal_dates["start_year"], fiscal_dates["end_year"], casual
+    )
     casual_liquor_values = casual_liquor.merge(cal_df, on="date", how="left")
     casual_liquor_values = casual_liquor_values.groupby(["period"]).sum()
     casual_liquor_chart = casual_liquor_values["cost"].tolist()
@@ -1891,8 +1816,10 @@ def alcohol():
     casual_liquor_bottle.sort_values(by=["cost"], ascending=False, inplace=True)
     casual_liquor_bottle = casual_liquor_bottle.head(10)
 
-    beer_vendors = get_vendors("Beer", start_year, casual)
-    casual_beer = get_purchases("Beer", start_year, end_year, casual)
+    beer_vendors = get_vendors("Beer", fiscal_dates["start_year"], casual)
+    casual_beer = get_purchases(
+        "Beer", fiscal_dates["start_year"], fiscal_dates["end_year"], casual
+    )
     casual_beer_values = casual_beer.merge(cal_df, on="date", how="left")
     casual_beer_values = casual_beer_values.groupby(["period"]).sum()
     casual_beer_chart = casual_beer_values["cost"].tolist()
@@ -1940,53 +1867,17 @@ def alcohol():
 @login_required
 def profile():
 
-    start_day = (
-        end_day
-    ) = start_week = end_week = start_period = end_period = start_year = end_year = ""
-    fiscal_dates = get_period(datetime.strptime(session["token"], "%Y-%m-%d"))
-    for i in fiscal_dates:
-        day_start = datetime.strptime(i.date, "%Y-%m-%d")
-        day_end = day_start + timedelta(days=1)
-        end_day = day_end.strftime("%Y-%m-%d")
-        start_day = i.date
-        start_week = i.week_start
-        end_week = i.week_end
-        start_period = i.period_start
-        end_period = i.period_end
-        start_year = i.year_start
-        end_year = i.year_end
-        seven = day_start - timedelta(days=7)
-        last_seven = seven.strftime("%Y-%m-%d")
-        thirty = day_start - timedelta(days=30)
-        last_thirty = thirty.strftime("%Y-%m-%d")
-
-    # Get matching day, week and period start and end dates
-    start_day_ly = get_lastyear(start_day)
-    end_day_ly = get_lastyear(end_day)
-    start_week_ly = get_lastyear(start_week)
-    end_week_ly = get_lastyear(end_week)
-    week_to_date = get_lastyear(start_day)
-    start_period_ly = get_lastyear(start_period)
-    end_period_ly = get_lastyear(end_period)
-    period_to_date = get_lastyear(start_day)
-    start_year_ly = get_lastyear(start_year)
-    end_year_ly = get_lastyear(end_year)
-    year_to_date = get_lastyear(start_day)
-
-    # Get list of Restaurants
-    data = Restaurants.query.all()
-    store_list = pd.DataFrame([x.as_dict() for x in data])
-
+    fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
     form1 = DateForm()
     form3 = StoreForm()
 
     if form1.submit1.data and form1.validate():
-        start_day = form1.selectdate.data.strftime("%Y-%m-%d")
-        session["token"] = start_day
+        new_day = form1.selectdate.data.strftime("%Y-%m-%d")
+        session["token"] = new_day
         return redirect(url_for("home_blueprint.profile"))
 
     if form3.submit3.data and form3.validate():
-        session["token"] = start_day
+        session["token"] = fiscal_dates["start_day"]
         store_id = form3.store.data.id
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
@@ -2004,15 +1895,10 @@ def profile():
 @login_required
 def potato(store_id):
 
-    form1 = DateForm()
-    form2 = UpdateForm()
-    form3 = StoreForm()
-    fiscal_dates = get_period(datetime.strptime(session["token"], "%Y-%m-%d"))
     store = Restaurants.query.filter_by(id=store_id).first()
 
     pot_df = pd.read_csv("/usr/local/share/potatochart.csv", usecols=["time"])
 
-    TODAY = datetime.date(datetime.now())
     for i in [28, 21, 14, 7]:
         target = TODAY - timedelta(days=i)
         start = target.strftime("%Y-%m-%d")
@@ -2108,41 +1994,3 @@ def potato(store_id):
         mimetype="application/pdf",
         headers={"Content-Disposition": "attachment;filename=potato_loading.pdf"},
     )
-
-
-# @blueprint.route("/<template>")
-# @login_required
-# def route_template(template):
-#
-#    try:
-#
-#        if not template.endswith(".html"):
-#            template += ".html"
-#
-#        # Detect the current page
-#        segment = get_segment(request)
-#
-#        # Serve the file (if exists) from app/templates/home/FILE.html
-#        return render_template("home/" + template, segment=segment)
-#
-#    except TemplateNotFound:
-#        return render_template("home/page-404.html"), 404
-#
-#    except:
-#        return render_template("home/page-500.html"), 500
-#
-#
-## Helper - Extract current page name from request
-# def get_segment(request):
-#
-#    try:
-#
-#        segment = request.path.split("/")[-1]
-#
-#        if segment == "":
-#            segment = "index"
-#
-#        return segment
-#
-#    except:
-#        return None
