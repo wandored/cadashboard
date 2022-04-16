@@ -105,7 +105,6 @@ def get_lastyear(date):
 
 
 def get_period(startdate):
-    # startdate = datetime.strptime(date, "%Y-%m-%d")
     start = startdate.strftime("%Y-%m-%d")
     target = Calendar.query.filter_by(date=start)
 
@@ -482,3 +481,51 @@ def update_recipe_costs():
     # TODO may need to delete by recipID if duplicates show up
     recipes.to_sql("Recipes", con=db.engine, if_exists="replace", index_label="id")
     return 0
+
+
+def set_dates(startdate):
+    start = startdate.strftime("%Y-%m-%d")
+    target = Calendar.query.filter_by(date=start)
+
+    for i in target:
+        day_start = datetime.strptime(i.date, "%Y-%m-%d")
+        day_end = day_start + timedelta(days=1)
+        seven = day_start - timedelta(days=7)
+        thirty = day_start - timedelta(days=30)
+        week_start = datetime.strptime(i.week_start, "%Y-%m-%d")
+        lws = week_start - timedelta(days=7)
+        week_end = datetime.strptime(i.week_end, "%Y-%m-%d")
+        lwe = week_end - timedelta(days=7)
+
+        d = dict()
+        d["day"] = i.day
+        d["week"] = i.week
+        d["period"] = i.period
+        d["year"] = i.year
+        d["quarter"] = i.quarter
+        d["date"] = day_start.strftime("%A, %B %d %Y")
+        d["start_day"] = i.date
+        d["end_day"] = day_end.strftime("%Y-%m-%d")
+        d["start_week"] = i.week_start
+        d["end_week"] = i.week_end
+        d["last_seven"] = seven.strftime("%Y-%m-%d")
+        d["start_period"] = i.period_start
+        d["end_period"] = i.period_end
+        d["last_thirty"] = thirty.strftime("%Y-%m-%d")
+        d["start_year"] = i.year_start
+        d["end_year"] = i.year_end
+        d["start_day_ly"] = get_lastyear(i.date)
+        d["end_day_ly"] = get_lastyear(day_end.strftime("%Y-%m-%d"))
+        d["start_week_ly"] = get_lastyear(i.week_start)
+        d["end_week_ly"] = get_lastyear(i.week_end)
+        d["week_to_date"] = get_lastyear(i.date)
+        d["start_period_ly"] = get_lastyear(i.period_start)
+        d["end_period_ly"] = get_lastyear(i.period_end)
+        d["period_to_date"] = get_lastyear(i.date)
+        d["start_year_ly"] = get_lastyear(i.year_start)
+        d["end_year_ly"] = get_lastyear(i.year_end)
+        d["year_to_date"] = get_lastyear(i.date)
+        d["start_previous_week"] = lws.strftime("%Y-%m-%d")
+        d["end_previous_week"] = lwe.strftime("%Y-%m-%d")
+
+    return d

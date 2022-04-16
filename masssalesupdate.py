@@ -271,7 +271,7 @@ if __name__ == "__main__":
     TODAY = datetime.date(datetime.now())
     YSTDAY = TODAY - timedelta(days=1)
 
-    for d in range(7):
+    for d in range(5):
         dt = YSTDAY - timedelta(days=d)
         tmrw = dt + timedelta(days=1)
         start_date = dt.strftime("%Y-%m-%d")

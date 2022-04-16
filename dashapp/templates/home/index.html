@@ -15,12 +15,10 @@
           <div class="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
             <i class="material-icons opacity-10">paid</i>
           </div>
-            {% for x in fiscal_dates %}
             <div class="text-end pt-1">
-              <p class="text-sm mb-0 text-capitalize">{{ x.day }}, {{ x.date }}</p>
+              <p class="text-sm mb-0 text-capitalize">{{ fiscal_dates["date"] }} </p>
               <h4 class="mb-0">{{ "${:,.0f}".format(daily_totals.sales) }}</h4>
             </div>
-            {% endfor %}
         </div>
         <hr class="dark horizontal my-0">
         {% if daily_totals.sales >= daily_totals.sales_ly %}
@@ -40,12 +38,10 @@
           <div class="icon icon-lg icon-shape bg-gradient-success shadow-success text-center border-radius-xl mt-n4 position-absolute">
             <i class="material-icons opacity-10">paid</i>
           </div>
-            {% for x in fiscal_dates %}
             <div class="text-end pt-1">
-              <p class="text-sm mb-0 text-capitalize">Week {{ x.week }} Sales</p>
+              <p class="text-sm mb-0 text-capitalize">Week {{ fiscal_dates["week"] }} Sales</p>
               <h4 class="mb-0">{{ "${:,.0f}".format(weekly_totals.sales) }}</h4>
             </div>
-            {% endfor %}
         </div>
         <hr class="dark horizontal my-0">
           {% if weekly_totals.sales >= weekly_totals.sales_ly %}
@@ -65,12 +61,10 @@
           <div class="icon icon-lg icon-shape bg-gradient-info shadow-info text-center border-radius-xl mt-n4 position-absolute">
             <i class="material-icons opacity-10">paid</i>
           </div>
-            {% for x in fiscal_dates %}
             <div class="text-end pt-1">
-              <p class="text-sm mb-0 text-capitalize">Period {{ x.period }} Sales</p>
+              <p class="text-sm mb-0 text-capitalize">Period {{ fiscal_dates["period"] }} Sales</p>
               <h4 class="mb-0">{{ "${:,.0f}".format(period_totals.sales) }}</h4>
             </div>
-            {% endfor %}
         </div>
         <hr class="dark horizontal my-0">
           {% if period_totals.sales >= period_totals.sales_ly %}
@@ -90,12 +84,10 @@
           <div class="icon icon-lg icon-shape bg-gradient-warning shadow-warning text-center border-radius-xl mt-n4 position-absolute">
             <i class="material-icons opacity-10">paid</i>
           </div>
-            {% for x in fiscal_dates %}
             <div class="text-end pt-1">
-              <p class="text-sm mb-0 text-capitalize">Fiscal {{ x.year }} Sales</p>
+              <p class="text-sm mb-0 text-capitalize">Fiscal {{ fiscal_dates["year"] }} Sales</p>
               <h4 class="mb-0"> {{ "${:,.0f}".format(yearly_totals.sales) }}</h4>
             </div>
-            {% endfor %}
         </div>
         <hr class="dark horizontal my-0">
           {% if yearly_totals.sales >= yearly_totals.sales_ly %}
@@ -176,11 +168,9 @@
       <div class="card">
         <div class="card-header pb-0">
           <div class="row">
-            {% for x in fiscal_dates %}
             <div class="col-lg-6 col-7">
-              <h6>Daily Sales - {{ x.day }}, {{ x.date }}</h6>
+              <h4>Daily Sales - {{ fiscal_dates["date"] }}</h4>
             </div>
-            {% endfor %}
             <div class="col-lg-6 col-5 my-auto text-end">
               <div class="dropdown float-lg-end pe-4">
                 <a class="cursor-pointer" id="dropdownTable" data-bs-toggle="dropdown" aria-expanded="false">

@@ -15,12 +15,10 @@
             <div class="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
               <i class="material-icons opacity-10">paid</i>
             </div>
-              {% for x in fiscal_dates %}
               <div class="text-end pt-1">
-                <p class="text-sm mb-0 text-capitalize">{{ x.day }}, {{ x.date }}</p>
+                <p class="text-sm mb-0 text-capitalize">{{ fiscal_dates["date"] }}</p>
                 <h4 class="mb-0">{{ "${:,.0f}".format(sales_day) }}</h4>
               </div>
-              {% endfor %}
           </div>
           <hr class="dark horizontal my-0">
           {% if sales_day >= sales_day_ly %}
@@ -40,12 +38,10 @@
             <div class="icon icon-lg icon-shape bg-gradient-success shadow-success text-center border-radius-xl mt-n4 position-absolute">
               <i class="material-icons opacity-10">paid</i>
             </div>
-              {% for x in fiscal_dates %}
               <div class="text-end pt-1">
-                <p class="text-sm mb-0 text-capitalize">Week {{ x.week }} Sales</p>
+                <p class="text-sm mb-0 text-capitalize">Week {{ fiscal_dates["week"] }} Sales</p>
                 <h4 class="mb-0">{{ "${:,.0f}".format(sales_week) }}</h4>
               </div>
-              {% endfor %}
           </div>
           <hr class="dark horizontal my-0">
             {% if sales_week >= sales_week_ly %}
@@ -65,12 +61,10 @@
             <div class="icon icon-lg icon-shape bg-gradient-info shadow-info text-center border-radius-xl mt-n4 position-absolute">
               <i class="material-icons opacity-10">paid</i>
             </div>
-              {% for x in fiscal_dates %}
               <div class="text-end pt-1">
-                <p class="text-sm mb-0 text-capitalize">Period {{ x.period }} Sales</p>
+                <p class="text-sm mb-0 text-capitalize">Period {{ fiscal_dates["period"] }} Sales</p>
                 <h4 class="mb-0">{{ "${:,.0f}".format(sales_period) }}</h4>
               </div>
-              {% endfor %}
           </div>
           <hr class="dark horizontal my-0">
             {% if sales_period >= sales_period_ly %}
@@ -90,12 +84,10 @@
             <div class="icon icon-lg icon-shape bg-gradient-warning shadow-warning text-center border-radius-xl mt-n4 position-absolute">
               <i class="material-icons opacity-10">paid</i>
             </div>
-              {% for x in fiscal_dates %}
               <div class="text-end pt-1">
-                <p class="text-sm mb-0 text-capitalize">Fiscal {{ x.year }} Sales</p>
+                <p class="text-sm mb-0 text-capitalize">Fiscal {{ fiscal_dates["year"] }} Sales</p>
                 <h4 class="mb-0"> {{ "${:,.0f}".format(sales_year) }}</h4>
               </div>
-              {% endfor %}
           </div>
           <hr class="dark horizontal my-0">
             {% if sales_year >= sales_year_ly %}
@@ -122,7 +114,7 @@
             </div>
           </div>
           <div class="card-body">
-            <h6 class="mb-0 ">Week to Date Sales</h6>
+              <h6 class="mb-0 ">Week to Date Sales</h6>
             {% if sales_week > sales_week_ly %}
             <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.0f}".format(sales_week - sales_week_ly) }} over last year</p>
             {% else %}
@@ -141,7 +133,7 @@
             </div>
           </div>
           <div class="card-body">
-            <h6 class="mb-0 ">Period to Date Sales</h6>
+              <h6 class="mb-0 ">Period to Date Sales</h6>
             {% if sales_period > sales_period_ly %}
             <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.0f}".format(sales_period - sales_period_ly) }} over last year</p>
             {% else %}
@@ -160,7 +152,7 @@
             </div>
           </div>
           <div class="card-body">
-            <h6 class="mb-0 ">Year to Date Sales</h6>
+              <h6 class="mb-0 ">Year to Date Sales</h6>
             {% if sales_year > sales_year_ly %}
             <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.0f}".format(sales_year - sales_year_ly) }} over last year</p>
             {% else %}
@@ -182,7 +174,7 @@
             </div>
           </div>
           <div class="card-body">
-              <h6 class="mb-0 ">Total Supply Costs Period {{ period }}</h6>
+              <h6 class="mb-0 ">Total Supply Costs Period {{ fiscal_dates["period"] }}</h6>
             {% if current_supply_budget > current_supply_cost %}
             <p class="text-sm "><i class="fa fa-thumbs-up text-success" aria-hidden="true"></i> {{ "{:,.0f}".format(current_supply_budget - current_supply_cost) }} remaining budget</p>
             {% else %}
@@ -201,7 +193,7 @@
             </div>
           </div>
           <div class="card-body">
-              <h6 class="mb-0 ">Total Smallware Costs Period {{ period }}</h6>
+              <h6 class="mb-0 ">Total Smallware Costs Period {{ fiscal_dates["period"] }}</h6>
             {% if current_smallware_budget > current_smallware_cost %}
             <p class="text-sm "><i class="fa fa-thumbs-up text-success" aria-hidden="true"></i> {{ "{:,.0f}".format(current_smallware_budget - current_smallware_cost) }} remaining budget</p>
             {% else %}
@@ -268,9 +260,7 @@
       <div class="col-lg-4 col-md-6">
         <div class="card">
           <div class="card-header bg-success pb-0">
-            {% for x in fiscal_dates %}
-            <h4>Top Price Increase {{ x.day }} {{ x.date }}</h4>
-            {% endfor %}
+            <h4>Top Price Increase {{ fiscal_dates["date"] }}</h4>
           </div>
             <div class="table-responsive">
               <table class="table-sm">
@@ -311,9 +301,7 @@
       <div class="col-lg-4 col-md-6">
         <div class="card">
           <div class="card-header bg-info pb-0">
-            {% for x in fiscal_dates %}
-            <h4>Top Price Decrease {{ x.day }} {{ x.date }}</h4>
-            {% endfor %}
+            <h4>Top Price Decrease {{ fiscal_dates["date"] }}</h4>
           </div>
             <div class="table-responsive">
               <table class="table-sm">
@@ -373,10 +361,8 @@
         <div class="col-lg-3">
           <div class="card h-100">
             <div class="card-header bg-warning pb-0">
-              {% for x in fiscal_dates %}
               <h4>"DO NOT USE" ITEMS</h4>
               <h6>Remove from inventory template</h6>
-              {% endfor %}
             </div>
             <div class="card">
               <table class="table-responsive table-md">
@@ -408,9 +394,7 @@
         <div class="col-lg-6 col-md-4">
           <div class="card">
             <div class="card-header bg-success pb-0">
-              {% for x in fiscal_dates %}
               <h4>LIVE LOBSTER SUGGESTED MENU PRICE</h4>
-              {% endfor %}
             </div>
             <div class="card">
               <div class="table-responsive">
@@ -452,9 +436,7 @@
         <div class="col-lg-6 col-md-4">
           <div class="card">
             <div class="card-header bg-warning pb-0">
-              {% for x in fiscal_dates %}
               <h4>STONE CLAW SUGGESTED MENU PRICE</h4>
-              {% endfor %}
             </div>
             <div class="card">
               <div class="table-responsive">
@@ -498,9 +480,7 @@
         <div class="col-lg-6 col-md-4">
           <div class="card">
             <div class="card-header bg-secondary pb-0">
-              {% for x in fiscal_dates %}
               <h4>SEA BASS LAST 5 PURCHASES</h4>
-              {% endfor %}
             </div>
             <div class="card">
               <div class="table-responsive">
@@ -560,9 +540,7 @@
         <div class="col-lg-4 col-md-3">
           <div class="card">
             <div class="card-header bg-primary pb-0">
-              {% for x in fiscal_dates %}
               <h4>SALMON LAST 5 PURCHASES</h4>
-              {% endfor %}
             </div>
             <div class="card">
               <div class="table-responsive">
@@ -611,9 +589,7 @@
         <div class="col-lg-4 col-md-3">
           <div class="card">
             <div class="card-header bg-info pb-0">
-              {% for x in fiscal_dates %}
               <h4>FEATURE FISH LAST 5 PURCHASES</h4>
-              {% endfor %}
             </div>
               <div class="table-responsive">
                 <table class="table-sm">

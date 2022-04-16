@@ -15,9 +15,7 @@
               <h4>MANUAL SALES UPDATE</h4>
             </div>
             <div class="card">
-              {% for x in fiscal_dates %}
-              CURRENT DATE: {{ x.date }}
-              {% endfor %}
+              WORKING DATE: {{ fiscal_dates["date"] }}
               <form method="POST" action="" style="text-align:center">
                 {{ form2.hidden_tag() }}
                 <fieldset id="" class="form-group mb-1">
@@ -73,10 +71,8 @@
         <div class="col-lg-4 col-md-6">
           <div class="card h-100">
             <div class="card-header bg-primary pb-0">
-              {% for x in fiscal_dates %}
               <h4>UNASSIGNED SALES</h4>
-              <h4>{{ x.day }}, {{ x.date }}</h4>
-              {% endfor %}
+              <h4>{{ fiscal_dates["date"] }}</h4>
             </div>
             <div class="card">
               <table class="table-responsive table-md">
@@ -108,10 +104,8 @@
         <div class="col-lg-4 col-md-6">
           <div class="card h-100">
             <div class="card-header bg-primary pb-0">
-              {% for x in fiscal_dates %}
               <h4>DO NOT USE ITEMS BEING USED</h4>
-              <h4>Period {{ x.period }} Week {{ x.week }}</h4>
-              {% endfor %}
+              <h4>Period {{ fiscal_dates["period"] }} Week {{ fiscal_dates["week"] }}</h4>
             </div>
             <div class="card">
               <table class="table-responsive table-md">
