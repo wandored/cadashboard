@@ -14,8 +14,8 @@ from flask.wrappers import Response
 from dashapp.home.util import (
     find_day_with_sales,
     refresh_data,
-    get_daily_sales,
-    get_daily_labor,
+    get_category_sales,
+    get_category_labor,
     convert_uofm,
     update_recipe_costs,
     set_dates,
@@ -101,24 +101,24 @@ def index():
 
         return value
 
-    values1 = get_chart_values(
+    daily_sales_list = get_chart_values(
         fiscal_dates["start_week"], fiscal_dates["end_week"], Calendar.date
     )
-    values1_ly = get_chart_values(
+    daily_sales_list_ly = get_chart_values(
         fiscal_dates["start_week_ly"], fiscal_dates["end_week_ly"], Calendar.date
     )
 
-    values2 = get_chart_values(
+    weekly_sales_list = get_chart_values(
         fiscal_dates["start_period"], fiscal_dates["end_period"], Calendar.week
     )
-    values2_ly = get_chart_values(
+    weekly_sales_list_ly = get_chart_values(
         fiscal_dates["start_period_ly"], fiscal_dates["end_period_ly"], Calendar.week
     )
 
-    values3 = get_chart_values(
+    period_sales_list = get_chart_values(
         fiscal_dates["start_year"], fiscal_dates["end_year"], Calendar.period
     )
-    values3_ly = get_chart_values(
+    period_sales_list_ly = get_chart_values(
         fiscal_dates["start_year_ly"], fiscal_dates["end_year_ly"], Calendar.period
     )
 
@@ -491,12 +491,12 @@ def index():
         current_user=current_user,
         roles=current_user.roles,
         fiscal_dates=fiscal_dates,
-        values1=values1,
-        values2=values2,
-        values3=values3,
-        values1_ly=values1_ly,
-        values2_ly=values2_ly,
-        values3_ly=values3_ly,
+        daily_sales_list=daily_sales_list,
+        daily_sales_list_ly=daily_sales_list_ly,
+        weekly_sales_list=weekly_sales_list,
+        weekly_sales_list_ly=weekly_sales_list_ly,
+        period_sales_list=period_sales_list,
+        period_sales_list_ly=period_sales_list_ly,
         budgets3=budgets3,
         daily_table=daily_table,
         daily_totals=daily_totals,
@@ -616,22 +616,22 @@ def store(store_id):
 
         return value
 
-    values1 = get_chart_values(
+    daily_sales_list = get_chart_values(
         fiscal_dates["start_week"], fiscal_dates["end_week"], Calendar.date
     )
-    values1_ly = get_chart_values(
+    daily_sales_list_ly = get_chart_values(
         fiscal_dates["start_week_ly"], fiscal_dates["end_week_ly"], Calendar.date
     )
-    values2 = get_chart_values(
+    weekly_sales_list = get_chart_values(
         fiscal_dates["start_period"], fiscal_dates["end_period"], Calendar.week
     )
-    values2_ly = get_chart_values(
+    weekly_sales_list_ly = get_chart_values(
         fiscal_dates["start_period_ly"], fiscal_dates["end_period_ly"], Calendar.week
     )
-    values3 = get_chart_values(
+    period_sales_list = get_chart_values(
         fiscal_dates["start_year"], fiscal_dates["end_year"], Calendar.period
     )
-    values3_ly = get_chart_values(
+    period_sales_list_ly = get_chart_values(
         fiscal_dates["start_year_ly"], fiscal_dates["end_year_ly"], Calendar.period
     )
 
@@ -646,81 +646,81 @@ def store(store_id):
     for v in budget_chart:
         budgets3.append(v.total_sales)
 
-    def sales_labor_table(start, end):
-        # Build sales and labor stats for the time period given
-
-        food_sales = get_daily_sales(start, end, store.name, "FOOD")
-        beer_sales = get_daily_sales(start, end, store.name, "BEER")
-        liquor_sales = get_daily_sales(start, end, store.name, "LIQUOR")
-        wine_sales = get_daily_sales(start, end, store.name, "WINE")
-        gift_card_sales = get_daily_sales(start, end, store.name, "GIFT CARDS")
-
-        sales_table = food_sales.merge(beer_sales)
-        sales_table = sales_table.merge(liquor_sales)
-        sales_table = sales_table.merge(wine_sales)
-        sales_table = sales_table.merge(gift_card_sales, how="outer")
-        sales_table.rename(
-            columns={
-                "FOOD": "food",
-                "BEER": "beer",
-                "LIQUOR": "liquor",
-                "WINE": "wine",
-                "GIFT CARDS": "gift_cards",
-            },
-            inplace=True,
-        )
-        sales_table.fillna(value=0, inplace=True)
-        sales_table["alcohol_sales"] = (
-            sales_table.beer + sales_table.liquor + sales_table.wine
-        )
-        sales_table["total_sales"] = sales_table.food + sales_table.alcohol_sales
-        sales_table["net_sales"] = sales_table.total_sales + sales_table.gift_cards
-
-        # Labor
-        bar_labor = get_daily_labor(start, end, store.name, "Bar")
-        host_labor = get_daily_labor(start, end, store.name, "Host")
-        restaurant_labor = get_daily_labor(start, end, store.name, "Restaurant")
-        kitchen_labor = get_daily_labor(start, end, store.name, "Kitchen")
-
-        labor_table = bar_labor.merge(host_labor)
-        labor_table = labor_table.merge(restaurant_labor)
-        labor_table = labor_table.merge(kitchen_labor)
-        labor_table.fillna(value=0, inplace=True)
-
-        labor_table["Total_Labor"] = (
-            labor_table.Bar
-            + labor_table.Host
-            + labor_table.Restaurant
-            + labor_table.Kitchen
-        )
-
-        join_data = labor_table[
-            [
-                "Bar",
-                "Host",
-                "Restaurant",
-                "Kitchen",
-                "Total_Labor",
-            ]
-        ]
-        _table = sales_table.join(join_data)
-        _table["Labor_pct"] = _table.Total_Labor / _table.total_sales
-        _table["Bar_pct"] = _table.Bar / (_table.alcohol_sales)
-        _table["Host_pct"] = _table.Host / (_table.food)
-        _table["Restaurant_pct"] = _table.Restaurant / (_table.food)
-        _table["Kitchen_pct"] = _table.Kitchen / (_table.food)
-        _table["name"] = store.name
-
-        _table = _table.merge(store_list, how="left")
-        totals = _table.sum()
-        return totals
-
-    weekly_totals = sales_labor_table(
-        fiscal_dates["start_week"], fiscal_dates["end_week"]
-    )
-    period_totals = sales_labor_table(
-        fiscal_dates["start_period"], fiscal_dates["end_period"]
-    )
+#    def sales_labor_table(start, end):
+#        # Build sales and labor stats for the time period given
+#
+#        food_sales = get_category_sales(start, end, store.name, "FOOD")
+#        beer_sales = get_category_sales(start, end, store.name, "BEER")
+#        liquor_sales = get_category_sales(start, end, store.name, "LIQUOR")
+#        wine_sales = get_category_sales(start, end, store.name, "WINE")
+#        gift_card_sales = get_category_sales(start, end, store.name, "GIFT CARDS")
+#
+#        sales_table = food_sales.merge(beer_sales)
+#        sales_table = sales_table.merge(liquor_sales)
+#        sales_table = sales_table.merge(wine_sales)
+#        sales_table = sales_table.merge(gift_card_sales, how="outer")
+#        sales_table.rename(
+#            columns={
+#                "FOOD": "food",
+#                "BEER": "beer",
+#                "LIQUOR": "liquor",
+#                "WINE": "wine",
+#                "GIFT CARDS": "gift_cards",
+#            },
+#            inplace=True,
+#        )
+#        sales_table.fillna(value=0, inplace=True)
+#        sales_table["alcohol_sales"] = (
+#            sales_table.beer + sales_table.liquor + sales_table.wine
+#        )
+#        sales_table["total_sales"] = sales_table.food + sales_table.alcohol_sales
+#        sales_table["net_sales"] = sales_table.total_sales + sales_table.gift_cards
+#
+#        # Labor
+#        bar_labor = get_category_labor(start, end, store.name, "Bar")
+#        host_labor = get_category_labor(start, end, store.name, "Host")
+#        restaurant_labor = get_category_labor(start, end, store.name, "Restaurant")
+#        kitchen_labor = get_category_labor(start, end, store.name, "Kitchen")
+#
+#        labor_table = bar_labor.merge(host_labor)
+#        labor_table = labor_table.merge(restaurant_labor)
+#        labor_table = labor_table.merge(kitchen_labor)
+#        labor_table.fillna(value=0, inplace=True)
+#
+#        labor_table["Total_Labor"] = (
+#            labor_table.Bar
+#            + labor_table.Host
+#            + labor_table.Restaurant
+#            + labor_table.Kitchen
+#        )
+#
+#        join_data = labor_table[
+#            [
+#                "Bar",
+#                "Host",
+#                "Restaurant",
+#                "Kitchen",
+#                "Total_Labor",
+#            ]
+#        ]
+#        _table = sales_table.join(join_data)
+#        _table["Labor_pct"] = _table.Total_Labor / _table.total_sales
+#        _table["Bar_pct"] = _table.Bar / (_table.alcohol_sales)
+#        _table["Host_pct"] = _table.Host / (_table.food)
+#        _table["Restaurant_pct"] = _table.Restaurant / (_table.food)
+#        _table["Kitchen_pct"] = _table.Kitchen / (_table.food)
+#        _table["name"] = store.name
+#
+#        _table = _table.merge(store_list, how="left")
+#        totals = _table.sum()
+#        return totals
+#
+#    weekly_totals = sales_labor_table(
+#        fiscal_dates["start_week"], fiscal_dates["end_week"]
+#    )
+#    period_totals = sales_labor_table(
+#        fiscal_dates["start_period"], fiscal_dates["end_period"]
+#    )
 
     lobster_items = []
     stone_items = []
@@ -1042,7 +1042,7 @@ def store(store_id):
     supply_cost_dol, supply_cost_pct = get_category_costs(
         fiscal_dates["start_year"],
         fiscal_dates["end_year"],
-        values3,
+        period_sales_list,
         cat=[
             "Rest. Supplies",
             "Kitchen Supplies",
@@ -1054,7 +1054,7 @@ def store(store_id):
     supply_cost_dol_ly, supply_cost_pct_ly = get_category_costs(
         fiscal_dates["start_year_ly"],
         fiscal_dates["end_year_ly"],
-        values3_ly,
+        period_sales_list_ly,
         cat=[
             "Rest. Supplies",
             "Kitchen Supplies",
@@ -1074,13 +1074,13 @@ def store(store_id):
     smallware_cost_dol, smallware_cost_pct = get_category_costs(
         fiscal_dates["start_year"],
         fiscal_dates["end_year"],
-        values3,
+        period_sales_list,
         cat=["China", "Silverware", "Glassware", "Smallwares"],
     )
     smallware_cost_dol_ly, smallware_cost_pct_ly = get_category_costs(
         fiscal_dates["start_year_ly"],
         fiscal_dates["end_year_ly"],
-        values3_ly,
+        period_sales_list_ly,
         cat=["China", "Silverware", "Glassware", "Smallwares"],
     )
     query = (
@@ -1126,12 +1126,12 @@ def store(store_id):
         sales_period_ly=sales_period_ly,
         sales_year=sales_year,
         sales_year_ly=sales_year_ly,
-        values1=values1,
-        values2=values2,
-        values3=values3,
-        values1_ly=values1_ly,
-        values2_ly=values2_ly,
-        values3_ly=values3_ly,
+        daily_sales_list=daily_sales_list,
+        daily_sales_list_ly=daily_sales_list_ly,
+        weekly_sales_list=weekly_sales_list,
+        weekly_sales_list_ly=weekly_sales_list_ly,
+        period_sales_list=period_sales_list,
+        period_sales_list_ly=period_sales_list_ly,
         budgets3=budgets3,
         supply_cost_dol=supply_cost_dol,
         supply_cost_dol_ly=supply_cost_dol_ly,
@@ -1143,8 +1143,8 @@ def store(store_id):
         current_supply_budget=current_supply_budget,
         current_smallware_cost=current_smallware_cost,
         current_smallware_budget=current_smallware_budget,
-        weekly_totals=weekly_totals,
-        period_totals=period_totals,
+        #weekly_totals=weekly_totals,
+        #period_totals=period_totals,
         lobster_items=lobster_items,
         stone_items=stone_items,
         sea_bass=sea_bass,
