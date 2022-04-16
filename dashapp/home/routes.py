@@ -518,6 +518,11 @@ def index():
 def store(store_id):
 
     store = Restaurants.query.filter_by(id=store_id).first()
+    
+    if not "token" in session:
+        session["token"] = YSTDAY.strftime("%Y-%m-%d")
+        return redirect(url_for("home_blueprint.store", store_id=store.id))
+    
     fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
 
     if store_id in [4, 9, 11, 17, 16]:
