@@ -1402,59 +1402,47 @@ def purchasing():
             item_list.append(row_dict)
         df = pd.DataFrame(item_list)
 
-        # if not df.empty:
-        #    df = df[(df != 0).all(1)]
-        #    df.dropna(axis=0, how="any", subset=["company"], inplace=True)
-        #    df["cost_lb"] = df["cost"] / (df["count"] * df["factor"]).astype(float)
-        #    df.sort_values(by=["date"], ascending=False, inplace=True)
+        if not df.empty:
+            #    df = df[(df != 0).all(1)]
+            #    df.dropna(axis=0, how="any", subset=["company"], inplace=True)
+            df["cost_lb"] = ((df["cost"] / df["count"]) / df["base_qty"] * 16).astype(
+                float
+            )
+            df.sort_values(by=["cost_lb"], inplace=True)
         return df
 
-    lobster_vendor = get_vendors("SEAFOOD Lobster Live*", fiscal_dates["last_seven"])
-    lobster_df = get_purchases("SEAFOOD Lobster Live*", fiscal_dates["last_seven"])
-
-    lobster_tail_vendor = get_vendors(
-        "SEAFOOD Lobster Tail*", fiscal_dates["last_seven"]
+    prime_rib_df = get_purchases("BEEF Prime Rib Choice", fiscal_dates["last_thirty"])
+    lobster_live_df = get_purchases(
+        "SEAFOOD Lobster Live*", fiscal_dates["last_thirty"]
     )
-    lobster_tail_df = get_purchases("SEAFOOD Lobster Tail*", fiscal_dates["last_seven"])
-
-    stone_vendor = get_vendors("^(SEAFOOD Crab Stone Claw)", fiscal_dates["last_seven"])
-    stone_df = get_purchases("^(SEAFOOD Crab Stone Claw)", fiscal_dates["last_seven"])
-
-    special_vendor = get_vendors("SEAFOOD Crabmeat Special", fiscal_dates["last_seven"])
-    special_df = get_purchases("SEAFOOD Crabmeat Special", fiscal_dates["last_seven"])
-
-    backfin_vendor = get_vendors(
-        "SEAFOOD Crabmeat Backfin", fiscal_dates["start_period"]
+    lobster_tail_df = get_purchases(
+        "SEAFOOD Lobster Tail*", fiscal_dates["last_thirty"]
     )
-    backfin_df = get_purchases("SEAFOOD Crabmeat Backfin", fiscal_dates["start_period"])
 
-    premium_vendor = get_vendors(
-        "SEAFOOD Crabmeat Premium", fiscal_dates["start_period"]
-    )
-    premium_df = get_purchases("SEAFOOD Crabmeat Premium", fiscal_dates["start_period"])
-    print(premium_df)
+    stone_df = get_purchases("^(SEAFOOD Crab Stone Claw)", fiscal_dates["last_thirty"])
 
-    colossal_vendor = get_vendors(
-        "SEAFOOD Crabmeat Colossal", fiscal_dates["start_period"]
-    )
+    special_df = get_purchases("SEAFOOD Crabmeat Special", fiscal_dates["last_thirty"])
+    backfin_df = get_purchases("SEAFOOD Crabmeat Backfin", fiscal_dates["last_thirty"])
+    premium_df = get_purchases("SEAFOOD Crabmeat Premium", fiscal_dates["last_thirty"])
     colossal_df = get_purchases(
-        "SEAFOOD Crabmeat Colossal", fiscal_dates["start_period"]
+        "SEAFOOD Crabmeat Colossal", fiscal_dates["last_thirty"]
     )
 
-    seabass_vendor = get_vendors("SEAFOOD Sea Bass Chilean", fiscal_dates["last_seven"])
-    seabass_df = get_purchases("SEAFOOD Sea Bass Chilean", fiscal_dates["last_seven"])
+    seabass_df = get_purchases("SEAFOOD Sea Bass Chilean", fiscal_dates["last_thirty"])
+    salmon_df = get_purchases("^(SEAFOOD) (Salmon)$", fiscal_dates["last_thirty"])
+    feature_df = get_purchases("SEAFOOD Feature Fish", fiscal_dates["last_thirty"])
 
-    salmon_vendor = get_vendors("^(SEAFOOD) (Salmon)$", fiscal_dates["last_seven"])
-    salmon_df = get_purchases("^(SEAFOOD) (Salmon)$", fiscal_dates["last_seven"])
-
-    feature_vendor = get_vendors("SEAFOOD Feature Fish", fiscal_dates["last_seven"])
-    feature_df = get_purchases("SEAFOOD Feature Fish", fiscal_dates["last_seven"])
-
-    shrimp10_vendor = get_vendors(
-        "SEAFOOD Shrimp U/10 White Headless", fiscal_dates["last_seven"]
-    )
     shrimp10_df = get_purchases(
-        "SEAFOOD Shrimp U/10 White Headless", fiscal_dates["last_seven"]
+        "SEAFOOD Shrimp U/10 White Headless", fiscal_dates["last_thirty"]
+    )
+    shrimp3135_df = get_purchases(
+        "SEAFOOD Shrimp 31/35 Butterfly", fiscal_dates["last_thirty"]
+    )
+    shrimp5160_df = get_purchases(
+        "SEAFOOD Shrimp 51/60 P&D", fiscal_dates["last_thirty"]
+    )
+    shrimp2630_df = get_purchases(
+        "SEAFOOD Shrimp 26/30 P&D", fiscal_dates["last_thirty"]
     )
 
     def period_purchases(regex, start, end):
@@ -1463,7 +1451,7 @@ def purchasing():
         ).all()
         cal_df = pd.DataFrame(calendar, columns=["date", "week", "period", "year"])
 
-        items = (
+        query = (
             db.session.query(
                 Transactions.date,
                 Transactions.company,
@@ -1485,23 +1473,24 @@ def purchasing():
             )
         ).all()
         item_list = []
-        for i in items:
-            if not i.UofM:
+        for q in query:
+            if not q.UofM:
                 continue
-            qty, uofm = convert_uofm(i)
-            # TODO fix the factor calc on purchasing
-            pound = qty / 16.0
-            row_dict = dict(i)
-            row_dict["factor"] = pound
+            qty, uofm = convert_uofm(q)
+            row_dict = dict(q)
+            row_dict["base_qty"] = qty
+            row_dict["base_uofm"] = uofm
+            row_dict["pounds"] = row_dict["count"] * row_dict["base_qty"] / 16
             item_list.append(row_dict)
         df = pd.DataFrame(item_list)
-        df = df[(df != 0).all(1)]
-        df["pounds"] = df["count"] * df["factor"]
-        df = df.merge(cal_df, on="date", how="left")
-        df = df.groupby(["period"]).sum()
-        df["cost_lb"] = df["cost"] / df["pounds"]
-        df_list = df["cost_lb"].tolist()
-        return df_list
+
+        if not df.empty:
+            # df = df[(df != 0).all(1)]
+            df = df.merge(cal_df, on="date", how="left")
+            df = df.groupby(["period"]).sum()
+            df["cost_lb"] = (df["cost"] / df["pounds"]).astype(float)
+            df_list = df["cost_lb"].tolist()
+            return df_list
 
     prime_chart = period_purchases(
         "^(BEEF Steak).*(Prime)$", fiscal_dates["start_year"], fiscal_dates["end_year"]
@@ -1607,6 +1596,38 @@ def purchasing():
         fiscal_dates["start_year_ly"],
         fiscal_dates["end_year_ly"],
     )
+    stone_chart = period_purchases(
+        "SEAFOOD Crab Stone Claw*", fiscal_dates["start_year"], fiscal_dates["end_year"]
+    )
+    stone_chart_ly = period_purchases(
+        "SEAFOOD Crab Stone Claw*",
+        fiscal_dates["start_year_ly"],
+        fiscal_dates["end_year_ly"],
+    )
+    shrimp10_chart = period_purchases(
+        "SEAFOOD Shrimp U/10*", fiscal_dates["start_year"], fiscal_dates["end_year"]
+    )
+    shrimp10_chart_ly = period_purchases(
+        "SEAFOOD Shrimp U/10*",
+        fiscal_dates["start_year_ly"],
+        fiscal_dates["end_year_ly"],
+    )
+    shrimp3135_chart = period_purchases(
+        "SEAFOOD Shrimp 31/35*", fiscal_dates["start_year"], fiscal_dates["end_year"]
+    )
+    shrimp3135_chart_ly = period_purchases(
+        "SEAFOOD Shrimp 31/35*",
+        fiscal_dates["start_year_ly"],
+        fiscal_dates["end_year_ly"],
+    )
+    shrimp2630_chart = period_purchases(
+        "SEAFOOD Shrimp 26/30*", fiscal_dates["start_year"], fiscal_dates["end_year"]
+    )
+    shrimp2630_chart_ly = period_purchases(
+        "SEAFOOD Shrimp 26/30*",
+        fiscal_dates["start_year_ly"],
+        fiscal_dates["end_year_ly"],
+    )
 
     return render_template(
         "home/purchasing.html",
@@ -1616,30 +1637,24 @@ def purchasing():
         form1=form1,
         form3=form3,
         current_user=current_user,
-        lobster_df=lobster_df,
-        lobster_vendor=lobster_vendor,
-        stone_vendor=stone_vendor,
+        lobster_live_df=lobster_live_df,
+        lobster_tail_df=lobster_tail_df,
         stone_df=stone_df,
         special_df=special_df,
-        special_vendor=special_vendor,
         backfin_df=backfin_df,
-        backfin_vendor=backfin_vendor,
         premium_df=premium_df,
-        premium_vendor=premium_vendor,
         colossal_df=colossal_df,
-        colossal_vendor=colossal_vendor,
-        seabass_vendor=seabass_vendor,
         seabass_df=seabass_df,
-        salmon_vendor=salmon_vendor,
         salmon_df=salmon_df,
-        shrimp10_vendor=shrimp10_vendor,
         shrimp10_df=shrimp10_df,
-        feature_vendor=feature_vendor,
+        shrimp3135_df=shrimp3135_df,
+        shrimp2630_df=shrimp2630_df,
         feature_df=feature_df,
         prime_chart=prime_chart,
         prime_chart_ly=prime_chart_ly,
         choice_chart=choice_chart,
         choice_chart_ly=choice_chart_ly,
+        prime_rib_df=prime_rib_df,
         prime_rib_chart=prime_rib_chart,
         prime_rib_chart_ly=prime_rib_chart_ly,
         special_crabmeat_chart=special_crabmeat_chart,
@@ -1660,6 +1675,14 @@ def purchasing():
         lobster_live_chart_ly=lobster_live_chart_ly,
         lobster_tail_chart=lobster_tail_chart,
         lobster_tail_chart_ly=lobster_tail_chart_ly,
+        stone_chart=stone_chart,
+        stone_chart_ly=stone_chart_ly,
+        shrimp10_chart=shrimp10_chart,
+        shrimp10_chart_ly=shrimp10_chart_ly,
+        shrimp3135_chart=shrimp3135_chart,
+        shrimp3135_chart_ly=shrimp3135_chart_ly,
+        shrimp2630_chart=shrimp2630_chart,
+        shrimp2630_chart_ly=shrimp2630_chart_ly,
     )
 
 
