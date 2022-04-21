@@ -46,15 +46,15 @@ from dashapp.authentication.models import (
 from sqlalchemy import and_, or_, func
 
 
-TODAY = datetime.date(datetime.now())
-CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
-YSTDAY = TODAY - timedelta(days=1)
-
 
 @blueprint.route("/", methods=["GET", "POST"])
 @blueprint.route("/index/", methods=["GET", "POST"])
 @login_required
 def index():
+
+    TODAY = datetime.date(datetime.now())
+    CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
+    YSTDAY = TODAY - timedelta(days=1)
 
     if not "token" in session:
         session["token"] = YSTDAY.strftime("%Y-%m-%d")
@@ -516,6 +516,10 @@ def index():
 @blueprint.route("/<int:store_id>/store/", methods=["GET", "POST"])
 @login_required
 def store(store_id):
+
+    TODAY = datetime.date(datetime.now())
+    CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
+    YSTDAY = TODAY - timedelta(days=1)
 
     store = Restaurants.query.filter_by(id=store_id).first()
 
@@ -1162,6 +1166,10 @@ def store(store_id):
 @login_required
 def marketing():
 
+    TODAY = datetime.date(datetime.now())
+    CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
+    YSTDAY = TODAY - timedelta(days=1)
+
     fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
     form1 = DateForm()
     if form1.submit1.data and form1.validate():
@@ -1340,6 +1348,10 @@ def marketing():
 @blueprint.route("/purchasing/", methods=["GET", "POST"])
 @login_required
 def purchasing():
+
+    TODAY = datetime.date(datetime.now())
+    CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
+    YSTDAY = TODAY - timedelta(days=1)
 
     fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
 
@@ -1691,6 +1703,10 @@ def purchasing():
 @roles_accepted("admin")
 def support():
 
+    TODAY = datetime.date(datetime.now())
+    CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
+    YSTDAY = TODAY - timedelta(days=1)
+
     fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
 
     form1 = DateForm()
@@ -1782,6 +1798,10 @@ def support():
 @blueprint.route("/alcohol/", methods=["GET", "POST"])
 @login_required
 def alcohol():
+
+    TODAY = datetime.date(datetime.now())
+    CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
+    YSTDAY = TODAY - timedelta(days=1)
 
     fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
 
@@ -1970,6 +1990,10 @@ def alcohol():
 @login_required
 def profile():
 
+    TODAY = datetime.date(datetime.now())
+    CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
+    YSTDAY = TODAY - timedelta(days=1)
+
     fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
     form1 = DateForm()
     form3 = StoreForm()
@@ -1997,6 +2021,13 @@ def profile():
 @blueprint.route("/<int:store_id>/potato/", methods=["GET", "POST"])
 @login_required
 def potato(store_id):
+
+    TODAY = datetime.date(datetime.now())
+    CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
+    YSTDAY = TODAY - timedelta(days=1)
+    
+    print(TODAY)
+    print(session['token'])
 
     store = Restaurants.query.filter_by(id=store_id).first()
 
