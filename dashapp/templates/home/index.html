@@ -382,7 +382,7 @@
           borderRadius: 4,
           borderSkipped: false,
           backgroundColor: "rgba(255, 255, 255, .8)",
-          data: {{ values1 | safe }},
+          data: {{ daily_sales_list | safe }},
           maxBarThickness: 6
         }, {
           label: "Last Year",
@@ -396,7 +396,7 @@
           type: "line",
           backgroundColor: "transparent",
           fill: true,
-          data: {{ values1_ly | safe }},
+          data: {{ daily_sales_list_ly | safe }},
           maxBarThickness: 6
         }, ],
       },
@@ -486,7 +486,7 @@
           bordercolor: "rgba(255, 255, 255, .8)",
           borderwidth: 4,
           fill: true,
-          data: {{ values2 | safe }},
+          data: {{ weekly_sales_list | safe }},
           maxbarthickness: 6
         }, {
           label: "Last Year",
@@ -501,7 +501,7 @@
           type: "bar",
           backgroundcolor: "transparent",
           fill: true,
-          data: {{ values2_ly | safe }},
+          data: {{ weekly_sales_list_ly | safe }},
           maxbarthickness: 6
         }, ],
       },
@@ -586,7 +586,7 @@
           borderWidth: 4,
           backgroundColor: "transparent",
           fill: true,
-          data: {{ values3 | safe }},
+          data: {{ period_sales_list | safe }},
           maxBarThickness: 6
         }, {
           label: "Last Year",
@@ -600,7 +600,7 @@
           type: "line",
           backgroundColor: "transparent",
           fill: true,
-          data: {{ values3_ly | safe }},
+          data: {{ period_sales_list_ly | safe }},
           maxBarThickness: 6
         }, {         
           label: "budget",

@@ -109,7 +109,7 @@
           <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
             <div class="bg-gradient-primary shadow-primary border-radius-lg py-3 pe-1">
               <div class="chart">
-                <canvas id="chart-bars" class="chart-canvas" height="170"></canvas>
+                <canvas id="chart-wtd" class="chart-canvas" height="170"></canvas>
               </div>
             </div>
           </div>
@@ -128,7 +128,7 @@
           <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
             <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
               <div class="chart">
-                <canvas id="chart-line" class="chart-canvas" height="170"></canvas>
+                <canvas id="chart-ptd" class="chart-canvas" height="170"></canvas>
               </div>
             </div>
           </div>
@@ -147,7 +147,7 @@
           <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
             <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
               <div class="chart">
-                <canvas id="chart-line-tasks" class="chart-canvas" height="170"></canvas>
+                <canvas id="chart-ytd" class="chart-canvas" height="170"></canvas>
               </div>
             </div>
           </div>
@@ -207,12 +207,17 @@
           <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
             <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
               <div class="chart">
-                <canvas id="chart-other" class="chart-canvas" height="170"></canvas>
+                <canvas id="chart-linen" class="chart-canvas" height="170"></canvas>
               </div>
             </div>
           </div>
           <div class="card-body">
-            <h6 class="mb-0 ">Cost</h6>
+            <h6 class="mb-0 ">Total Linen Costs Period {{ fiscal_dates["period"] }}</h6>
+            {% if period_linen_cost_ly > period_linen_cost %}
+            <p class="text-sm "><i class="fa fa-thumbs-up text-success" aria-hidden="true"></i> {{ "{:,.0f}".format(period_linen_cost_ly - period_linen_cost) }} less then last year</p>
+            {% else %}
+            <p class="text-sm "><i class="fa fa-thumbs-down text-danger" aria-hidden="true"></i> {{ "{:,.0f}".format(period_linen_cost_ly - period_linen_cost) }} over last year</p>
+            {% endif %}
           </div>
         </div>
       </div>
@@ -642,7 +647,7 @@
 
   <script src="/static/assets/js/plugins/chartjs.min.js"></script>
   <script>
-    var ctx = document.getElementById("chart-bars").getContext("2d");
+    var ctx = document.getElementById("chart-wtd").getContext("2d");
 
     new Chart(ctx, {
       type: "bar",
@@ -655,7 +660,7 @@
           borderRadius: 4,
           borderSkipped: false,
           backgroundColor: "rgba(255, 255, 255, .8)",
-          data: {{ values1 | safe }},
+          data: {{ daily_sales_list | safe }},
           maxBarThickness: 6
         }, {
           label: "Last Year",
@@ -669,7 +674,7 @@
           type: "line",
           backgroundColor: "transparent",
           fill: true,
-          data: {{ values1_ly | safe }},
+          data: {{ daily_sales_list_ly | safe }},
           maxBarThickness: 6
         }, ],
       },
@@ -741,7 +746,7 @@
     });
 
 
-    var ctx2 = document.getElementById("chart-line").getContext("2d");
+    var ctx2 = document.getElementById("chart-ptd").getContext("2d");
 
     new Chart(ctx2, {
       type: "bar",
@@ -759,7 +764,7 @@
           bordercolor: "rgba(255, 255, 255, .8)",
           borderwidth: 4,
           fill: true,
-          data: {{ values2 | safe }},
+          data: {{ weekly_sales_list | safe }},
           maxbarthickness: 6
         }, {
           label: "Last Year",
@@ -774,7 +779,7 @@
           type: "bar",
           backgroundcolor: "transparent",
           fill: true,
-          data: {{ values2_ly | safe }},
+          data: {{ weekly_sales_list_ly | safe }},
           maxbarthickness: 6
         }, ],
       },
@@ -842,7 +847,7 @@
       },
     });
 
-    var ctx3 = document.getElementById("chart-line-tasks").getContext("2d");
+    var ctx3 = document.getElementById("chart-ytd").getContext("2d");
     new Chart(ctx3, {
       type: "line",
       data: {
@@ -858,7 +863,7 @@
           borderWidth: 4,
           backgroundColor: "transparent",
           fill: true,
-          data: {{ values3 | safe }},
+          data: {{ period_sales_list | safe }},
           maxBarThickness: 6
         }, {
           label: "Last Year",
@@ -872,7 +877,7 @@
           type: "line",
           backgroundColor: "transparent",
           fill: true,
-          data: {{ values3_ly | safe }},
+          data: {{ period_sales_list_ly | safe }},
           maxBarThickness: 6
         }, {
           label: "budget",
@@ -1111,6 +1116,104 @@
           backgroundColor: "transparent",
           fill: true,
           data: {{ smallware_budget | safe }},
+          maxBarThickness: 6
+        }, ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          }
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
+        scales: {
+          y: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              padding: 10,
+              color: '#f8f9fa',
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+              // Abbreviate the thousands
+              callback: function(value, index, values) {
+                return value / 1e3 + ' T';
+              },
+            },
+          },
+          x: {
+            grid: {
+              drawBorder: false,
+              display: false,
+              drawOnChartArea: false,
+              drawTicks: false,
+              borderDash: [5, 5]
+            },
+            ticks: {
+              display: true,
+              color: '#f8f9fa',
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+            }
+          },
+        },
+      },
+    });
+
+    var ctx6 = document.getElementById("chart-linen").getContext("2d");
+    new Chart(ctx6, {
+      type: "line",
+      data: {
+        labels: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13"],
+        datasets: [{
+          label: "Total Supply Costs",
+          tension: 0,
+          borderWidth: 0,
+          pointRadius: 5,
+          pointBackgroundColor: "rgba(255, 255, 255, .8)",
+          pointBorderColor: "transparent",
+          borderColor: "rgba(255, 255, 255, .8)",
+          borderWidth: 4,
+          backgroundColor: "transparent",
+          fill: true,
+          data: {{ linen_cost_dol | safe }},
+          maxBarThickness: 6
+        }, {
+          label: "Last Year",
+          tension: 0,
+          borderWidth: 0,
+          pointRadius: 5,
+          pointBackgroundColor: "rgba(200, 200, 200, 1)",
+          pointBorderColor: "transparent",
+          borderColor: "rgba(200, 200, 200, 1)",
+          borderWidth: 4,
+          type: "line",
+          backgroundColor: "transparent",
+          fill: true,
+          data: {{ linen_cost_dol_ly | safe }},
           maxBarThickness: 6
         }, ],
       },

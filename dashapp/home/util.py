@@ -247,7 +247,7 @@ def sales_detail(start, end):
     return 0
 
 
-def get_daily_sales(start, end, store, cat):
+def get_category_sales(start, end, store, cat):
 
     if cat == "GIFT CARDS":
         data = (
@@ -279,7 +279,7 @@ def get_daily_sales(start, end, store, cat):
     return df
 
 
-def get_daily_labor(start, end, store, cat):
+def get_category_labor(start, end, store, cat):
 
     data = (
         db.session.query(

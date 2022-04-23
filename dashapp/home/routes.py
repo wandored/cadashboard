@@ -14,8 +14,8 @@ from flask.wrappers import Response
 from dashapp.home.util import (
     find_day_with_sales,
     refresh_data,
-    get_daily_sales,
-    get_daily_labor,
+    get_category_sales,
+    get_category_labor,
     convert_uofm,
     update_recipe_costs,
     set_dates,
@@ -46,15 +46,14 @@ from dashapp.authentication.models import (
 from sqlalchemy import and_, or_, func
 
 
-TODAY = datetime.date(datetime.now())
-CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
-YSTDAY = TODAY - timedelta(days=1)
-
-
 @blueprint.route("/", methods=["GET", "POST"])
 @blueprint.route("/index/", methods=["GET", "POST"])
 @login_required
 def index():
+
+    TODAY = datetime.date(datetime.now())
+    CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
+    YSTDAY = TODAY - timedelta(days=1)
 
     if not "token" in session:
         session["token"] = YSTDAY.strftime("%Y-%m-%d")
@@ -101,24 +100,24 @@ def index():
 
         return value
 
-    values1 = get_chart_values(
+    daily_sales_list = get_chart_values(
         fiscal_dates["start_week"], fiscal_dates["end_week"], Calendar.date
     )
-    values1_ly = get_chart_values(
+    daily_sales_list_ly = get_chart_values(
         fiscal_dates["start_week_ly"], fiscal_dates["end_week_ly"], Calendar.date
     )
 
-    values2 = get_chart_values(
+    weekly_sales_list = get_chart_values(
         fiscal_dates["start_period"], fiscal_dates["end_period"], Calendar.week
     )
-    values2_ly = get_chart_values(
+    weekly_sales_list_ly = get_chart_values(
         fiscal_dates["start_period_ly"], fiscal_dates["end_period_ly"], Calendar.week
     )
 
-    values3 = get_chart_values(
+    period_sales_list = get_chart_values(
         fiscal_dates["start_year"], fiscal_dates["end_year"], Calendar.period
     )
-    values3_ly = get_chart_values(
+    period_sales_list_ly = get_chart_values(
         fiscal_dates["start_year_ly"], fiscal_dates["end_year_ly"], Calendar.period
     )
 
@@ -491,12 +490,12 @@ def index():
         current_user=current_user,
         roles=current_user.roles,
         fiscal_dates=fiscal_dates,
-        values1=values1,
-        values2=values2,
-        values3=values3,
-        values1_ly=values1_ly,
-        values2_ly=values2_ly,
-        values3_ly=values3_ly,
+        daily_sales_list=daily_sales_list,
+        daily_sales_list_ly=daily_sales_list_ly,
+        weekly_sales_list=weekly_sales_list,
+        weekly_sales_list_ly=weekly_sales_list_ly,
+        period_sales_list=period_sales_list,
+        period_sales_list_ly=period_sales_list_ly,
         budgets3=budgets3,
         daily_table=daily_table,
         daily_totals=daily_totals,
@@ -517,12 +516,16 @@ def index():
 @login_required
 def store(store_id):
 
+    TODAY = datetime.date(datetime.now())
+    CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
+    YSTDAY = TODAY - timedelta(days=1)
+
     store = Restaurants.query.filter_by(id=store_id).first()
-    
+
     if not "token" in session:
         session["token"] = YSTDAY.strftime("%Y-%m-%d")
         return redirect(url_for("home_blueprint.store", store_id=store.id))
-    
+
     fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
 
     if store_id in [4, 9, 11, 17, 16]:
@@ -616,22 +619,22 @@ def store(store_id):
 
         return value
 
-    values1 = get_chart_values(
+    daily_sales_list = get_chart_values(
         fiscal_dates["start_week"], fiscal_dates["end_week"], Calendar.date
     )
-    values1_ly = get_chart_values(
+    daily_sales_list_ly = get_chart_values(
         fiscal_dates["start_week_ly"], fiscal_dates["end_week_ly"], Calendar.date
     )
-    values2 = get_chart_values(
+    weekly_sales_list = get_chart_values(
         fiscal_dates["start_period"], fiscal_dates["end_period"], Calendar.week
     )
-    values2_ly = get_chart_values(
+    weekly_sales_list_ly = get_chart_values(
         fiscal_dates["start_period_ly"], fiscal_dates["end_period_ly"], Calendar.week
     )
-    values3 = get_chart_values(
+    period_sales_list = get_chart_values(
         fiscal_dates["start_year"], fiscal_dates["end_year"], Calendar.period
     )
-    values3_ly = get_chart_values(
+    period_sales_list_ly = get_chart_values(
         fiscal_dates["start_year_ly"], fiscal_dates["end_year_ly"], Calendar.period
     )
 
@@ -646,81 +649,81 @@ def store(store_id):
     for v in budget_chart:
         budgets3.append(v.total_sales)
 
-    def sales_labor_table(start, end):
-        # Build sales and labor stats for the time period given
-
-        food_sales = get_daily_sales(start, end, store.name, "FOOD")
-        beer_sales = get_daily_sales(start, end, store.name, "BEER")
-        liquor_sales = get_daily_sales(start, end, store.name, "LIQUOR")
-        wine_sales = get_daily_sales(start, end, store.name, "WINE")
-        gift_card_sales = get_daily_sales(start, end, store.name, "GIFT CARDS")
-
-        sales_table = food_sales.merge(beer_sales)
-        sales_table = sales_table.merge(liquor_sales)
-        sales_table = sales_table.merge(wine_sales)
-        sales_table = sales_table.merge(gift_card_sales, how="outer")
-        sales_table.rename(
-            columns={
-                "FOOD": "food",
-                "BEER": "beer",
-                "LIQUOR": "liquor",
-                "WINE": "wine",
-                "GIFT CARDS": "gift_cards",
-            },
-            inplace=True,
-        )
-        sales_table.fillna(value=0, inplace=True)
-        sales_table["alcohol_sales"] = (
-            sales_table.beer + sales_table.liquor + sales_table.wine
-        )
-        sales_table["total_sales"] = sales_table.food + sales_table.alcohol_sales
-        sales_table["net_sales"] = sales_table.total_sales + sales_table.gift_cards
-
-        # Labor
-        bar_labor = get_daily_labor(start, end, store.name, "Bar")
-        host_labor = get_daily_labor(start, end, store.name, "Host")
-        restaurant_labor = get_daily_labor(start, end, store.name, "Restaurant")
-        kitchen_labor = get_daily_labor(start, end, store.name, "Kitchen")
-
-        labor_table = bar_labor.merge(host_labor)
-        labor_table = labor_table.merge(restaurant_labor)
-        labor_table = labor_table.merge(kitchen_labor)
-        labor_table.fillna(value=0, inplace=True)
-
-        labor_table["Total_Labor"] = (
-            labor_table.Bar
-            + labor_table.Host
-            + labor_table.Restaurant
-            + labor_table.Kitchen
-        )
-
-        join_data = labor_table[
-            [
-                "Bar",
-                "Host",
-                "Restaurant",
-                "Kitchen",
-                "Total_Labor",
-            ]
-        ]
-        _table = sales_table.join(join_data)
-        _table["Labor_pct"] = _table.Total_Labor / _table.total_sales
-        _table["Bar_pct"] = _table.Bar / (_table.alcohol_sales)
-        _table["Host_pct"] = _table.Host / (_table.food)
-        _table["Restaurant_pct"] = _table.Restaurant / (_table.food)
-        _table["Kitchen_pct"] = _table.Kitchen / (_table.food)
-        _table["name"] = store.name
-
-        _table = _table.merge(store_list, how="left")
-        totals = _table.sum()
-        return totals
-
-    weekly_totals = sales_labor_table(
-        fiscal_dates["start_week"], fiscal_dates["end_week"]
-    )
-    period_totals = sales_labor_table(
-        fiscal_dates["start_period"], fiscal_dates["end_period"]
-    )
+    #    def sales_labor_table(start, end):
+    #        # Build sales and labor stats for the time period given
+    #
+    #        food_sales = get_category_sales(start, end, store.name, "FOOD")
+    #        beer_sales = get_category_sales(start, end, store.name, "BEER")
+    #        liquor_sales = get_category_sales(start, end, store.name, "LIQUOR")
+    #        wine_sales = get_category_sales(start, end, store.name, "WINE")
+    #        gift_card_sales = get_category_sales(start, end, store.name, "GIFT CARDS")
+    #
+    #        sales_table = food_sales.merge(beer_sales)
+    #        sales_table = sales_table.merge(liquor_sales)
+    #        sales_table = sales_table.merge(wine_sales)
+    #        sales_table = sales_table.merge(gift_card_sales, how="outer")
+    #        sales_table.rename(
+    #            columns={
+    #                "FOOD": "food",
+    #                "BEER": "beer",
+    #                "LIQUOR": "liquor",
+    #                "WINE": "wine",
+    #                "GIFT CARDS": "gift_cards",
+    #            },
+    #            inplace=True,
+    #        )
+    #        sales_table.fillna(value=0, inplace=True)
+    #        sales_table["alcohol_sales"] = (
+    #            sales_table.beer + sales_table.liquor + sales_table.wine
+    #        )
+    #        sales_table["total_sales"] = sales_table.food + sales_table.alcohol_sales
+    #        sales_table["net_sales"] = sales_table.total_sales + sales_table.gift_cards
+    #
+    #        # Labor
+    #        bar_labor = get_category_labor(start, end, store.name, "Bar")
+    #        host_labor = get_category_labor(start, end, store.name, "Host")
+    #        restaurant_labor = get_category_labor(start, end, store.name, "Restaurant")
+    #        kitchen_labor = get_category_labor(start, end, store.name, "Kitchen")
+    #
+    #        labor_table = bar_labor.merge(host_labor)
+    #        labor_table = labor_table.merge(restaurant_labor)
+    #        labor_table = labor_table.merge(kitchen_labor)
+    #        labor_table.fillna(value=0, inplace=True)
+    #
+    #        labor_table["Total_Labor"] = (
+    #            labor_table.Bar
+    #            + labor_table.Host
+    #            + labor_table.Restaurant
+    #            + labor_table.Kitchen
+    #        )
+    #
+    #        join_data = labor_table[
+    #            [
+    #                "Bar",
+    #                "Host",
+    #                "Restaurant",
+    #                "Kitchen",
+    #                "Total_Labor",
+    #            ]
+    #        ]
+    #        _table = sales_table.join(join_data)
+    #        _table["Labor_pct"] = _table.Total_Labor / _table.total_sales
+    #        _table["Bar_pct"] = _table.Bar / (_table.alcohol_sales)
+    #        _table["Host_pct"] = _table.Host / (_table.food)
+    #        _table["Restaurant_pct"] = _table.Restaurant / (_table.food)
+    #        _table["Kitchen_pct"] = _table.Kitchen / (_table.food)
+    #        _table["name"] = store.name
+    #
+    #        _table = _table.merge(store_list, how="left")
+    #        totals = _table.sum()
+    #        return totals
+    #
+    #    weekly_totals = sales_labor_table(
+    #        fiscal_dates["start_week"], fiscal_dates["end_week"]
+    #    )
+    #    period_totals = sales_labor_table(
+    #        fiscal_dates["start_period"], fiscal_dates["end_period"]
+    #    )
 
     lobster_items = []
     stone_items = []
@@ -1038,11 +1041,11 @@ def store(store_id):
             pct_lst.append(dol_lst[i] / sales[i])
         return dol_lst, pct_lst
 
-    # TODO check for no purchases of supplies
+    # Supplies cost chart
     supply_cost_dol, supply_cost_pct = get_category_costs(
         fiscal_dates["start_year"],
         fiscal_dates["end_year"],
-        values3,
+        period_sales_list,
         cat=[
             "Rest. Supplies",
             "Kitchen Supplies",
@@ -1054,7 +1057,7 @@ def store(store_id):
     supply_cost_dol_ly, supply_cost_pct_ly = get_category_costs(
         fiscal_dates["start_year_ly"],
         fiscal_dates["end_year_ly"],
-        values3_ly,
+        period_sales_list_ly,
         cat=[
             "Rest. Supplies",
             "Kitchen Supplies",
@@ -1071,16 +1074,18 @@ def store(store_id):
     supply_budget = []
     for v in query:
         supply_budget.append(v.total_supplies)
+
+    # Smallwares cost chart
     smallware_cost_dol, smallware_cost_pct = get_category_costs(
         fiscal_dates["start_year"],
         fiscal_dates["end_year"],
-        values3,
+        period_sales_list,
         cat=["China", "Silverware", "Glassware", "Smallwares"],
     )
     smallware_cost_dol_ly, smallware_cost_pct_ly = get_category_costs(
         fiscal_dates["start_year_ly"],
         fiscal_dates["end_year_ly"],
-        values3_ly,
+        period_sales_list_ly,
         cat=["China", "Silverware", "Glassware", "Smallwares"],
     )
     query = (
@@ -1092,10 +1097,26 @@ def store(store_id):
     for v in query:
         smallware_budget.append(v.total_smallwares)
 
+    # linen cost chart
+    linen_cost_dol, linen_cost_pct = get_category_costs(
+        fiscal_dates["start_year"],
+        fiscal_dates["end_year"],
+        period_sales_list,
+        cat=["Linen"],
+    )
+    linen_cost_dol_ly, linen_cost_pct_ly = get_category_costs(
+        fiscal_dates["start_year_ly"],
+        fiscal_dates["end_year_ly"],
+        period_sales_list_ly,
+        cat=["Linen"],
+    )
+
     current_supply_cost = supply_cost_dol[fiscal_dates["period"] - 1]
     current_supply_budget = supply_budget[fiscal_dates["period"] - 1]
     current_smallware_cost = smallware_cost_dol[fiscal_dates["period"] - 1]
     current_smallware_budget = smallware_budget[fiscal_dates["period"] - 1]
+    period_linen_cost = linen_cost_dol[fiscal_dates["period"] - 1]
+    period_linen_cost_ly = linen_cost_dol_ly[fiscal_dates["period"] - 1]
 
     query = (
         Transactions.query.with_entities(Transactions.item).filter(
@@ -1126,12 +1147,12 @@ def store(store_id):
         sales_period_ly=sales_period_ly,
         sales_year=sales_year,
         sales_year_ly=sales_year_ly,
-        values1=values1,
-        values2=values2,
-        values3=values3,
-        values1_ly=values1_ly,
-        values2_ly=values2_ly,
-        values3_ly=values3_ly,
+        daily_sales_list=daily_sales_list,
+        daily_sales_list_ly=daily_sales_list_ly,
+        weekly_sales_list=weekly_sales_list,
+        weekly_sales_list_ly=weekly_sales_list_ly,
+        period_sales_list=period_sales_list,
+        period_sales_list_ly=period_sales_list_ly,
         budgets3=budgets3,
         supply_cost_dol=supply_cost_dol,
         supply_cost_dol_ly=supply_cost_dol_ly,
@@ -1143,8 +1164,12 @@ def store(store_id):
         current_supply_budget=current_supply_budget,
         current_smallware_cost=current_smallware_cost,
         current_smallware_budget=current_smallware_budget,
-        weekly_totals=weekly_totals,
-        period_totals=period_totals,
+        linen_cost_dol=linen_cost_dol,
+        linen_cost_dol_ly=linen_cost_dol_ly,
+        period_linen_cost=period_linen_cost,
+        period_linen_cost_ly=period_linen_cost_ly,
+        # weekly_totals=weekly_totals,
+        # period_totals=period_totals,
         lobster_items=lobster_items,
         stone_items=stone_items,
         sea_bass=sea_bass,
@@ -1161,6 +1186,10 @@ def store(store_id):
 @blueprint.route("/marketing/", methods=["GET", "POST"])
 @login_required
 def marketing():
+
+    TODAY = datetime.date(datetime.now())
+    CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
+    YSTDAY = TODAY - timedelta(days=1)
 
     fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
     form1 = DateForm()
@@ -1341,6 +1370,10 @@ def marketing():
 @login_required
 def purchasing():
 
+    TODAY = datetime.date(datetime.now())
+    CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
+    YSTDAY = TODAY - timedelta(days=1)
+
     fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
 
     # Get list of Restaurants
@@ -1372,13 +1405,11 @@ def purchasing():
         ).all()
         return query
 
-    def get_purchases(regex, days):
+    def get_cost_per_vendor(regex, days):
 
-        items = (
+        query = (
             db.session.query(
-                Transactions.date,
                 Transactions.company,
-                Transactions.name,
                 Transactions.UofM,
                 func.sum(Transactions.quantity).label("count"),
                 func.sum(Transactions.amount).label("cost"),
@@ -1389,62 +1420,76 @@ def purchasing():
                 Transactions.type == "AP Invoice",
             )
             .group_by(
-                Transactions.date,
                 Transactions.company,
-                Transactions.name,
                 Transactions.UofM,
             )
         ).all()
         item_list = []
-        for i in items:
-            qty, uofm = convert_uofm(i)
+        for q in query:
+            qty, uofm = convert_uofm(q)
             # TODO fix the factor calc on purchasing
-            pound = qty / 16
-            row_dict = dict(i)
-            row_dict["factor"] = pound
+            # pound = qty / 16
+            row_dict = dict(q)
+            row_dict["base_qty"] = qty
+            row_dict["base_uofm"] = uofm
             item_list.append(row_dict)
         df = pd.DataFrame(item_list)
+
         if not df.empty:
-            df = df[(df != 0).all(1)]
-            df.dropna(axis=0, how="any", subset=["company"], inplace=True)
-            df["cost_lb"] = df["cost"] / (df["count"] * df["factor"]).astype(float)
-            df.sort_values(by=["date"], ascending=False, inplace=True)
+            #    df = df[(df != 0).all(1)]
+            #    df.dropna(axis=0, how="any", subset=["company"], inplace=True)
+            df["cost_lb"] = ((df["cost"] / df["count"]) / df["base_qty"] * 16).astype(
+                float
+            )
+            df.sort_values(by=["cost_lb"], inplace=True)
         return df
 
-    lobster_vendor = get_vendors("SEAFOOD Lobster Live*", fiscal_dates["last_seven"])
-    lobster_df = get_purchases("SEAFOOD Lobster Live*", fiscal_dates["last_seven"])
-
-    stone_vendor = get_vendors("^(SEAFOOD Crab Stone Claw)", fiscal_dates["last_seven"])
-    stone_df = get_purchases("^(SEAFOOD Crab Stone Claw)", fiscal_dates["last_seven"])
-
-    special_vendor = get_vendors("SEAFOOD Crabmeat Special", fiscal_dates["last_seven"])
-    special_df = get_purchases("SEAFOOD Crabmeat Special", fiscal_dates["last_seven"])
-
-    backfin_vendor = get_vendors("SEAFOOD Crabmeat Backfin", fiscal_dates["last_seven"])
-    backfin_df = get_purchases("SEAFOOD Crabmeat Backfin", fiscal_dates["last_seven"])
-
-    premium_vendor = get_vendors("SEAFOOD Crabmeat Premium", fiscal_dates["last_seven"])
-    premium_df = get_purchases("SEAFOOD Crabmeat Premium", fiscal_dates["last_seven"])
-
-    colossal_vendor = get_vendors(
-        "SEAFOOD Crabmeat Colossal", fiscal_dates["last_seven"]
+    prime_rib_df = get_cost_per_vendor(
+        "BEEF Prime Rib Choice", fiscal_dates["last_thirty"]
     )
-    colossal_df = get_purchases("SEAFOOD Crabmeat Colossal", fiscal_dates["last_seven"])
-
-    seabass_vendor = get_vendors("SEAFOOD Sea Bass Chilean", fiscal_dates["last_seven"])
-    seabass_df = get_purchases("SEAFOOD Sea Bass Chilean", fiscal_dates["last_seven"])
-
-    salmon_vendor = get_vendors("^(SEAFOOD) (Salmon)$", fiscal_dates["last_seven"])
-    salmon_df = get_purchases("^(SEAFOOD) (Salmon)$", fiscal_dates["last_seven"])
-
-    feature_vendor = get_vendors("SEAFOOD Feature Fish", fiscal_dates["last_seven"])
-    feature_df = get_purchases("SEAFOOD Feature Fish", fiscal_dates["last_seven"])
-
-    shrimp10_vendor = get_vendors(
-        "SEAFOOD Shrimp U/10 White Headless", fiscal_dates["last_seven"]
+    lobster_live_df = get_cost_per_vendor(
+        "SEAFOOD Lobster Live*", fiscal_dates["last_thirty"]
     )
-    shrimp10_df = get_purchases(
-        "SEAFOOD Shrimp U/10 White Headless", fiscal_dates["last_seven"]
+    lobster_tail_df = get_cost_per_vendor(
+        "SEAFOOD Lobster Tail*", fiscal_dates["last_thirty"]
+    )
+
+    stone_df = get_cost_per_vendor(
+        "^(SEAFOOD Crab Stone Claw)", fiscal_dates["last_thirty"]
+    )
+
+    special_df = get_cost_per_vendor(
+        "SEAFOOD Crabmeat Special", fiscal_dates["last_thirty"]
+    )
+    backfin_df = get_cost_per_vendor(
+        "SEAFOOD Crabmeat Backfin", fiscal_dates["last_thirty"]
+    )
+    premium_df = get_cost_per_vendor(
+        "SEAFOOD Crabmeat Premium", fiscal_dates["last_thirty"]
+    )
+    colossal_df = get_cost_per_vendor(
+        "SEAFOOD Crabmeat Colossal", fiscal_dates["last_thirty"]
+    )
+
+    seabass_df = get_cost_per_vendor(
+        "SEAFOOD Sea Bass Chilean", fiscal_dates["last_thirty"]
+    )
+    salmon_df = get_cost_per_vendor("^(SEAFOOD) (Salmon)$", fiscal_dates["last_thirty"])
+    feature_df = get_cost_per_vendor(
+        "SEAFOOD Feature Fish", fiscal_dates["last_thirty"]
+    )
+
+    shrimp10_df = get_cost_per_vendor(
+        "SEAFOOD Shrimp U/10 White Headless", fiscal_dates["last_thirty"]
+    )
+    shrimp3135_df = get_cost_per_vendor(
+        "SEAFOOD Shrimp 31/35 Butterfly", fiscal_dates["last_thirty"]
+    )
+    shrimp5160_df = get_cost_per_vendor(
+        "SEAFOOD Shrimp 51/60 P&D", fiscal_dates["last_thirty"]
+    )
+    shrimp2630_df = get_cost_per_vendor(
+        "SEAFOOD Shrimp 26/30 P&D", fiscal_dates["last_thirty"]
     )
 
     def period_purchases(regex, start, end):
@@ -1453,7 +1498,7 @@ def purchasing():
         ).all()
         cal_df = pd.DataFrame(calendar, columns=["date", "week", "period", "year"])
 
-        items = (
+        query = (
             db.session.query(
                 Transactions.date,
                 Transactions.company,
@@ -1475,23 +1520,24 @@ def purchasing():
             )
         ).all()
         item_list = []
-        for i in items:
-            if not i.UofM:
+        for q in query:
+            if not q.UofM:
                 continue
-            qty, uofm = convert_uofm(i)
-            # TODO fix the factor calc on purchasing
-            pound = qty / 16.0
-            row_dict = dict(i)
-            row_dict["factor"] = pound
+            qty, uofm = convert_uofm(q)
+            row_dict = dict(q)
+            row_dict["base_qty"] = qty
+            row_dict["base_uofm"] = uofm
+            row_dict["pounds"] = row_dict["count"] * row_dict["base_qty"] / 16
             item_list.append(row_dict)
         df = pd.DataFrame(item_list)
-        df = df[(df != 0).all(1)]
-        df["pounds"] = df["count"] * df["factor"]
-        df = df.merge(cal_df, on="date", how="left")
-        df = df.groupby(["period"]).sum()
-        df["cost_lb"] = df["cost"] / df["pounds"]
-        df_list = df["cost_lb"].tolist()
-        return df_list
+
+        if not df.empty:
+            # df = df[(df != 0).all(1)]
+            df = df.merge(cal_df, on="date", how="left")
+            df = df.groupby(["period"]).sum()
+            df["cost_lb"] = (df["cost"] / df["pounds"]).astype(float)
+            df_list = df["cost_lb"].tolist()
+            return df_list
 
     prime_chart = period_purchases(
         "^(BEEF Steak).*(Prime)$", fiscal_dates["start_year"], fiscal_dates["end_year"]
@@ -1501,7 +1547,6 @@ def purchasing():
         fiscal_dates["start_year_ly"],
         fiscal_dates["end_year_ly"],
     )
-
     choice_chart = period_purchases(
         "^(BEEF Steak).*(Choice)$", fiscal_dates["start_year"], fiscal_dates["end_year"]
     )
@@ -1510,7 +1555,6 @@ def purchasing():
         fiscal_dates["start_year_ly"],
         fiscal_dates["end_year_ly"],
     )
-
     prime_rib_chart = period_purchases(
         "BEEF Prime Rib Choice", fiscal_dates["start_year"], fiscal_dates["end_year"]
     )
@@ -1519,14 +1563,46 @@ def purchasing():
         fiscal_dates["start_year_ly"],
         fiscal_dates["end_year_ly"],
     )
-
-    crabmeat_chart = period_purchases(
-        "SEAFOOD Crabmeat*", fiscal_dates["start_year"], fiscal_dates["end_year"]
+    special_crabmeat_chart = period_purchases(
+        "SEAFOOD Crabmeat Special*",
+        fiscal_dates["start_year"],
+        fiscal_dates["end_year"],
     )
-    crabmeat_chart_ly = period_purchases(
-        "SEAFOOD Crabmeat*", fiscal_dates["start_year_ly"], fiscal_dates["end_year_ly"]
+    special_crabmeat_chart_ly = period_purchases(
+        "SEAFOOD Crabmeat Special*",
+        fiscal_dates["start_year_ly"],
+        fiscal_dates["end_year_ly"],
     )
-
+    backfin_crabmeat_chart = period_purchases(
+        "SEAFOOD Crabmeat Backfin*",
+        fiscal_dates["start_year"],
+        fiscal_dates["end_year"],
+    )
+    backfin_crabmeat_chart_ly = period_purchases(
+        "SEAFOOD Crabmeat Backfin*",
+        fiscal_dates["start_year_ly"],
+        fiscal_dates["end_year_ly"],
+    )
+    premium_crabmeat_chart = period_purchases(
+        "SEAFOOD Crabmeat Premium*",
+        fiscal_dates["start_year"],
+        fiscal_dates["end_year"],
+    )
+    premium_crabmeat_chart_ly = period_purchases(
+        "SEAFOOD Crabmeat Premium*",
+        fiscal_dates["start_year_ly"],
+        fiscal_dates["end_year_ly"],
+    )
+    colossal_crabmeat_chart = period_purchases(
+        "SEAFOOD Crabmeat Colossal*",
+        fiscal_dates["start_year"],
+        fiscal_dates["end_year"],
+    )
+    colossal_crabmeat_chart_ly = period_purchases(
+        "SEAFOOD Crabmeat Colossal*",
+        fiscal_dates["start_year_ly"],
+        fiscal_dates["end_year_ly"],
+    )
     salmon_chart = period_purchases(
         "^(SEAFOOD) (Salmon)$", fiscal_dates["start_year"], fiscal_dates["end_year"]
     )
@@ -1535,12 +1611,67 @@ def purchasing():
         fiscal_dates["start_year_ly"],
         fiscal_dates["end_year_ly"],
     )
-
     seabass_chart = period_purchases(
         "SEAFOOD Sea Bass Chilean", fiscal_dates["start_year"], fiscal_dates["end_year"]
     )
     seabass_chart_ly = period_purchases(
         "SEAFOOD Sea Bass Chilean",
+        fiscal_dates["start_year_ly"],
+        fiscal_dates["end_year_ly"],
+    )
+    feature_fish_chart = period_purchases(
+        "SEAFOOD Feature Fish", fiscal_dates["start_year"], fiscal_dates["end_year"]
+    )
+    feature_fish_chart_ly = period_purchases(
+        "SEAFOOD Feature Fish",
+        fiscal_dates["start_year_ly"],
+        fiscal_dates["end_year_ly"],
+    )
+    lobster_live_chart = period_purchases(
+        "SEAFOOD Lobster Live*", fiscal_dates["start_year"], fiscal_dates["end_year"]
+    )
+    lobster_live_chart_ly = period_purchases(
+        "SEAFOOD Lobster Live*",
+        fiscal_dates["start_year_ly"],
+        fiscal_dates["end_year_ly"],
+    )
+    lobster_tail_chart = period_purchases(
+        "SEAFOOD Lobster Tail*", fiscal_dates["start_year"], fiscal_dates["end_year"]
+    )
+    lobster_tail_chart_ly = period_purchases(
+        "SEAFOOD Lobster Tail*",
+        fiscal_dates["start_year_ly"],
+        fiscal_dates["end_year_ly"],
+    )
+    stone_chart = period_purchases(
+        "SEAFOOD Crab Stone Claw*", fiscal_dates["start_year"], fiscal_dates["end_year"]
+    )
+    stone_chart_ly = period_purchases(
+        "SEAFOOD Crab Stone Claw*",
+        fiscal_dates["start_year_ly"],
+        fiscal_dates["end_year_ly"],
+    )
+    shrimp10_chart = period_purchases(
+        "SEAFOOD Shrimp U/10*", fiscal_dates["start_year"], fiscal_dates["end_year"]
+    )
+    shrimp10_chart_ly = period_purchases(
+        "SEAFOOD Shrimp U/10*",
+        fiscal_dates["start_year_ly"],
+        fiscal_dates["end_year_ly"],
+    )
+    shrimp3135_chart = period_purchases(
+        "SEAFOOD Shrimp 31/35*", fiscal_dates["start_year"], fiscal_dates["end_year"]
+    )
+    shrimp3135_chart_ly = period_purchases(
+        "SEAFOOD Shrimp 31/35*",
+        fiscal_dates["start_year_ly"],
+        fiscal_dates["end_year_ly"],
+    )
+    shrimp2630_chart = period_purchases(
+        "SEAFOOD Shrimp 26/30*", fiscal_dates["start_year"], fiscal_dates["end_year"]
+    )
+    shrimp2630_chart_ly = period_purchases(
+        "SEAFOOD Shrimp 26/30*",
         fiscal_dates["start_year_ly"],
         fiscal_dates["end_year_ly"],
     )
@@ -1553,38 +1684,52 @@ def purchasing():
         form1=form1,
         form3=form3,
         current_user=current_user,
-        lobster_df=lobster_df,
-        lobster_vendor=lobster_vendor,
-        stone_vendor=stone_vendor,
-        stone_df=stone_df,
-        special_df=special_df,
-        special_vendor=special_vendor,
-        backfin_df=backfin_df,
-        backfin_vendor=backfin_vendor,
-        premium_df=premium_df,
-        premium_vendor=premium_vendor,
-        colossal_df=colossal_df,
-        colossal_vendor=colossal_vendor,
-        seabass_vendor=seabass_vendor,
-        seabass_df=seabass_df,
-        salmon_vendor=salmon_vendor,
-        salmon_df=salmon_df,
-        shrimp10_vendor=shrimp10_vendor,
-        shrimp10_df=shrimp10_df,
-        feature_vendor=feature_vendor,
-        feature_df=feature_df,
         prime_chart=prime_chart,
         prime_chart_ly=prime_chart_ly,
         choice_chart=choice_chart,
         choice_chart_ly=choice_chart_ly,
+        prime_rib_df=prime_rib_df,
         prime_rib_chart=prime_rib_chart,
         prime_rib_chart_ly=prime_rib_chart_ly,
-        crabmeat_chart=crabmeat_chart,
-        crabmeat_chart_ly=crabmeat_chart_ly,
-        salmon_chart=salmon_chart,
-        salmon_chart_ly=salmon_chart_ly,
+        lobster_live_df=lobster_live_df,
+        lobster_live_chart=lobster_live_chart,
+        lobster_live_chart_ly=lobster_live_chart_ly,
+        lobster_tail_df=lobster_tail_df,
+        lobster_tail_chart=lobster_tail_chart,
+        lobster_tail_chart_ly=lobster_tail_chart_ly,
+        stone_df=stone_df,
+        stone_chart=stone_chart,
+        stone_chart_ly=stone_chart_ly,
+        special_df=special_df,
+        special_crabmeat_chart=special_crabmeat_chart,
+        special_crabmeat_chart_ly=special_crabmeat_chart_ly,
+        backfin_df=backfin_df,
+        backfin_crabmeat_chart=backfin_crabmeat_chart,
+        backfin_crabmeat_chart_ly=backfin_crabmeat_chart_ly,
+        premium_df=premium_df,
+        premium_crabmeat_chart=premium_crabmeat_chart,
+        premium_crabmeat_chart_ly=premium_crabmeat_chart_ly,
+        colossal_df=colossal_df,
+        colossal_crabmeat_chart=colossal_crabmeat_chart,
+        colossal_crabmeat_chart_ly=colossal_crabmeat_chart_ly,
+        seabass_df=seabass_df,
         seabass_chart=seabass_chart,
         seabass_chart_ly=seabass_chart_ly,
+        salmon_df=salmon_df,
+        salmon_chart=salmon_chart,
+        salmon_chart_ly=salmon_chart_ly,
+        shrimp10_df=shrimp10_df,
+        shrimp10_chart=shrimp10_chart,
+        shrimp10_chart_ly=shrimp10_chart_ly,
+        shrimp3135_df=shrimp3135_df,
+        shrimp3135_chart=shrimp3135_chart,
+        shrimp3135_chart_ly=shrimp3135_chart_ly,
+        shrimp2630_df=shrimp2630_df,
+        shrimp2630_chart=shrimp2630_chart,
+        shrimp2630_chart_ly=shrimp2630_chart_ly,
+        feature_df=feature_df,
+        feature_fish_chart=feature_fish_chart,
+        feature_fish_chart_ly=feature_fish_chart_ly,
     )
 
 
@@ -1592,6 +1737,10 @@ def purchasing():
 @login_required
 @roles_accepted("admin")
 def support():
+
+    TODAY = datetime.date(datetime.now())
+    CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
+    YSTDAY = TODAY - timedelta(days=1)
 
     fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
 
@@ -1684,6 +1833,10 @@ def support():
 @blueprint.route("/alcohol/", methods=["GET", "POST"])
 @login_required
 def alcohol():
+
+    TODAY = datetime.date(datetime.now())
+    CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
+    YSTDAY = TODAY - timedelta(days=1)
 
     fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
 
@@ -1872,6 +2025,10 @@ def alcohol():
 @login_required
 def profile():
 
+    TODAY = datetime.date(datetime.now())
+    CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
+    YSTDAY = TODAY - timedelta(days=1)
+
     fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
     form1 = DateForm()
     form3 = StoreForm()
@@ -1899,6 +2056,13 @@ def profile():
 @blueprint.route("/<int:store_id>/potato/", methods=["GET", "POST"])
 @login_required
 def potato(store_id):
+
+    TODAY = datetime.date(datetime.now())
+    CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
+    YSTDAY = TODAY - timedelta(days=1)
+
+    print(TODAY)
+    print(session["token"])
 
     store = Restaurants.query.filter_by(id=store_id).first()
 
