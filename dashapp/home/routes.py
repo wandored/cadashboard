@@ -46,7 +46,6 @@ from dashapp.authentication.models import (
 from sqlalchemy import and_, or_, func
 
 
-
 @blueprint.route("/", methods=["GET", "POST"])
 @blueprint.route("/index/", methods=["GET", "POST"])
 @login_required
@@ -1042,7 +1041,7 @@ def store(store_id):
             pct_lst.append(dol_lst[i] / sales[i])
         return dol_lst, pct_lst
 
-    # TODO check for no purchases of supplies
+    # Supplies cost chart
     supply_cost_dol, supply_cost_pct = get_category_costs(
         fiscal_dates["start_year"],
         fiscal_dates["end_year"],
@@ -1075,6 +1074,8 @@ def store(store_id):
     supply_budget = []
     for v in query:
         supply_budget.append(v.total_supplies)
+
+    # Smallwares cost chart
     smallware_cost_dol, smallware_cost_pct = get_category_costs(
         fiscal_dates["start_year"],
         fiscal_dates["end_year"],
@@ -1096,10 +1097,26 @@ def store(store_id):
     for v in query:
         smallware_budget.append(v.total_smallwares)
 
+    # linen cost chart
+    linen_cost_dol, linen_cost_pct = get_category_costs(
+        fiscal_dates["start_year"],
+        fiscal_dates["end_year"],
+        period_sales_list,
+        cat=["Linen"],
+    )
+    linen_cost_dol_ly, linen_cost_pct_ly = get_category_costs(
+        fiscal_dates["start_year_ly"],
+        fiscal_dates["end_year_ly"],
+        period_sales_list_ly,
+        cat=["Linen"],
+    )
+
     current_supply_cost = supply_cost_dol[fiscal_dates["period"] - 1]
     current_supply_budget = supply_budget[fiscal_dates["period"] - 1]
     current_smallware_cost = smallware_cost_dol[fiscal_dates["period"] - 1]
     current_smallware_budget = smallware_budget[fiscal_dates["period"] - 1]
+    period_linen_cost = linen_cost_dol[fiscal_dates["period"] - 1]
+    period_linen_cost_ly = linen_cost_dol_ly[fiscal_dates["period"] - 1]
 
     query = (
         Transactions.query.with_entities(Transactions.item).filter(
@@ -1147,6 +1164,10 @@ def store(store_id):
         current_supply_budget=current_supply_budget,
         current_smallware_cost=current_smallware_cost,
         current_smallware_budget=current_smallware_budget,
+        linen_cost_dol=linen_cost_dol,
+        linen_cost_dol_ly=linen_cost_dol_ly,
+        period_linen_cost=period_linen_cost,
+        period_linen_cost_ly=period_linen_cost_ly,
         # weekly_totals=weekly_totals,
         # period_totals=period_totals,
         lobster_items=lobster_items,
@@ -1384,7 +1405,7 @@ def purchasing():
         ).all()
         return query
 
-    def get_purchases(regex, days):
+    def get_cost_per_vendor(regex, days):
 
         query = (
             db.session.query(
@@ -1423,37 +1444,51 @@ def purchasing():
             df.sort_values(by=["cost_lb"], inplace=True)
         return df
 
-    prime_rib_df = get_purchases("BEEF Prime Rib Choice", fiscal_dates["last_thirty"])
-    lobster_live_df = get_purchases(
+    prime_rib_df = get_cost_per_vendor(
+        "BEEF Prime Rib Choice", fiscal_dates["last_thirty"]
+    )
+    lobster_live_df = get_cost_per_vendor(
         "SEAFOOD Lobster Live*", fiscal_dates["last_thirty"]
     )
-    lobster_tail_df = get_purchases(
+    lobster_tail_df = get_cost_per_vendor(
         "SEAFOOD Lobster Tail*", fiscal_dates["last_thirty"]
     )
 
-    stone_df = get_purchases("^(SEAFOOD Crab Stone Claw)", fiscal_dates["last_thirty"])
+    stone_df = get_cost_per_vendor(
+        "^(SEAFOOD Crab Stone Claw)", fiscal_dates["last_thirty"]
+    )
 
-    special_df = get_purchases("SEAFOOD Crabmeat Special", fiscal_dates["last_thirty"])
-    backfin_df = get_purchases("SEAFOOD Crabmeat Backfin", fiscal_dates["last_thirty"])
-    premium_df = get_purchases("SEAFOOD Crabmeat Premium", fiscal_dates["last_thirty"])
-    colossal_df = get_purchases(
+    special_df = get_cost_per_vendor(
+        "SEAFOOD Crabmeat Special", fiscal_dates["last_thirty"]
+    )
+    backfin_df = get_cost_per_vendor(
+        "SEAFOOD Crabmeat Backfin", fiscal_dates["last_thirty"]
+    )
+    premium_df = get_cost_per_vendor(
+        "SEAFOOD Crabmeat Premium", fiscal_dates["last_thirty"]
+    )
+    colossal_df = get_cost_per_vendor(
         "SEAFOOD Crabmeat Colossal", fiscal_dates["last_thirty"]
     )
 
-    seabass_df = get_purchases("SEAFOOD Sea Bass Chilean", fiscal_dates["last_thirty"])
-    salmon_df = get_purchases("^(SEAFOOD) (Salmon)$", fiscal_dates["last_thirty"])
-    feature_df = get_purchases("SEAFOOD Feature Fish", fiscal_dates["last_thirty"])
+    seabass_df = get_cost_per_vendor(
+        "SEAFOOD Sea Bass Chilean", fiscal_dates["last_thirty"]
+    )
+    salmon_df = get_cost_per_vendor("^(SEAFOOD) (Salmon)$", fiscal_dates["last_thirty"])
+    feature_df = get_cost_per_vendor(
+        "SEAFOOD Feature Fish", fiscal_dates["last_thirty"]
+    )
 
-    shrimp10_df = get_purchases(
+    shrimp10_df = get_cost_per_vendor(
         "SEAFOOD Shrimp U/10 White Headless", fiscal_dates["last_thirty"]
     )
-    shrimp3135_df = get_purchases(
+    shrimp3135_df = get_cost_per_vendor(
         "SEAFOOD Shrimp 31/35 Butterfly", fiscal_dates["last_thirty"]
     )
-    shrimp5160_df = get_purchases(
+    shrimp5160_df = get_cost_per_vendor(
         "SEAFOOD Shrimp 51/60 P&D", fiscal_dates["last_thirty"]
     )
-    shrimp2630_df = get_purchases(
+    shrimp2630_df = get_cost_per_vendor(
         "SEAFOOD Shrimp 26/30 P&D", fiscal_dates["last_thirty"]
     )
 
@@ -1649,19 +1684,6 @@ def purchasing():
         form1=form1,
         form3=form3,
         current_user=current_user,
-        lobster_live_df=lobster_live_df,
-        lobster_tail_df=lobster_tail_df,
-        stone_df=stone_df,
-        special_df=special_df,
-        backfin_df=backfin_df,
-        premium_df=premium_df,
-        colossal_df=colossal_df,
-        seabass_df=seabass_df,
-        salmon_df=salmon_df,
-        shrimp10_df=shrimp10_df,
-        shrimp3135_df=shrimp3135_df,
-        shrimp2630_df=shrimp2630_df,
-        feature_df=feature_df,
         prime_chart=prime_chart,
         prime_chart_ly=prime_chart_ly,
         choice_chart=choice_chart,
@@ -1669,32 +1691,45 @@ def purchasing():
         prime_rib_df=prime_rib_df,
         prime_rib_chart=prime_rib_chart,
         prime_rib_chart_ly=prime_rib_chart_ly,
-        special_crabmeat_chart=special_crabmeat_chart,
-        special_crabmeat_chart_ly=special_crabmeat_chart_ly,
-        backfin_crabmeat_chart=backfin_crabmeat_chart,
-        backfin_crabmeat_chart_ly=backfin_crabmeat_chart_ly,
-        premium_crabmeat_chart=premium_crabmeat_chart,
-        premium_crabmeat_chart_ly=premium_crabmeat_chart_ly,
-        colossal_crabmeat_chart=colossal_crabmeat_chart,
-        colossal_crabmeat_chart_ly=colossal_crabmeat_chart_ly,
-        salmon_chart=salmon_chart,
-        salmon_chart_ly=salmon_chart_ly,
-        seabass_chart=seabass_chart,
-        seabass_chart_ly=seabass_chart_ly,
-        feature_fish_chart=feature_fish_chart,
-        feature_fish_chart_ly=feature_fish_chart_ly,
+        lobster_live_df=lobster_live_df,
         lobster_live_chart=lobster_live_chart,
         lobster_live_chart_ly=lobster_live_chart_ly,
+        lobster_tail_df=lobster_tail_df,
         lobster_tail_chart=lobster_tail_chart,
         lobster_tail_chart_ly=lobster_tail_chart_ly,
+        stone_df=stone_df,
         stone_chart=stone_chart,
         stone_chart_ly=stone_chart_ly,
+        special_df=special_df,
+        special_crabmeat_chart=special_crabmeat_chart,
+        special_crabmeat_chart_ly=special_crabmeat_chart_ly,
+        backfin_df=backfin_df,
+        backfin_crabmeat_chart=backfin_crabmeat_chart,
+        backfin_crabmeat_chart_ly=backfin_crabmeat_chart_ly,
+        premium_df=premium_df,
+        premium_crabmeat_chart=premium_crabmeat_chart,
+        premium_crabmeat_chart_ly=premium_crabmeat_chart_ly,
+        colossal_df=colossal_df,
+        colossal_crabmeat_chart=colossal_crabmeat_chart,
+        colossal_crabmeat_chart_ly=colossal_crabmeat_chart_ly,
+        seabass_df=seabass_df,
+        seabass_chart=seabass_chart,
+        seabass_chart_ly=seabass_chart_ly,
+        salmon_df=salmon_df,
+        salmon_chart=salmon_chart,
+        salmon_chart_ly=salmon_chart_ly,
+        shrimp10_df=shrimp10_df,
         shrimp10_chart=shrimp10_chart,
         shrimp10_chart_ly=shrimp10_chart_ly,
+        shrimp3135_df=shrimp3135_df,
         shrimp3135_chart=shrimp3135_chart,
         shrimp3135_chart_ly=shrimp3135_chart_ly,
+        shrimp2630_df=shrimp2630_df,
         shrimp2630_chart=shrimp2630_chart,
         shrimp2630_chart_ly=shrimp2630_chart_ly,
+        feature_df=feature_df,
+        feature_fish_chart=feature_fish_chart,
+        feature_fish_chart_ly=feature_fish_chart_ly,
     )
 
 
@@ -2025,9 +2060,9 @@ def potato(store_id):
     TODAY = datetime.date(datetime.now())
     CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
     YSTDAY = TODAY - timedelta(days=1)
-    
+
     print(TODAY)
-    print(session['token'])
+    print(session["token"])
 
     store = Restaurants.query.filter_by(id=store_id).first()
 
