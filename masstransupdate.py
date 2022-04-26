@@ -117,21 +117,52 @@ def transactionDetails(start, end):
 
 def write_to_database(df1, df2, df3):
 
-    df = df3.merge(df1, on=["transactionId"])
-    df = df.merge(df2, on="itemId")
+    df = df3.merge(df2, how="left", on=["itemId"])
+    df = df.merge(df1, on=["transactionId", "id", "name"])
     df.rename(
         columns={
-            "item_y": "item",
+            "id": "store_id",
+            "item_x": "item",
             "unitOfMeasureName": "UofM",
-            "name_x": "name",
-            "id_x": "store_id",
             "transactionId": "trans_id",
             "companyId": "companyid",
         },
         inplace=True,
     )
-    df.drop(columns=["itemId", "name_y", "id_y", "item_x"], inplace=True)
-    df.to_sql("Transactions", engine, if_exists="append", index=False)
+    df.drop(columns=["itemId", "item_y"], inplace=True)
+    df = df[
+        [
+            "date",
+            "trans_id",
+            "store_id",
+            "name",
+            "item",
+            "category1",
+            "category2",
+            "category3",
+            "quantity",
+            "UofM",
+            "credit",
+            "debit",
+            "amount",
+            "type",
+            "modified",
+            "companyid",
+            "company",
+        ]
+    ]
+    df_trans = df[
+        df["type"].isin(
+            [
+                "Stock Count",
+                "AP Invoice",
+                "AP Credit Memo",
+                "Waste Log",
+                "Item Transfer",
+            ]
+        )
+    ]
+    df_trans.to_sql("Transactions", engine, if_exists="append", index=False)
     conn.commit()
 
 

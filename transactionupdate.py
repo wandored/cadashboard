@@ -99,10 +99,8 @@ def Items():
 
 def transactionDetails(start, end):
 
-    url_filter = (
-        "$filter=modifiedOn ge {}T00:00:00Z and modifiedOn le {}T00:00:00Z".format(
-            start, end
-        )
+    url_filter = "$filter=modifiedOn ge {}T00:00:00Z and modifiedOn le {}T00:00:00Z and rowType eq 'Detail'".format(
+        start, end
     )
     query = "$select=locationId,itemId,credit,debit,amount,quantity,unitOfMeasureName,modifiedOn,transactionId&{}".format(
         url_filter
@@ -125,21 +123,52 @@ def transactionDetails(start, end):
 
 def write_to_database(df1, df2, df3):
 
-    df = df3.merge(df1, on=["transactionId"])
-    df = df.merge(df2, on="itemId")
+    df = df3.merge(df2, how="left", on=["itemId"])
+    df = df.merge(df1, on=["transactionId", "id", "name"])
     df.rename(
         columns={
-            "item_y": "item",
+            "id": "store_id",
+            "item_x": "item",
             "unitOfMeasureName": "UofM",
-            "name_x": "name",
-            "id_x": "store_id",
             "transactionId": "trans_id",
             "companyId": "companyid",
         },
         inplace=True,
     )
-    df.drop(columns=["itemId", "name_y", "id_y", "item_x"], inplace=True)
-    df.to_sql("Transactions", engine, if_exists="append", index=False)
+    df.drop(columns=["itemId", "item_y"], inplace=True)
+    df = df[
+        [
+            "date",
+            "trans_id",
+            "store_id",
+            "name",
+            "item",
+            "category1",
+            "category2",
+            "category3",
+            "quantity",
+            "UofM",
+            "credit",
+            "debit",
+            "amount",
+            "type",
+            "modified",
+            "companyid",
+            "company",
+        ]
+    ]
+    df_trans = df[
+        df["type"].isin(
+            [
+                "Stock Count",
+                "AP Invoice",
+                "AP Credit Memo",
+                "Waste Log",
+                "Item Transfer",
+            ]
+        )
+    ]
+    df_trans.to_sql("Transactions", engine, if_exists="append", index=False)
     conn.commit()
 
 
@@ -158,8 +187,10 @@ if __name__ == "__main__":
     TODAY = datetime.date(datetime.now())
     YSTDAY = TODAY - timedelta(days=1)
     TOMROW = TODAY + timedelta(days=1)
-    start_date = TODAY.strftime("%Y-%m-%d")
-    end_date = TOMROW.strftime("%Y-%m-%d")
+    # start_date = TODAY.strftime("%Y-%m-%d")
+    start_date = "2022-04-19"
+    # end_date = TOMROW.strftime("%Y-%m-%d")
+    end_date = "2022-04-20"
     print(f"date {start_date}")
 
     df_items = Items()
