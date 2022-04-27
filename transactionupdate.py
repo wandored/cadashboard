@@ -44,6 +44,16 @@ def removeSpecial(df):
     return df
 
 
+def get_glaccount():
+    query = "$select=glAccountId,name"
+    url = "{}/GlAccount?{}".format(Config.SRVC_ROOT, query)
+    rqst = make_HTTP_request(url)
+    df = make_dataframe(rqst)
+    df.rename(columns={"name": "account"}, inplace=True)
+
+    return df
+
+
 def transaction(id_list):
 
     rqst_list = []
@@ -102,7 +112,7 @@ def transactionDetails(start, end):
     url_filter = "$filter=modifiedOn ge {}T00:00:00Z and modifiedOn le {}T00:00:00Z and rowType eq 'Detail'".format(
         start, end
     )
-    query = "$select=locationId,itemId,credit,debit,amount,quantity,unitOfMeasureName,modifiedOn,transactionId&{}".format(
+    query = "$select=locationId,itemId,credit,debit,amount,quantity,unitOfMeasureName,modifiedOn,transactionId,glAccountId&{}".format(
         url_filter
     )
     url = "{}/TransactionDetail?{}".format(Config.SRVC_ROOT, query)
@@ -123,7 +133,9 @@ def transactionDetails(start, end):
 
 def write_to_database(df1, df2, df3):
 
-    df = df3.merge(df2, how="left", on=["itemId"])
+    gl = get_glaccount()
+    df = df3.merge(gl, on='glAccountId')
+    df = df.merge(df2, how="left", on=["itemId"])
     df = df.merge(df1, on=["transactionId", "id", "name"])
     df.rename(
         columns={
@@ -155,9 +167,10 @@ def write_to_database(df1, df2, df3):
             "modified",
             "companyid",
             "company",
+            "account",
         ]
     ]
-    df_trans = df[
+    df = df[
         df["type"].isin(
             [
                 "Stock Count",
@@ -168,7 +181,8 @@ def write_to_database(df1, df2, df3):
             ]
         )
     ]
-    df_trans.to_sql("Transactions", engine, if_exists="append", index=False)
+    df = df[df["account"] != "Accounts Payable"]
+    df.to_sql("Transactions", engine, if_exists="append", index=False)
     conn.commit()
 
 
@@ -188,9 +202,9 @@ if __name__ == "__main__":
     YSTDAY = TODAY - timedelta(days=1)
     TOMROW = TODAY + timedelta(days=1)
     # start_date = TODAY.strftime("%Y-%m-%d")
-    start_date = "2022-04-19"
+    start_date = "2022-04-26"
     # end_date = TOMROW.strftime("%Y-%m-%d")
-    end_date = "2022-04-20"
+    end_date = "2022-04-27"
     print(f"date {start_date}")
 
     df_items = Items()

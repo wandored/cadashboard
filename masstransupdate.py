@@ -34,6 +34,16 @@ def make_dataframe(sales):
     return df
 
 
+def get_glaccount():
+    query = "$select=glAccountId,name"
+    url = "{}/GlAccount?{}".format(Config.SRVC_ROOT, query)
+    rqst = make_HTTP_request(url)
+    df = make_dataframe(rqst)
+    df.rename(columns={"name": "account"}, inplace=True)
+
+    return df
+
+
 def transaction(id_list):
 
     rqst_list = []
@@ -95,7 +105,7 @@ def transactionDetails(start, end):
             start, end
         )
     )
-    query = "$select=locationId,itemId,credit,debit,amount,quantity,unitOfMeasureName,modifiedOn,transactionId&{}".format(
+    query = "$select=locationId,itemId,credit,debit,amount,quantity,unitOfMeasureName,modifiedOn,transactionId,glAccountId&{}".format(
         url_filter
     )
     url = "{}/TransactionDetail?{}".format(Config.SRVC_ROOT, query)
@@ -117,7 +127,9 @@ def transactionDetails(start, end):
 
 def write_to_database(df1, df2, df3):
 
-    df = df3.merge(df2, how="left", on=["itemId"])
+    gl = get_glaccount()
+    df = df3.merge(gl, on="glAccountId")
+    df = df.merge(df2, how="left", on=["itemId"])
     df = df.merge(df1, on=["transactionId", "id", "name"])
     df.rename(
         columns={
@@ -149,9 +161,10 @@ def write_to_database(df1, df2, df3):
             "modified",
             "companyid",
             "company",
+            "account",
         ]
     ]
-    df_trans = df[
+    df = df[
         df["type"].isin(
             [
                 "Stock Count",
@@ -162,7 +175,8 @@ def write_to_database(df1, df2, df3):
             ]
         )
     ]
-    df_trans.to_sql("Transactions", engine, if_exists="append", index=False)
+    df = df[df["account"] != "Accounts Payable"]
+    df.to_sql("Transactions", engine, if_exists="append", index=False)
     conn.commit()
 
 
@@ -179,7 +193,7 @@ if __name__ == "__main__":
     rest_query = 'select * from "Restaurants"'
 
     TODAY = date.today()
-    for d in range(3):
+    for d in range(1, 28):
         dt = TODAY - timedelta(days=d)
         print(f"date {dt}")
         tmrw = dt + timedelta(days=1)
