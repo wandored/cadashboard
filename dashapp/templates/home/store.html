@@ -396,38 +396,31 @@
     <div class="row mb-4">
       {% if concept == 'steakhouse' %}
       <!-- lobster cost -->
-        <div class="col-lg-6 col-md-4">
+        <div class="col-lg-4 col-md-6">
           <div class="card">
-            <div class="card-header bg-success pb-0">
+            <div class="card-header bg-primary pb-0">
               <h4>LIVE LOBSTER SUGGESTED MENU PRICE</h4>
+              <h4>AVERAGE COST LAST 30 DAYS {{ "${:,.2f}".format(live_lobster_avg_cost) }}</h4>
             </div>
             <div class="card">
               <div class="table-responsive">
-                <table class="table-sm">
+                <table class="table-sm text-align">
                   <thead>
                     <tr>
-                      <th scope="col">LOBSTER</th>
-                      <th scope="col">DATE</th>
-                      <th scope="col">COST/LB</th>
+                      <th scope="col">SIZE</th>
                       <th scope="col">PORTION COST</th>
-                      <th scope="col">SUG. PRICE 40%</th>
+                      <th scope="col">MENU PRICE @ 40%</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {% for v in lobster_items %}
+                    {% for v in lobster_items["lobster_sizes"] %}
                       <tr>
                         <th scope="row">{{ v.item }}</th>
-                        <td>
-                          <p class="mb-0 ms-1 text-begin">{{ v.date }}</p>
-                        </td>
                           <td>
-                            <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v.debit/v.quantity) }}</p>
+                            <p class="mb-0 ms-1 text-end">{{ "${:,.2f}".format(live_lobster_avg_cost*v.factor) }}</p>
                           </td>
                           <td>
-                            <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format((v.debit/v.quantity)*(v.size/1)) }}</p>
-                          </td>
-                          <td>
-                            <p class="mb-0 ms-1 text-begin">${{ (((v.debit/v.quantity)*(v.size/1)/0.4) | round) - 0.05 }}</p>
+                            <p class="mb-0 ms-1 text-end">${{ (((live_lobster_avg_cost*v.factor)/0.4) | round) - 0.05 }}</p>
                           </td>
                       </tr>
                     {% endfor %}
@@ -438,42 +431,33 @@
           </div>
         </div>
         <!-- stone cost -->
-        <div class="col-lg-6 col-md-4">
+        <div class="col-lg-4 col-md-6">
           <div class="card">
-            <div class="card-header bg-warning pb-0">
+            <div class="card-header bg-danger pb-0">
               <h4>STONE CLAW SUGGESTED MENU PRICE</h4>
+              <h4>AVERAGE COST LAST 30 DAYS {{ "${:,.2f}".format(stone_claw_avg_cost) }}</h4>
             </div>
             <div class="card">
               <div class="table-responsive">
-                <table class="table-sm">
+                <table class="table-sm text-align">
                   <thead>
                     <tr>
-                      <th scope="col">CLAW</th>
-                      <th scope="col">DATE</th>
-                      <th scope="col">COST/LB</th>
+                      <th scope="col">SIZE</th>
                       <th scope="col">PORTION COST</th>
-                      <th scope="col">SUG. PRICE 40%</th>
+                      <th scope="col">MENU PRICE @ 40%</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {% for v in stone_items %}
-                      {% if v.quantity != 0 %}
+                    {% for v in stone_items["stone_sizes"] %}
                       <tr>
                         <th scope="row">{{ v.item }}</th>
-                        <td>
-                          <p class="mb-0 ms-1 text-begin">{{ v.date }}</p>
-                        </td>
                           <td>
-                            <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v.debit/v.quantity) }}</p>
+                            <p class="mb-0 ms-1 text-end">{{ "${:,.2f}".format(stone_claw_avg_cost*v.factor) }}</p>
                           </td>
                           <td>
-                            <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format((v.debit/v.quantity)*(v.size/16)) }}</p>
-                          </td>
-                          <td>
-                            <p class="mb-0 ms-1 text-begin">${{ (((v.debit/v.quantity)*(v.size/16)/0.4) | round) - 0.05 }}</p>
+                            <p class="mb-0 ms-1 text-end">${{ (((stone_claw_avg_cost*v.factor)/0.4) | round) - 0.05 }}</p>
                           </td>
                       </tr>
-                      {% endif %}
                     {% endfor %}
                   </tbody>
                 </table>
@@ -482,21 +466,21 @@
           </div>
         </div>
         <!-- seabass cost -->
-        <div class="col-lg-6 col-md-4">
+        <div class="col-lg-4 col-md-6">
           <div class="card">
             <div class="card-header bg-secondary pb-0">
               <h4>SEA BASS LAST 5 PURCHASES</h4>
             </div>
             <div class="card">
               <div class="table-responsive">
-                <table class="table-sm">
+                <table class="table-sm text-align">
                   <thead>
                     <tr>
                       <th scope="col">DATE</th>
                       <th scope="col">UofM</th>
                       <th scope="col">COST/UofM</th>
                       <th scope="col">PORTION COST</th>
-                      <th scope="col">SUG. PRICE 40%</th>
+                      <th scope="col">MENU PRICE @ 40%</th>
                     </tr>
                   </thead>
                   <tbody>
