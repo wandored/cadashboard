@@ -4,17 +4,22 @@ Copyright (c) 2019 - present AppSeed.us
 """
 
 import re
+import json
 import pandas as pd
 from fpdf import FPDF
 from flask.helpers import url_for
 from flask_security.decorators import roles_accepted
+from pandas.core.algorithms import isin
 from dashapp.home import blueprint
 from flask import flash, render_template, session, redirect, url_for
 from flask.wrappers import Response
 from dashapp.home.util import (
     find_day_with_sales,
+    get_glaccount_costs,
+    get_item_avg_cost,
     refresh_data,
     get_category_sales,
+#    get_category_costs,
     get_category_labor,
     convert_uofm,
     update_recipe_costs,
@@ -63,7 +68,7 @@ def index():
 
     # Check for no sales
     if not Sales.query.filter_by(date=fiscal_dates["start_day"]).first():
-        session["token"] = find_day_with_sales(fiscal_dates["start_day"])
+        session["token"] = find_day_with_sales(day=fiscal_dates["start_day"])
         return redirect(url_for("home_blueprint.index"))
 
     # Get Data
@@ -536,10 +541,8 @@ def store(store_id):
     data = Restaurants.query.all()
     store_list = pd.DataFrame([x.as_dict() for x in data])
 
-    if not Sales.query.filter_by(
-        date=fiscal_dates["start_day"], name=store.name
-    ).first():
-        session["token"] = find_day_with_sales(fiscal_dates["start_day"])
+    if not Sales.query.filter_by(date=fiscal_dates["start_day"], name=store.name).first():
+        session["token"] = find_day_with_sales(day=fiscal_dates["start_day"], store=store.name)
         return redirect(url_for("home_blueprint.store", store_id=store.id))
 
     # Get Data
@@ -725,44 +728,44 @@ def store(store_id):
     #        fiscal_dates["start_period"], fiscal_dates["end_period"]
     #    )
 
-    lobster_items = []
     stone_items = []
     sea_bass = []
     salmon = []
     feature = []
 
-    def get_shellfish(regex):
 
-        lst = (
-            db.session.query(Transactions.item)
-            .filter(Transactions.item.regexp_match(regex))
-            .group_by(Transactions.item)
-        ).all()
-        items = []
-        for i in lst:
-            cost = (
-                db.session.query(
-                    Transactions.item,
-                    Transactions.date,
-                    Transactions.debit,
-                    Transactions.quantity,
-                )
-                .filter(
-                    Transactions.item == i.item,
-                    Transactions.store_id == store_id,
-                    Transactions.type == "AP Invoice",
-                )
-                .order_by(Transactions.date.desc())
-            ).first()
-            if cost:
-                row_dict = dict(cost)
-                ext = re.findall(r"\d*\.?\d", i.item)
-                if not ext:
-                    ext = re.findall(r"\d{1,2}", i.item)
-                size = float(ext[0])
-                row_dict["size"] = size
-                items.append(row_dict)
-        return items
+    #def get_shellfish(regex):
+
+    #    lst = (
+    #        db.session.query(Transactions.item)
+    #        .filter(Transactions.item.regexp_match(regex))
+    #        .group_by(Transactions.item)
+    #    ).all()
+    #    items = []
+    #    for i in lst:
+    #        cost = (
+    #            db.session.query(
+    #                Transactions.item,
+    #                Transactions.date,
+    #                Transactions.debit,
+    #                Transactions.quantity,
+    #            )
+    #            .filter(
+    #                Transactions.item == i.item,
+    #                Transactions.store_id == store_id,
+    #                Transactions.type == "AP Invoice",
+    #            )
+    #            .order_by(Transactions.date.desc())
+    #        ).first()
+    #        if cost:
+    #            row_dict = dict(cost)
+    #            ext = re.findall(r"\d*\.?\d", i.item)
+    #            if not ext:
+    #                ext = re.findall(r"\d{1,2}", i.item)
+    #            size = float(ext[0])
+    #            row_dict["size"] = size
+    #            items.append(row_dict)
+    #    return items
 
     def get_fish(regex):
 
@@ -786,9 +789,23 @@ def store(store_id):
         )
         return fish
 
+    live_lobster_avg_cost = get_item_avg_cost("SEAFOOD Lobster Live*",
+                                      fiscal_dates["last_thirty"],
+                                      fiscal_dates["start_day"],
+                                      store_id)
+    with open("./lobster_items.json") as file:
+        lobster_items = json.load(file)
+
+    stone_claw_avg_cost = get_item_avg_cost("^(SEAFOOD Crab Stone Claw)",
+                                      fiscal_dates["last_thirty"],
+                                      fiscal_dates["start_day"],
+                                      store_id)
+    with open("./stone_claw_items.json") as file:
+        stone_items = json.load(file)
+
     if concept == "steakhouse":
-        lobster_items = get_shellfish("SEAFOOD Lobster Live*")
-        stone_items = get_shellfish("^(SEAFOOD Crab Stone Claw)")
+        # lobster_items = get_shellfish("SEAFOOD Lobster Live*")
+        # stone_items = get_shellfish("^(SEAFOOD Crab Stone Claw)")
         sea_bass = get_fish("SEAFOOD Sea Bass Chilean")
         salmon = get_fish("SEAFOOD Sea Bass Chilean")
 
@@ -1030,19 +1047,18 @@ def store(store_id):
             )
         )
         dol_lst = []
-        pct_lst = []
         for v in query:
             amount = v.costs - v.credits
             dol_lst.append(amount)
         add_items = len(sales) - len(dol_lst)
         for i in range(0, add_items):
             dol_lst.append(0)
-        for i in range(0, len(sales)):
-            pct_lst.append(dol_lst[i] / sales[i])
-        return dol_lst, pct_lst
+        #for i in range(0, len(sales)):
+        #    pct_lst.append(dol_lst[i] / sales[i])
+        return dol_lst
 
     # Supplies cost chart
-    supply_cost_dol, supply_cost_pct = get_category_costs(
+    supply_cost_dol = get_category_costs(
         fiscal_dates["start_year"],
         fiscal_dates["end_year"],
         period_sales_list,
@@ -1054,7 +1070,7 @@ def store(store_id):
             "Bar Supplies",
         ],
     )
-    supply_cost_dol_ly, supply_cost_pct_ly = get_category_costs(
+    supply_cost_dol_ly = get_category_costs(
         fiscal_dates["start_year_ly"],
         fiscal_dates["end_year_ly"],
         period_sales_list_ly,
@@ -1076,13 +1092,13 @@ def store(store_id):
         supply_budget.append(v.total_supplies)
 
     # Smallwares cost chart
-    smallware_cost_dol, smallware_cost_pct = get_category_costs(
+    smallware_cost_dol = get_category_costs(
         fiscal_dates["start_year"],
         fiscal_dates["end_year"],
         period_sales_list,
         cat=["China", "Silverware", "Glassware", "Smallwares"],
     )
-    smallware_cost_dol_ly, smallware_cost_pct_ly = get_category_costs(
+    smallware_cost_dol_ly = get_category_costs(
         fiscal_dates["start_year_ly"],
         fiscal_dates["end_year_ly"],
         period_sales_list_ly,
@@ -1098,13 +1114,28 @@ def store(store_id):
         smallware_budget.append(v.total_smallwares)
 
     # linen cost chart
-    linen_cost_dol, linen_cost_pct = get_category_costs(
+    #linen_cost_dol = get_glaccount_costs(
+    #    fiscal_dates["start_year"],
+    #    fiscal_dates["end_year"],
+    #    "Linen",
+    #    store.name,
+    #    Calendar.period,
+    #)
+
+    #linen_cost_dol_ly = get_glaccount_costs(
+    #    fiscal_dates["start_year_ly"],
+    #    fiscal_dates["end_year_ly"],
+    #    "Linen",
+    #    store.name,
+    #    Calendar.period,
+    # linen cost chart
+    linen_cost_dol = get_category_costs(
         fiscal_dates["start_year"],
         fiscal_dates["end_year"],
         period_sales_list,
         cat=["Linen"],
     )
-    linen_cost_dol_ly, linen_cost_pct_ly = get_category_costs(
+    linen_cost_dol_ly = get_category_costs(
         fiscal_dates["start_year_ly"],
         fiscal_dates["end_year_ly"],
         period_sales_list_ly,
@@ -1171,7 +1202,9 @@ def store(store_id):
         # weekly_totals=weekly_totals,
         # period_totals=period_totals,
         lobster_items=lobster_items,
+        live_lobster_avg_cost=live_lobster_avg_cost,
         stone_items=stone_items,
+        stone_claw_avg_cost=stone_claw_avg_cost,
         sea_bass=sea_bass,
         salmon=salmon,
         feature=feature,
@@ -1646,11 +1679,22 @@ def purchasing():
     stone_chart = period_purchases(
         "SEAFOOD Crab Stone Claw*", fiscal_dates["start_year"], fiscal_dates["end_year"]
     )
+    # this mess is for the stone crab offseason to add zeors to the chart
+    if 5 < fiscal_dates['period']:
+        if fiscal_dates['period'] > 10:
+            dd = 10
+        else:
+            dd = fiscal_dates['period']
+        for ii in range(5, dd):
+            stone_chart[ii:ii] = [0]
+
     stone_chart_ly = period_purchases(
         "SEAFOOD Crab Stone Claw*",
         fiscal_dates["start_year_ly"],
         fiscal_dates["end_year_ly"],
     )
+    off_season = [0,0,0,0,0]
+    stone_chart_ly[5:5] = off_season
     shrimp10_chart = period_purchases(
         "SEAFOOD Shrimp U/10*", fiscal_dates["start_year"], fiscal_dates["end_year"]
     )

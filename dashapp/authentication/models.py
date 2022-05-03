@@ -260,6 +260,7 @@ class Transactions(db.Model):
     modified = db.Column(db.String(64))
     companyid = db.Column(db.String(64))
     company = db.Column(db.String(64))
+    account = db.Column(db.String(64))
 
 
 class Budgets(db.Model):

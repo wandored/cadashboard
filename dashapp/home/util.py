@@ -17,6 +17,7 @@ from dashapp.authentication.models import (
     Menuitems,
     Potatoes,
     Unitsofmeasure,
+    Transactions,
 )
 from sqlalchemy import or_, func
 
@@ -31,12 +32,18 @@ pd.option_context(
 )
 
 
-def find_day_with_sales(day):
-    while not Sales.query.filter_by(date=day).first():
-        date = datetime.strptime(day, "%Y-%m-%d")
-        next_day = date - timedelta(days=1)
-        day = next_day.strftime("%Y-%m-%d")
-    return day
+def find_day_with_sales(**kwargs):
+    if 'store' in kwargs:
+        while not Sales.query.filter_by(date=kwargs['day'], name=kwargs['store']).first():
+            date = datetime.strptime(kwargs['day'], "%Y-%m-%d")
+            next_day = date - timedelta(days=1)
+            kwargs['day'] = next_day.strftime("%Y-%m-%d")
+    else:
+        while not Sales.query.filter_by(date=kwargs['day']).first():
+            date = datetime.strptime(kwargs['day'], "%Y-%m-%d")
+            next_day = date - timedelta(days=1)
+            kwargs['day'] = next_day.strftime("%Y-%m-%d")
+    return kwargs['day']
 
 
 def refresh_data(start, end):
@@ -248,6 +255,7 @@ def sales_detail(start, end):
 
 
 def get_category_sales(start, end, store, cat):
+    # dataframe of sales per category per period
 
     if cat == "GIFT CARDS":
         data = (
@@ -279,6 +287,83 @@ def get_category_sales(start, end, store, cat):
     return df
 
 
+def get_glaccount_costs(start, end, acct, store, epoch):
+    # Return list of sales
+    query = (
+        db.session.query(
+            func.sum(Transactions.credit).label("credits"),
+            func.sum(Transactions.debit).label("costs"),
+        )
+        .select_from(Transactions)
+        .join(Calendar, Calendar.date == Transactions.date)
+        .group_by(epoch)
+        .order_by(epoch)
+        .filter(
+            Transactions.date.between(start, end),
+            Transactions.account == acct,
+            Transactions.name == store
+        )
+    )
+    results = []
+    for q in query:
+        amount = q.costs - q.credits
+        results.append(amount)
+    return results
+
+#def get_category_costs(start, end, sales, cat):
+#    # List of costs per category per period
+#    query = (
+#        db.session.query(
+#            func.sum(Transactions.credit).label("credits"),
+#            func.sum(Transactions.debit).label("costs"),
+#        )
+#        .select_from(Transactions)
+#        .join(Calendar, Calendar.date == Transactions.date)
+#        .group_by(Calendar.period)
+#        .order_by(Calendar.period)
+#        .filter(
+#            Transactions.date.between(start, end),
+#            Transactions.category2.in_(cat),
+#            Transactions.name == store.name,
+#        )
+#    )
+#    dol_lst = []
+#    pct_lst = []
+#    for v in query:
+#        amount = v.costs - v.credits
+#        dol_lst.append(amount)
+#    add_items = len(sales) - len(dol_lst)
+#    for i in range(0, add_items):
+#        dol_lst.append(0)
+#    for i in range(0, len(sales)):
+#        pct_lst.append(dol_lst[i] / sales[i])
+#    return dol_lst, pct_lst
+
+
+def get_item_avg_cost(regex, start, end, id):
+    # Return average cost for purchase item
+    
+    query = (
+        db.session.query(
+            func.sum(Transactions.debit).label("cost"),
+            func.sum(Transactions.quantity).label("count")
+        )
+        .filter(
+            Transactions.item.regexp_match(regex),
+            Transactions.date.between(start, end),
+            Transactions.store_id == id,
+            Transactions.type == "AP Invoice"
+        )
+    )
+    for q in query:
+        try:
+            avg_cost = q["cost"] / q["count"]
+        except:
+            avg_cost = 0
+
+    return avg_cost
+
+
 def get_category_labor(start, end, store, cat):
 
     data = (
@@ -287,7 +372,9 @@ def get_category_labor(start, end, store, cat):
             func.sum(Labor.dollars).label("total_dollars"),
         )
         .filter(
-            Labor.date.between(start, end), Labor.name == store, Labor.category == cat
+            Labor.date.between(start, end),
+            Labor.name == store,
+            Labor.category == cat
         )
         .group_by(Labor.date)
         .all()

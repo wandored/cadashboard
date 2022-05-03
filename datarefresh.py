@@ -13,6 +13,8 @@ import numpy as np
 import psycopg2
 from dashapp import Config
 
+pd.options.mode.chained_assignment = None
+
 
 def make_HTTP_request(url):
     all_records = []

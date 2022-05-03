@@ -13,6 +13,8 @@ import numpy as np
 import psycopg2
 from dashapp import Config
 
+pd.options.mode.chained_assignment = None
+
 
 def make_HTTP_request(url):
     all_records = []
@@ -276,7 +278,6 @@ if __name__ == "__main__":
         tmrw = dt + timedelta(days=1)
         start_date = dt.strftime("%Y-%m-%d")
         end_date = tmrw.strftime("%Y-%m-%d")
-        # end_date = TODAY.strftime("%Y-%m-%d")
         print(dt)
         print()
 

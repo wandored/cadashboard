@@ -1,0 +1,44 @@
+{
+    "stone_sizes": [
+        {
+            "item": "Stone Crab Claw 3oz",
+            "factor": 0.1875
+        },
+        {
+            "item": "Stone Crab Claw 4oz",
+            "factor": 0.25
+        },
+        {
+            "item": "Stone Crab Claw 5oz",
+            "factor": 0.3125
+        },
+        {
+            "item": "Stone Crab Claw 6oz",
+            "factor": 0.375
+        },
+        {
+            "item": "Stone Crab Claw 7oz",
+            "factor": 0.4375
+        },
+        {
+            "item": "Stone Crab Claw 8oz",
+            "factor": 0.5
+        },
+        {
+            "item": "Stone Crab Claw 9oz",
+            "factor": 0.5625
+        },
+        {
+            "item": "Stone Crab Claw 10oz",
+            "factor": 0.625
+        },
+        {
+            "item": "Stone Crab Claw 11oz",
+            "factor": 0.6875
+        },
+        {
+            "item": "Stone Crab Claw 12oz",
+            "factor": 0.75
+        }
+    ]
+}

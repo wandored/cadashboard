@@ -34,6 +34,16 @@ def make_dataframe(sales):
     return df
 
 
+def get_glaccount():
+    query = "$select=glAccountId,name"
+    url = "{}/GlAccount?{}".format(Config.SRVC_ROOT, query)
+    rqst = make_HTTP_request(url)
+    df = make_dataframe(rqst)
+    df.rename(columns={"name": "account"}, inplace=True)
+
+    return df
+
+
 def transaction(id_list):
 
     rqst_list = []
@@ -95,7 +105,7 @@ def transactionDetails(start, end):
             start, end
         )
     )
-    query = "$select=locationId,itemId,credit,debit,amount,quantity,unitOfMeasureName,modifiedOn,transactionId&{}".format(
+    query = "$select=locationId,itemId,credit,debit,amount,quantity,unitOfMeasureName,modifiedOn,transactionId,glAccountId&{}".format(
         url_filter
     )
     url = "{}/TransactionDetail?{}".format(Config.SRVC_ROOT, query)
@@ -117,20 +127,55 @@ def transactionDetails(start, end):
 
 def write_to_database(df1, df2, df3):
 
-    df = df3.merge(df1, on=["transactionId"])
-    df = df.merge(df2, on="itemId")
+    gl = get_glaccount()
+    df = df3.merge(gl, on="glAccountId")
+    df = df.merge(df2, how="left", on=["itemId"])
+    df = df.merge(df1, on=["transactionId", "id", "name"])
     df.rename(
         columns={
-            "item_y": "item",
+            "id": "store_id",
+            "item_x": "item",
             "unitOfMeasureName": "UofM",
-            "name_x": "name",
-            "id_x": "store_id",
             "transactionId": "trans_id",
             "companyId": "companyid",
         },
         inplace=True,
     )
-    df.drop(columns=["itemId", "name_y", "id_y", "item_x"], inplace=True)
+    df.drop(columns=["itemId", "item_y"], inplace=True)
+    df = df[
+        [
+            "date",
+            "trans_id",
+            "store_id",
+            "name",
+            "item",
+            "category1",
+            "category2",
+            "category3",
+            "quantity",
+            "UofM",
+            "credit",
+            "debit",
+            "amount",
+            "type",
+            "modified",
+            "companyid",
+            "company",
+            "account",
+        ]
+    ]
+    df = df[
+        df["type"].isin(
+            [
+                "Stock Count",
+                "AP Invoice",
+                "AP Credit Memo",
+                "Waste Log",
+                "Item Transfer",
+            ]
+        )
+    ]
+    df = df[df["account"] != "Accounts Payable"]
     df.to_sql("Transactions", engine, if_exists="append", index=False)
     conn.commit()
 
@@ -148,7 +193,8 @@ if __name__ == "__main__":
     rest_query = 'select * from "Restaurants"'
 
     TODAY = date.today()
-    for d in range(3):
+    date_list = [1, 2, 3, 4, 5, 6, 7, 365, 366, 367, 368, 369, 370, 371]
+    for d in date_list:
         dt = TODAY - timedelta(days=d)
         print(f"date {dt}")
         tmrw = dt + timedelta(days=1)
