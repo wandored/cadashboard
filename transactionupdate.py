@@ -134,7 +134,7 @@ def transactionDetails(start, end):
 def write_to_database(df1, df2, df3):
 
     gl = get_glaccount()
-    df = df3.merge(gl, on='glAccountId')
+    df = df3.merge(gl, on="glAccountId")
     df = df.merge(df2, how="left", on=["itemId"])
     df = df.merge(df1, on=["transactionId", "id", "name"])
     df.rename(
@@ -201,10 +201,8 @@ if __name__ == "__main__":
     TODAY = datetime.date(datetime.now())
     YSTDAY = TODAY - timedelta(days=1)
     TOMROW = TODAY + timedelta(days=1)
-    # start_date = TODAY.strftime("%Y-%m-%d")
-    start_date = "2022-04-26"
-    # end_date = TOMROW.strftime("%Y-%m-%d")
-    end_date = "2022-04-27"
+    start_date = TODAY.strftime("%Y-%m-%d")
+    end_date = TOMROW.strftime("%Y-%m-%d")
     print(f"date {start_date}")
 
     df_items = Items()
