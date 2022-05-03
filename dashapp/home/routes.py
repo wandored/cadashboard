@@ -9,6 +9,7 @@ import pandas as pd
 from fpdf import FPDF
 from flask.helpers import url_for
 from flask_security.decorators import roles_accepted
+from pandas.core.algorithms import isin
 from dashapp.home import blueprint
 from flask import flash, render_template, session, redirect, url_for
 from flask.wrappers import Response
@@ -801,8 +802,6 @@ def store(store_id):
                                       store_id)
     with open("./stone_claw_items.json") as file:
         stone_items = json.load(file)
-    for v in stone_items["stone_sizes"]:
-        print(v)
 
     if concept == "steakhouse":
         # lobster_items = get_shellfish("SEAFOOD Lobster Live*")
@@ -1048,19 +1047,18 @@ def store(store_id):
             )
         )
         dol_lst = []
-        pct_lst = []
         for v in query:
             amount = v.costs - v.credits
             dol_lst.append(amount)
         add_items = len(sales) - len(dol_lst)
         for i in range(0, add_items):
             dol_lst.append(0)
-        for i in range(0, len(sales)):
-            pct_lst.append(dol_lst[i] / sales[i])
-        return dol_lst, pct_lst
+        #for i in range(0, len(sales)):
+        #    pct_lst.append(dol_lst[i] / sales[i])
+        return dol_lst
 
     # Supplies cost chart
-    supply_cost_dol, supply_cost_pct = get_category_costs(
+    supply_cost_dol = get_category_costs(
         fiscal_dates["start_year"],
         fiscal_dates["end_year"],
         period_sales_list,
@@ -1072,7 +1070,7 @@ def store(store_id):
             "Bar Supplies",
         ],
     )
-    supply_cost_dol_ly, supply_cost_pct_ly = get_category_costs(
+    supply_cost_dol_ly = get_category_costs(
         fiscal_dates["start_year_ly"],
         fiscal_dates["end_year_ly"],
         period_sales_list_ly,
@@ -1094,13 +1092,13 @@ def store(store_id):
         supply_budget.append(v.total_supplies)
 
     # Smallwares cost chart
-    smallware_cost_dol, smallware_cost_pct = get_category_costs(
+    smallware_cost_dol = get_category_costs(
         fiscal_dates["start_year"],
         fiscal_dates["end_year"],
         period_sales_list,
         cat=["China", "Silverware", "Glassware", "Smallwares"],
     )
-    smallware_cost_dol_ly, smallware_cost_pct_ly = get_category_costs(
+    smallware_cost_dol_ly = get_category_costs(
         fiscal_dates["start_year_ly"],
         fiscal_dates["end_year_ly"],
         period_sales_list_ly,
@@ -1131,13 +1129,13 @@ def store(store_id):
     #    store.name,
     #    Calendar.period,
     # linen cost chart
-    linen_cost_dol, linen_cost_pct = get_category_costs(
+    linen_cost_dol = get_category_costs(
         fiscal_dates["start_year"],
         fiscal_dates["end_year"],
         period_sales_list,
         cat=["Linen"],
     )
-    linen_cost_dol_ly, linen_cost_pct_ly = get_category_costs(
+    linen_cost_dol_ly = get_category_costs(
         fiscal_dates["start_year_ly"],
         fiscal_dates["end_year_ly"],
         period_sales_list_ly,
@@ -1681,11 +1679,22 @@ def purchasing():
     stone_chart = period_purchases(
         "SEAFOOD Crab Stone Claw*", fiscal_dates["start_year"], fiscal_dates["end_year"]
     )
+    # this mess is for the stone crab offseason to add zeors to the chart
+    if 5 < fiscal_dates['period']:
+        if fiscal_dates['period'] > 10:
+            dd = 10
+        else:
+            dd = fiscal_dates['period']
+        for ii in range(5, dd):
+            stone_chart[ii:ii] = [0]
+
     stone_chart_ly = period_purchases(
         "SEAFOOD Crab Stone Claw*",
         fiscal_dates["start_year_ly"],
         fiscal_dates["end_year_ly"],
     )
+    off_season = [0,0,0,0,0]
+    stone_chart_ly[5:5] = off_season
     shrimp10_chart = period_purchases(
         "SEAFOOD Shrimp U/10*", fiscal_dates["start_year"], fiscal_dates["end_year"]
     )
