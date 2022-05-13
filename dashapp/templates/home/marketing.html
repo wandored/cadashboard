@@ -8,88 +8,12 @@
 {% block content %}
 
   <div class="container-fluid py-4">
-    <div class="row min-vh-60 h-100">
-        <!-- lent chart -->
-      <div class="col-lg-4 col-md-6 mt-4 mb-4">
-        <div class="card z-index-2 ">
-          <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-            <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
-              <div class="chart">
-                <canvas id="chart-lent" class="chart-canvas" height="170"></canvas>
-              </div>
-            </div>
-          </div>
-          <div class="card-body">
-          <table class="table-responsive table-md">
-            <thead>
-                <th scope="row">LENT SANDWICH FEATURES</th>
-              <tr>
-                <th scope="col">STORE</th>
-                <th scope="col">COUNT</th>
-                <th scope="col">SALES</th>
-              </tr>
-            </thead>
-              <tbody>
-                  {% for k, v in lent_sales.iterrows() %}
-                    <tr>
-                      <th scope="row">{{ v.store }}</th>
-                      <td>
-                        <p class="mb-0 ms-1 text-begin">{{ "{:,.0f}".format(v['count']) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v.sales) }}</p>
-                      </td>
-                    </tr>
-                  {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-      <!-- fishfry chart -->
-      <div class="col-lg-4 col-md-6 mt-4 mb-4">
-        <div class="card z-index-2 ">
-          <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-            <div class="bg-gradient-info shadow-success border-radius-lg py-3 pe-1">
-              <div class="chart">
-                <canvas id="chart-fishfry" class="chart-canvas" height="170"></canvas>
-              </div>
-            </div>
-          </div>
-          <div class="card-body">
-          <table class="table-responsive table-md">
-            <thead>
-                <th scope="row">FISH FRYDAYS</th>
-              <tr>
-                <th scope="col">STORE</th>
-                <th scope="col">COUNT</th>
-                <th scope="col">SALES</th>
-              </tr>
-            </thead>
-              <tbody>
-                  {% for k, v in fish_fryday.iterrows() %}
-                    <tr>
-                      <th scope="row">{{ v.store }}</th>
-                      <td>
-                        <p class="mb-0 ms-1 text-begin">{{ "{:,.0f}".format(v['count']) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v.sales) }}</p>
-                      </td>
-                    </tr>
-                  {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
     <div class="row min-vh-80 h-100">
         <!-- giftcard chart -->
       <div class="col-lg-6 col-md-6 mt-4 mb-4">
         <div class="card z-index-2 ">
           <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-            <div class="bg-gradient-primary shadow-success border-radius-lg py-3 pe-1">
+            <div class="bg-gradient-primary shadow-primary border-radius-lg py-3 pe-1">
               <div class="chart">
                 <canvas id="chart-giftcard" class="chart-canvas" height="300"></canvas>
               </div>
@@ -97,15 +21,15 @@
           </div>
           <div class="card-body">
             <div class="table-responsive">
-              <table class="table align-items-begin mb-0">
+              <table class="table text-begin mb-0">
                 <thead>
-                  <th scope="row">GIFT CARD SALES YTD</th>
+                  <th scope="row">GC SALES AND PAYMENTS</th>
                     <tr>
                       <th scope="col">STORE</th>
                       <th scope="col">COUNT</th>
                       <th scope="col">SALES</th>
-                      <th scope="col">COUNT LY</th>
-                      <th scope="col">SALES LY</th>
+                      <th scope="col">PAYMENTS</th>
+                      <th scope="col">DIFFERENCE</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -113,16 +37,16 @@
                     <tr>
                       <th scope="row">{{ v.store }}</th>
                         <td>
-                          <p class="mb-0 ms-1 text-begin">{{ "{:,.0f}".format(v.quantity_x) }}</p>
+                          <p class="mb-0 ms-1">{{ "{:,.0f}".format(v.quantity) }}</p>
                         </td>
                         <td>
-                          <p class="mb-0 ms-1 text-begin">{{ "${:,.0f}".format(v.amount_x) }}</p>
+                          <p class="mb-0 ms-1">{{ "${:,.0f}".format(v.amount) }}</p>
                         </td>
                         <td>
-                          <p class="mb-0 ms-1 text-begin">{{ "{:,.0f}".format(v.quantity_y) }}</p>
+                          <p class="mb-0 ms-1">{{ "${:,.0f}".format(v.payment) }}</p>
                         </td>
                         <td>
-                          <p class="mb-0 ms-1 text-begin">{{ "${:,.0f}".format(v.amount_y) }}</p>
+                          <p class="mb-0 ms-1">{{ "${:,.0f}".format(v['diff']) }}</p>
                         </td>
                     </tr>
                   {% endfor %}
@@ -149,22 +73,36 @@
       data: {
         labels: ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8', 'P9', 'P10', 'P11', 'P12', 'P13'],
         datasets: [{
+          label: "BALANCE",
+          tension: 0,
+          borderWidth: 5,
+          borderRadius: 5,
+          borderColor: "rgba(100, 100, 100, 1)",
+          pointBackgroundColor: "rgba(100, 100, 100, 1)",
+          pointBorderColor: "transparent",
+          backgroundColor: "rgba(100, 100, 100, 1)",
+          fill: false,
+          data: {{ giftcard_diff | safe }},
+          type: "line"
+        },{
           label: "GC SALES",
           tension: 0.4,
           borderWidth: 0,
           borderRadius: 4,
           borderSkipped: false,
           backgroundColor: "rgba(255, 255, 255, .8)",
-          data: {{ giftcard_values1 | safe }},
+          data: {{ giftcard_sales | safe }},
+          stack: 'Stack 0'
         },{
-          label: "GC SALES LY",
+          label: "GC PAYMENTS",
           tension: 0.4,
           borderWidth: 0,
           borderRadius: 4,
           borderSkipped: false,
           backgroundColor: "rgba(200, 200, 200, .8)",
-          data: {{ giftcard_values2 | safe }},
-        }, ],
+          data: {{ giftcard_payments | safe }},
+          stack: 'Stack 0'
+        } ],
       },
       options: {
         responsive: true,
@@ -229,171 +167,5 @@
       },
     });
 
-    var ctx1 = document.getElementById("chart-lent").getContext("2d");
-    new Chart(ctx1, {
-      type: "bar",
-      data: {
-        labels: ["W", "T", "F", "S", "S", "M", "T"],
-        datasets: [{
-          label: "Lent Feature Sales",
-          tension: 0.4,
-          borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false,
-          backgroundColor: "rgba(255, 255, 255, .8)",
-          data: {{ lent_values | safe }},
-          maxBarThickness: 20
-        }, ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          }
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              suggestedMin: 0,
-              suggestedMax: 500,
-              beginAtZero: true,
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-              color: "#fff",
-            },
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              color: '#f8f9fa',
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-            },
-          },
-        },
-      },
-    });
-
-    var ctx2 = document.getElementById("chart-fishfry").getContext("2d");
-    new Chart(ctx2, {
-      type: "bar",
-      data: {
-        labels: ["4th", "11th", "18th", "25th", "1st", "8th", "15th"],
-        datasets: [{
-          label: "GSC",
-          tension: 0.4,
-          borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false,
-          backgroundColor: "rgba(255, 255, 255, .8)",
-          data: {{ fishfry_values1 | safe }},
-          maxBarThickness: 20
-        },{
-          label: "CRH",
-          tension: 0.4,
-          borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false,
-          backgroundColor: "rgba(200, 200, 200, .8)",
-          data: {{ fishfry_values2 | safe }},
-          maxBarThickness: 20
-        }, ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          }
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              suggestedMin: 0,
-              suggestedMax: 500,
-              beginAtZero: true,
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-              color: "#fff",
-            },
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              color: '#f8f9fa',
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-            },
-          },
-        },
-      },
-    });
   </script>
 {% endblock javascripts %}

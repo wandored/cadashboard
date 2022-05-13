@@ -67,6 +67,7 @@ def refresh_data(start, end):
     # refresh labor
     labor_detail(start, end)
     # refresh categories and menuitems
+    # TODO add sales_payments
     sales_detail(start, end)
     potato_sales(start)
     return 0
@@ -135,7 +136,6 @@ def sales_employee(start, end):
     )
     query = "$select=dayPart,netSales,numberofGuests,location&{}".format(url_filter)
     url = "{}/SalesEmployee?{}".format(Config.SRVC_ROOT, query)
-    print(url)
     rqst = make_HTTP_request(url)
     df = make_dataframe(rqst)
     if df.empty:
@@ -169,7 +169,6 @@ def labor_detail(start, end):
     )
     query = "$select=jobTitle,hours,total,location_ID&{}".format(url_filter)
     url = "{}/LaborDetail?{}".format(Config.SRVC_ROOT, query)
-    print(url)
     rqst = make_HTTP_request(url)
     df = make_dataframe(rqst)
     if df.empty:
@@ -203,7 +202,6 @@ def sales_detail(start, end):
         url_filter
     )
     url = "{}/SalesDetail?{}".format(Config.SRVC_ROOT, query)
-    print(url)
     rqst = make_HTTP_request(url)
     df = make_dataframe(rqst)
     if df.empty:
@@ -214,8 +212,6 @@ def sales_detail(start, end):
     df_cats = pd.DataFrame(
         list(major_cats.items()), columns=["menu_category", "category"]
     )
-
-    # the data needs to be cleaned before it can be used
 
     data = db.session.query(Restaurants).all()
     df_loc = pd.DataFrame(
@@ -579,6 +575,7 @@ def set_dates(startdate):
         day_end = day_start + timedelta(days=1)
         seven = day_start - timedelta(days=7)
         thirty = day_start - timedelta(days=30)
+        threesixtyfive = day_start - timedelta(days=365)
         week_start = datetime.strptime(i.week_start, "%Y-%m-%d")
         lws = week_start - timedelta(days=7)
         week_end = datetime.strptime(i.week_end, "%Y-%m-%d")
@@ -601,6 +598,7 @@ def set_dates(startdate):
         d["last_thirty"] = thirty.strftime("%Y-%m-%d")
         d["start_year"] = i.year_start
         d["end_year"] = i.year_end
+        d["last_threesixtyfive"] = threesixtyfive.strftime("%Y-%m-%d")
         d["start_day_ly"] = get_lastyear(i.date)
         d["end_day_ly"] = get_lastyear(day_end.strftime("%Y-%m-%d"))
         d["start_week_ly"] = get_lastyear(i.week_start)

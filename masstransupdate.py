@@ -193,7 +193,7 @@ if __name__ == "__main__":
     rest_query = 'select * from "Restaurants"'
 
     TODAY = date.today()
-    date_list = [1, 2, 3, 4, 5, 6, 7, 365, 366, 367, 368, 369, 370, 371]
+    date_list = [365, 364, 363, 362, 361, 360, 359]
     for d in date_list:
         dt = TODAY - timedelta(days=d)
         print(f"date {dt}")

@@ -258,6 +258,33 @@ def potato_sales(start):
     return
 
 
+def sales_payments(start, end):
+
+    url_filter = "$filter=date ge {}T00:00:00Z and date le {}T00:00:00Z".format(
+        start, end
+    )
+    query = "$select=amount,date,location,paymenttype&{}".format(url_filter)
+    url = "{}/SalesPayment?{}".format(Config.SRVC_ROOT, query)
+    rqst = make_HTTP_request(url)
+    df = make_dataframe(rqst)
+    if df.empty:
+        return
+    cur.execute(rest_query)
+    data = cur.fetchall()
+    df_loc = pd.DataFrame.from_records(data, columns=["restaurant_id", "location", "name"])
+    df_merge = df_loc.merge(df, on="location")
+
+    # pivot data and write to database
+    df_pivot = df_merge.pivot_table(
+        index=["restaurant_id", "location", "paymenttype"], values="amount", aggfunc=np.sum
+    )
+    df_pivot.loc[:, "date"] = start
+    df_pivot.to_sql("Payments", engine, if_exists="append")
+    conn.commit()
+
+    return
+
+
 if __name__ == "__main__":
 
     engine = create_engine(Config.SQLALCHEMY_DATABASE_URI)
@@ -281,12 +308,14 @@ if __name__ == "__main__":
         print(dt)
         print()
 
+        cur.execute('DELETE FROM "Payments" WHERE date = %s', (start_date,))
         cur.execute('DELETE FROM "Sales" WHERE date = %s', (start_date,))
         cur.execute('DELETE FROM "Labor" WHERE date = %s', (start_date,))
         cur.execute('DELETE FROM "Menuitems" WHERE date = %s', (start_date,))
         cur.execute('DELETE FROM "Potatoes" WHERE date = %s', (start_date,))
         conn.commit()
 
+        sales_payments(start_date, end_date)
         sales_detail(start_date, end_date)
         sales_employee(start_date, end_date)
         labor_datail(start_date, end_date)

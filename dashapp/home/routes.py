@@ -19,7 +19,7 @@ from dashapp.home.util import (
     get_item_avg_cost,
     refresh_data,
     get_category_sales,
-#    get_category_costs,
+    #    get_category_costs,
     get_category_labor,
     convert_uofm,
     update_recipe_costs,
@@ -47,6 +47,7 @@ from dashapp.authentication.models import (
     Potatoes,
     Unitsofmeasure,
     Recipes,
+    Payments,
 )
 from sqlalchemy import and_, or_, func
 
@@ -541,8 +542,12 @@ def store(store_id):
     data = Restaurants.query.all()
     store_list = pd.DataFrame([x.as_dict() for x in data])
 
-    if not Sales.query.filter_by(date=fiscal_dates["start_day"], name=store.name).first():
-        session["token"] = find_day_with_sales(day=fiscal_dates["start_day"], store=store.name)
+    if not Sales.query.filter_by(
+        date=fiscal_dates["start_day"], name=store.name
+    ).first():
+        session["token"] = find_day_with_sales(
+            day=fiscal_dates["start_day"], store=store.name
+        )
         return redirect(url_for("home_blueprint.store", store_id=store.id))
 
     # Get Data
@@ -733,8 +738,7 @@ def store(store_id):
     salmon = []
     feature = []
 
-
-    #def get_shellfish(regex):
+    # def get_shellfish(regex):
 
     #    lst = (
     #        db.session.query(Transactions.item)
@@ -789,17 +793,21 @@ def store(store_id):
         )
         return fish
 
-    live_lobster_avg_cost = get_item_avg_cost("SEAFOOD Lobster Live*",
-                                      fiscal_dates["last_thirty"],
-                                      fiscal_dates["start_day"],
-                                      store_id)
+    live_lobster_avg_cost = get_item_avg_cost(
+        "SEAFOOD Lobster Live*",
+        fiscal_dates["last_thirty"],
+        fiscal_dates["start_day"],
+        store_id,
+    )
     with open("./lobster_items.json") as file:
         lobster_items = json.load(file)
 
-    stone_claw_avg_cost = get_item_avg_cost("^(SEAFOOD Crab Stone Claw)",
-                                      fiscal_dates["last_thirty"],
-                                      fiscal_dates["start_day"],
-                                      store_id)
+    stone_claw_avg_cost = get_item_avg_cost(
+        "^(SEAFOOD Crab Stone Claw)",
+        fiscal_dates["last_thirty"],
+        fiscal_dates["start_day"],
+        store_id,
+    )
     with open("./stone_claw_items.json") as file:
         stone_items = json.load(file)
 
@@ -1053,7 +1061,7 @@ def store(store_id):
         add_items = len(sales) - len(dol_lst)
         for i in range(0, add_items):
             dol_lst.append(0)
-        #for i in range(0, len(sales)):
+        # for i in range(0, len(sales)):
         #    pct_lst.append(dol_lst[i] / sales[i])
         return dol_lst
 
@@ -1114,20 +1122,22 @@ def store(store_id):
         smallware_budget.append(v.total_smallwares)
 
     # linen cost chart
-    #linen_cost_dol = get_glaccount_costs(
+    # linen_cost_dol = get_glaccount_costs(
     #    fiscal_dates["start_year"],
     #    fiscal_dates["end_year"],
     #    "Linen",
     #    store.name,
     #    Calendar.period,
-    #)
+    # )
 
-    #linen_cost_dol_ly = get_glaccount_costs(
+    # linen_cost_dol_ly = get_glaccount_costs(
     #    fiscal_dates["start_year_ly"],
     #    fiscal_dates["end_year_ly"],
     #    "Linen",
     #    store.name,
     #    Calendar.period,
+    # )
+
     # linen cost chart
     linen_cost_dol = get_category_costs(
         fiscal_dates["start_year"],
@@ -1241,13 +1251,13 @@ def marketing():
 
     # Gift Card Sales
 
-    def get_giftcard_values(start, end, time):
+    def get_giftcard_sales(start, end, epoch):
         chart = (
             db.session.query(func.sum(Menuitems.amount).label("sales"))
             .select_from(Menuitems)
             .join(Calendar, Calendar.date == Menuitems.date)
-            .group_by(time)
-            .order_by(time)
+            .group_by(epoch)
+            .order_by(epoch)
             .filter(
                 Menuitems.date.between(start, end),
                 Menuitems.menuitem.regexp_match("(?i)GIFT CARD*"),
@@ -1259,14 +1269,38 @@ def marketing():
 
         return value
 
-    giftcard_values1 = get_giftcard_values(
+    def get_giftcard_payments(start, end, epoch):
+        chart = (
+            db.session.query(func.sum(Payments.amount).label("sales"))
+            .select_from(Payments)
+            .join(Calendar, Calendar.date == Payments.date)
+            .group_by(epoch)
+            .order_by(epoch)
+            .filter(
+                Payments.date.between(start, end),
+                Payments.paymenttype.regexp_match("(?i)GIFT CARD*"),
+            )
+        )
+        value = []
+        for v in chart:
+            value.append(int(v.sales))
+
+        return value
+
+    giftcard_sales = get_giftcard_sales(
         fiscal_dates["start_year"], fiscal_dates["end_year"], Calendar.period
     )
-    giftcard_values2 = get_giftcard_values(
-        fiscal_dates["start_year_ly"], fiscal_dates["end_year_ly"], Calendar.period
+    giftcard_payments = get_giftcard_payments(
+        fiscal_dates["start_year"], fiscal_dates["end_year"], Calendar.period
     )
+    # TODO set to trailing year beginning in 2023
+    giftcard_diff = []
+    for ii in range(len(giftcard_sales)):
+        dif = giftcard_sales[ii] - giftcard_payments[ii]
+        giftcard_diff.append(dif)
+    giftcard_payments[:] = [-abs(x) for x in giftcard_payments]
 
-    def get_giftcard_sales(start, end):
+    def get_giftcard_sales_per_store(start, end):
         query = (
             db.session.query(
                 Menuitems.name,
@@ -1286,98 +1320,49 @@ def marketing():
         sales.loc["TOTALS"] = sales.sum(numeric_only=True)
         return sales
 
-    gift_card_sales = get_giftcard_sales(
+    def get_giftcard_payments_per_store(start, end):
+
+        data = Restaurants.query.all()
+        df_loc = pd.DataFrame([x.as_dict() for x in data])
+        df_loc.rename(
+            columns={
+                "id": "restaurant_id",
+            },
+            inplace=True,
+        )
+
+        query = (
+            db.session.query(
+                Payments.restaurant_id,
+                func.sum(Payments.amount).label("payment"),
+            )
+            .filter(
+                Payments.date.between(start, end),
+                Payments.paymenttype.regexp_match("GIFT CARD"),
+            )
+            .group_by(Payments.restaurant_id)
+        ).all()
+
+        payments = pd.DataFrame.from_records(
+            query, columns=["restaurant_id", "payment"]
+        )
+        payments.sort_values(by=["payment"], ascending=False, inplace=True)
+        payments = df_loc.merge(payments, on="restaurant_id")
+
+        payments.loc["TOTALS"] = payments.sum(numeric_only=True)
+        return payments
+
+    gift_card_sales = get_giftcard_sales_per_store(
         fiscal_dates["start_year"], fiscal_dates["end_year"]
     )
-    gift_card_sales_ly = get_giftcard_sales(
-        fiscal_dates["start_year_ly"], fiscal_dates["year_to_date"]
+    gift_card_payments = get_giftcard_payments_per_store(
+        fiscal_dates["start_year"], fiscal_dates["end_year"]
     )
-    gift_card_sales = gift_card_sales.merge(gift_card_sales_ly, on="store")
-
-    def get_lent_values(start, end, time):
-        chart = (
-            db.session.query(func.sum(Menuitems.quantity).label("count"))
-            .select_from(Menuitems)
-            .join(Calendar, Calendar.date == Menuitems.date)
-            .group_by(time)
-            .order_by(time)
-            .filter(
-                Menuitems.date.between(start, end),
-                or_(
-                    Menuitems.menuitem == "BLACKENED MAHI SANDWICH",
-                    Menuitems.menuitem == "CRISPY FLOUNDER SANDWICH",
-                ),
-            )
-        )
-        value = []
-        for v in chart:
-            value.append(int(v.count))
-
-        return value
-
-    lent_values = get_lent_values(
-        fiscal_dates["start_week"], fiscal_dates["end_week"], Calendar.date
+    gift_card_sales = gift_card_sales.merge(
+        gift_card_payments, left_on="store", right_on="name"
     )
-
-    query = (
-        db.session.query(
-            Menuitems.name,
-            func.sum(Menuitems.quantity).label("count"),
-            func.sum(Menuitems.amount).label("sales"),
-        )
-        .filter(
-            Menuitems.date.between("2022-03-02", "2022-04-17"),
-            or_(
-                Menuitems.menuitem == "BLACKENED MAHI SANDWICH",
-                Menuitems.menuitem == "CRISPY FLOUNDER SANDWICH",
-            ),
-        )
-        .group_by(Menuitems.name)
-    ).all()
-    lent_sales = pd.DataFrame.from_records(query, columns=["store", "count", "sales"])
-    lent_sales.sort_values(by=["count"], ascending=False, inplace=True)
-
-    def get_fishfry_values(store, start, end, time):
-        chart = (
-            db.session.query(func.sum(Menuitems.quantity).label("count"))
-            .select_from(Menuitems)
-            .join(Calendar, Calendar.date == Menuitems.date)
-            .group_by(time)
-            .order_by(time)
-            .filter(
-                Menuitems.date.between(start, end),
-                Menuitems.menuitem.regexp_match("FISH FRYDAY"),
-                Menuitems.name == store,
-            )
-        )
-        value = []
-        for v in chart:
-            value.append(int(v.count))
-
-        return value
-
-    fishfry_values1 = get_fishfry_values(
-        "GULFSTREAM CAFE", "2022-03-02", "2022-04-17", Calendar.week
-    )
-    fishfry_values2 = get_fishfry_values(
-        "CAROLINA ROADHOUSE", "2022-03-02", "2022-04-17", Calendar.week
-    )
-
-    fish_fry = (
-        db.session.query(
-            Menuitems.name,
-            func.sum(Menuitems.quantity).label("count"),
-            func.sum(Menuitems.amount).label("sales"),
-        )
-        .filter(
-            Menuitems.date.between("2022-03-02", "2022-04-17"),
-            Menuitems.menuitem.regexp_match("FISH FRYDAY"),
-        )
-        .group_by(Menuitems.name)
-    ).all()
-    fish_fryday = pd.DataFrame.from_records(
-        fish_fry, columns=["store", "count", "sales"]
-    )
+    gift_card_sales["diff"] = gift_card_sales["amount"] - gift_card_sales["payment"]
+    gift_card_sales.sort_values(by=["diff"], ascending=False, inplace=True)
 
     return render_template(
         "home/marketing.html",
@@ -1389,13 +1374,9 @@ def marketing():
         current_user=current_user,
         roles=current_user.roles,
         gift_card_sales=gift_card_sales,
-        giftcard_values1=giftcard_values1,
-        giftcard_values2=giftcard_values2,
-        lent_sales=lent_sales,
-        lent_values=lent_values,
-        fish_fryday=fish_fryday,
-        fishfry_values1=fishfry_values1,
-        fishfry_values2=fishfry_values2,
+        giftcard_sales=giftcard_sales,
+        giftcard_payments=giftcard_payments,
+        giftcard_diff=giftcard_diff,
     )
 
 
@@ -1680,11 +1661,11 @@ def purchasing():
         "SEAFOOD Crab Stone Claw*", fiscal_dates["start_year"], fiscal_dates["end_year"]
     )
     # this mess is for the stone crab offseason to add zeors to the chart
-    if 5 < fiscal_dates['period']:
-        if fiscal_dates['period'] > 10:
+    if 5 < fiscal_dates["period"]:
+        if fiscal_dates["period"] > 10:
             dd = 10
         else:
-            dd = fiscal_dates['period']
+            dd = fiscal_dates["period"]
         for ii in range(5, dd):
             stone_chart[ii:ii] = [0]
 
@@ -1693,7 +1674,7 @@ def purchasing():
         fiscal_dates["start_year_ly"],
         fiscal_dates["end_year_ly"],
     )
-    off_season = [0,0,0,0,0]
+    off_season = [0, 0, 0, 0, 0]
     stone_chart_ly[5:5] = off_season
     shrimp10_chart = period_purchases(
         "SEAFOOD Shrimp U/10*", fiscal_dates["start_year"], fiscal_dates["end_year"]
