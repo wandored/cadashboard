@@ -262,12 +262,16 @@ def sales_payments(start, end):
         return
     cur.execute(rest_query)
     data = cur.fetchall()
-    df_loc = pd.DataFrame.from_records(data, columns=["restaurant_id", "location", "name"])
+    df_loc = pd.DataFrame.from_records(
+        data, columns=["restaurant_id", "location", "name"]
+    )
     df_merge = df_loc.merge(df, on="location")
 
     # pivot data and write to database
     df_pivot = df_merge.pivot_table(
-        index=["restaurant_id", "location", "paymenttype"], values="amount", aggfunc=np.sum
+        index=["restaurant_id", "location", "paymenttype"],
+        values="amount",
+        aggfunc=np.sum,
     )
     df_pivot.loc[:, "date"] = start
     df_pivot.to_sql("Payments", engine, if_exists="append")

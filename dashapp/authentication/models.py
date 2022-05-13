@@ -97,6 +97,9 @@ class UserAdmin(sqla.ModelView):
 
     # Automatically display human-readable names for the current and available Roles when creating or editing a User
     column_auto_select_related = True
+    column_searchable_list = ['email']
+    column_filters = ['active']
+    page_size = 50
 
     # Prevent administration of Users unless the currently logged-in user has the "admin" role
     def is_accessible(self):

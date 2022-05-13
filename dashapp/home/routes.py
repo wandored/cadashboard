@@ -19,7 +19,7 @@ from dashapp.home.util import (
     get_item_avg_cost,
     refresh_data,
     get_category_sales,
-#    get_category_costs,
+    #    get_category_costs,
     get_category_labor,
     convert_uofm,
     update_recipe_costs,
@@ -542,8 +542,12 @@ def store(store_id):
     data = Restaurants.query.all()
     store_list = pd.DataFrame([x.as_dict() for x in data])
 
-    if not Sales.query.filter_by(date=fiscal_dates["start_day"], name=store.name).first():
-        session["token"] = find_day_with_sales(day=fiscal_dates["start_day"], store=store.name)
+    if not Sales.query.filter_by(
+        date=fiscal_dates["start_day"], name=store.name
+    ).first():
+        session["token"] = find_day_with_sales(
+            day=fiscal_dates["start_day"], store=store.name
+        )
         return redirect(url_for("home_blueprint.store", store_id=store.id))
 
     # Get Data
@@ -734,8 +738,7 @@ def store(store_id):
     salmon = []
     feature = []
 
-
-    #def get_shellfish(regex):
+    # def get_shellfish(regex):
 
     #    lst = (
     #        db.session.query(Transactions.item)
@@ -790,17 +793,21 @@ def store(store_id):
         )
         return fish
 
-    live_lobster_avg_cost = get_item_avg_cost("SEAFOOD Lobster Live*",
-                                      fiscal_dates["last_thirty"],
-                                      fiscal_dates["start_day"],
-                                      store_id)
+    live_lobster_avg_cost = get_item_avg_cost(
+        "SEAFOOD Lobster Live*",
+        fiscal_dates["last_thirty"],
+        fiscal_dates["start_day"],
+        store_id,
+    )
     with open("./lobster_items.json") as file:
         lobster_items = json.load(file)
 
-    stone_claw_avg_cost = get_item_avg_cost("^(SEAFOOD Crab Stone Claw)",
-                                      fiscal_dates["last_thirty"],
-                                      fiscal_dates["start_day"],
-                                      store_id)
+    stone_claw_avg_cost = get_item_avg_cost(
+        "^(SEAFOOD Crab Stone Claw)",
+        fiscal_dates["last_thirty"],
+        fiscal_dates["start_day"],
+        store_id,
+    )
     with open("./stone_claw_items.json") as file:
         stone_items = json.load(file)
 
@@ -1054,7 +1061,7 @@ def store(store_id):
         add_items = len(sales) - len(dol_lst)
         for i in range(0, add_items):
             dol_lst.append(0)
-        #for i in range(0, len(sales)):
+        # for i in range(0, len(sales)):
         #    pct_lst.append(dol_lst[i] / sales[i])
         return dol_lst
 
@@ -1115,22 +1122,22 @@ def store(store_id):
         smallware_budget.append(v.total_smallwares)
 
     # linen cost chart
-    #linen_cost_dol = get_glaccount_costs(
+    # linen_cost_dol = get_glaccount_costs(
     #    fiscal_dates["start_year"],
     #    fiscal_dates["end_year"],
     #    "Linen",
     #    store.name,
     #    Calendar.period,
-    #)
+    # )
 
-    #linen_cost_dol_ly = get_glaccount_costs(
+    # linen_cost_dol_ly = get_glaccount_costs(
     #    fiscal_dates["start_year_ly"],
     #    fiscal_dates["end_year_ly"],
     #    "Linen",
     #    store.name,
     #    Calendar.period,
-    #)
-    
+    # )
+
     # linen cost chart
     linen_cost_dol = get_category_costs(
         fiscal_dates["start_year"],
@@ -1283,17 +1290,15 @@ def marketing():
     giftcard_sales = get_giftcard_sales(
         fiscal_dates["start_year"], fiscal_dates["end_year"], Calendar.period
     )
-    print(giftcard_sales)
     giftcard_payments = get_giftcard_payments(
         fiscal_dates["start_year"], fiscal_dates["end_year"], Calendar.period
     )
+    # TODO set to trailing year beginning in 2023
     giftcard_diff = []
     for ii in range(len(giftcard_sales)):
-        dif = (giftcard_sales[ii] - giftcard_payments[ii])
+        dif = giftcard_sales[ii] - giftcard_payments[ii]
         giftcard_diff.append(dif)
     giftcard_payments[:] = [-abs(x) for x in giftcard_payments]
-    print(giftcard_payments)
-    print(giftcard_diff)
 
     def get_giftcard_sales_per_store(start, end):
         query = (
@@ -1353,11 +1358,11 @@ def marketing():
     gift_card_payments = get_giftcard_payments_per_store(
         fiscal_dates["start_year"], fiscal_dates["end_year"]
     )
-    gift_card_sales = gift_card_sales.merge(gift_card_payments, left_on="store", right_on="name")
+    gift_card_sales = gift_card_sales.merge(
+        gift_card_payments, left_on="store", right_on="name"
+    )
     gift_card_sales["diff"] = gift_card_sales["amount"] - gift_card_sales["payment"]
     gift_card_sales.sort_values(by=["diff"], ascending=False, inplace=True)
-    print(gift_card_sales)
-
 
     return render_template(
         "home/marketing.html",
@@ -1656,11 +1661,11 @@ def purchasing():
         "SEAFOOD Crab Stone Claw*", fiscal_dates["start_year"], fiscal_dates["end_year"]
     )
     # this mess is for the stone crab offseason to add zeors to the chart
-    if 5 < fiscal_dates['period']:
-        if fiscal_dates['period'] > 10:
+    if 5 < fiscal_dates["period"]:
+        if fiscal_dates["period"] > 10:
             dd = 10
         else:
-            dd = fiscal_dates['period']
+            dd = fiscal_dates["period"]
         for ii in range(5, dd):
             stone_chart[ii:ii] = [0]
 
@@ -1669,7 +1674,7 @@ def purchasing():
         fiscal_dates["start_year_ly"],
         fiscal_dates["end_year_ly"],
     )
-    off_season = [0,0,0,0,0]
+    off_season = [0, 0, 0, 0, 0]
     stone_chart_ly[5:5] = off_season
     shrimp10_chart = period_purchases(
         "SEAFOOD Shrimp U/10*", fiscal_dates["start_year"], fiscal_dates["end_year"]
