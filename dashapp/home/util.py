@@ -579,6 +579,7 @@ def set_dates(startdate):
         day_end = day_start + timedelta(days=1)
         seven = day_start - timedelta(days=7)
         thirty = day_start - timedelta(days=30)
+        threesixtyfive = day_start - timedelta(days=365)
         week_start = datetime.strptime(i.week_start, "%Y-%m-%d")
         lws = week_start - timedelta(days=7)
         week_end = datetime.strptime(i.week_end, "%Y-%m-%d")
@@ -601,6 +602,7 @@ def set_dates(startdate):
         d["last_thirty"] = thirty.strftime("%Y-%m-%d")
         d["start_year"] = i.year_start
         d["end_year"] = i.year_end
+        d["last_threesixtyfive"] = threesixtyfive.strftime("%Y-%m-%d")
         d["start_day_ly"] = get_lastyear(i.date)
         d["end_day_ly"] = get_lastyear(day_end.strftime("%Y-%m-%d"))
         d["start_week_ly"] = get_lastyear(i.week_start)

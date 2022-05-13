@@ -150,6 +150,7 @@ class Restaurants(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     location = db.Column(db.String(64), unique=True)
     name = db.Column(db.String(64), unique=True)
+    payment = db.relationship("Payments", backref="payment_types", lazy=True)
 
     def as_dict(self):
         return {"id": self.id, "name": self.name, "location": self.location}
@@ -388,3 +389,15 @@ class Recipes(db.Model):
     posid = db.Column(db.Integer)
     recipeid = db.Column(db.String(64))
     menuitemid = db.Column(db.String(64))
+
+
+class Payments(db.Model):
+
+    __tablename__ = "Payments"
+
+    id = db.Column(db.Integer, primary_key=True)
+    amount = db.Column(db.Float)
+    date = db.Column(db.String(64))
+    location = db.Column(db.String(64))
+    paymenttype = db.Column(db.String(64))
+    restaurant_id = db.Column(db.Integer, db.ForeignKey('Restaurants.id'))
