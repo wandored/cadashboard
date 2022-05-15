@@ -1253,7 +1253,8 @@ def marketing():
 
     def get_giftcard_sales(start, end, epoch):
         chart = (
-            db.session.query(func.sum(Menuitems.amount).label("sales"))
+            db.session.query(func.sum(Menuitems.amount).label("sales"),
+                             Calendar.period)
             .select_from(Menuitems)
             .join(Calendar, Calendar.date == Menuitems.date)
             .group_by(epoch)
@@ -1264,14 +1265,18 @@ def marketing():
             )
         )
         value = []
-        for v in chart:
-            value.append(int(v.sales))
+        for p in period_order:
+            for v in chart:
+                if v.period == p:
+                    print(v)
+                    value.append(int(v.sales))
 
         return value
 
     def get_giftcard_payments(start, end, epoch):
         chart = (
-            db.session.query(func.sum(Payments.amount).label("sales"))
+            db.session.query(func.sum(Payments.amount).label("sales"),
+                             Calendar.period)
             .select_from(Payments)
             .join(Calendar, Calendar.date == Payments.date)
             .group_by(epoch)
@@ -1282,21 +1287,41 @@ def marketing():
             )
         )
         value = []
-        for v in chart:
-            value.append(int(v.sales))
+        for p in period_order:
+            for v in chart:
+                if v.period == p:
+                    print(v)
+                    value.append(int(v.sales))
 
         return value
 
+    # list of last 13 periods
+    period_list = [1,2,3,4,5,6,7,8,9,10,11,12,13]
+    slice1 = period_list[fiscal_dates["period"]:]
+    slice2 = period_list[:fiscal_dates["period"]]
+    period_order = slice1 + slice2
+    print(period_order)
+
+    print(fiscal_dates["last_threesixtyfive"])
     giftcard_sales = get_giftcard_sales(
-        fiscal_dates["start_year"], fiscal_dates["end_year"], Calendar.period
+        fiscal_dates["last_threesixtyfive"],
+        fiscal_dates["start_day"],
+        Calendar.period
     )
+    print(giftcard_sales)
     giftcard_payments = get_giftcard_payments(
-        fiscal_dates["start_year"], fiscal_dates["end_year"], Calendar.period
+        fiscal_dates["last_threesixtyfive"],
+        fiscal_dates["start_day"],
+        Calendar.period
     )
+    print(giftcard_payments)
+
     # TODO set to trailing year beginning in 2023
     giftcard_diff = []
+    dif = 0
     for ii in range(len(giftcard_sales)):
-        dif = giftcard_sales[ii] - giftcard_payments[ii]
+        dif = (giftcard_sales[ii] - giftcard_payments[ii]) + dif
+        print(dif)
         giftcard_diff.append(dif)
     giftcard_payments[:] = [-abs(x) for x in giftcard_payments]
 
@@ -1377,6 +1402,7 @@ def marketing():
         giftcard_sales=giftcard_sales,
         giftcard_payments=giftcard_payments,
         giftcard_diff=giftcard_diff,
+        period_order=period_order,
     )
 
 

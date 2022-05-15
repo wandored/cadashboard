@@ -89,7 +89,7 @@ def transaction(id_list):
     rqst = make_HTTP_request(url)
     df = make_dataframe(rqst)
     df.rename(columns={"name": "company"}, inplace=True)
-    df_return = pd.merge(df_merge, df, on="companyId", how="left")
+    df_return = df_merge.merge(df, on="companyId", how="left")
 
     return df_return
 
