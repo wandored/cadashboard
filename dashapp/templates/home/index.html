@@ -204,9 +204,15 @@
                 <tr> 
                   <td>
                     <div class="d-flex px-2 py-1">
+                    {% if v.sales >= v.top_sales %}
+                      <div class="d-flex flex-column">
+                        <a class="me-2" href="{{ url_for('home_blueprint.store', store_id=v.id) }}"><h6 class="mb-0 text-sm">{{ v.name }} <i class="fa fa-sack-dollar text-success" aria-hidden="true"></i></h6></a>
+                      </div>
+                      {% else %}
                       <div class="d-flex flex-column">
                         <a class="me-2" href="{{ url_for('home_blueprint.store', store_id=v.id) }}"><h6 class="mb-0 text-sm">{{ v.name }}</h6></a>
                       </div>
+                      {% endif %}
                     </div>
                   </td>
                   <td>

@@ -24,6 +24,7 @@ from dashapp.home.util import (
     convert_uofm,
     update_recipe_costs,
     set_dates,
+    sales_record,
 )
 from flask_security import login_required, current_user
 from datetime import datetime, timedelta
@@ -66,6 +67,9 @@ def index():
         return redirect(url_for("home_blueprint.index"))
 
     fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
+    # List of stores to add ID so i can pass to other templates
+    data = Restaurants.query.all()
+    store_df = pd.DataFrame([x.as_dict() for x in data])
 
     # Check for no sales
     if not Sales.query.filter_by(date=fiscal_dates["start_day"]).first():
@@ -179,6 +183,19 @@ def index():
         .all()
     )
 
+    # Get the top sales for each store
+    store_list = store_df["name"]
+    top_sales_list = []
+    for sl in store_list:
+        query = sales_record(sl)
+        if query != None:
+            row = [sl, query]
+            top_sales_list.append(row)
+
+    top_sales_df = pd.DataFrame.from_records(
+        top_sales_list, columns=["name", "top_sales"]
+    )
+
     df_sales_day = pd.DataFrame.from_records(sales_day, columns=["name", "sales"])
     df_sales_day_ly = pd.DataFrame.from_records(
         sales_day_ly, columns=["name", "sales_ly"]
@@ -192,6 +209,7 @@ def index():
     sales_table = df_sales_day.merge(df_sales_day_ly, how="outer", sort=True)
     sales_table = sales_table.merge(df_entree_count, how="outer", sort=True)
     sales_table = sales_table.merge(df_entree_count_ly, how="outer", sort=True)
+    sales_table = sales_table.merge(top_sales_df, how="left")
 
     labor_day = (
         db.session.query(
@@ -225,11 +243,7 @@ def index():
 
     daily_table = sales_table.merge(labor_table, how="outer", sort=True)
 
-    # List of stores to add ID so i can pass to other templates
-    data = Restaurants.query.all()
-    store_list = pd.DataFrame([x.as_dict() for x in data])
-    daily_table = daily_table.merge(store_list, how="left")
-
+    daily_table = daily_table.merge(store_df, how="left")
     daily_table.set_index("name", inplace=True)
 
     # Grab top sales over last year before we add totals
@@ -540,7 +554,7 @@ def store(store_id):
         concept = "casual"
 
     data = Restaurants.query.all()
-    store_list = pd.DataFrame([x.as_dict() for x in data])
+    store_df = pd.DataFrame([x.as_dict() for x in data])
 
     if not Sales.query.filter_by(
         date=fiscal_dates["start_day"], name=store.name
@@ -722,7 +736,7 @@ def store(store_id):
     #        _table["Kitchen_pct"] = _table.Kitchen / (_table.food)
     #        _table["name"] = store.name
     #
-    #        _table = _table.merge(store_list, how="left")
+    #        _table = _table.merge(store_df, how="left")
     #        totals = _table.sum()
     #        return totals
     #
@@ -1253,8 +1267,7 @@ def marketing():
 
     def get_giftcard_sales(start, end, epoch):
         chart = (
-            db.session.query(func.sum(Menuitems.amount).label("sales"),
-                             Calendar.period)
+            db.session.query(func.sum(Menuitems.amount).label("sales"), Calendar.period)
             .select_from(Menuitems)
             .join(Calendar, Calendar.date == Menuitems.date)
             .group_by(epoch)
@@ -1275,8 +1288,7 @@ def marketing():
 
     def get_giftcard_payments(start, end, epoch):
         chart = (
-            db.session.query(func.sum(Payments.amount).label("sales"),
-                             Calendar.period)
+            db.session.query(func.sum(Payments.amount).label("sales"), Calendar.period)
             .select_from(Payments)
             .join(Calendar, Calendar.date == Payments.date)
             .group_by(epoch)
@@ -1296,23 +1308,19 @@ def marketing():
         return value
 
     # list of last 13 periods
-    period_list = [1,2,3,4,5,6,7,8,9,10,11,12,13]
-    slice1 = period_list[fiscal_dates["period"]:]
-    slice2 = period_list[:fiscal_dates["period"]]
+    period_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+    slice1 = period_list[fiscal_dates["period"] :]
+    slice2 = period_list[: fiscal_dates["period"]]
     period_order = slice1 + slice2
     print(period_order)
 
     print(fiscal_dates["last_threesixtyfive"])
     giftcard_sales = get_giftcard_sales(
-        fiscal_dates["last_threesixtyfive"],
-        fiscal_dates["start_day"],
-        Calendar.period
+        fiscal_dates["last_threesixtyfive"], fiscal_dates["start_day"], Calendar.period
     )
     print(giftcard_sales)
     giftcard_payments = get_giftcard_payments(
-        fiscal_dates["last_threesixtyfive"],
-        fiscal_dates["start_day"],
-        Calendar.period
+        fiscal_dates["last_threesixtyfive"], fiscal_dates["start_day"], Calendar.period
     )
     print(giftcard_payments)
 
@@ -1418,7 +1426,7 @@ def purchasing():
 
     # Get list of Restaurants
     data = Restaurants.query.all()
-    store_list = pd.DataFrame([x.as_dict() for x in data])
+    store_df = pd.DataFrame([x.as_dict() for x in data])
 
     form1 = DateForm()
     form3 = StoreForm()
