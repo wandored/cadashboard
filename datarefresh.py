@@ -145,6 +145,7 @@ def labor_datail(start, end):
     )
     query = "$select=jobTitle,hours,total,location_ID&{}".format(url_filter)
     url = "{}/LaborDetail?{}".format(Config.SRVC_ROOT, query)
+    print(url)
     rqst = make_HTTP_request(url)
     df = make_dataframe(rqst)
     if df.empty:

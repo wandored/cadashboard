@@ -26,6 +26,7 @@ from dashapp.home.util import (
     set_dates,
     sales_record,
 )
+from dashapp.config import Config
 from flask_security import login_required, current_user
 from datetime import datetime, timedelta
 from dashapp.authentication.forms import (
@@ -61,6 +62,7 @@ def index():
     TODAY = datetime.date(datetime.now())
     CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
     YSTDAY = TODAY - timedelta(days=1)
+    company_name = Config.COMPANY_NAME
 
     if not "token" in session:
         session["token"] = YSTDAY.strftime("%Y-%m-%d")
@@ -504,6 +506,7 @@ def index():
     return render_template(
         "home/index.html",
         title="CentraArchy",
+        company_name=company_name,
         form1=form1,
         form3=form3,
         segment="index",
@@ -539,6 +542,7 @@ def store(store_id):
     TODAY = datetime.date(datetime.now())
     CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
     YSTDAY = TODAY - timedelta(days=1)
+    company_name = Config.COMPANY_NAME
 
     store = Restaurants.query.filter_by(id=store_id).first()
 
@@ -1185,6 +1189,7 @@ def store(store_id):
     return render_template(
         "home/store.html",
         title=store.name,
+        company_name=company_name,
         store_id=store.id,
         segment="store.name",
         concept=concept,
@@ -1247,6 +1252,7 @@ def marketing():
     TODAY = datetime.date(datetime.now())
     CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
     YSTDAY = TODAY - timedelta(days=1)
+    company_name = Config.COMPANY_NAME
 
     fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
     form1 = DateForm()
@@ -1400,6 +1406,7 @@ def marketing():
     return render_template(
         "home/marketing.html",
         title="Marketing",
+        company_name=company_name,
         segment="marketing",
         fiscal_dates=fiscal_dates,
         form1=form1,
@@ -1421,6 +1428,7 @@ def purchasing():
     TODAY = datetime.date(datetime.now())
     CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
     YSTDAY = TODAY - timedelta(days=1)
+    company_name = Config.COMPANY_NAME
 
     fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
 
@@ -1738,6 +1746,7 @@ def purchasing():
     return render_template(
         "home/purchasing.html",
         title="Purchasing",
+        company_name=company_name,
         segment="purchasing",
         fiscal_dates=fiscal_dates,
         form1=form1,
@@ -1800,6 +1809,7 @@ def support():
     TODAY = datetime.date(datetime.now())
     CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
     YSTDAY = TODAY - timedelta(days=1)
+    company_name = Config.COMPANY_NAME
 
     fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
 
@@ -1878,6 +1888,7 @@ def support():
     return render_template(
         "home/support.html",
         title="Support",
+        company_name=company_name,
         segment="support",
         fiscal_dates=fiscal_dates,
         form1=form1,
@@ -1896,6 +1907,7 @@ def alcohol():
     TODAY = datetime.date(datetime.now())
     CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
     YSTDAY = TODAY - timedelta(days=1)
+    company_name = Config.COMPANY_NAME
 
     fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
 
@@ -2049,6 +2061,7 @@ def alcohol():
     return render_template(
         "home/alcohol.html",
         title="Alcohol",
+        company_name=company_name,
         segment="alcohol",
         fiscal_dates=fiscal_dates,
         form1=form1,
@@ -2087,6 +2100,7 @@ def profile():
     TODAY = datetime.date(datetime.now())
     CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
     YSTDAY = TODAY - timedelta(days=1)
+    company_name = Config.COMPANY_NAME
 
     fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
     form1 = DateForm()
@@ -2105,6 +2119,7 @@ def profile():
     return render_template(
         "home/profile.html",
         title="Profile",
+        company_name=company_name,
         segment="profile",
         fiscal_dates=fiscal_dates,
         form1=form1,
@@ -2119,6 +2134,7 @@ def potato(store_id):
     TODAY = datetime.date(datetime.now())
     CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
     YSTDAY = TODAY - timedelta(days=1)
+    company_name = Config.COMPANY_NAME
 
     print(TODAY)
     print(session["token"])

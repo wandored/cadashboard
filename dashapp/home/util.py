@@ -1,5 +1,5 @@
 """
-CentraArchy Dashboard by wandored
+Dashboard by wandored
 """
 import json
 import csv
@@ -183,6 +183,7 @@ def labor_detail(start, end):
     )
     query = "$select=jobTitle,hours,total,location_ID&{}".format(url_filter)
     url = "{}/LaborDetail?{}".format(Config.SRVC_ROOT, query)
+    print(url)
     rqst = make_HTTP_request(url)
     df = make_dataframe(rqst)
     if df.empty:

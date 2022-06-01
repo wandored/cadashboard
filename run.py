@@ -1,5 +1,5 @@
 """
-CentraArchy Dashboard app
+Dashboard app
 """
 
 from dashapp import create_app

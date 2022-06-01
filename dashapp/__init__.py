@@ -1,5 +1,5 @@
 """
-CentraArchy Dashboard App
+Dashboard App
 """
 
 from flask import Flask
