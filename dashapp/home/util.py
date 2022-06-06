@@ -72,6 +72,7 @@ def refresh_data(start, end):
     Menuitems.query.filter_by(date=start).delete()
     Potatoes.query.filter_by(date=start).delete()
     db.session.commit()
+    print(start)
 
     # refres the sales data and check to make sure there are sales for that day
     baddates = sales_employee(start, end)
@@ -79,7 +80,7 @@ def refresh_data(start, end):
         return 1
 
     # refresh labor
-    labor_detail(start, end)
+    labor_detail(start)
     # refresh categories and menuitems
     # TODO add sales_payments
     sales_detail(start, end)
@@ -174,13 +175,9 @@ def sales_employee(start, end):
     return 0
 
 
-def labor_detail(start, end):
+def labor_detail(start):
 
-    url_filter = (
-        "$filter=dateWorked ge {}T00:00:00Z and dateWorked le {}T00:00:00Z".format(
-            start, end
-        )
-    )
+    url_filter = "$filter=dateWorked eq {}T00:00:00Z".format(start)
     query = "$select=jobTitle,hours,total,location_ID&{}".format(url_filter)
     url = "{}/LaborDetail?{}".format(Config.SRVC_ROOT, query)
     print(url)

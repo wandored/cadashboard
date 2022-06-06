@@ -141,13 +141,9 @@ def sales_employee(start, end):
     return
 
 
-def labor_datail(start, end):
+def labor_detail(start):
 
-    url_filter = (
-        "$filter=dateWorked ge {}T00:00:00Z and dateWorked le {}T00:00:00Z".format(
-            start, end
-        )
-    )
+    url_filter = "$filter=dateWorked eq {}T00:00:00Z".format(start)
     query = "$select=jobTitle,hours,total,location_ID&{}".format(url_filter)
     url = "{}/LaborDetail?{}".format(Config.SRVC_ROOT, query)
     print(url)
@@ -271,12 +267,16 @@ def sales_payments(start, end):
         return
     cur.execute(rest_query)
     data = cur.fetchall()
-    df_loc = pd.DataFrame.from_records(data, columns=["restaurant_id", "location", "name"])
+    df_loc = pd.DataFrame.from_records(
+        data, columns=["restaurant_id", "location", "name"]
+    )
     df_merge = df_loc.merge(df, on="location")
 
     # pivot data and write to database
     df_pivot = df_merge.pivot_table(
-        index=["restaurant_id", "location", "paymenttype"], values="amount", aggfunc=np.sum
+        index=["restaurant_id", "location", "paymenttype"],
+        values="amount",
+        aggfunc=np.sum,
     )
     df_pivot.loc[:, "date"] = start
     df_pivot.to_sql("Payments", engine, if_exists="append")
@@ -300,7 +300,8 @@ if __name__ == "__main__":
     TODAY = datetime.date(datetime.now())
     YSTDAY = TODAY - timedelta(days=1)
 
-    for d in range(5):
+    date_list = [0, 1, 2, 3, 365, 364, 363, 362]
+    for d in date_list:
         dt = YSTDAY - timedelta(days=d)
         tmrw = dt + timedelta(days=1)
         start_date = dt.strftime("%Y-%m-%d")
@@ -318,7 +319,7 @@ if __name__ == "__main__":
         sales_payments(start_date, end_date)
         sales_detail(start_date, end_date)
         sales_employee(start_date, end_date)
-        labor_datail(start_date, end_date)
+        labor_detail(start_date)
         potato_sales(start_date)
 
     conn.close()
