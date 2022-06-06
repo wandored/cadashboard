@@ -1,5 +1,5 @@
 """
-CentraArchy Dashboard by wandored
+Dashboard by wandored
 """
 import json
 import csv
@@ -32,18 +32,32 @@ pd.option_context(
 )
 
 
+def sales_record(store):
+    query = (
+        db.session.query(func.sum(Sales.sales).label("top_sales"))
+        .filter(Sales.name == store)
+        .group_by(Sales.date)
+        .order_by(func.sum(Sales.sales).desc())
+        .first()
+    )
+    if query:
+        return query["top_sales"]
+
+
 def find_day_with_sales(**kwargs):
-    if 'store' in kwargs:
-        while not Sales.query.filter_by(date=kwargs['day'], name=kwargs['store']).first():
-            date = datetime.strptime(kwargs['day'], "%Y-%m-%d")
+    if "store" in kwargs:
+        while not Sales.query.filter_by(
+            date=kwargs["day"], name=kwargs["store"]
+        ).first():
+            date = datetime.strptime(kwargs["day"], "%Y-%m-%d")
             next_day = date - timedelta(days=1)
-            kwargs['day'] = next_day.strftime("%Y-%m-%d")
+            kwargs["day"] = next_day.strftime("%Y-%m-%d")
     else:
-        while not Sales.query.filter_by(date=kwargs['day']).first():
-            date = datetime.strptime(kwargs['day'], "%Y-%m-%d")
+        while not Sales.query.filter_by(date=kwargs["day"]).first():
+            date = datetime.strptime(kwargs["day"], "%Y-%m-%d")
             next_day = date - timedelta(days=1)
-            kwargs['day'] = next_day.strftime("%Y-%m-%d")
-    return kwargs['day']
+            kwargs["day"] = next_day.strftime("%Y-%m-%d")
+    return kwargs["day"]
 
 
 def refresh_data(start, end):
@@ -169,6 +183,7 @@ def labor_detail(start, end):
     )
     query = "$select=jobTitle,hours,total,location_ID&{}".format(url_filter)
     url = "{}/LaborDetail?{}".format(Config.SRVC_ROOT, query)
+    print(url)
     rqst = make_HTTP_request(url)
     df = make_dataframe(rqst)
     if df.empty:
@@ -297,7 +312,7 @@ def get_glaccount_costs(start, end, acct, store, epoch):
         .filter(
             Transactions.date.between(start, end),
             Transactions.account == acct,
-            Transactions.name == store
+            Transactions.name == store,
         )
     )
     results = []
@@ -306,7 +321,8 @@ def get_glaccount_costs(start, end, acct, store, epoch):
         results.append(amount)
     return results
 
-#def get_category_costs(start, end, sales, cat):
+
+# def get_category_costs(start, end, sales, cat):
 #    # List of costs per category per period
 #    query = (
 #        db.session.query(
@@ -338,18 +354,15 @@ def get_glaccount_costs(start, end, acct, store, epoch):
 
 def get_item_avg_cost(regex, start, end, id):
     # Return average cost for purchase item
-    
-    query = (
-        db.session.query(
-            func.sum(Transactions.debit).label("cost"),
-            func.sum(Transactions.quantity).label("count")
-        )
-        .filter(
-            Transactions.item.regexp_match(regex),
-            Transactions.date.between(start, end),
-            Transactions.store_id == id,
-            Transactions.type == "AP Invoice"
-        )
+
+    query = db.session.query(
+        func.sum(Transactions.debit).label("cost"),
+        func.sum(Transactions.quantity).label("count"),
+    ).filter(
+        Transactions.item.regexp_match(regex),
+        Transactions.date.between(start, end),
+        Transactions.store_id == id,
+        Transactions.type == "AP Invoice",
     )
     for q in query:
         try:
@@ -368,9 +381,7 @@ def get_category_labor(start, end, store, cat):
             func.sum(Labor.dollars).label("total_dollars"),
         )
         .filter(
-            Labor.date.between(start, end),
-            Labor.name == store,
-            Labor.category == cat
+            Labor.date.between(start, end), Labor.name == store, Labor.category == cat
         )
         .group_by(Labor.date)
         .all()
