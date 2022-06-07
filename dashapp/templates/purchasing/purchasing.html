@@ -1,0 +1,101 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} {{ title }} {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+    <!-- First Row -Charts -->
+    <div class="row mt-4">
+        <div class="col-lg-4 col-md-6 mt-4 mb-4">
+            <div class="card z-index-2 ">
+                <div class="card-header p-0 position-relative mx-3 z-index-2 bg-transparent">
+                    <div class="chart">
+                        <canvas id="food-chart" class="chart-canvas" height="10"></canvas>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h4 class="mb-0 ">Food Costs</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-4 mt-4 mb-4">
+            <div class="card z-index-2 ">
+                <div class="card-header p-0 position-relative mx-3 z-index-2 bg-transparent">
+                    <div class="chart">
+                        <canvas id="alcohol-chart" class="chart-canvas" height="10"></canvas>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h4 class="mb-0 ">Alcohol Costs</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-4 mt-4 mb-4">
+            <div class="card z-index-2 ">
+                <div class="card-header p-0 position-relative mx-3 z-index-2 bg-transparent">
+                    <div class="chart">
+                        <canvas id="nonfood-chart" class="chart-canvas" height="10"></canvas>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h4 class="mb-0 ">Non-Food Costs</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+  {% include 'includes/footer.html' %}
+
+</div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+<script src="/static/assets/js/plugins/chartjs.min.js"></script>
+<script>
+    var ctx1 = document.getElementById("food-chart").getContext("2d");
+    new Chart(ctx1, {
+        type: "pie",
+        data: {
+            labels: ["Beef", "Food Other", "Pork", "Poultry", "Produce", "Seafood"],
+            datasets: [{
+                label: "Food Costs",
+                data: [1000, 600, 100, 200, 400, 800],
+                backgroundColor: [
+                    'rgba(233, 30, 99, 1)',
+                    'rgba(123, 128, 154, 1)',
+                    'rgba(244, 67, 53, 1)',
+                    'rgba(251, 140, 0, 1)',
+                    'rgba(76, 175, 80, 1)',
+                    'rgba(26, 115, 232, 1)',
+                ],
+                borderColor: [
+                    'rgba(233, 30, 99, 0)',
+                    'rgba(123, 128, 154, 0)',
+                    'rgba(244, 67, 53, 0)',
+                    'rgba(251, 140, 0, 0)',
+                    'rgba(76, 175, 80, 0)',
+                    'rgba(26, 115, 232, 0)',
+                ],
+                borderWidth: 1,
+        }, ],
+      },
+        options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                display: true,
+            }
+        },
+    },
+    });
+
+
+</script>
+{% endblock javascripts %}
