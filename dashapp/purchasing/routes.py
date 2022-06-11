@@ -27,7 +27,6 @@ def purchasing():
     TODAY = datetime.date(datetime.now())
     CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
     YSTDAY = TODAY - timedelta(days=1)
-    company_name = Config.COMPANY_NAME
 
     fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
 
@@ -48,24 +47,87 @@ def purchasing():
         store_id = form3.store.data.id
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
-# TODO food cost chart
-#    food_costs = get_category_costs(
-#        fiscal_dates["start_period"],
-#        fiscal_dates["end_period"],
-#        "Food",
-#    )
+    food_list = ["Beef", "Food Other", "Pork", "Poultry", "Produce", "Fish"]
+    top_ten_food = get_category_topten(
+        food_list,
+        fiscal_dates["last_thirty"],
+        fiscal_dates["start_day"],
+    )
+    top_ten_food_items = top_ten_food["Item"].tolist()
+    top_ten_food_values = top_ten_food["Cost"].tolist()
 
+    food_category_costs = get_category_costs(
+        food_list,
+        fiscal_dates["last_thirty"],
+        fiscal_dates["start_day"],
+    )
 
+    non_food_list = [
+        "Restaurant Supplies",
+        "Kitchen Supplies",
+        "Cleaning Supplies",
+        "Office Supplies",
+        "Catering Supplies/Expense",
+        "Bar Supplies" "Smallware",
+        "China",
+        "Silverware",
+        "Glassware",
+    ]
+    non_food_category_costs = get_category_costs(
+        non_food_list,
+        fiscal_dates["last_thirty"],
+        fiscal_dates["start_day"],
+    )
+
+    # supply_list = [
+    #    "Restaurant Supplies",
+    #    "Kitchen Supplies",
+    #    "Cleaning Supplies",
+    #    "Office Supplies",
+    #    "Catering Supplies/Expense",
+    #    "Bar Supplies"
+    # ]
+    # top_ten_supply = get_category_topten(
+    #    food_list,
+    #    fiscal_dates['last_thirty'],
+    #    fiscal_dates['start_day'],
+    # )
+    # top_ten_supply_items = top_ten_supply['Item'].tolist()
+    # top_ten_supply_values = top_ten_supply['Cost'].tolist()
+
+    # smallware_list = [
+    #    "Smallware",
+    #    "China",
+    #    "Silverware",
+    #    "Glassware",
+    # ]
+    # top_ten_smallware = get_category_topten(
+    #    food_list,
+    #    fiscal_dates['last_thirty'],
+    #    fiscal_dates['start_day'],
+    # )
+    # top_ten_smallware_items = top_ten_smallware['Item'].tolist()
+    # top_ten_smallware_values = top_ten_smallware['Cost'].tolist()
+
+    # TODO refactor with **locals() in render_template
 
     return render_template(
         "purchasing/purchasing.html",
         title="Purchasing",
-        company_name=company_name,
+        company_name=Config.COMPANY_NAME,
         segment="purchasing",
         fiscal_dates=fiscal_dates,
         form1=form1,
         form3=form3,
         current_user=current_user,
+        top_ten=top_ten_food,
+        top_ten_items=top_ten_food_items,
+        top_ten_values=top_ten_food_values,
+        # top_ten_supply=top_ten_supply,
+        # top_ten_supply_items=top_ten_supply_items,
+        # top_ten_supply_values=top_ten_supply_values,
+        food_category_costs=food_category_costs,
+        non_food_category_costs=non_food_category_costs,
     )
 
 
@@ -76,7 +138,6 @@ def beef():
     TODAY = datetime.date(datetime.now())
     CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
     YSTDAY = TODAY - timedelta(days=1)
-    company_name = Config.COMPANY_NAME
 
     fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
 
@@ -96,12 +157,13 @@ def beef():
         session["token"] = fiscal_dates["start_day"]
         store_id = form3.store.data.id
         return redirect(url_for("home_blueprint.store", store_id=store_id))
-    
 
-    prime_rib_df = get_cost_per_vendor(
-        "BEEF Prime Rib Choice", fiscal_dates["last_thirty"]
+    # Prime Steak data
+    top_ten_prime = get_item_topten(
+        "^(BEEF Steak).*(Prime)$",
+        fiscal_dates["last_thirty"],
+        fiscal_dates["start_day"],
     )
-
     prime_chart = period_purchases(
         "^(BEEF Steak).*(Prime)$", fiscal_dates["start_year"], fiscal_dates["end_year"]
     )
@@ -109,6 +171,13 @@ def beef():
         "^(BEEF Steak).*(Prime)$",
         fiscal_dates["start_year_ly"],
         fiscal_dates["end_year_ly"],
+    )
+
+    # Choice Steak data
+    top_ten_choice = get_item_topten(
+        "^(BEEF Steak).*(Choice)$",
+        fiscal_dates["last_thirty"],
+        fiscal_dates["start_day"],
     )
     choice_chart = period_purchases(
         "^(BEEF Steak).*(Choice)$", fiscal_dates["start_year"], fiscal_dates["end_year"]
@@ -118,8 +187,13 @@ def beef():
         fiscal_dates["start_year_ly"],
         fiscal_dates["end_year_ly"],
     )
+
+    # Prime rib data
     prime_rib_chart = period_purchases(
         "BEEF Prime Rib Choice", fiscal_dates["start_year"], fiscal_dates["end_year"]
+    )
+    prime_rib_df = get_cost_per_vendor(
+        "BEEF Prime Rib Choice", fiscal_dates["last_thirty"]
     )
     prime_rib_chart_ly = period_purchases(
         "BEEF Prime Rib Choice",
@@ -127,11 +201,10 @@ def beef():
         fiscal_dates["end_year_ly"],
     )
 
-
     return render_template(
         "purchasing/beef.html",
         title="Beef",
-        company_name=company_name,
+        company_name=Config.COMPANY_NAME,
         segment="purchasing",
         fiscal_dates=fiscal_dates,
         form1=form1,
@@ -144,6 +217,8 @@ def beef():
         prime_rib_df=prime_rib_df,
         prime_rib_chart=prime_rib_chart,
         prime_rib_chart_ly=prime_rib_chart_ly,
+        top_ten_choice=top_ten_choice,
+        top_ten_prime=top_ten_prime,
     )
 
 
@@ -154,7 +229,6 @@ def poultry():
     TODAY = datetime.date(datetime.now())
     CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
     YSTDAY = TODAY - timedelta(days=1)
-    company_name = Config.COMPANY_NAME
 
     fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
 
@@ -175,16 +249,26 @@ def poultry():
         store_id = form3.store.data.id
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
+    top_ten = get_category_topten(
+        ["Poultry"],
+        fiscal_dates["last_thirty"],
+        fiscal_dates["start_day"],
+    )
+    top_ten_items = top_ten["Item"].tolist()
+    top_ten_values = top_ten["Cost"].tolist()
 
     return render_template(
         "purchasing/poultry.html",
         title="Poultry",
-        company_name=company_name,
+        company_name=Config.COMPANY_NAME,
         segment="purchasing",
         fiscal_dates=fiscal_dates,
         form1=form1,
         form3=form3,
         current_user=current_user,
+        top_ten=top_ten,
+        top_ten_items=top_ten_items,
+        top_ten_values=top_ten_values,
     )
 
 
@@ -195,7 +279,6 @@ def seafood():
     TODAY = datetime.date(datetime.now())
     CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
     YSTDAY = TODAY - timedelta(days=1)
-    company_name = Config.COMPANY_NAME
 
     fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
 
@@ -215,6 +298,14 @@ def seafood():
         session["token"] = fiscal_dates["start_day"]
         store_id = form3.store.data.id
         return redirect(url_for("home_blueprint.store", store_id=store_id))
+
+    top_ten = get_category_topten(
+        ["Fish"],
+        fiscal_dates["last_thirty"],
+        fiscal_dates["start_day"],
+    )
+    top_ten_items = top_ten["Item"].tolist()
+    top_ten_values = top_ten["Cost"].tolist()
 
     lobster_live_df = get_cost_per_vendor(
         "SEAFOOD Lobster Live*", fiscal_dates["last_thirty"]
@@ -385,11 +476,10 @@ def seafood():
         fiscal_dates["end_year_ly"],
     )
 
-
     return render_template(
         "purchasing/seafood.html",
         title="Seafood",
-        company_name=company_name,
+        company_name=Config.COMPANY_NAME,
         segment="purchasing",
         fiscal_dates=fiscal_dates,
         form1=form1,
@@ -434,6 +524,9 @@ def seafood():
         feature_df=feature_df,
         feature_fish_chart=feature_fish_chart,
         feature_fish_chart_ly=feature_fish_chart_ly,
+        top_ten=top_ten,
+        top_ten_items=top_ten_items,
+        top_ten_values=top_ten_values,
     )
 
 
@@ -444,7 +537,6 @@ def pork():
     TODAY = datetime.date(datetime.now())
     CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
     YSTDAY = TODAY - timedelta(days=1)
-    company_name = Config.COMPANY_NAME
 
     fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
 
@@ -465,16 +557,26 @@ def pork():
         store_id = form3.store.data.id
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
+    top_ten = get_category_topten(
+        ["Pork"],
+        fiscal_dates["last_thirty"],
+        fiscal_dates["start_day"],
+    )
+    top_ten_items = top_ten["Item"].tolist()
+    top_ten_values = top_ten["Cost"].tolist()
 
     return render_template(
         "purchasing/pork.html",
         title="pork",
-        company_name=company_name,
+        company_name=Config.COMPANY_NAME,
         segment="purchasing",
         fiscal_dates=fiscal_dates,
         form1=form1,
         form3=form3,
         current_user=current_user,
+        top_ten=top_ten,
+        top_ten_items=top_ten_items,
+        top_ten_values=top_ten_values,
     )
 
 
@@ -485,7 +587,6 @@ def produce():
     TODAY = datetime.date(datetime.now())
     CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
     YSTDAY = TODAY - timedelta(days=1)
-    company_name = Config.COMPANY_NAME
 
     fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
 
@@ -506,16 +607,26 @@ def produce():
         store_id = form3.store.data.id
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
+    top_ten = get_category_topten(
+        ["Produce"],
+        fiscal_dates["last_thirty"],
+        fiscal_dates["start_day"],
+    )
+    top_ten_items = top_ten["Item"].tolist()
+    top_ten_values = top_ten["Cost"].tolist()
 
     return render_template(
         "purchasing/produce.html",
         title="Produce",
-        company_name=company_name,
+        company_name=Config.COMPANY_NAME,
         segment="purchasing",
         fiscal_dates=fiscal_dates,
         form1=form1,
         form3=form3,
         current_user=current_user,
+        top_ten=top_ten,
+        top_ten_items=top_ten_items,
+        top_ten_values=top_ten_values,
     )
 
 
@@ -526,7 +637,6 @@ def foodother():
     TODAY = datetime.date(datetime.now())
     CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
     YSTDAY = TODAY - timedelta(days=1)
-    company_name = Config.COMPANY_NAME
 
     fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
 
@@ -547,14 +657,24 @@ def foodother():
         store_id = form3.store.data.id
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
+    top_ten = get_category_topten(
+        ["Food Other"],
+        fiscal_dates["last_thirty"],
+        fiscal_dates["start_day"],
+    )
+    top_ten_items = top_ten["Item"].tolist()
+    top_ten_values = top_ten["Cost"].tolist()
 
     return render_template(
         "purchasing/foodother.html",
         title="Food Other",
-        company_name=company_name,
+        company_name=Config.COMPANY_NAME,
         segment="purchasing",
         fiscal_dates=fiscal_dates,
         form1=form1,
         form3=form3,
         current_user=current_user,
+        top_ten=top_ten,
+        top_ten_items=top_ten_items,
+        top_ten_values=top_ten_values,
     )

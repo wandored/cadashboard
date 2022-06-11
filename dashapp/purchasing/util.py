@@ -99,6 +99,7 @@ def get_vendors(regex, days):
     ).all()
     return query
 
+
 def get_cost_per_vendor(regex, days):
 
     query = (
@@ -132,9 +133,7 @@ def get_cost_per_vendor(regex, days):
     if not df.empty:
         #    df = df[(df != 0).all(1)]
         #    df.dropna(axis=0, how="any", subset=["company"], inplace=True)
-        df["cost_lb"] = ((df["cost"] / df["count"]) / df["base_qty"] * 16).astype(
-            float
-        )
+        df["cost_lb"] = ((df["cost"] / df["count"]) / df["base_qty"] * 16).astype(float)
         df.sort_values(by=["cost_lb"], inplace=True)
     return df
 
@@ -187,24 +186,62 @@ def period_purchases(regex, start, end):
         return df_list
 
 
-def get_category_costs(start, end, acct):
+def get_category_costs(regex, start, end):
     # Return list of sales
     query = (
         db.session.query(
+            Transactions.account,
             func.sum(Transactions.credit).label("credits"),
             func.sum(Transactions.debit).label("costs"),
         )
-        .select_from(Transactions)
-        .join(Calendar, Calendar.date == Transactions.date)
-        .group_by(epoch)
-        .order_by(epoch)
         .filter(
+            Transactions.account.in_(regex),
             Transactions.date.between(start, end),
-            Transactions.account == acct,
+            Transactions.type == "AP Invoice",
         )
-    )
-    results = []
-    for q in query:
-        amount = q.costs - q.credits
-        results.append(amount)
+        .group_by(Transactions.account)
+        .order_by(func.sum(Transactions.debit).desc())
+    ).all()
+    results = pd.DataFrame(query, columns=["Account", "Credits", "Costs"])
+    results["Totals"] = results["Costs"] - results["Credits"]
     return results
+
+
+def get_category_topten(regex, start, end):
+
+    query = (
+        db.session.query(
+            Transactions.item,
+            func.sum(Transactions.debit).label("cost"),
+        )
+        .filter(
+            Transactions.account.in_(regex),
+            Transactions.date.between(start, end),
+            Transactions.type == "AP Invoice",
+        )
+        .group_by(Transactions.item)
+        .order_by(func.sum(Transactions.debit).desc())
+    ).limit(10)
+    dframe = pd.DataFrame(query, columns=["Item", "Cost"])
+
+    return dframe
+
+
+def get_item_topten(regex, start, end):
+
+    query = (
+        db.session.query(
+            Transactions.item,
+            func.sum(Transactions.debit).label("cost"),
+        )
+        .filter(
+            Transactions.item.regexp_match(regex),
+            Transactions.date.between(start, end),
+            Transactions.type == "AP Invoice",
+        )
+        .group_by(Transactions.item)
+        .order_by(func.sum(Transactions.debit).desc())
+    ).limit(10)
+    dframe = pd.DataFrame(query, columns=["Item", "Cost"])
+
+    return dframe
