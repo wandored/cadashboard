@@ -505,7 +505,7 @@ def index():
 
     return render_template(
         "home/index.html",
-        title="CentraArchy",
+        title=Config.COMPANY_NAME,
         company_name=company_name,
         form1=form1,
         form3=form3,

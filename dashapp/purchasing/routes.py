@@ -19,11 +19,6 @@ from dashapp.authentication.forms import *
 from dashapp.authentication.models import *
 from sqlalchemy import and_, or_, func
 
-from dashapp.purchasing.util import get_glaccount_costs
-from dashapp.purchasing.util import get_category_costs
-
-
-
 
 @blueprint.route("/purchasing/", methods=["GET", "POST"])
 @login_required
