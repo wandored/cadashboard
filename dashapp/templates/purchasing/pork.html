@@ -11,20 +11,6 @@
     <div class="row mt-4">
         <div class="col-lg-2 col-md-4">
             <div class="card position-relative">
-                <div class="card-body text-center bg-gradient-primary">
-                    <a href="{{ url_for('purchasing_blueprint.beef') }}"><h4 class="stretched-link mb-0">BEEF</h4></a>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-2 col-md-4">
-            <div class="card position-relative">
-                <div class="card-body text-center bg-gradient-secondary">
-                    <a href="{{ url_for('purchasing_blueprint.foodother') }}"><h4 class="stretched-link mb-0">FOOD OTHER</h4></a>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-2 col-md-4">
-            <div class="card position-relative">
                 <div class="card-body text-center bg-gradient-danger">
                     <a href="{{ url_for('purchasing_blueprint.pork') }}"><h4 class="stretched-link mb-0">PORK</h4></a>
                 </div>
@@ -51,6 +37,61 @@
                 </div>
             </div>
         </div>
+        <div class="col-lg-2 col-md-4">
+            <div class="card position-relative">
+                <div class="card-body text-center bg-gradient-primary">
+                    <a href="{{ url_for('purchasing_blueprint.beef') }}"><h4 class="stretched-link mb-0">BEEF</h4></a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4">
+            <div class="card position-relative">
+                <div class="card-body text-center bg-gradient-secondary">
+                    <a href="{{ url_for('purchasing_blueprint.foodother') }}"><h4 class="stretched-link mb-0">FOOD OTHER</h4></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- First Row -Charts -->
+    <div class="row mt-4">
+        <div class="col-lg-4 col-md-6 mt-4 mb-4">
+            <div class="card z-index-2 ">
+                <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                    <div class="bg-gradient-danger shadow-danger border-radius-lg py-3 pe-1">
+                        <div class="chart">
+                            <canvas id="chart-topten" class="chart-canvas" height="170"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h4 class="mb-0 ">Top 10 Past 30 Days</h4>
+                    <div class="table-responsive table-hover">
+                        <table class="table-sm text-dark">
+                            <thead>
+                                <tr>
+                                    <th scope="col">PRODUCT</th>
+                                    <th scope="col">TOTAL COST</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    {% for k, s in top_ten.iterrows() %}
+                                <tr>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ s['Item'] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ "${:,.0f}".format(s['Cost']) }}</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     {% include 'includes/footer.html' %}
@@ -60,4 +101,55 @@
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
-{% block javascripts %}{% endblock javascripts %}
+{% block javascripts %}
+
+<script src="/static/assets/js/plugins/chartjs.min.js"></script>
+<script>
+    var ctx1 = document.getElementById("chart-topten").getContext("2d");
+    new Chart(ctx1, {
+        type: "pie",
+        data: {
+                labels: {{ top_ten_items | safe }},
+            datasets: [{
+                label: "Food Costs",
+                    data: {{ top_ten_values | safe }},
+                backgroundColor: [
+                    'blue',
+                    'indigo',
+                    'purple',
+                    'pink',
+                    'red',
+                    'cyan',
+                    'orange',
+                    'yellow',
+                    'green',
+                    'teal',
+                ],
+                borderColor: [
+                    'blue',
+                    'indigo',
+                    'purple',
+                    'pink',
+                    'red',
+                    'cyan',
+                    'orange',
+                    'yellow',
+                    'green',
+                    'teal',
+                ],
+                borderWidth: 1,
+        }, ],
+      },
+        options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                display: false,
+            }
+        },
+    },
+    });
+
+</script>
+
+{% endblock javascripts %}

@@ -65,6 +65,31 @@
                 </div>
                 <div class="card-body">
                     <h4 class="mb-0 ">Prime Steak Index</h4>
+                    <div class="table-responsive table-hover">
+                        <table class="table-sm text-dark">
+                            <thead>
+                                <tr>
+                                    <th scope="col">STEAK</th>
+                                    <th scope="col">TOTAL COST</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    {% for k, s in top_ten_prime.iterrows() %}
+                                <tr>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ s['Item'] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ "${:,.0f}".format(s['Cost']) }}</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <h6 class="mb-0 ">Last 30 Days</h6>
                 </div>
             </div>
         </div>
@@ -79,6 +104,31 @@
                 </div>
                 <div class="card-body">
                     <h4 class="mb-0 ">Choice Steak Index</h4>
+                    <div class="table-responsive table-hover">
+                        <table class="table-sm text-dark">
+                            <thead>
+                                <tr>
+                                    <th scope="col">STEAK</th>
+                                    <th scope="col">TOTAL COST</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    {% for k, s in top_ten_choice.iterrows() %}
+                                <tr>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ s['Item'] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ "${:,.0f}".format(s['Cost']) }}</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <h6 class="mb-0 ">Last 30 Days</h6>
                 </div>
             </div>
         </div>
@@ -121,6 +171,7 @@
                             </tbody>
                         </table>
                     </div>
+                    <h6 class="mb-0 ">Last 30 Days</h6>
                 </div>
             </div>
         </div>
