@@ -1,0 +1,63 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Template {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+    <div class="row mt-4">
+        <div class="col-lg-2 col-md-4">
+            <div class="card position-relative">
+                <div class="card-body text-center bg-gradient-primary">
+                    <a href="{{ url_for('purchasing_blueprint.beef') }}"><h4 class="stretched-link mb-0">BEEF</h4></a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4">
+            <div class="card position-relative">
+                <div class="card-body text-center bg-gradient-secondary">
+                    <a href="{{ url_for('purchasing_blueprint.foodother') }}"><h4 class="stretched-link mb-0">FOOD OTHER</h4></a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4">
+            <div class="card position-relative">
+                <div class="card-body text-center bg-gradient-danger">
+                    <a href="{{ url_for('purchasing_blueprint.pork') }}"><h4 class="stretched-link mb-0">PORK</h4></a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4">
+            <div class="card position-relative">
+                <div class="card-body text-center bg-gradient-warning">
+                    <a href="{{ url_for('purchasing_blueprint.poultry') }}"><h4 class="stretched-link mb-0">POULTRY</h4></a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4">
+            <div class="card position-relative">
+                <div class="card-body text-center bg-gradient-success">
+                    <a href="{{ url_for('purchasing_blueprint.produce') }}"><h4 class="stretched-link mb-0">PRODUCE</h4></a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4">
+            <div class="card position-relative">
+                <div class="card-body text-center bg-gradient-info">
+                    <a href="{{ url_for('purchasing_blueprint.seafood') }}"><h4 class="stretched-link mb-0">SEAFOOD</h4></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% include 'includes/footer.html' %}
+
+</div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}
