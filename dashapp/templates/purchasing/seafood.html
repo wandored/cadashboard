@@ -9,44 +9,44 @@
 
 <div class="container-fluid py-4">
     <div class="row mt-4">
-        <div class="col-lg-2 col-md-4">
-            <div class="card position-relative">
-                <div class="card-body text-center bg-gradient-info">
+        <div class="col-lg-2 col-md-4 mb-1">
+            <div class="card bg-info shadow-info position-relative">
+                <div class="card-body text-center">
                     <a href="{{ url_for('purchasing_blueprint.seafood') }}"><h4 class="stretched-link mb-0">SEAFOOD</h4></a>
                 </div>
             </div>
         </div>
-        <div class="col-lg-2 col-md-4">
-            <div class="card position-relative">
-                <div class="card-body text-center bg-gradient-primary">
+        <div class="col-lg-2 col-md-4 mb-1">
+            <div class="card bg-primary shadow-primary position-relative">
+                <div class="card-body text-center">
                     <a href="{{ url_for('purchasing_blueprint.beef') }}"><h4 class="stretched-link mb-0">BEEF</h4></a>
                 </div>
             </div>
         </div>
-        <div class="col-lg-2 col-md-4">
-            <div class="card position-relative">
-                <div class="card-body text-center bg-gradient-secondary">
+        <div class="col-lg-2 col-md-4 mb-1">
+            <div class="card bg-secondary shadow-secondary position-relative">
+                <div class="card-body text-center">
                     <a href="{{ url_for('purchasing_blueprint.foodother') }}"><h4 class="stretched-link mb-0">FOOD OTHER</h4></a>
                 </div>
             </div>
         </div>
-        <div class="col-lg-2 col-md-4">
-            <div class="card position-relative">
-                <div class="card-body text-center bg-gradient-danger">
+        <div class="col-lg-2 col-md-4 mb-1">
+            <div class="card bg-danger shadow-danger position-relative">
+                <div class="card-body text-center">
                     <a href="{{ url_for('purchasing_blueprint.pork') }}"><h4 class="stretched-link mb-0">PORK</h4></a>
                 </div>
             </div>
         </div>
-        <div class="col-lg-2 col-md-4">
-            <div class="card position-relative">
-                <div class="card-body text-center bg-gradient-warning">
+        <div class="col-lg-2 col-md-4 mb-1">
+            <div class="card bg-warning shadow-warning position-relative">
+                <div class="card-body text-center">
                     <a href="{{ url_for('purchasing_blueprint.poultry') }}"><h4 class="stretched-link mb-0">POULTRY</h4></a>
                 </div>
             </div>
         </div>
-        <div class="col-lg-2 col-md-4">
-            <div class="card position-relative">
-                <div class="card-body text-center bg-gradient-success">
+        <div class="col-lg-2 col-md-4 mb-1">
+            <div class="card bg-success shadow-success position-relative">
+                <div class="card-body text-center">
                     <a href="{{ url_for('purchasing_blueprint.produce') }}"><h4 class="stretched-link mb-0">PRODUCE</h4></a>
                 </div>
             </div>
@@ -55,15 +55,8 @@
     <!-- Fish Row -Charts -->
     <div class="row mt-4">
         <div class="col-lg-4 col-md-4 mt-4 mb-4">
-            <div class="card z-index-2  ">
-                <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                    <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
-                        <div class="chart">
-                            <canvas id="chart-topten" class="chart-canvas" height="170"></canvas>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body">
+            <div class="card z-index-2 shadow-info">
+                <div class="card-body shadow-info">
                     <h4 class="mb-0 ">Top 10 Past 30 Days</h4>
                     <div class="table-responsive table-hover">
                         <table class="table-sm text-dark">
@@ -93,7 +86,7 @@
             </div>
         </div>
         <div class="col-lg-4 mt-4 mb-3">
-            <div class="card z-index-2 ">
+            <div class="card z-index-2 shadow-info">
                 <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
                     <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
                         <div class="chart">
@@ -136,7 +129,7 @@
             </div>
         </div>
         <div class="col-lg-4 mt-4 mb-3">
-            <div class="card z-index-2 ">
+            <div class="card z-index-2 shadow-info">
                 <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
                     <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
                         <div class="chart">
@@ -182,9 +175,9 @@
     <!-- Crabmeat Row -Charts -->
     <div class="row mt-4">
         <div class="col-lg-4 col-md-4 mt-4 mb-4">
-            <div class="card z-index-2  ">
+            <div class="card z-index-2 shadow-info">
                 <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                    <div class="bg-gradient-warning shadow-warning border-radius-lg py-3 pe-1">
+                    <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
                         <div class="chart">
                             <canvas id="chart-backfin" class="chart-canvas" height="170"></canvas>
                         </div>
@@ -225,9 +218,9 @@
             </div>
         </div>
         <div class="col-lg-4 mt-4 mb-3">
-            <div class="card z-index-2 ">
+            <div class="card z-index-2 shadow-info">
                 <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                    <div class="bg-gradient-warning shadow-warning border-radius-lg py-3 pe-1">
+                    <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
                         <div class="chart">
                             <canvas id="chart-premium" class="chart-canvas" height="170"></canvas>
                         </div>
@@ -268,9 +261,9 @@
             </div>
         </div>
         <div class="col-lg-4 mt-4 mb-3">
-            <div class="card z-index-2 ">
+            <div class="card z-index-2 shadow-info">
                 <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                    <div class="bg-gradient-warning shadow-warning border-radius-lg py-3 pe-1">
+                    <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
                         <div class="chart">
                             <canvas id="chart-colossal" class="chart-canvas" height="170"></canvas>
                         </div>
@@ -314,9 +307,9 @@
     <!-- Third Row -Charts -->
     <div class="row mt-4">
         <div class="col-lg-4 col-md-4 mt-4 mb-4">
-            <div class="card z-index-2  ">
+            <div class="card z-index-2 shadow-info">
                 <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                    <div class="bg-gradient-warning shadow-warning border-radius-lg py-3 pe-1">
+                    <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
                         <div class="chart">
                             <canvas id="chart-special" class="chart-canvas" height="170"></canvas>
                         </div>
@@ -360,9 +353,9 @@
     <!-- Lobster Row -Charts -->
     <div class="row mt-4">
         <div class="col-lg-4 mt-4 mb-3">
-            <div class="card z-index-2 ">
+            <div class="card z-index-2 shadow-info">
                 <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                    <div class="bg-gradient-primary shadow-primary border-radius-lg py-3 pe-1">
+                    <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
                         <div class="chart">
                             <canvas id="chart-lobster-live" class="chart-canvas" height="170"></canvas>
                         </div>
@@ -403,9 +396,9 @@
             </div>
         </div>
         <div class="col-lg-4 mt-4 mb-3">
-            <div class="card z-index-2 ">
+            <div class="card z-index-2 shadow-info">
                 <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                    <div class="bg-gradient-primary shadow-primary border-radius-lg py-3 pe-1">
+                    <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
                         <div class="chart">
                             <canvas id="chart-lobster-tail" class="chart-canvas" height="170"></canvas>
                         </div>
@@ -446,9 +439,9 @@
             </div>
         </div>
         <div class="col-lg-4 mt-4 mb-3">
-            <div class="card z-index-2 ">
+            <div class="card z-index-2 shadow-info">
                 <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                    <div class="bg-gradient-primary shadow-primary border-radius-lg py-3 pe-1">
+                    <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
                         <div class="chart">
                             <canvas id="chart-stone" class="chart-canvas" height="170"></canvas>
                         </div>
@@ -492,9 +485,9 @@
     <!-- Shrimp Row -Charts -->
     <div class="row mt-4">
         <div class="col-lg-4 mt-4 mb-3">
-            <div class="card z-index-2 ">
+            <div class="card z-index-2 shadow-info">
                 <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                    <div class="bg-gradient-danger shadow-danger border-radius-lg py-3 pe-1">
+                    <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
                         <div class="chart">
                             <canvas id="chart-shrimp10" class="chart-canvas" height="170"></canvas>
                         </div>
@@ -535,9 +528,9 @@
             </div>
         </div>
         <div class="col-lg-4 mt-4 mb-3">
-            <div class="card z-index-2 ">
+            <div class="card z-index-2 shadow-info">
                 <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                    <div class="bg-gradient-danger shadow-danger border-radius-lg py-3 pe-1">
+                    <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
                         <div class="chart">
                             <canvas id="chart-shrimp3135" class="chart-canvas" height="170"></canvas>
                         </div>
@@ -578,9 +571,9 @@
             </div>
         </div>
         <div class="col-lg-4 mt-4 mb-3">
-            <div class="card z-index-2 ">
+            <div class="card z-index-2 shadow-info">
                 <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                    <div class="bg-gradient-danger shadow-danger border-radius-lg py-3 pe-1">
+                    <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
                         <div class="chart">
                             <canvas id="chart-shrimp2630" class="chart-canvas" height="170"></canvas>
                         </div>
@@ -633,51 +626,6 @@
 
 <script src="/static/assets/js/plugins/chartjs.min.js"></script>
 <script>
-
-    var ctx1 = document.getElementById("chart-topten").getContext("2d");
-    new Chart(ctx1, {
-        type: "pie",
-        data: {
-                labels: {{ top_ten_items | safe }},
-            datasets: [{
-                label: "Food Costs",
-                    data: {{ top_ten_values | safe }},
-                backgroundColor: [
-                    'blue',
-                    'indigo',
-                    'purple',
-                    'pink',
-                    'red',
-                    'cyan',
-                    'orange',
-                    'yellow',
-                    'green',
-                    'teal',
-                ],
-                borderColor: [
-                    'blue',
-                    'indigo',
-                    'purple',
-                    'pink',
-                    'red',
-                    'cyan',
-                    'orange',
-                    'yellow',
-                    'green',
-                    'teal',
-                ],
-                borderWidth: 1,
-        }, ],
-      },
-        options: {
-        responsive: true,
-        plugins: {
-            legend: {
-                display: false,
-            }
-        },
-    },
-    });
 
     var ctx2 = document.getElementById("chart-backfin").getContext("2d");
     new Chart(ctx2, {
