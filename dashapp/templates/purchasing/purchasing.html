@@ -9,48 +9,48 @@
 
 <div class="container-fluid py-4">
     <div class="row mt-2">
-        <div class="col-lg-2 col-md-4">
-            <div class="card shadow-primary position-relative">
-                <div class="card-body text-center">
+        <div class="col-lg-2 col-md-4 mb-1">
+            <div class="card bg-primary shadow-primary position-relative">
+                <div class="card-body text-primary text-center">
                     <h6>BEEF COSTS</h6>
                     <a href="{{ url_for('purchasing_blueprint.beef') }}"><h4 class="stretched-link mb-0">{{ "${:,.0f}".format(beef_costs) }}</h4></a>
                 </div>
             </div>
         </div>
-        <div class="col-lg-2 col-md-4">
-            <div class="card shadow-secondary position-relative">
+        <div class="col-lg-2 col-md-4 mb-1">
+            <div class="card bg-secondary shadow-secondary position-relative">
                 <div class="card-body text-center">
                     <h6>FOOD OTHER COSTS</h6>
                     <a href="{{ url_for('purchasing_blueprint.foodother') }}"><h4 class="stretched-link mb-0">{{ "${:,.0f}".format(foodother_costs) }}</h4></a>
                 </div>
             </div>
         </div>
-        <div class="col-lg-2 col-md-4">
-            <div class="card shadow-danger position-relative">
+        <div class="col-lg-2 col-md-4 mb-1">
+            <div class="card bg-danger shadow-danger position-relative">
                 <div class="card-body text-center">
                     <h6>PORK COSTS</h6>
                     <a href="{{ url_for('purchasing_blueprint.pork') }}"><h4 class="stretched-link mb-0">{{ "${:,.0f}".format(pork_costs) }}</h4></a>
                 </div>
             </div>
         </div>
-        <div class="col-lg-2 col-md-4">
-            <div class="card shadow-warning position-relative">
+        <div class="col-lg-2 col-md-4 mb-1">
+            <div class="card bg-warning shadow-warning position-relative">
                 <div class="card-body text-center">
                     <h6>POULTRY COSTS</h6>
                     <a href="{{ url_for('purchasing_blueprint.poultry') }}"><h4 class="stretched-link mb-0">{{ "${:,.0f}".format(poultry_costs) }}</h4></a>
                 </div>
             </div>
         </div>
-        <div class="col-lg-2 col-md-4">
-            <div class="card shadow-success position-relative">
+        <div class="col-lg-2 col-md-4 mb-1">
+            <div class="card bg-success shadow-success position-relative">
                 <div class="card-body text-center">
                     <h6>PRODUCE COSTS</h6>
                     <a href="{{ url_for('purchasing_blueprint.produce') }}"><h4 class="stretched-link mb-0">{{ "${:,.0f}".format(produce_costs) }}</h4></a>
                 </div>
             </div>
         </div>
-        <div class="col-lg-2 col-md-4">
-            <div class="card shadow-info position-relative">
+        <div class="col-lg-2 col-md-4 mb-1">
+            <div class="card bg-info shadow-info position-relative">
                 <div class="card-body text-center">
                     <h6>SEAFOOD COSTS</h6>
                     <a href="{{ url_for('purchasing_blueprint.seafood') }}"><h4 class="stretched-link mb-0">{{ "${:,.0f}".format(seafood_costs) }}</h4></a>

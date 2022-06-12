@@ -67,7 +67,6 @@ def purchasing():
     produce_costs = food_category_costs["Totals"].loc[4]
     seafood_costs = food_category_costs["Totals"].loc[5]
 
-
     supply_list = [
         "Restaurant Supplies",
         "Kitchen Supplies",
@@ -82,8 +81,7 @@ def purchasing():
         fiscal_dates["start_day"],
     )
     smallware_list = [
-        "Smallware"
-        "China",
+        "Smallware" "China",
         "Silverware",
         "Glassware",
     ]
@@ -275,6 +273,23 @@ def poultry():
         fiscal_dates["start_day"],
     )
 
+    # Create charts for items in top ten list
+    product_list = top_ten["Item"].tolist()
+    product_dict = {}
+    x = 1
+    product_names = []
+    for pl in product_list:
+        this_year = period_purchases(
+            pl, fiscal_dates["start_year"], fiscal_dates["end_year"]
+        )
+        last_year = period_purchases(
+            pl, fiscal_dates["start_year_ly"], fiscal_dates["end_year_ly"]
+        )
+        product_dict["{}_ty".format(x)] = this_year
+        product_dict["{}_ly".format(x)] = last_year
+        x = x + 1
+        product_names.append(pl)
+
     return render_template(
         "purchasing/poultry.html",
         title="Poultry",
@@ -285,6 +300,8 @@ def poultry():
         form3=form3,
         current_user=current_user,
         top_ten=top_ten,
+        product_dict=product_dict,
+        product_names=product_names,
     )
 
 
@@ -575,6 +592,23 @@ def pork():
         fiscal_dates["start_day"],
     )
 
+    # Create charts for items in top ten list
+    product_list = top_ten["Item"].tolist()
+    product_dict = {}
+    x = 1
+    product_names = []
+    for pl in product_list:
+        this_year = period_purchases(
+            pl, fiscal_dates["start_year"], fiscal_dates["end_year"]
+        )
+        last_year = period_purchases(
+            pl, fiscal_dates["start_year_ly"], fiscal_dates["end_year_ly"]
+        )
+        product_dict["{}_ty".format(x)] = this_year
+        product_dict["{}_ly".format(x)] = last_year
+        x = x + 1
+        product_names.append(pl)
+
     return render_template(
         "purchasing/pork.html",
         title="pork",
@@ -585,6 +619,8 @@ def pork():
         form3=form3,
         current_user=current_user,
         top_ten=top_ten,
+        product_dict=product_dict,
+        product_names=product_names,
     )
 
 
@@ -621,6 +657,23 @@ def produce():
         fiscal_dates["start_day"],
     )
 
+    # Create charts for items in top ten list
+    product_list = top_ten["Item"].tolist()
+    product_dict = {}
+    x = 1
+    product_names = []
+    for pl in product_list:
+        this_year = period_purchases(
+            pl, fiscal_dates["start_year"], fiscal_dates["end_year"]
+        )
+        last_year = period_purchases(
+            pl, fiscal_dates["start_year_ly"], fiscal_dates["end_year_ly"]
+        )
+        product_dict["{}_ty".format(x)] = this_year
+        product_dict["{}_ly".format(x)] = last_year
+        x = x + 1
+        product_names.append(pl)
+
     return render_template(
         "purchasing/produce.html",
         title="Produce",
@@ -631,6 +684,8 @@ def produce():
         form3=form3,
         current_user=current_user,
         top_ten=top_ten,
+        product_dict=product_dict,
+        product_names=product_names,
     )
 
 
@@ -667,6 +722,23 @@ def foodother():
         fiscal_dates["start_day"],
     )
 
+    # Create charts for items in top ten list
+    product_list = top_ten["Item"].tolist()
+    product_dict = {}
+    x = 1
+    product_names = []
+    for pl in product_list:
+        this_year = period_purchases(
+            pl, fiscal_dates["start_year"], fiscal_dates["end_year"]
+        )
+        last_year = period_purchases(
+            pl, fiscal_dates["start_year_ly"], fiscal_dates["end_year_ly"]
+        )
+        product_dict["{}_ty".format(x)] = this_year
+        product_dict["{}_ly".format(x)] = last_year
+        x = x + 1
+        product_names.append(pl)
+
     return render_template(
         "purchasing/foodother.html",
         title="Food Other",
@@ -677,4 +749,6 @@ def foodother():
         form3=form3,
         current_user=current_user,
         top_ten=top_ten,
+        product_dict=product_dict,
+        product_names=product_names,
     )
