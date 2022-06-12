@@ -53,31 +53,50 @@ def purchasing():
         fiscal_dates["last_thirty"],
         fiscal_dates["start_day"],
     )
-    top_ten_food_items = top_ten_food["Item"].tolist()
-    top_ten_food_values = top_ten_food["Cost"].tolist()
-
     food_category_costs = get_category_costs(
         food_list,
         fiscal_dates["last_thirty"],
         fiscal_dates["start_day"],
     )
+    food_category_costs.replace("Fish", "Seafood", inplace=True)
+    food_category_costs.sort_values(by="Account", inplace=True)
+    beef_costs = food_category_costs["Totals"].loc[0]
+    foodother_costs = food_category_costs["Totals"].loc[1]
+    pork_costs = food_category_costs["Totals"].loc[2]
+    poultry_costs = food_category_costs["Totals"].loc[3]
+    produce_costs = food_category_costs["Totals"].loc[4]
+    seafood_costs = food_category_costs["Totals"].loc[5]
 
-    non_food_list = [
+
+    supply_list = [
         "Restaurant Supplies",
         "Kitchen Supplies",
         "Cleaning Supplies",
         "Office Supplies",
         "Catering Supplies/Expense",
         "Bar Supplies" "Smallware",
+    ]
+    supply_costs = get_category_costs(
+        supply_list,
+        fiscal_dates["last_thirty"],
+        fiscal_dates["start_day"],
+    )
+    smallware_list = [
+        "Smallware"
         "China",
         "Silverware",
         "Glassware",
     ]
-    non_food_category_costs = get_category_costs(
-        non_food_list,
+    smallware_costs = get_category_costs(
+        smallware_list,
         fiscal_dates["last_thirty"],
         fiscal_dates["start_day"],
     )
+    # TODO supplies boxex
+    smallware_costs.loc["Smallware"] = smallware_costs.sum(numeric_only=True)
+    total_row = smallware_costs.loc["Smallware"]
+    smallware_costs = pd.concat([smallware_costs, total_row])
+    print(supply_costs)
 
     # supply_list = [
     #    "Restaurant Supplies",
@@ -121,13 +140,14 @@ def purchasing():
         form3=form3,
         current_user=current_user,
         top_ten=top_ten_food,
-        top_ten_items=top_ten_food_items,
-        top_ten_values=top_ten_food_values,
-        # top_ten_supply=top_ten_supply,
         # top_ten_supply_items=top_ten_supply_items,
         # top_ten_supply_values=top_ten_supply_values,
-        food_category_costs=food_category_costs,
-        non_food_category_costs=non_food_category_costs,
+        beef_costs=beef_costs,
+        foodother_costs=foodother_costs,
+        pork_costs=pork_costs,
+        poultry_costs=poultry_costs,
+        produce_costs=produce_costs,
+        seafood_costs=seafood_costs,
     )
 
 
@@ -254,8 +274,6 @@ def poultry():
         fiscal_dates["last_thirty"],
         fiscal_dates["start_day"],
     )
-    top_ten_items = top_ten["Item"].tolist()
-    top_ten_values = top_ten["Cost"].tolist()
 
     return render_template(
         "purchasing/poultry.html",
@@ -267,8 +285,6 @@ def poultry():
         form3=form3,
         current_user=current_user,
         top_ten=top_ten,
-        top_ten_items=top_ten_items,
-        top_ten_values=top_ten_values,
     )
 
 
@@ -304,8 +320,6 @@ def seafood():
         fiscal_dates["last_thirty"],
         fiscal_dates["start_day"],
     )
-    top_ten_items = top_ten["Item"].tolist()
-    top_ten_values = top_ten["Cost"].tolist()
 
     lobster_live_df = get_cost_per_vendor(
         "SEAFOOD Lobster Live*", fiscal_dates["last_thirty"]
@@ -525,8 +539,6 @@ def seafood():
         feature_fish_chart=feature_fish_chart,
         feature_fish_chart_ly=feature_fish_chart_ly,
         top_ten=top_ten,
-        top_ten_items=top_ten_items,
-        top_ten_values=top_ten_values,
     )
 
 
@@ -562,8 +574,6 @@ def pork():
         fiscal_dates["last_thirty"],
         fiscal_dates["start_day"],
     )
-    top_ten_items = top_ten["Item"].tolist()
-    top_ten_values = top_ten["Cost"].tolist()
 
     return render_template(
         "purchasing/pork.html",
@@ -575,8 +585,6 @@ def pork():
         form3=form3,
         current_user=current_user,
         top_ten=top_ten,
-        top_ten_items=top_ten_items,
-        top_ten_values=top_ten_values,
     )
 
 
@@ -612,8 +620,6 @@ def produce():
         fiscal_dates["last_thirty"],
         fiscal_dates["start_day"],
     )
-    top_ten_items = top_ten["Item"].tolist()
-    top_ten_values = top_ten["Cost"].tolist()
 
     return render_template(
         "purchasing/produce.html",
@@ -625,8 +631,6 @@ def produce():
         form3=form3,
         current_user=current_user,
         top_ten=top_ten,
-        top_ten_items=top_ten_items,
-        top_ten_values=top_ten_values,
     )
 
 
@@ -662,8 +666,6 @@ def foodother():
         fiscal_dates["last_thirty"],
         fiscal_dates["start_day"],
     )
-    top_ten_items = top_ten["Item"].tolist()
-    top_ten_values = top_ten["Cost"].tolist()
 
     return render_template(
         "purchasing/foodother.html",
@@ -675,6 +677,4 @@ def foodother():
         form3=form3,
         current_user=current_user,
         top_ten=top_ten,
-        top_ten_items=top_ten_items,
-        top_ten_values=top_ten_values,
     )
