@@ -59,13 +59,13 @@ def purchasing():
         fiscal_dates["start_day"],
     )
     food_category_costs.replace("Fish", "Seafood", inplace=True)
-    food_category_costs.sort_values(by="Account", inplace=True)
-    beef_costs = food_category_costs["Totals"].loc[0]
-    foodother_costs = food_category_costs["Totals"].loc[1]
-    pork_costs = food_category_costs["Totals"].loc[2]
-    poultry_costs = food_category_costs["Totals"].loc[3]
-    produce_costs = food_category_costs["Totals"].loc[4]
-    seafood_costs = food_category_costs["Totals"].loc[5]
+    food_category_costs.set_index("Account", inplace=True)
+    beef_costs = food_category_costs.loc["Beef"]["Totals"]
+    foodother_costs = food_category_costs.loc["Food Other"]["Totals"]
+    pork_costs = food_category_costs.loc["Pork"]["Totals"]
+    poultry_costs = food_category_costs.loc["Poultry"]["Totals"]
+    produce_costs = food_category_costs.loc["Produce"]["Totals"]
+    seafood_costs = food_category_costs.loc["Seafood"]["Totals"]
 
     supply_list = [
         "Restaurant Supplies",
@@ -272,6 +272,16 @@ def poultry():
         fiscal_dates["last_thirty"],
         fiscal_dates["start_day"],
     )
+    top_ten_restaurant = get_restaurant_topten(
+        ["Poultry"],
+        fiscal_dates["last_thirty"],
+        fiscal_dates["start_day"],
+    )
+    top_ten_vendor = get_vendor_topten(
+        ["Poultry"],
+        fiscal_dates["last_thirty"],
+        fiscal_dates["start_day"],
+    )
 
     # Create charts for items in top ten list
     product_list = top_ten["Item"].tolist()
@@ -300,6 +310,8 @@ def poultry():
         form3=form3,
         current_user=current_user,
         top_ten=top_ten,
+        top_ten_restaurant=top_ten_restaurant,
+        top_ten_vendor=top_ten_vendor,
         product_dict=product_dict,
         product_names=product_names,
     )
@@ -333,6 +345,16 @@ def seafood():
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
     top_ten = get_category_topten(
+        ["Fish"],
+        fiscal_dates["last_thirty"],
+        fiscal_dates["start_day"],
+    )
+    top_ten_restaurant = get_restaurant_topten(
+        ["Fish"],
+        fiscal_dates["last_thirty"],
+        fiscal_dates["start_day"],
+    )
+    top_ten_vendor = get_vendor_topten(
         ["Fish"],
         fiscal_dates["last_thirty"],
         fiscal_dates["start_day"],
@@ -556,6 +578,8 @@ def seafood():
         feature_fish_chart=feature_fish_chart,
         feature_fish_chart_ly=feature_fish_chart_ly,
         top_ten=top_ten,
+        top_ten_vendor=top_ten_vendor,
+        top_ten_restaurant=top_ten_restaurant,
     )
 
 
@@ -591,6 +615,16 @@ def pork():
         fiscal_dates["last_thirty"],
         fiscal_dates["start_day"],
     )
+    top_ten_restaurant = get_restaurant_topten(
+        ["Pork"],
+        fiscal_dates["last_thirty"],
+        fiscal_dates["start_day"],
+    )
+    top_ten_vendor = get_vendor_topten(
+        ["Pork"],
+        fiscal_dates["last_thirty"],
+        fiscal_dates["start_day"],
+    )
 
     # Create charts for items in top ten list
     product_list = top_ten["Item"].tolist()
@@ -619,6 +653,8 @@ def pork():
         form3=form3,
         current_user=current_user,
         top_ten=top_ten,
+        top_ten_vendor=top_ten_vendor,
+        top_ten_restaurant=top_ten_restaurant,
         product_dict=product_dict,
         product_names=product_names,
     )
@@ -656,6 +692,16 @@ def produce():
         fiscal_dates["last_thirty"],
         fiscal_dates["start_day"],
     )
+    top_ten_restaurant = get_restaurant_topten(
+        ["Produce"],
+        fiscal_dates["last_thirty"],
+        fiscal_dates["start_day"],
+    )
+    top_ten_vendor = get_vendor_topten(
+        ["Produce"],
+        fiscal_dates["last_thirty"],
+        fiscal_dates["start_day"],
+    )
 
     # Create charts for items in top ten list
     product_list = top_ten["Item"].tolist()
@@ -684,6 +730,8 @@ def produce():
         form3=form3,
         current_user=current_user,
         top_ten=top_ten,
+        top_ten_vendor=top_ten_vendor,
+        top_ten_restaurant=top_ten_restaurant,
         product_dict=product_dict,
         product_names=product_names,
     )
@@ -721,6 +769,16 @@ def foodother():
         fiscal_dates["last_thirty"],
         fiscal_dates["start_day"],
     )
+    top_ten_restaurant = get_restaurant_topten(
+        ["Food Other"],
+        fiscal_dates["last_thirty"],
+        fiscal_dates["start_day"],
+    )
+    top_ten_vendor = get_vendor_topten(
+        ["Food Other"],
+        fiscal_dates["last_thirty"],
+        fiscal_dates["start_day"],
+    )
 
     # Create charts for items in top ten list
     product_list = top_ten["Item"].tolist()
@@ -749,6 +807,8 @@ def foodother():
         form3=form3,
         current_user=current_user,
         top_ten=top_ten,
+        top_ten_vendor=top_ten_vendor,
+        top_ten_restaurant=top_ten_restaurant,
         product_dict=product_dict,
         product_names=product_names,
     )

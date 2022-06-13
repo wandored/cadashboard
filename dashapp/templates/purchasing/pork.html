@@ -16,36 +16,36 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-2 col-md-4">
-            <div class="card bg-warning position-relative">
+        <div class="col-lg-2 col-md-4 mb-1">
+            <div class="card bg-warning shadow-warning position-relative">
                 <div class="card-body text-center">
                     <a href="{{ url_for('purchasing_blueprint.poultry') }}"><h4 class="stretched-link mb-0">POULTRY</h4></a>
                 </div>
             </div>
         </div>
-        <div class="col-lg-2 col-md-4">
-            <div class="card bg-success position-relative">
+        <div class="col-lg-2 col-md-4 mb-1">
+            <div class="card bg-success shadow-success position-relative">
                 <div class="card-body text-center">
                     <a href="{{ url_for('purchasing_blueprint.produce') }}"><h4 class="stretched-link mb-0">PRODUCE</h4></a>
                 </div>
             </div>
         </div>
-        <div class="col-lg-2 col-md-4">
-            <div class="card bg-info position-relative">
+        <div class="col-lg-2 col-md-4 mb-1">
+            <div class="card bg-info shadow-info position-relative">
                 <div class="card-body text-center">
                     <a href="{{ url_for('purchasing_blueprint.seafood') }}"><h4 class="stretched-link mb-0">SEAFOOD</h4></a>
                 </div>
             </div>
         </div>
-        <div class="col-lg-2 col-md-4">
-            <div class="card bg-primary position-relative">
+        <div class="col-lg-2 col-md-4 mb-1">
+            <div class="card bg-primary shadow-primary position-relative">
                 <div class="card-body text-center">
                     <a href="{{ url_for('purchasing_blueprint.beef') }}"><h4 class="stretched-link mb-0">BEEF</h4></a>
                 </div>
             </div>
         </div>
-        <div class="col-lg-2 col-md-4">
-            <div class="card bg-secondary position-relative">
+        <div class="col-lg-2 col-md-4 mb-1">
+            <div class="card bg-secondary shadow-secondary position-relative">
                 <div class="card-body text-center">
                     <a href="{{ url_for('purchasing_blueprint.foodother') }}"><h4 class="stretched-link mb-0">FOOD OTHER</h4></a>
                 </div>
@@ -72,6 +72,68 @@
                                 <tr>
                                     <td>
                                         <p class="mb-0 ms-1 text-begin">{{ s['Item'] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ "${:,.0f}".format(s['Cost']) }}</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 mt-4 mb-4">
+            <div class="card z-index-2 ">
+                <div class="card-body shadow-danger">
+                    <h4 class="mb-0 ">Restaurant Purchases Past 30 Days</h4>
+                    <div class="table-responsive table-hover">
+                        <table class="table-sm text-dark">
+                            <thead>
+                                <tr>
+                                    <th scope="col">RESTAURANT</th>
+                                    <th scope="col">TOTAL COST</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    {% for k, s in top_ten_restaurant.iterrows() %}
+                                <tr>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ s['Restaurant'] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ "${:,.0f}".format(s['Cost']) }}</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 mt-4 mb-4">
+            <div class="card z-index-2 ">
+                <div class="card-body shadow-danger">
+                    <h4 class="mb-0 ">Purchases per Vendor Past 30 Days</h4>
+                    <div class="table-responsive table-hover">
+                        <table class="table-sm text-dark">
+                            <thead>
+                                <tr>
+                                    <th scope="col">VENDOR</th>
+                                    <th scope="col">TOTAL COST</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    {% for k, s in top_ten_vendor.iterrows() %}
+                                <tr>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ s['Vendor'] }}</p>
                                     </td>
                                     <td>
                                         <p class="mb-0 ms-1 text-begin">{{ "${:,.0f}".format(s['Cost']) }}</p>
