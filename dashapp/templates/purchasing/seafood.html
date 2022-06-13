@@ -85,6 +85,70 @@
                 </div>
             </div>
         </div>
+        <div class="col-lg-4 col-md-6 mt-4 mb-4">
+            <div class="card z-index-2 ">
+                <div class="card-body shadow-info">
+                    <h4 class="mb-0 ">Restaurant Purchases Past 30 Days</h4>
+                    <div class="table-responsive table-hover">
+                        <table class="table-sm text-dark">
+                            <thead>
+                                <tr>
+                                    <th scope="col">RESTAURANT</th>
+                                    <th scope="col">TOTAL COST</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    {% for k, s in top_ten_restaurant.iterrows() %}
+                                <tr>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ s['Restaurant'] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ "${:,.0f}".format(s['Cost']) }}</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 mt-4 mb-4">
+            <div class="card z-index-2 ">
+                <div class="card-body shadow-info">
+                    <h4 class="mb-0 ">Purchases per Vendor Past 30 Days</h4>
+                    <div class="table-responsive table-hover">
+                        <table class="table-sm text-dark">
+                            <thead>
+                                <tr>
+                                    <th scope="col">VENDOR</th>
+                                    <th scope="col">TOTAL COST</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    {% for k, s in top_ten_vendor.iterrows() %}
+                                <tr>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ s['Vendor'] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ "${:,.0f}".format(s['Cost']) }}</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-4">
         <div class="col-lg-4 mt-4 mb-3">
             <div class="card z-index-2 shadow-info">
                 <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">

@@ -227,6 +227,46 @@ def get_category_topten(regex, start, end):
     return dframe
 
 
+def get_restaurant_topten(regex, start, end):
+
+    query = (
+        db.session.query(
+            Transactions.name,
+            func.sum(Transactions.debit).label("cost"),
+        )
+        .filter(
+            Transactions.account.in_(regex),
+            Transactions.date.between(start, end),
+            Transactions.type == "AP Invoice",
+        )
+        .group_by(Transactions.name)
+        .order_by(func.sum(Transactions.debit).desc())
+    ).all()
+    dframe = pd.DataFrame(query, columns=["Restaurant", "Cost"])
+
+    return dframe
+
+
+def get_vendor_topten(regex, start, end):
+
+    query = (
+        db.session.query(
+            Transactions.company,
+            func.sum(Transactions.debit).label("cost"),
+        )
+        .filter(
+            Transactions.account.in_(regex),
+            Transactions.date.between(start, end),
+            Transactions.type == "AP Invoice",
+        )
+        .group_by(Transactions.company)
+        .order_by(func.sum(Transactions.debit).desc())
+    ).limit(10)
+    dframe = pd.DataFrame(query, columns=["Vendor", "Cost"])
+
+    return dframe
+
+
 def get_item_topten(regex, start, end):
 
     query = (
