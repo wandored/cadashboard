@@ -1,10 +1,10 @@
 $(document).ready(function() {
 
-	$('DateForm').on('submit', function(event) {
+	$('UpdateForm').on('submit', function(event) {
 
 		event.preventDefault();
 
-		var formData = new FormData($('DateForm')[0]);
+		var formData = new FormData($('UpdateForm')[0]);
 
 		$.ajax({
 			xhr : function() {

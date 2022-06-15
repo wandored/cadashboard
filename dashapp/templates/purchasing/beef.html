@@ -74,8 +74,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    {% for k, s in top_ten_prime.iterrows() %}
+                                {% for k, s in top_ten_prime.iterrows() %}
                                 <tr>
                                     <td>
                                         <p class="mb-0 ms-1 text-begin">{{ s['Item'] }}</p>
@@ -85,11 +84,10 @@
                                     </td>
                                 </tr>
                                 {% endfor %}
-                                </tr>
                             </tbody>
                         </table>
                     </div>
-                    <h6 class="mb-0 ">Last 30 Days</h6>
+                    <h6>Last 30 Days</h6>
                 </div>
             </div>
         </div>
@@ -113,8 +111,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    {% for k, s in top_ten_choice.iterrows() %}
+                                {% for k, s in top_ten_choice.iterrows() %}
                                 <tr>
                                     <td>
                                         <p class="mb-0 ms-1 text-begin">{{ s['Item'] }}</p>
@@ -124,14 +121,15 @@
                                     </td>
                                 </tr>
                                 {% endfor %}
-                                </tr>
                             </tbody>
                         </table>
                     </div>
-                    <h6 class="mb-0 ">Last 30 Days</h6>
+                    <h6>Last 30 Days</h6>
                 </div>
             </div>
         </div>
+    </div>
+    <div class="row mt-4">
         <div class="col-lg-4 col-md-4 mt-4 mb-4">
             <div class="card z-index-2 shadow-primary">
                 <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
@@ -147,31 +145,162 @@
                         <table class="table-sm text-dark">
                             <thead>
                                 <tr>
-                                    <th scope="col">VENDOR</th>
-                                    <th scope="col">PACK</th>
-                                    <th scope="col">COST/LB</th>
+                                    <th scope="col">RESTAURANT</th>
+                                    <th scope="col">AVERAGE COST</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    {% for k, s in prime_rib_df.iterrows() %}
+                                {% for k, v in prime_rib_store.iterrows() %}
                                 <tr>
                                     <td>
-                                        <p class="mb-0 ms-1 text-begin">{{ s['company'] }}</p>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
                                     </td>
                                     <td>
-                                        <p class="mb-0 ms-1 text-begin">{{ s['UofM'] }}</p>
-                                    </td>
-                                    <td>
-                                        <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(s['cost_lb']) }}</p>
+                                        <p class="mb-0 ms-1 text-end">{{ "${:,.2f}".format(v.unit_cost) }}</p>
                                     </td>
                                 </tr>
                                 {% endfor %}
+                            </tbody>
+                        </table>
+                        <hr>
+                        <table class="table-sm text-dark">
+                            <thead>
+                                <tr>
+                                    <th scope="col">VENDOR</th>
+                                    <th scope="col">AVERAGE COST</th>
                                 </tr>
+                            </thead>
+                            <tbody>
+                                {% for k, v in prime_rib_vendor.iterrows() %}
+                                <tr>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{  "${:,.2f}".format(v.unit_cost) }}</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                     </div>
-                    <h6 class="mb-0 ">Last 30 Days</h6>
+                    <h6 class="mb-0 ">Last 7 Days</h6>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-4 mt-4 mb-4">
+            <div class="card z-index-2 shadow-primary">
+                <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                    <div class="bg-gradient-primary shadow-primary border-radius-lg py-3 pe-1">
+                        <div class="chart">
+                            <canvas id="chart-short_rib" class="chart-canvas" height="170"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h4 class="mb-0 ">Short Rib Index</h4>
+                    <div class="table-responsive table-hover">
+                        <table class="table-sm text-dark">
+                            <thead>
+                                <tr>
+                                    <th scope="col">RESTAURANT</th>
+                                    <th scope="col">AVERAGE COST</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for k, v in short_rib_store.iterrows() %}
+                                <tr>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{ "${:,.2f}".format(v.unit_cost) }}</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <hr>
+                        <table class="table-sm text-dark">
+                            <thead>
+                                <tr>
+                                    <th scope="col">VENDOR</th>
+                                    <th scope="col">AVERAGE COST</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for k, v in short_rib_vendor.iterrows() %}
+                                <tr>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{  "${:,.2f}".format(v.unit_cost) }}</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <h6>Last 7 Days</h6>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-4 mt-4 mb-4">
+            <div class="card z-index-2 shadow-primary">
+                <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                    <div class="bg-gradient-primary shadow-primary border-radius-lg py-3 pe-1">
+                        <div class="chart">
+                            <canvas id="chart-corned_beef" class="chart-canvas" height="170"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h4 class="mb-0 ">Corned Beef Index</h4>
+                    <div class="table-responsive table-hover">
+                        <table class="table-sm text-dark">
+                            <thead>
+                                <tr>
+                                    <th scope="col">RESTAURANT</th>
+                                    <th scope="col">AVERAGE COST</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for k, v in corned_beef_store.iterrows() %}
+                                <tr>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{ "${:,.2f}".format(v.unit_cost) }}</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <hr>
+                        <table class="table-sm text-dark">
+                            <thead>
+                                <tr>
+                                    <th scope="col">VENDOR</th>
+                                    <th scope="col">AVERAGE COST</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for k, v in corned_beef_vendor.iterrows() %}
+                                <tr>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{  "${:,.2f}".format(v.unit_cost) }}</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <h6>Last 7 Days</h6>
                 </div>
             </div>
         </div>
@@ -376,8 +505,8 @@
     },
     });
 
-    var ctx6 = document.getElementById("chart-prime_rib").getContext("2d");
-    new Chart(ctx6, {
+    var ctx4 = document.getElementById("chart-prime_rib").getContext("2d");
+    new Chart(ctx4, {
         type: "line",
         data: {
             labels: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13"],
@@ -470,5 +599,193 @@
     },
     });
 
+    var ctx5 = document.getElementById("chart-short_rib").getContext("2d");
+    new Chart(ctx5, {
+        type: "line",
+        data: {
+            labels: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13"],
+            datasets: [{
+                label: "Current",
+                tension: 0,
+                borderWidth: 0,
+                pointRadius: 5,
+                pointBackgroundColor: "rgba(255, 255, 255, 1)",
+                pointBorderColor: "transparent",
+                borderColor: "rgba(255, 255, 255, 1)",
+                borderWidth: 4,
+                backgroundColor: "transparent",
+                fill: true,
+                data: {{short_rib_chart | safe }},
+        maxBarThickness: 6
+        }, {
+            label: "Last Year",
+            tension: 0,
+            borderWidth: 0,
+            pointRadius: 5,
+            pointBackgroundColor: "rgba(200, 200, 200, 1)",
+            pointBorderColor: "transparent",
+            borderColor: "rgba(200, 200, 200, 1)",
+            borderWidth: 4,
+            type: "line",
+            backgroundColor: "transparent",
+            fill: true,
+            data: {{short_rib_chart_ly | safe }},
+        maxBarThickness: 6
+        }, ],
+      },
+        options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false,
+            }
+        },
+        interaction: {
+            intersect: false,
+            mode: 'index',
+        },
+        scales: {
+            y: {
+                grid: {
+                    drawBorder: false,
+                    display: true,
+                    drawOnChartArea: true,
+                    drawTicks: false,
+                    borderDash: [5, 5],
+                    color: 'rgba(255, 255, 255, .2)'
+                },
+                ticks: {
+                    display: true,
+                    padding: 10,
+                    color: '#f8f9fa',
+                    font: {
+                        size: 14,
+                        weight: 300,
+                        family: "Roboto",
+                        style: 'normal',
+                        lineHeight: 2
+                    },
+                },
+            },
+            x: {
+                grid: {
+                    drawBorder: false,
+                    display: false,
+                    drawOnChartArea: false,
+                    drawTicks: false,
+                    borderDash: [5, 5]
+                },
+                ticks: {
+                    display: true,
+                    color: '#f8f9fa',
+                    padding: 10,
+                    font: {
+                        size: 14,
+                        weight: 300,
+                        family: "Roboto",
+                        style: 'normal',
+                        lineHeight: 2
+                    },
+                }
+            },
+        },
+    },
+    });
+
+    var ctx6 = document.getElementById("chart-corned_beef").getContext("2d");
+    new Chart(ctx6, {
+        type: "line",
+        data: {
+            labels: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13"],
+            datasets: [{
+                label: "Current",
+                tension: 0,
+                borderWidth: 0,
+                pointRadius: 5,
+                pointBackgroundColor: "rgba(255, 255, 255, 1)",
+                pointBorderColor: "transparent",
+                borderColor: "rgba(255, 255, 255, 1)",
+                borderWidth: 4,
+                backgroundColor: "transparent",
+                fill: true,
+                data: {{corned_beef_chart | safe }},
+        maxBarThickness: 6
+        }, {
+            label: "Last Year",
+            tension: 0,
+            borderWidth: 0,
+            pointRadius: 5,
+            pointBackgroundColor: "rgba(200, 200, 200, 1)",
+            pointBorderColor: "transparent",
+            borderColor: "rgba(200, 200, 200, 1)",
+            borderWidth: 4,
+            type: "line",
+            backgroundColor: "transparent",
+            fill: true,
+            data: {{corned_beef_chart_ly | safe }},
+        maxBarThickness: 6
+        }, ],
+      },
+        options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false,
+            }
+        },
+        interaction: {
+            intersect: false,
+            mode: 'index',
+        },
+        scales: {
+            y: {
+                grid: {
+                    drawBorder: false,
+                    display: true,
+                    drawOnChartArea: true,
+                    drawTicks: false,
+                    borderDash: [5, 5],
+                    color: 'rgba(255, 255, 255, .2)'
+                },
+                ticks: {
+                    display: true,
+                    padding: 10,
+                    color: '#f8f9fa',
+                    font: {
+                        size: 14,
+                        weight: 300,
+                        family: "Roboto",
+                        style: 'normal',
+                        lineHeight: 2
+                    },
+                },
+            },
+            x: {
+                grid: {
+                    drawBorder: false,
+                    display: false,
+                    drawOnChartArea: false,
+                    drawTicks: false,
+                    borderDash: [5, 5]
+                },
+                ticks: {
+                    display: true,
+                    color: '#f8f9fa',
+                    padding: 10,
+                    font: {
+                        size: 14,
+                        weight: 300,
+                        family: "Roboto",
+                        style: 'normal',
+                        lineHeight: 2
+                    },
+                }
+            },
+        },
+    },
+    });
 </script>
+
 {% endblock javascripts %}
