@@ -6,13 +6,12 @@
 {% block stylesheets %}{% endblock stylesheets %}
 
 {% block content %}
-
 <div class="container-fluid py-4">
     <div class="row mt-2">
         <div class="col-lg-2 col-md-4 mb-1">
             <div class="card bg-primary shadow-primary position-relative">
                 <div class="card-body text-primary text-center">
-                    <h6>BEEF COSTS</h6>
+                    <h6>BEEF</h6>
                     <a href="{{ url_for('purchasing_blueprint.beef') }}"><h4 class="stretched-link mb-0">{{ "${:,.0f}".format(beef_costs) }}</h4></a>
                 </div>
             </div>
@@ -20,7 +19,7 @@
         <div class="col-lg-2 col-md-4 mb-1">
             <div class="card bg-secondary shadow-secondary position-relative">
                 <div class="card-body text-center">
-                    <h6>FOOD OTHER COSTS</h6>
+                    <h6>FOOD OTHER</h6>
                     <a href="{{ url_for('purchasing_blueprint.foodother') }}"><h4 class="stretched-link mb-0">{{ "${:,.0f}".format(foodother_costs) }}</h4></a>
                 </div>
             </div>
@@ -28,7 +27,7 @@
         <div class="col-lg-2 col-md-4 mb-1">
             <div class="card bg-danger shadow-danger position-relative">
                 <div class="card-body text-center">
-                    <h6>PORK COSTS</h6>
+                    <h6>PORK</h6>
                     <a href="{{ url_for('purchasing_blueprint.pork') }}"><h4 class="stretched-link mb-0">{{ "${:,.0f}".format(pork_costs) }}</h4></a>
                 </div>
             </div>
@@ -36,7 +35,7 @@
         <div class="col-lg-2 col-md-4 mb-1">
             <div class="card bg-warning shadow-warning position-relative">
                 <div class="card-body text-center">
-                    <h6>POULTRY COSTS</h6>
+                    <h6>POULTRY</h6>
                     <a href="{{ url_for('purchasing_blueprint.poultry') }}"><h4 class="stretched-link mb-0">{{ "${:,.0f}".format(poultry_costs) }}</h4></a>
                 </div>
             </div>
@@ -44,7 +43,7 @@
         <div class="col-lg-2 col-md-4 mb-1">
             <div class="card bg-success shadow-success position-relative">
                 <div class="card-body text-center">
-                    <h6>PRODUCE COSTS</h6>
+                    <h6>PRODUCE</h6>
                     <a href="{{ url_for('purchasing_blueprint.produce') }}"><h4 class="stretched-link mb-0">{{ "${:,.0f}".format(produce_costs) }}</h4></a>
                 </div>
             </div>
@@ -52,7 +51,7 @@
         <div class="col-lg-2 col-md-4 mb-1">
             <div class="card bg-info shadow-info position-relative">
                 <div class="card-body text-center">
-                    <h6>SEAFOOD COSTS</h6>
+                    <h6>SEAFOOD</h6>
                     <a href="{{ url_for('purchasing_blueprint.seafood') }}"><h4 class="stretched-link mb-0">{{ "${:,.0f}".format(seafood_costs) }}</h4></a>
                 </div>
             </div>
@@ -74,10 +73,50 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    {% for k, s in top_ten.iterrows() %}
+                                    {% for k, s in top_ten_food.iterrows() %}
                                 <tr>
                                     <td>
                                         <p class="mb-0 ms-1 text-begin">{{ s['Item'] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ "${:,.0f}".format(s['Cost']) }}</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 mt-2 mb-2">
+            <div class="card h-100 bg-gradient-light shadow-primary">
+                <div class="card-body">
+                    <div class="chart">
+                        <canvas id="food-chart" class="chart-canvas" height="100"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 mt-2 mb-2">
+            <div class="card h-100 shadow-primary">
+                <div class="card-body">
+                    <h4 class="mb-0 ">Top 10 Food Vendors Past 30 Days</h4>
+                    <div class="table-responsive table-hover">
+                        <table class="table-sm text-dark">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Vendor</th>
+                                    <th scope="col">TOTAL COST</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    {% for k, s in top_ten_vendor.iterrows() %}
+                                <tr>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ s['Vendor'] }}</p>
                                     </td>
                                     <td>
                                         <p class="mb-0 ms-1 text-begin">{{ "${:,.0f}".format(s['Cost']) }}</p>
@@ -108,33 +147,27 @@
     new Chart(ctx1, {
         type: "pie",
         data: {
-            labels: {{ top_ten_items | safe }},
+            labels: {{ food_category_items | safe }},
             datasets: [{
                 label: "Food Costs",
-                data: {{ top_ten_values | safe }},
+                data: {{ food_category_values | safe }},
                 backgroundColor: [
-                    'blue',
-                    'indigo',
-                    'purple',
-                    'pink',
-                    'red',
-                    'cyan',
-                    'orange',
-                    'yellow',
-                    'green',
-                    'teal',
+                    "rgba(233, 30, 99, 1)",
+                    "rgba(123, 128, 154, 1)",
+                    "rgba(26, 115, 232, 1)",
+                    "rgba(244, 67, 53, 1)",
+                    "rgba(76, 175, 80, 1)",
+                    "rgba(255, 152, 0, 1)",
+                    "rgba(64, 64, 64, 1)",
                 ],
                 borderColor: [
-                    'blue',
-                    'indigo',
-                    'purple',
-                    'pink',
-                    'red',
-                    'cyan',
-                    'orange',
-                    'yellow',
-                    'green',
-                    'teal',
+                    "rgba(233, 30, 99, 1)",
+                    "rgba(123, 128, 154, 1)",
+                    "rgba(26, 115, 232, 1)",
+                    "rgba(244, 67, 53, 1)",
+                    "rgba(76, 175, 80, 1)",
+                    "rgba(255, 152, 0, 1)",
+                    "rgba(64, 64, 64, 1)",
                 ],
                 borderWidth: 1,
         }, ],

@@ -43,7 +43,7 @@
     allow_dismiss: true,
     allow_duplicates: true,
     newest_on_top: false,
-    showProgressbar: false,
+    showProgressbar: true,
     placement: {
       from: "top",
       align: "right"

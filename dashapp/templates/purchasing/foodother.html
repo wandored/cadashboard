@@ -57,7 +57,7 @@
         <div class="col-lg-4 col-md-6 mt-4 mb-4">
             <div class="card z-index-2 ">
                 <div class="card-body shadow-secondary">
-                    <h4 class="mb-0 ">Top 10 Past 30 Days</h4>
+                    <h4 class="mb-0 ">Top 10 Products</h4>
                     <div class="table-responsive table-hover">
                         <table class="table-sm text-dark">
                             <thead>
@@ -82,13 +82,14 @@
                             </tbody>
                         </table>
                     </div>
+                    <h6>Past 30 Days</h6>
                 </div>
             </div>
         </div>
         <div class="col-lg-4 col-md-6 mt-4 mb-4">
             <div class="card z-index-2 ">
                 <div class="card-body shadow-secondary">
-                    <h4 class="mb-0 ">Restaurant Purchases Past 30 Days</h4>
+                    <h4 class="mb-0 ">Purchases per Restaurant</h4>
                     <div class="table-responsive table-hover">
                         <table class="table-sm text-dark">
                             <thead>
@@ -113,13 +114,14 @@
                             </tbody>
                         </table>
                     </div>
+                    <h6>Past 30 Days</h6>
                 </div>
             </div>
         </div>
         <div class="col-lg-4 col-md-6 mt-4 mb-4">
             <div class="card z-index-2 ">
                 <div class="card-body shadow-secondary">
-                    <h4 class="mb-0 ">Purchases per Vendor Past 30 Days</h4>
+                    <h4 class="mb-0 ">Purchases per Vendor</h4>
                     <div class="table-responsive table-hover">
                         <table class="table-sm text-dark">
                             <thead>
@@ -144,6 +146,7 @@
                             </tbody>
                         </table>
                     </div>
+                    <h6>Past 30 Days</h6>
                 </div>
             </div>
         </div>
@@ -161,6 +164,50 @@
                 </div>
                 <div class="card-body">
                     <h4 class="mb-0 ">{{ product_names[0]}}</h4>
+                    <div class="table-responsive table-hover">
+                        <table class="table-sm text-dark">
+                            <thead>
+                                <tr>
+                                    <th scope="col">RESTAURANT</th>
+                                    <th scope="col">AVERAGE COST</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for k, v in store_cost_dict["1"].iterrows() %}
+                                <tr>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{ "${:,.2f}".format(v.unit_cost) }}</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <hr>
+                        <table class="table-sm text-dark">
+                            <thead>
+                                <tr>
+                                    <th scope="col">VENDOR</th>
+                                    <th scope="col">AVERAGE COST</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for k, v in vendor_cost_dict["1"].iterrows() %}
+                                <tr>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{  "${:,.2f}".format(v.unit_cost) }}</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <h6>Past 7 Days</h6>
                 </div>
             </div>
         </div>
@@ -175,6 +222,50 @@
                 </div>
                 <div class="card-body">
                     <h4 class="mb-0 ">{{ product_names[1] }}</h4>
+                    <div class="table-responsive table-hover">
+                        <table class="table-sm text-dark">
+                            <thead>
+                                <tr>
+                                    <th scope="col">RESTAURANT</th>
+                                    <th scope="col">AVERAGE COST</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for k, v in store_cost_dict["2"].iterrows() %}
+                                <tr>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{ "${:,.2f}".format(v.unit_cost) }}</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <hr>
+                        <table class="table-sm text-dark">
+                            <thead>
+                                <tr>
+                                    <th scope="col">VENDOR</th>
+                                    <th scope="col">AVERAGE COST</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for k, v in vendor_cost_dict["2"].iterrows() %}
+                                <tr>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{  "${:,.2f}".format(v.unit_cost) }}</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <h6>Past 7 Days</h6>
                 </div>
             </div>
         </div>
@@ -189,6 +280,50 @@
                 </div>
                 <div class="card-body">
                     <h4 class="mb-0 ">{{ product_names[2] }}</h4>
+                    <div class="table-responsive table-hover">
+                        <table class="table-sm text-dark">
+                            <thead>
+                                <tr>
+                                    <th scope="col">RESTAURANT</th>
+                                    <th scope="col">AVERAGE COST</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for k, v in store_cost_dict["3"].iterrows() %}
+                                <tr>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{ "${:,.2f}".format(v.unit_cost) }}</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <hr>
+                        <table class="table-sm text-dark">
+                            <thead>
+                                <tr>
+                                    <th scope="col">VENDOR</th>
+                                    <th scope="col">AVERAGE COST</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for k, v in vendor_cost_dict["3"].iterrows() %}
+                                <tr>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{  "${:,.2f}".format(v.unit_cost) }}</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <h6>Past 7 Days</h6>
                 </div>
             </div>
         </div>
@@ -205,6 +340,50 @@
                 </div>
                 <div class="card-body">
                     <h4 class="mb-0 ">{{ product_names[3] }}</h4>
+                    <div class="table-responsive table-hover">
+                        <table class="table-sm text-dark">
+                            <thead>
+                                <tr>
+                                    <th scope="col">RESTAURANT</th>
+                                    <th scope="col">AVERAGE COST</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for k, v in store_cost_dict["4"].iterrows() %}
+                                <tr>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{ "${:,.2f}".format(v.unit_cost) }}</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <hr>
+                        <table class="table-sm text-dark">
+                            <thead>
+                                <tr>
+                                    <th scope="col">VENDOR</th>
+                                    <th scope="col">AVERAGE COST</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for k, v in vendor_cost_dict["4"].iterrows() %}
+                                <tr>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{  "${:,.2f}".format(v.unit_cost) }}</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <h6>Past 7 Days</h6>
                 </div>
             </div>
         </div>
@@ -219,6 +398,50 @@
                 </div>
                 <div class="card-body">
                     <h4 class="mb-0 ">{{ product_names[4] }}</h4>
+                    <div class="table-responsive table-hover">
+                        <table class="table-sm text-dark">
+                            <thead>
+                                <tr>
+                                    <th scope="col">RESTAURANT</th>
+                                    <th scope="col">AVERAGE COST</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for k, v in store_cost_dict["5"].iterrows() %}
+                                <tr>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{ "${:,.2f}".format(v.unit_cost) }}</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <hr>
+                        <table class="table-sm text-dark">
+                            <thead>
+                                <tr>
+                                    <th scope="col">VENDOR</th>
+                                    <th scope="col">AVERAGE COST</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for k, v in vendor_cost_dict["5"].iterrows() %}
+                                <tr>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{  "${:,.2f}".format(v.unit_cost) }}</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <h6>Past 7 Days</h6>
                 </div>
             </div>
         </div>
@@ -233,6 +456,50 @@
                 </div>
                 <div class="card-body">
                     <h4 class="mb-0 ">{{ product_names[5] }}</h4>
+                    <div class="table-responsive table-hover">
+                        <table class="table-sm text-dark">
+                            <thead>
+                                <tr>
+                                    <th scope="col">RESTAURANT</th>
+                                    <th scope="col">AVERAGE COST</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for k, v in store_cost_dict["6"].iterrows() %}
+                                <tr>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{ "${:,.2f}".format(v.unit_cost) }}</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <hr>
+                        <table class="table-sm text-dark">
+                            <thead>
+                                <tr>
+                                    <th scope="col">VENDOR</th>
+                                    <th scope="col">AVERAGE COST</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for k, v in vendor_cost_dict["6"].iterrows() %}
+                                <tr>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{  "${:,.2f}".format(v.unit_cost) }}</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <h6>Past 7 Days</h6>
                 </div>
             </div>
         </div>
@@ -249,6 +516,50 @@
                 </div>
                 <div class="card-body">
                     <h4 class="mb-0 ">{{ product_names[6] }}</h4>
+                    <div class="table-responsive table-hover">
+                        <table class="table-sm text-dark">
+                            <thead>
+                                <tr>
+                                    <th scope="col">RESTAURANT</th>
+                                    <th scope="col">AVERAGE COST</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for k, v in store_cost_dict["7"].iterrows() %}
+                                <tr>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{ "${:,.2f}".format(v.unit_cost) }}</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <hr>
+                        <table class="table-sm text-dark">
+                            <thead>
+                                <tr>
+                                    <th scope="col">VENDOR</th>
+                                    <th scope="col">AVERAGE COST</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for k, v in vendor_cost_dict["7"].iterrows() %}
+                                <tr>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{  "${:,.2f}".format(v.unit_cost) }}</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <h6>Past 7 Days</h6>
                 </div>
             </div>
         </div>
@@ -263,6 +574,50 @@
                 </div>
                 <div class="card-body">
                     <h4 class="mb-0 ">{{ product_names[7] }}</h4>
+                    <div class="table-responsive table-hover">
+                        <table class="table-sm text-dark">
+                            <thead>
+                                <tr>
+                                    <th scope="col">RESTAURANT</th>
+                                    <th scope="col">AVERAGE COST</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for k, v in store_cost_dict["8"].iterrows() %}
+                                <tr>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{ "${:,.2f}".format(v.unit_cost) }}</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <hr>
+                        <table class="table-sm text-dark">
+                            <thead>
+                                <tr>
+                                    <th scope="col">VENDOR</th>
+                                    <th scope="col">AVERAGE COST</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for k, v in vendor_cost_dict["8"].iterrows() %}
+                                <tr>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{  "${:,.2f}".format(v.unit_cost) }}</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <h6>Past 7 Days</h6>
                 </div>
             </div>
         </div>
@@ -277,6 +632,50 @@
                 </div>
                 <div class="card-body">
                     <h4 class="mb-0 ">{{ product_names[8] }}</h4>
+                    <div class="table-responsive table-hover">
+                        <table class="table-sm text-dark">
+                            <thead>
+                                <tr>
+                                    <th scope="col">RESTAURANT</th>
+                                    <th scope="col">AVERAGE COST</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for k, v in store_cost_dict["9"].iterrows() %}
+                                <tr>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{ "${:,.2f}".format(v.unit_cost) }}</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <hr>
+                        <table class="table-sm text-dark">
+                            <thead>
+                                <tr>
+                                    <th scope="col">VENDOR</th>
+                                    <th scope="col">AVERAGE COST</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for k, v in vendor_cost_dict["9"].iterrows() %}
+                                <tr>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{  "${:,.2f}".format(v.unit_cost) }}</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <h6>Past 7 Days</h6>
                 </div>
             </div>
         </div>
@@ -293,6 +692,50 @@
                 </div>
                 <div class="card-body">
                     <h4 class="mb-0 ">{{ product_names[9] }}</h4>
+                    <div class="table-responsive table-hover">
+                        <table class="table-sm text-dark">
+                            <thead>
+                                <tr>
+                                    <th scope="col">RESTAURANT</th>
+                                    <th scope="col">AVERAGE COST</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for k, v in store_cost_dict["10"].iterrows() %}
+                                <tr>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{ "${:,.2f}".format(v.unit_cost) }}</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <hr>
+                        <table class="table-sm text-dark">
+                            <thead>
+                                <tr>
+                                    <th scope="col">VENDOR</th>
+                                    <th scope="col">AVERAGE COST</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for k, v in vendor_cost_dict["10"].iterrows() %}
+                                <tr>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{  "${:,.2f}".format(v.unit_cost) }}</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <h6>Past 7 Days</h6>
                 </div>
             </div>
         </div>

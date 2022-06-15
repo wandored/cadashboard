@@ -1,6 +1,7 @@
 """
 Dashboard by wandored
 """
+from numpy import NAN
 import pandas as pd
 from datetime import datetime, timedelta
 from dashapp.authentication.models import *
@@ -131,14 +132,66 @@ def get_cost_per_vendor(regex, days):
     df = pd.DataFrame(item_list)
 
     if not df.empty:
-        #    df = df[(df != 0).all(1)]
-        #    df.dropna(axis=0, how="any", subset=["company"], inplace=True)
-        df["cost_lb"] = ((df["cost"] / df["count"]) / df["base_qty"] * 16).astype(float)
-        df.sort_values(by=["cost_lb"], inplace=True)
+        df["unit_cost"] = ((df["cost"] / df["count"]) / df["base_qty"] * 16).astype(
+            float
+        )
+        df.drop(
+            columns=["UofM", "count", "cost", "base_qty", "base_uofm"], inplace=True
+        )
+        table = pd.pivot_table(df, values="unit_cost", index="company", aggfunc="mean")
+        table.sort_values(by=["unit_cost"], inplace=True)
+        # TODO need to figure for different pack size
+        return table
+    df = pd.DataFrame()
+    return df
+
+
+def get_cost_per_store(regex, days):
+
+    query = (
+        db.session.query(
+            Transactions.name,
+            Transactions.UofM,
+            func.sum(Transactions.quantity).label("count"),
+            func.sum(Transactions.amount).label("cost"),
+        )
+        .filter(
+            Transactions.item.regexp_match(regex),
+            Transactions.date >= days,
+            Transactions.type == "AP Invoice",
+        )
+        .group_by(
+            Transactions.name,
+            Transactions.UofM,
+        )
+    ).all()
+    item_list = []
+    for q in query:
+        qty, uofm = convert_uofm(q)
+        # TODO fix the factor calc on purchasing
+        # pound = qty / 16
+        row_dict = dict(q)
+        row_dict["base_qty"] = qty
+        row_dict["base_uofm"] = uofm
+        item_list.append(row_dict)
+    df = pd.DataFrame(item_list)
+
+    if not df.empty:
+        df["unit_cost"] = ((df["cost"] / df["count"]) / df["base_qty"] * 16).astype(
+            float
+        )
+        df.drop(
+            columns=["UofM", "count", "cost", "base_qty", "base_uofm"], inplace=True
+        )
+        table = pd.pivot_table(df, values="unit_cost", index="name", aggfunc="mean")
+        table.sort_values(by=["unit_cost"], inplace=True)
+        return table
+    df = pd.DataFrame()
     return df
 
 
 def period_purchases(regex, start, end):
+    # generate list of purchase costs per period for charts
     calendar = Calendar.query.with_entities(
         Calendar.date, Calendar.week, Calendar.period, Calendar.year
     ).all()
@@ -179,9 +232,10 @@ def period_purchases(regex, start, end):
 
     if not df.empty:
         # df = df[(df != 0).all(1)]
-        df = df.merge(cal_df, on="date", how="left")
+        df = df.merge(cal_df, on="date", how="right")
         df = df.groupby(["period"]).sum()
         df["cost_lb"] = (df["cost"] / df["pounds"]).astype(float)
+        df["cost_lb"] = df["cost_lb"].fillna(0)
         df_list = df["cost_lb"].tolist()
         return df_list
 
