@@ -47,30 +47,39 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-white {% if 'marketing' in segment %} active bg-gradient-primary {% endif %}"
-                    href="/marketing">
-                    <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="material-icons opacity-10">newspaper</i>
-                    </div>
-                    <span class="nav-link-text ms-1">Marketing</span>
-                </a>
-            </li>
-            <li class="nav-item">
                 <a class="nav-link text-white {% if 'purchasing' in segment %} active bg-gradient-primary {% endif %}"
                     href="/purchasing">
                     <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="material-icons opacity-10">request_quote</i>
+                        <i class="material-icons opacity-10">restaurant_menu</i>
                     </div>
-                    <span class="nav-link-text ms-1">Purchasing</span>
+                    <span class="nav-link-text ms-1">Food</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link text-white {% if 'alcohol' in segment %} active bg-gradient-primary {% endif %}"
                     href="/alcohol">
                     <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="material-icons opacity-10">local_bar</i>
+                        <i class="material-icons opacity-10">liquor</i>
                     </div>
                     <span class="nav-link-text ms-1">Alcohol</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white {% if 'supplies' in segment %} active bg-gradient-primary {% endif %}"
+                    href="/supplies">
+                    <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="material-icons opacity-10">blender</i>
+                    </div>
+                    <span class="nav-link-text ms-1">Supplies</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white {% if 'marketing' in segment %} active bg-gradient-primary {% endif %}"
+                    href="/marketing">
+                    <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="material-icons opacity-10">newspaper</i>
+                    </div>
+                    <span class="nav-link-text ms-1">Marketing</span>
                 </a>
             </li>
             <li class="nav-item mt-3">
@@ -88,21 +97,21 @@
             {% for x in current_user.roles %}
             {% if x == 'admin' %}
             <li class="nav-item">
-                <a class="nav-link text-white {% if 'admin' in segment %} active bg-gradient-primary {% endif %}"
-                    href="/admin">
-                    <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="material-icons opacity-10">admin_panel_settings</i>
-                    </div>
-                    <span class="nav-link-text ms-1">Admin Page</span>
-                </a>
-            </li>
-            <li class="nav-item">
                 <a class="nav-link text-white {% if 'support' in segment %} active bg-gradient-primary {% endif %}"
                     href="/support">
                     <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
                         <i class="material-icons opacity-10">support_agent</i>
                     </div>
                     <span class="nav-link-text ms-1">Support Page</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white {% if 'admin' in segment %} active bg-gradient-primary {% endif %}"
+                    href="/admin">
+                    <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="material-icons opacity-10">admin_panel_settings</i>
+                    </div>
+                    <span class="nav-link-text ms-1">Admin Page</span>
                 </a>
             </li>
             {% endif %}

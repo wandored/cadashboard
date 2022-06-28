@@ -2,6 +2,7 @@
 Dashboard by wandored
 """
 from numpy import NAN
+import numpy as np
 import pandas as pd
 from datetime import datetime, timedelta
 from dashapp.authentication.models import *
@@ -132,16 +133,43 @@ def get_cost_per_vendor(regex, days):
     df = pd.DataFrame(item_list)
 
     if not df.empty:
-        df["unit_cost"] = ((df["cost"] / df["count"]) / df["base_qty"] * 16).astype(
-            float
+        # calculate the unit cost based on base_uofm value
+        df["unit_cost"] = np.where(
+            df["base_uofm"] == "OZ-wt",
+            ((df["cost"] / df["count"]) / df["base_qty"] * 16).astype(float),
+            np.where(
+                df["base_uofm"] == "OZ-fl",
+                ((df["cost"] / df["count"]) / df["base_qty"] * 128).astype(float),
+                ((df["cost"] / df["count"]) / df["base_qty"] * 1).astype(float),
+            ),
+        )
+        df["unit_qty"] = np.where(
+            df["base_uofm"] == "OZ-wt",
+            (df["count"] * df["base_qty"] / 16).astype(float),
+            np.where(
+                df["base_uofm"] == "OZ-fl",
+                (df["count"] * df["base_qty"] / 128).astype(float),
+                (df["count"] * df["base_qty"]).astype(float),
+            ),
+        )
+        df["report_unit"] = np.where(
+            df["base_uofm"] == "OZ-wt",
+            "Pound",
+            np.where(
+                df["base_uofm"] == "OZ-fl",
+                "Gallon",
+                "Each",
+            ),
         )
         df.drop(
             columns=["UofM", "count", "cost", "base_qty", "base_uofm"], inplace=True
         )
-        table = pd.pivot_table(df, values="unit_cost", index="company", aggfunc="mean")
-        table.sort_values(by=["unit_cost"], inplace=True)
-        # TODO need to figure for different pack size
-        return table
+        table = pd.pivot_table(
+            df, values=["unit_cost", "unit_qty"], index=["company", "report_unit"], aggfunc="mean"
+        )
+        if not table.empty:
+            table.sort_values(by=["unit_cost"], inplace=True)
+            return table
     df = pd.DataFrame()
     return df
 
@@ -168,8 +196,6 @@ def get_cost_per_store(regex, days):
     item_list = []
     for q in query:
         qty, uofm = convert_uofm(q)
-        # TODO fix the factor calc on purchasing
-        # pound = qty / 16
         row_dict = dict(q)
         row_dict["base_qty"] = qty
         row_dict["base_uofm"] = uofm
@@ -177,15 +203,43 @@ def get_cost_per_store(regex, days):
     df = pd.DataFrame(item_list)
 
     if not df.empty:
-        df["unit_cost"] = ((df["cost"] / df["count"]) / df["base_qty"] * 16).astype(
-            float
+        # calculate the unit cost based on base_uofm value
+        df["unit_cost"] = np.where(
+            df["base_uofm"] == "OZ-wt",
+            ((df["cost"] / df["count"]) / df["base_qty"] * 16).astype(float),
+            np.where(
+                df["base_uofm"] == "OZ-fl",
+                ((df["cost"] / df["count"]) / df["base_qty"] * 128).astype(float),
+                ((df["cost"] / df["count"]) / df["base_qty"]).astype(float),
+            ),
+        )
+        df["unit_qty"] = np.where(
+            df["base_uofm"] == "OZ-wt",
+            (df["count"] * df["base_qty"] / 16).astype(float),
+            np.where(
+                df["base_uofm"] == "OZ-fl",
+                (df["count"] * df["base_qty"] / 128).astype(float),
+                (df["count"] * df["base_qty"]).astype(float),
+            ),
+        )
+        df["report_unit"] = np.where(
+            df["base_uofm"] == "OZ-wt",
+            "Pound",
+            np.where(
+                df["base_uofm"] == "OZ-fl",
+                "Gallon",
+                "Each",
+            ),
         )
         df.drop(
             columns=["UofM", "count", "cost", "base_qty", "base_uofm"], inplace=True
         )
-        table = pd.pivot_table(df, values="unit_cost", index="name", aggfunc="mean")
-        table.sort_values(by=["unit_cost"], inplace=True)
-        return table
+        table = pd.pivot_table(
+            df, values=["unit_cost", "unit_qty"], index=["name", "report_unit"], aggfunc="mean"
+        )
+        if not table.empty:
+            table.sort_values(by=["unit_qty"], ascending=False, inplace=True)
+            return table
     df = pd.DataFrame()
     return df
 
@@ -226,17 +280,26 @@ def period_purchases(regex, start, end):
         row_dict = dict(q)
         row_dict["base_qty"] = qty
         row_dict["base_uofm"] = uofm
-        row_dict["pounds"] = row_dict["count"] * row_dict["base_qty"] / 16
+
+        row_dict["unit_qty"] = np.where(
+            row_dict["base_uofm"] == "OZ-wt",
+            row_dict["count"] * row_dict["base_qty"] / 16,
+            np.where(
+                row_dict["base_uofm"] == "OZ-fl",
+                row_dict["count"] * row_dict["base_qty"] / 128,
+                row_dict["count"] * row_dict["base_qty"],
+            ),
+        )
+        row_dict["unit_qty"] = np.float(row_dict["unit_qty"])
         item_list.append(row_dict)
     df = pd.DataFrame(item_list)
 
     if not df.empty:
-        # df = df[(df != 0).all(1)]
-        df = df.merge(cal_df, on="date", how="right")
+        df = df.merge(cal_df, on="date", how="inner")
         df = df.groupby(["period"]).sum()
-        df["cost_lb"] = (df["cost"] / df["pounds"]).astype(float)
-        df["cost_lb"] = df["cost_lb"].fillna(0)
-        df_list = df["cost_lb"].tolist()
+        df["unit_cost"] = (df["cost"] / df["unit_qty"]).astype(float)
+        df["unit_cost"] = df["unit_cost"].fillna(0)
+        df_list = df["unit_cost"].tolist()
         return df_list
 
 
@@ -276,9 +339,9 @@ def get_category_topten(regex, start, end):
         .group_by(Transactions.item)
         .order_by(func.sum(Transactions.debit).desc())
     ).limit(10)
-    dframe = pd.DataFrame(query, columns=["Item", "Cost"])
+    df = pd.DataFrame(query, columns=["Item", "Cost"])
 
-    return dframe
+    return df
 
 
 def get_restaurant_topten(regex, start, end):
