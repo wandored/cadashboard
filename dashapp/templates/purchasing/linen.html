@@ -1,52 +1,38 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} {{ title }} {% endblock %} 
+{% block title %} Template {% endblock %}
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}{% endblock stylesheets %}
 
 {% block content %}
+
 <div class="container-fluid py-4">
     <div class="row mt-2">
-        <div class="col-lg-2 col-md-4 mb-1">
+        <div class="col-lg-4 col-md-4 mb-1">
             <div class="card bg-primary shadow-primary position-relative">
-                <div class="card-body text-primary text-center">
-                    <a href="{{ url_for('purchasing_blueprint.beef') }}"><h4 class="stretched-link mb-0">BEEF</h4></a>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-2 col-md-4 mb-1">
-            <div class="card bg-secondary shadow-secondary position-relative">
                 <div class="card-body text-center">
-                    <a href="{{ url_for('purchasing_blueprint.foodother') }}"><h4 class="stretched-link mb-0">FOOD OTHER</h4></a>
+                    <a href="{{ url_for('supply_blueprint.supplies') }}">
+                        <h4 class="stretched-link mb-0">Supplies</h4>
+                    </a>
                 </div>
             </div>
         </div>
-        <div class="col-lg-2 col-md-4 mb-1">
-            <div class="card bg-danger shadow-danger position-relative">
+        <div class="col-lg-4 col-md-4 mb-1">
+            <div class="card bg-info shadow-secondary position-info">
                 <div class="card-body text-center">
-                    <a href="{{ url_for('purchasing_blueprint.pork') }}"><h4 class="stretched-link mb-0">PORK</h4></a>
+                    <a href="{{ url_for('supply_blueprint.smallwares') }}">
+                        <h4 class="stretched-link mb-0">Smallwares</h4>
+                    </a>
                 </div>
             </div>
         </div>
-        <div class="col-lg-2 col-md-4 mb-1">
+        <div class="col-lg-4 col-md-4 mb-1">
             <div class="card bg-warning shadow-warning position-relative">
                 <div class="card-body text-center">
-                    <a href="{{ url_for('purchasing_blueprint.poultry') }}"><h4 class="stretched-link mb-0">POULTRY</h4></a>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-2 col-md-4 mb-1">
-            <div class="card bg-success shadow-success position-relative">
-                <div class="card-body text-center">
-                    <a href="{{ url_for('purchasing_blueprint.produce') }}"><h4 class="stretched-link mb-0">PRODUCE</h4></a>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-2 col-md-4 mb-1">
-            <div class="card bg-info shadow-info position-relative">
-                <div class="card-body text-center">
-                    <a href="{{ url_for('purchasing_blueprint.seafood') }}"><h4 class="stretched-link mb-0">SEAFOOD</h4></a>
+                    <a href="{{ url_for('supply_blueprint.linen') }}">
+                        <h4 class="stretched-link mb-0">Linen</h4>
+                    </a>
                 </div>
             </div>
         </div>
@@ -54,16 +40,16 @@
     <!-- First Row -Charts -->
     <div class="row mt-2">
         <div class="col-lg-4 col-md-6 mt-2 mb-2">
-            <div class="card h-100 shadow-primary">
+            <div class="card h-100 shadow-warning">
                 <div class="card-body">
-                    <h4 class="mb-0 ">Top 10 Food Items Past 30 Days</h4>
+                    <h4 class="mb-0 ">Top Linen Costs Items</h4>
                     <div class="table-responsive table-hover">
                         <table class="table-sm text-dark">
+                            <caption>Past 30 Days</caption>
                             <thead>
                                 <tr>
-                                    <th scope="col">PRODUCT</th>
+                                    <th scope="col">Item</th>
                                     <th scope="col">TOTAL COST</th>
-                                    <th scope="col">% OF TOTAL</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -76,8 +62,37 @@
                                     <td>
                                         <p class="mb-0 ms-1 text-begin">{{ "${:,.0f}".format(s['Cost']) }}</p>
                                     </td>
+                                </tr>
+                                {% endfor %}
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 mt-2 mb-2">
+            <div class="card h-100 shadow-warning">
+                <div class="card-body">
+                    <h4 class="mb-0 ">Linen Costs per Restaurant</h4>
+                    <div class="table-responsive table-hover">
+                        <table class="table-sm text-dark">
+                            <caption>Past 30 Days</caption>
+                            <thead>
+                                <tr>
+                                    <th scope="col">RESTAURANT</th>
+                                    <th scope="col">TOTAL COST</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    {% for k, s in top_ten_restaurant.iterrows() %}
+                                <tr>
                                     <td>
-                                        <p class="mb-0 ms-1 text-begin">{{ "{:,.1f}%".format(s['percent']*100) }}</p>
+                                        <p class="mb-0 ms-1 text-begin">{{ s['Restaurant'] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ "${:,.0f}".format(s['Cost']) }}</p>
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -89,20 +104,12 @@
             </div>
         </div>
         <div class="col-lg-4 col-md-6 mt-2 mb-2">
-            <div class="card h-100 bg-gradient-light shadow-primary">
+            <div class="card h-100 shadow-warning">
                 <div class="card-body">
-                    <div class="chart">
-                        <canvas id="food-chart" class="chart-canvas" height="100"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-4 col-md-6 mt-2 mb-2">
-            <div class="card h-100 shadow-primary">
-                <div class="card-body">
-                    <h4 class="mb-0 ">Top 10 Food Vendors Past 30 Days</h4>
+                    <h4 class="mb-0 ">Top Linen Vendors</h4>
                     <div class="table-responsive table-hover">
                         <table class="table-sm text-dark">
+                            <caption>Past 30 Days</caption>
                             <thead>
                                 <tr>
                                     <th scope="col">Vendor</th>
@@ -134,7 +141,7 @@
         </div>
     </div>
 
-  {% include 'includes/footer.html' %}
+    {% include 'includes/footer.html' %}
 
 </div>
 
@@ -143,47 +150,5 @@
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
 
-<script src="/static/assets/js/plugins/chartjs.min.js"></script>
-<script>
-    var ctx1 = document.getElementById("food-chart").getContext("2d");
-    new Chart(ctx1, {
-        type: "pie",
-        data: {
-            labels: {{ category_items | safe }},
-            datasets: [{
-                label: "Food Costs",
-                data: {{ category_values | safe }},
-                backgroundColor: [
-                    "rgba(233, 30, 99, 1)",
-                    "rgba(123, 128, 154, 1)",
-                    "rgba(26, 115, 232, 1)",
-                    "rgba(244, 67, 53, 1)",
-                    "rgba(76, 175, 80, 1)",
-                    "rgba(255, 152, 0, 1)",
-                    "rgba(64, 64, 64, 1)",
-                ],
-                borderColor: [
-                    "rgba(233, 30, 99, 1)",
-                    "rgba(123, 128, 154, 1)",
-                    "rgba(26, 115, 232, 1)",
-                    "rgba(244, 67, 53, 1)",
-                    "rgba(76, 175, 80, 1)",
-                    "rgba(255, 152, 0, 1)",
-                    "rgba(64, 64, 64, 1)",
-                ],
-                borderWidth: 1,
-        }, ],
-      },
-        options: {
-        responsive: true,
-        plugins: {
-            legend: {
-                display: false,
-            }
-        },
-    },
-    });
 
-
-</script>
 {% endblock javascripts %}

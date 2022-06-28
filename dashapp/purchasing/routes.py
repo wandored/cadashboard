@@ -48,93 +48,31 @@ def purchasing():
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
     food_list = ["Beef", "Food Other", "Pork", "Poultry", "Produce", "Fish"]
-    top_ten_food = get_category_topten(
+    top_ten = get_category_topten(
         food_list,
         fiscal_dates["last_thirty"],
         fiscal_dates["start_day"],
     )
 
-    food_category_costs = get_category_costs(
+    category_costs = get_category_costs(
         food_list,
         fiscal_dates["last_thirty"],
         fiscal_dates["start_day"],
     )
-    food_category_items = food_category_costs["Account"].tolist()
-    food_category_values = food_category_costs["Totals"].tolist()
+    category_items = category_costs["Account"].tolist()
+    category_values = category_costs["Totals"].tolist()
 
-    food_category_costs.replace("Fish", "Seafood", inplace=True)
-    food_category_costs.set_index("Account", inplace=True)
-    beef_costs = food_category_costs.loc["Beef"]["Totals"]
-    foodother_costs = food_category_costs.loc["Food Other"]["Totals"]
-    pork_costs = food_category_costs.loc["Pork"]["Totals"]
-    poultry_costs = food_category_costs.loc["Poultry"]["Totals"]
-    produce_costs = food_category_costs.loc["Produce"]["Totals"]
-    seafood_costs = food_category_costs.loc["Seafood"]["Totals"]
+    category_costs.replace("Fish", "Seafood", inplace=True)
+    category_costs.set_index("Account", inplace=True)
 
     top_ten_vendor = get_vendor_topten(
         food_list,
         fiscal_dates["last_thirty"],
         fiscal_dates["start_day"],
     )
-
-    supply_list = [
-        "Restaurant Supplies",
-        "Kitchen Supplies",
-        "Cleaning Supplies",
-        "Office Supplies",
-        "Catering Supplies/Expense",
-        "Bar Supplies" "Smallware",
-    ]
-    supply_costs = get_category_costs(
-        supply_list,
-        fiscal_dates["last_thirty"],
-        fiscal_dates["start_day"],
-    )
-    smallware_list = [
-        "Smallware" "China",
-        "Silverware",
-        "Glassware",
-    ]
-    smallware_costs = get_category_costs(
-        smallware_list,
-        fiscal_dates["last_thirty"],
-        fiscal_dates["start_day"],
-    )
-    # TODO supplies boxex
-    smallware_costs.loc["Smallware"] = smallware_costs.sum(numeric_only=True)
-    total_row = smallware_costs.loc["Smallware"]
-    smallware_costs = pd.concat([smallware_costs, total_row])
-    print(supply_costs)
-
-    # supply_list = [
-    #    "Restaurant Supplies",
-    #    "Kitchen Supplies",
-    #    "Cleaning Supplies",
-    #    "Office Supplies",
-    #    "Catering Supplies/Expense",
-    #    "Bar Supplies"
-    # ]
-    # top_ten_supply = get_category_topten(
-    #    food_list,
-    #    fiscal_dates['last_thirty'],
-    #    fiscal_dates['start_day'],
-    # )
-    # top_ten_supply_items = top_ten_supply['Item'].tolist()
-    # top_ten_supply_values = top_ten_supply['Cost'].tolist()
-
-    # smallware_list = [
-    #    "Smallware",
-    #    "China",
-    #    "Silverware",
-    #    "Glassware",
-    # ]
-    # top_ten_smallware = get_category_topten(
-    #    food_list,
-    #    fiscal_dates['last_thirty'],
-    #    fiscal_dates['start_day'],
-    # )
-    # top_ten_smallware_items = top_ten_smallware['Item'].tolist()
-    # top_ten_smallware_values = top_ten_smallware['Cost'].tolist()
+    category_costs_total = category_costs["Totals"].sum()
+    top_ten["percent"] = top_ten["Cost"] / category_costs_total
+    top_ten_vendor["percent"] = top_ten_vendor["Cost"] / category_costs_total
 
     # TODO refactor with **locals() in render_template
 
@@ -147,18 +85,10 @@ def purchasing():
         form1=form1,
         form3=form3,
         current_user=current_user,
-        top_ten_food=top_ten_food,
-        food_category_items=food_category_items,
-        food_category_values=food_category_values,
+        top_ten=top_ten,
+        category_items=category_items,
+        category_values=category_values,
         top_ten_vendor=top_ten_vendor,
-        # top_ten_supply_items=top_ten_supply_items,
-        # top_ten_supply_values=top_ten_supply_values,
-        beef_costs=beef_costs,
-        foodother_costs=foodother_costs,
-        pork_costs=pork_costs,
-        poultry_costs=poultry_costs,
-        produce_costs=produce_costs,
-        seafood_costs=seafood_costs,
     )
 
 
@@ -254,6 +184,42 @@ def beef():
         "BEEF Ribs Short Choice", fiscal_dates["last_seven"]
     )
 
+    prime_tenderloin_chart = period_purchases(
+        "BEEF Tenderloin Whole Prime",
+        fiscal_dates["start_year"],
+        fiscal_dates["end_year"],
+    )
+    del prime_tenderloin_chart[fiscal_dates["period"] :]
+    prime_tenderloin_chart_ly = period_purchases(
+        "BEEF Tenderloin Whole Prime",
+        fiscal_dates["start_year_ly"],
+        fiscal_dates["end_year_ly"],
+    )
+    prime_tenderloin_store = get_cost_per_store(
+        "BEEF Tenderloin Whole Prime", fiscal_dates["last_seven"]
+    )
+    prime_tenderloin_vendor = get_cost_per_vendor(
+        "BEEF Tenderloin Whole Prime", fiscal_dates["last_seven"]
+    )
+
+    choice_tenderloin_chart = period_purchases(
+        "BEEF Tenderloin Whole Choice",
+        fiscal_dates["start_year"],
+        fiscal_dates["end_year"],
+    )
+    del choice_tenderloin_chart[fiscal_dates["period"] :]
+    choice_tenderloin_chart_ly = period_purchases(
+        "BEEF Tenderloin Whole Choice",
+        fiscal_dates["start_year_ly"],
+        fiscal_dates["end_year_ly"],
+    )
+    choice_tenderloin_store = get_cost_per_store(
+        "BEEF Tenderloin Whole Choice", fiscal_dates["last_seven"]
+    )
+    choice_tenderloin_vendor = get_cost_per_vendor(
+        "BEEF Tenderloin Whole Choice", fiscal_dates["last_seven"]
+    )
+
     corned_beef_chart = period_purchases(
         "BEEF Corned Beef", fiscal_dates["start_year"], fiscal_dates["end_year"]
     )
@@ -269,34 +235,62 @@ def beef():
     corned_beef_vendor = get_cost_per_vendor(
         "BEEF Corned Beef", fiscal_dates["last_seven"]
     )
+    burger_patty_chart = period_purchases(
+        "BEEF Patty Grnd Beef 8oz", fiscal_dates["start_year"], fiscal_dates["end_year"]
+    )
+    del burger_patty_chart[fiscal_dates["period"] :]
+    burger_patty_chart_ly = period_purchases(
+        "BEEF Patty Grnd Beef 8oz",
+        fiscal_dates["start_year_ly"],
+        fiscal_dates["end_year_ly"],
+    )
+    burger_patty_store = get_cost_per_store(
+        "BEEF Patty Grnd Beef 8oz", fiscal_dates["last_seven"]
+    )
+    burger_patty_vendor = get_cost_per_vendor(
+        "BEEF Patty Grnd Beef 8oz", fiscal_dates["last_seven"]
+    )
 
     return render_template(
         "purchasing/beef.html",
         title="Beef",
         company_name=Config.COMPANY_NAME,
         segment="purchasing",
-        fiscal_dates=fiscal_dates,
-        form1=form1,
-        form3=form3,
-        current_user=current_user,
-        top_ten_choice=top_ten_choice,
-        top_ten_prime=top_ten_prime,
-        prime_chart=prime_chart,
-        prime_chart_ly=prime_chart_ly,
-        choice_chart=choice_chart,
-        choice_chart_ly=choice_chart_ly,
-        prime_rib_chart=prime_rib_chart,
-        prime_rib_chart_ly=prime_rib_chart_ly,
-        short_rib_chart=short_rib_chart,
-        short_rib_chart_ly=short_rib_chart_ly,
-        corned_beef_chart=corned_beef_chart,
-        corned_beef_chart_ly=corned_beef_chart_ly,
-        prime_rib_store=prime_rib_store,
-        prime_rib_vendor=prime_rib_vendor,
-        short_rib_store=short_rib_store,
-        short_rib_vendor=short_rib_vendor,
-        corned_beef_store=corned_beef_store,
-        corned_beef_vendor=corned_beef_vendor,
+        **locals(),
+        # fiscal_dates=fiscal_dates,
+        # form1=form1,
+        # form3=form3,
+        # current_user=current_user,
+        # top_ten_prime=top_ten_prime,
+        # prime_chart=prime_chart,
+        # prime_chart_ly=prime_chart_ly,
+        # top_ten_choice=top_ten_choice,
+        # choice_chart=choice_chart,
+        # choice_chart_ly=choice_chart_ly,
+        # prime_rib_chart=prime_rib_chart,
+        # prime_rib_chart_ly=prime_rib_chart_ly,
+        # prime_rib_store=prime_rib_store,
+        # prime_rib_vendor=prime_rib_vendor,
+        # short_rib_chart=short_rib_chart,
+        # short_rib_chart_ly=short_rib_chart_ly,
+        # short_rib_store=short_rib_store,
+        # short_rib_vendor=short_rib_vendor,
+        # corned_beef_chart=corned_beef_chart,
+        # corned_beef_chart_ly=corned_beef_chart_ly,
+        # corned_beef_store=corned_beef_store,
+        # corned_beef_vendor=corned_beef_vendor,
+        # prime_tenderloin_chart=prime_tenderloin_chart,
+        # prime_tenderloin_chart_ly=prime_tenderloin_chart_ly,
+        # prime_tenderloin_store=prime_tenderloin_store,
+        # prime_tenderloin_vendor=prime_tenderloin_vendor,
+        # choice_tenderloin_chart=choice_tenderloin_chart,
+        # choice_tenderloin_chart_ly=choice_tenderloin_chart_ly,
+        # choice_tenderloin_store=choice_tenderloin_store,
+        # choice_tenderloin_vendor=choice_tenderloin_vendor,
+        # burger_patty_chart=burger_patty_chart,
+        # burger_patty_chart_ly=burger_patty_chart_ly,
+        # burger_patty_store=burger_patty_store,
+        # burger_patty_vendor=burger_patty_vendor,
     )
 
 
@@ -343,6 +337,15 @@ def poultry():
         fiscal_dates["start_day"],
     )
 
+    category_costs = get_category_costs(
+        ["Poultry"],
+        fiscal_dates["last_thirty"],
+        fiscal_dates["start_day"],
+    )
+    category_costs_total = category_costs["Totals"].sum()
+    top_ten["percent"] = top_ten["Cost"] / category_costs_total
+    top_ten_vendor["percent"] = top_ten_vendor["Cost"] / category_costs_total
+
     # Create charts for items in top ten list
     product_list = top_ten["Item"].tolist()
     product_dict = {}
@@ -352,22 +355,24 @@ def poultry():
     product_names = []
     for pl in product_list:
         this_year = period_purchases(
-            pl, fiscal_dates["start_year"], fiscal_dates["end_year"]
+            "^({})$".format(pl), fiscal_dates["start_year"], fiscal_dates["end_year"]
         )
         del this_year[fiscal_dates["period"] :]  # remove zeros from future periods
         last_year = period_purchases(
-            pl, fiscal_dates["start_year_ly"], fiscal_dates["end_year_ly"]
+            "^({})$".format(pl),
+            fiscal_dates["start_year_ly"],
+            fiscal_dates["end_year_ly"],
         )
         product_dict["{}_ty".format(x)] = this_year
         product_dict["{}_ly".format(x)] = last_year
         product_names.append(pl)
 
         store_cost_dict["{}".format(x)] = get_cost_per_store(
-            pl, fiscal_dates["last_seven"]
+            "^({})$".format(pl), fiscal_dates["last_seven"]
         )
 
         vendor_cost_dict["{}".format(x)] = get_cost_per_vendor(
-            pl, fiscal_dates["last_seven"]
+            "^({})$".format(pl), fiscal_dates["last_seven"]
         )
         x = x + 1
 
@@ -433,6 +438,15 @@ def seafood():
         fiscal_dates["start_day"],
     )
 
+    category_costs = get_category_costs(
+        ["Fish"],
+        fiscal_dates["last_thirty"],
+        fiscal_dates["start_day"],
+    )
+    category_costs_total = category_costs["Totals"].sum()
+    top_ten["percent"] = top_ten["Cost"] / category_costs_total
+    top_ten_vendor["percent"] = top_ten_vendor["Cost"] / category_costs_total
+
     # Create charts for items in top ten list
     product_list = top_ten["Item"].tolist()
     product_dict = {}
@@ -442,22 +456,24 @@ def seafood():
     product_names = []
     for pl in product_list:
         this_year = period_purchases(
-            pl, fiscal_dates["start_year"], fiscal_dates["end_year"]
+            "^({})$".format(pl), fiscal_dates["start_year"], fiscal_dates["end_year"]
         )
         del this_year[fiscal_dates["period"] :]
         last_year = period_purchases(
-            pl, fiscal_dates["start_year_ly"], fiscal_dates["end_year_ly"]
+            "^({})$".format(pl),
+            fiscal_dates["start_year_ly"],
+            fiscal_dates["end_year_ly"],
         )
         product_dict["{}_ty".format(x)] = this_year
         product_dict["{}_ly".format(x)] = last_year
         product_names.append(pl)
 
         store_cost_dict["{}".format(x)] = get_cost_per_store(
-            pl, fiscal_dates["last_seven"]
+            "^({})$".format(pl), fiscal_dates["last_seven"]
         )
 
         vendor_cost_dict["{}".format(x)] = get_cost_per_vendor(
-            pl, fiscal_dates["last_seven"]
+            "^({})$".format(pl), fiscal_dates["last_seven"]
         )
         x = x + 1
 
@@ -523,6 +539,15 @@ def pork():
         fiscal_dates["start_day"],
     )
 
+    category_costs = get_category_costs(
+        ["Pork"],
+        fiscal_dates["last_thirty"],
+        fiscal_dates["start_day"],
+    )
+    category_costs_total = category_costs["Totals"].sum()
+    top_ten["percent"] = top_ten["Cost"] / category_costs_total
+    top_ten_vendor["percent"] = top_ten_vendor["Cost"] / category_costs_total
+
     # Create charts for items in top ten list
     product_list = top_ten["Item"].tolist()
     product_dict = {}
@@ -532,22 +557,24 @@ def pork():
     product_names = []
     for pl in product_list:
         this_year = period_purchases(
-            pl, fiscal_dates["start_year"], fiscal_dates["end_year"]
+            "^({})$".format(pl), fiscal_dates["start_year"], fiscal_dates["end_year"]
         )
         del this_year[fiscal_dates["period"] :]
         last_year = period_purchases(
-            pl, fiscal_dates["start_year_ly"], fiscal_dates["end_year_ly"]
+            "^({})$".format(pl),
+            fiscal_dates["start_year_ly"],
+            fiscal_dates["end_year_ly"],
         )
         product_dict["{}_ty".format(x)] = this_year
         product_dict["{}_ly".format(x)] = last_year
         product_names.append(pl)
 
         store_cost_dict["{}".format(x)] = get_cost_per_store(
-            pl, fiscal_dates["last_seven"]
+            "^({})$".format(pl), fiscal_dates["last_seven"]
         )
 
         vendor_cost_dict["{}".format(x)] = get_cost_per_vendor(
-            pl, fiscal_dates["last_seven"]
+            "^({})$".format(pl), fiscal_dates["last_seven"]
         )
         x = x + 1
 
@@ -613,6 +640,15 @@ def produce():
         fiscal_dates["start_day"],
     )
 
+    category_costs = get_category_costs(
+        ["Produce"],
+        fiscal_dates["last_thirty"],
+        fiscal_dates["start_day"],
+    )
+    category_costs_total = category_costs["Totals"].sum()
+    top_ten["percent"] = top_ten["Cost"] / category_costs_total
+    top_ten_vendor["percent"] = top_ten_vendor["Cost"] / category_costs_total
+
     # Create charts for items in top ten list
     product_list = top_ten["Item"].tolist()
     product_dict = {}
@@ -622,22 +658,24 @@ def produce():
     product_names = []
     for pl in product_list:
         this_year = period_purchases(
-            pl, fiscal_dates["start_year"], fiscal_dates["end_year"]
+            "^({})$".format(pl), fiscal_dates["start_year"], fiscal_dates["end_year"]
         )
         del this_year[fiscal_dates["period"] :]
         last_year = period_purchases(
-            pl, fiscal_dates["start_year_ly"], fiscal_dates["end_year_ly"]
+            "^({})$".format(pl),
+            fiscal_dates["start_year_ly"],
+            fiscal_dates["end_year_ly"],
         )
         product_dict["{}_ty".format(x)] = this_year
         product_dict["{}_ly".format(x)] = last_year
         product_names.append(pl)
 
         store_cost_dict["{}".format(x)] = get_cost_per_store(
-            pl, fiscal_dates["last_seven"]
+            "^({})$".format(pl), fiscal_dates["last_seven"]
         )
 
         vendor_cost_dict["{}".format(x)] = get_cost_per_vendor(
-            pl, fiscal_dates["last_seven"]
+            "^({})$".format(pl), fiscal_dates["last_seven"]
         )
         x = x + 1
 
@@ -703,6 +741,15 @@ def foodother():
         fiscal_dates["start_day"],
     )
 
+    category_costs = get_category_costs(
+        ["Food Other"],
+        fiscal_dates["last_thirty"],
+        fiscal_dates["start_day"],
+    )
+    category_costs_total = category_costs["Totals"].sum()
+    top_ten["percent"] = top_ten["Cost"] / category_costs_total
+    top_ten_vendor["percent"] = top_ten_vendor["Cost"] / category_costs_total
+
     # Create charts for items in top ten list
     product_list = top_ten["Item"].tolist()
     product_dict = {}
@@ -712,22 +759,24 @@ def foodother():
     product_names = []
     for pl in product_list:
         this_year = period_purchases(
-            pl, fiscal_dates["start_year"], fiscal_dates["end_year"]
+            "^({})$".format(pl), fiscal_dates["start_year"], fiscal_dates["end_year"]
         )
         del this_year[fiscal_dates["period"] :]
         last_year = period_purchases(
-            pl, fiscal_dates["start_year_ly"], fiscal_dates["end_year_ly"]
+            "^({})$".format(pl),
+            fiscal_dates["start_year_ly"],
+            fiscal_dates["end_year_ly"],
         )
         product_dict["{}_ty".format(x)] = this_year
         product_dict["{}_ly".format(x)] = last_year
         product_names.append(pl)
 
         store_cost_dict["{}".format(x)] = get_cost_per_store(
-            pl, fiscal_dates["last_seven"]
+            "^({})$".format(pl), fiscal_dates["last_seven"]
         )
 
         vendor_cost_dict["{}".format(x)] = get_cost_per_vendor(
-            pl, fiscal_dates["last_seven"]
+            "^({})$".format(pl), fiscal_dates["last_seven"]
         )
         x = x + 1
 

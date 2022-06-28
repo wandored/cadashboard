@@ -55,15 +55,17 @@
     <!-- First Row -Charts -->
     <div class="row mt-4">
         <div class="col-lg-4 col-md-6 mt-4 mb-4">
-            <div class="card z-index-2 ">
+            <div class="card z-index-2 h-100">
                 <div class="card-body shadow-danger">
                     <h4 class="mb-0 ">Top 10 Products</h4>
                     <div class="table-responsive table-hover">
                         <table class="table-sm text-dark">
+                            <caption>Last 30 Days</caption>
                             <thead>
                                 <tr>
                                     <th scope="col">PRODUCT</th>
                                     <th scope="col">TOTAL COST</th>
+                                    <th scope="col">% OF TOTAL</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -76,22 +78,25 @@
                                     <td>
                                         <p class="mb-0 ms-1 text-begin">{{ "${:,.0f}".format(s['Cost']) }}</p>
                                     </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ "{:,.1f}%".format(s['percent']*100) }}</p>
+                                    </td>
                                 </tr>
                                 {% endfor %}
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-                    <h6>Past 30 Days</h6>
                 </div>
             </div>
         </div>
         <div class="col-lg-4 col-md-6 mt-4 mb-4">
-            <div class="card z-index-2 ">
+            <div class="card z-index-2 h-100">
                 <div class="card-body shadow-danger">
                     <h4 class="mb-0 ">Purchases per Restaurant</h4>
                     <div class="table-responsive table-hover">
                         <table class="table-sm text-dark">
+                            <caption>Last 30 Days</caption>
                             <thead>
                                 <tr>
                                     <th scope="col">RESTAURANT</th>
@@ -114,20 +119,21 @@
                             </tbody>
                         </table>
                     </div>
-                    <h6>Past 30 Days</h6>
                 </div>
             </div>
         </div>
         <div class="col-lg-4 col-md-6 mt-4 mb-4">
-            <div class="card z-index-2 ">
+            <div class="card z-index-2 h-100">
                 <div class="card-body shadow-danger">
                     <h4 class="mb-0 ">Purchases per Vendor</h4>
                     <div class="table-responsive table-hover">
                         <table class="table-sm text-dark">
+                            <caption>Last 30 Days</caption>
                             <thead>
                                 <tr>
                                     <th scope="col">VENDOR</th>
                                     <th scope="col">TOTAL COST</th>
+                                    <th scope="col">% OF TOTAL</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -140,13 +146,15 @@
                                     <td>
                                         <p class="mb-0 ms-1 text-begin">{{ "${:,.0f}".format(s['Cost']) }}</p>
                                     </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ "{:,.1f}%".format(s['percent']*100) }}</p>
+                                    </td>
                                 </tr>
                                 {% endfor %}
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-                    <h6>Past 30 Days</h6>
                 </div>
             </div>
         </div>
@@ -169,14 +177,22 @@
                             <thead>
                                 <tr>
                                     <th scope="col">RESTAURANT</th>
-                                    <th scope="col">AVERAGE COST</th>
+                                    <th scope="col">UNIT</th>
+                                    <th scope="col">COUNT</th>
+                                    <th scope="col">COST</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for k, v in store_cost_dict["1"].iterrows() %}
                                 <tr>
                                     <td>
-                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name[0] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name[1] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{ "{:,.0f}".format(v.unit_qty) }}</p>
                                     </td>
                                     <td>
                                         <p class="mb-0 ms-1 text-end">{{ "${:,.2f}".format(v.unit_cost) }}</p>
@@ -187,17 +203,26 @@
                         </table>
                         <hr>
                         <table class="table-sm text-dark">
+                            <caption>Last 7 Days</caption>
                             <thead>
                                 <tr>
                                     <th scope="col">VENDOR</th>
-                                    <th scope="col">AVERAGE COST</th>
+                                    <th scope="col">UNIT</th>
+                                    <th scope="col">COUNT</th>
+                                    <th scope="col">COST</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for k, v in vendor_cost_dict["1"].iterrows() %}
                                 <tr>
                                     <td>
-                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name[0] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name[1] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{ "{:,.0f}".format(v.unit_qty) }}</p>
                                     </td>
                                     <td>
                                         <p class="mb-0 ms-1 text-end">{{  "${:,.2f}".format(v.unit_cost) }}</p>
@@ -207,7 +232,6 @@
                             </tbody>
                         </table>
                     </div>
-                    <h6>Past 7 Days</h6>
                 </div>
             </div>
         </div>
@@ -227,14 +251,22 @@
                             <thead>
                                 <tr>
                                     <th scope="col">RESTAURANT</th>
-                                    <th scope="col">AVERAGE COST</th>
+                                    <th scope="col">UNIT</th>
+                                    <th scope="col">COUNT</th>
+                                    <th scope="col">COST</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for k, v in store_cost_dict["2"].iterrows() %}
                                 <tr>
                                     <td>
-                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name[0] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name[1] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{ "{:,.0f}".format(v.unit_qty) }}</p>
                                     </td>
                                     <td>
                                         <p class="mb-0 ms-1 text-end">{{ "${:,.2f}".format(v.unit_cost) }}</p>
@@ -245,17 +277,26 @@
                         </table>
                         <hr>
                         <table class="table-sm text-dark">
+                            <caption>Last 7 Days</caption>
                             <thead>
                                 <tr>
                                     <th scope="col">VENDOR</th>
-                                    <th scope="col">AVERAGE COST</th>
+                                    <th scope="col">UNIT</th>
+                                    <th scope="col">COUNT</th>
+                                    <th scope="col">COST</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for k, v in vendor_cost_dict["2"].iterrows() %}
                                 <tr>
                                     <td>
-                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name[0] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name[1] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{ "{:,.0f}".format(v.unit_qty) }}</p>
                                     </td>
                                     <td>
                                         <p class="mb-0 ms-1 text-end">{{  "${:,.2f}".format(v.unit_cost) }}</p>
@@ -265,7 +306,6 @@
                             </tbody>
                         </table>
                     </div>
-                    <h6>Past 7 Days</h6>
                 </div>
             </div>
         </div>
@@ -285,14 +325,22 @@
                             <thead>
                                 <tr>
                                     <th scope="col">RESTAURANT</th>
-                                    <th scope="col">AVERAGE COST</th>
+                                    <th scope="col">UNIT</th>
+                                    <th scope="col">COUNT</th>
+                                    <th scope="col">COST</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for k, v in store_cost_dict["3"].iterrows() %}
                                 <tr>
                                     <td>
-                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name[0] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name[1] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{ "{:,.0f}".format(v.unit_qty) }}</p>
                                     </td>
                                     <td>
                                         <p class="mb-0 ms-1 text-end">{{ "${:,.2f}".format(v.unit_cost) }}</p>
@@ -303,17 +351,26 @@
                         </table>
                         <hr>
                         <table class="table-sm text-dark">
+                            <caption>Last 7 Days</caption>
                             <thead>
                                 <tr>
                                     <th scope="col">VENDOR</th>
-                                    <th scope="col">AVERAGE COST</th>
+                                    <th scope="col">UNIT</th>
+                                    <th scope="col">COUNT</th>
+                                    <th scope="col">COST</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for k, v in vendor_cost_dict["3"].iterrows() %}
                                 <tr>
                                     <td>
-                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name[0] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name[1] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{ "{:,.0f}".format(v.unit_qty) }}</p>
                                     </td>
                                     <td>
                                         <p class="mb-0 ms-1 text-end">{{  "${:,.2f}".format(v.unit_cost) }}</p>
@@ -323,7 +380,6 @@
                             </tbody>
                         </table>
                     </div>
-                    <h6>Past 7 Days</h6>
                 </div>
             </div>
         </div>
@@ -345,14 +401,22 @@
                             <thead>
                                 <tr>
                                     <th scope="col">RESTAURANT</th>
-                                    <th scope="col">AVERAGE COST</th>
+                                    <th scope="col">UNIT</th>
+                                    <th scope="col">COUNT</th>
+                                    <th scope="col">COST</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for k, v in store_cost_dict["4"].iterrows() %}
                                 <tr>
                                     <td>
-                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name[0] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name[1] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{ "{:,.0f}".format(v.unit_qty) }}</p>
                                     </td>
                                     <td>
                                         <p class="mb-0 ms-1 text-end">{{ "${:,.2f}".format(v.unit_cost) }}</p>
@@ -363,17 +427,26 @@
                         </table>
                         <hr>
                         <table class="table-sm text-dark">
+                            <caption>Last 7 Days</caption>
                             <thead>
                                 <tr>
                                     <th scope="col">VENDOR</th>
-                                    <th scope="col">AVERAGE COST</th>
+                                    <th scope="col">UNIT</th>
+                                    <th scope="col">COUNT</th>
+                                    <th scope="col">COST</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for k, v in vendor_cost_dict["4"].iterrows() %}
                                 <tr>
                                     <td>
-                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name[0] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name[1] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{ "{:,.0f}".format(v.unit_qty) }}</p>
                                     </td>
                                     <td>
                                         <p class="mb-0 ms-1 text-end">{{  "${:,.2f}".format(v.unit_cost) }}</p>
@@ -383,7 +456,6 @@
                             </tbody>
                         </table>
                     </div>
-                    <h6>Past 7 Days</h6>
                 </div>
             </div>
         </div>
@@ -403,14 +475,22 @@
                             <thead>
                                 <tr>
                                     <th scope="col">RESTAURANT</th>
-                                    <th scope="col">AVERAGE COST</th>
+                                    <th scope="col">UNIT</th>
+                                    <th scope="col">COUNT</th>
+                                    <th scope="col">COST</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for k, v in store_cost_dict["5"].iterrows() %}
                                 <tr>
                                     <td>
-                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name[0] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name[1] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{ "{:,.0f}".format(v.unit_qty) }}</p>
                                     </td>
                                     <td>
                                         <p class="mb-0 ms-1 text-end">{{ "${:,.2f}".format(v.unit_cost) }}</p>
@@ -421,17 +501,26 @@
                         </table>
                         <hr>
                         <table class="table-sm text-dark">
+                            <caption>Last 7 Days</caption>
                             <thead>
                                 <tr>
                                     <th scope="col">VENDOR</th>
-                                    <th scope="col">AVERAGE COST</th>
+                                    <th scope="col">UNIT</th>
+                                    <th scope="col">COUNT</th>
+                                    <th scope="col">COST</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for k, v in vendor_cost_dict["5"].iterrows() %}
                                 <tr>
                                     <td>
-                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name[0] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name[1] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{ "{:,.0f}".format(v.unit_qty) }}</p>
                                     </td>
                                     <td>
                                         <p class="mb-0 ms-1 text-end">{{  "${:,.2f}".format(v.unit_cost) }}</p>
@@ -441,7 +530,6 @@
                             </tbody>
                         </table>
                     </div>
-                    <h6>Past 7 Days</h6>
                 </div>
             </div>
         </div>
@@ -461,14 +549,22 @@
                             <thead>
                                 <tr>
                                     <th scope="col">RESTAURANT</th>
-                                    <th scope="col">AVERAGE COST</th>
+                                    <th scope="col">UNIT</th>
+                                    <th scope="col">COUNT</th>
+                                    <th scope="col">COST</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for k, v in store_cost_dict["6"].iterrows() %}
                                 <tr>
                                     <td>
-                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name[0] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name[1] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{ "{:,.0f}".format(v.unit_qty) }}</p>
                                     </td>
                                     <td>
                                         <p class="mb-0 ms-1 text-end">{{ "${:,.2f}".format(v.unit_cost) }}</p>
@@ -479,17 +575,26 @@
                         </table>
                         <hr>
                         <table class="table-sm text-dark">
+                            <caption>Last 7 Days</caption>
                             <thead>
                                 <tr>
                                     <th scope="col">VENDOR</th>
-                                    <th scope="col">AVERAGE COST</th>
+                                    <th scope="col">UNIT</th>
+                                    <th scope="col">COUNT</th>
+                                    <th scope="col">COST</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for k, v in vendor_cost_dict["6"].iterrows() %}
                                 <tr>
                                     <td>
-                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name[0] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name[1] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{ "{:,.0f}".format(v.unit_qty) }}</p>
                                     </td>
                                     <td>
                                         <p class="mb-0 ms-1 text-end">{{  "${:,.2f}".format(v.unit_cost) }}</p>
@@ -499,7 +604,6 @@
                             </tbody>
                         </table>
                     </div>
-                    <h6>Past 7 Days</h6>
                 </div>
             </div>
         </div>
@@ -521,14 +625,22 @@
                             <thead>
                                 <tr>
                                     <th scope="col">RESTAURANT</th>
-                                    <th scope="col">AVERAGE COST</th>
+                                    <th scope="col">UNIT</th>
+                                    <th scope="col">COUNT</th>
+                                    <th scope="col">COST</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for k, v in store_cost_dict["7"].iterrows() %}
                                 <tr>
                                     <td>
-                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name[0] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name[1] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{ "{:,.0f}".format(v.unit_qty) }}</p>
                                     </td>
                                     <td>
                                         <p class="mb-0 ms-1 text-end">{{ "${:,.2f}".format(v.unit_cost) }}</p>
@@ -539,17 +651,26 @@
                         </table>
                         <hr>
                         <table class="table-sm text-dark">
+                            <caption>Last 7 Days</caption>
                             <thead>
                                 <tr>
                                     <th scope="col">VENDOR</th>
-                                    <th scope="col">AVERAGE COST</th>
+                                    <th scope="col">UNIT</th>
+                                    <th scope="col">COUNT</th>
+                                    <th scope="col">COST</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for k, v in vendor_cost_dict["7"].iterrows() %}
                                 <tr>
                                     <td>
-                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name[0] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name[1] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{ "{:,.0f}".format(v.unit_qty) }}</p>
                                     </td>
                                     <td>
                                         <p class="mb-0 ms-1 text-end">{{  "${:,.2f}".format(v.unit_cost) }}</p>
@@ -559,7 +680,6 @@
                             </tbody>
                         </table>
                     </div>
-                    <h6>Past 7 Days</h6>
                 </div>
             </div>
         </div>
@@ -579,14 +699,22 @@
                             <thead>
                                 <tr>
                                     <th scope="col">RESTAURANT</th>
-                                    <th scope="col">AVERAGE COST</th>
+                                    <th scope="col">UNIT</th>
+                                    <th scope="col">COUNT</th>
+                                    <th scope="col">COST</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for k, v in store_cost_dict["8"].iterrows() %}
                                 <tr>
                                     <td>
-                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name[0] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name[1] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{ "{:,.0f}".format(v.unit_qty) }}</p>
                                     </td>
                                     <td>
                                         <p class="mb-0 ms-1 text-end">{{ "${:,.2f}".format(v.unit_cost) }}</p>
@@ -597,17 +725,26 @@
                         </table>
                         <hr>
                         <table class="table-sm text-dark">
+                            <caption>Last 7 Days</caption>
                             <thead>
                                 <tr>
                                     <th scope="col">VENDOR</th>
-                                    <th scope="col">AVERAGE COST</th>
+                                    <th scope="col">UNIT</th>
+                                    <th scope="col">COUNT</th>
+                                    <th scope="col">COST</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for k, v in vendor_cost_dict["8"].iterrows() %}
                                 <tr>
                                     <td>
-                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name[0] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name[1] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{ "{:,.0f}".format(v.unit_qty) }}</p>
                                     </td>
                                     <td>
                                         <p class="mb-0 ms-1 text-end">{{  "${:,.2f}".format(v.unit_cost) }}</p>
@@ -617,7 +754,6 @@
                             </tbody>
                         </table>
                     </div>
-                    <h6>Past 7 Days</h6>
                 </div>
             </div>
         </div>
@@ -637,14 +773,22 @@
                             <thead>
                                 <tr>
                                     <th scope="col">RESTAURANT</th>
-                                    <th scope="col">AVERAGE COST</th>
+                                    <th scope="col">UNIT</th>
+                                    <th scope="col">COUNT</th>
+                                    <th scope="col">COST</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for k, v in store_cost_dict["9"].iterrows() %}
                                 <tr>
                                     <td>
-                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name[0] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name[1] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{ "{:,.0f}".format(v.unit_qty) }}</p>
                                     </td>
                                     <td>
                                         <p class="mb-0 ms-1 text-end">{{ "${:,.2f}".format(v.unit_cost) }}</p>
@@ -655,17 +799,26 @@
                         </table>
                         <hr>
                         <table class="table-sm text-dark">
+                            <caption>Last 7 Days</caption>
                             <thead>
                                 <tr>
                                     <th scope="col">VENDOR</th>
-                                    <th scope="col">AVERAGE COST</th>
+                                    <th scope="col">UNIT</th>
+                                    <th scope="col">COUNT</th>
+                                    <th scope="col">COST</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for k, v in vendor_cost_dict["9"].iterrows() %}
                                 <tr>
                                     <td>
-                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name[0] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name[1] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{ "{:,.0f}".format(v.unit_qty) }}</p>
                                     </td>
                                     <td>
                                         <p class="mb-0 ms-1 text-end">{{  "${:,.2f}".format(v.unit_cost) }}</p>
@@ -675,7 +828,6 @@
                             </tbody>
                         </table>
                     </div>
-                    <h6>Past 7 Days</h6>
                 </div>
             </div>
         </div>
@@ -697,14 +849,22 @@
                             <thead>
                                 <tr>
                                     <th scope="col">RESTAURANT</th>
-                                    <th scope="col">AVERAGE COST</th>
+                                    <th scope="col">UNIT</th>
+                                    <th scope="col">COUNT</th>
+                                    <th scope="col">COST</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for k, v in store_cost_dict["10"].iterrows() %}
                                 <tr>
                                     <td>
-                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name[0] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name[1] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{ "{:,.0f}".format(v.unit_qty) }}</p>
                                     </td>
                                     <td>
                                         <p class="mb-0 ms-1 text-end">{{ "${:,.2f}".format(v.unit_cost) }}</p>
@@ -715,17 +875,26 @@
                         </table>
                         <hr>
                         <table class="table-sm text-dark">
+                            <caption>Last 7 Days</caption>
                             <thead>
                                 <tr>
                                     <th scope="col">VENDOR</th>
-                                    <th scope="col">AVERAGE COST</th>
+                                    <th scope="col">UNIT</th>
+                                    <th scope="col">COUNT</th>
+                                    <th scope="col">COST</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for k, v in vendor_cost_dict["10"].iterrows() %}
                                 <tr>
                                     <td>
-                                        <p class="mb-0 ms-1 text-begin">{{ v.name }}</p>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name[0] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-begin">{{ v.name[1] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{ "{:,.0f}".format(v.unit_qty) }}</p>
                                     </td>
                                     <td>
                                         <p class="mb-0 ms-1 text-end">{{  "${:,.2f}".format(v.unit_cost) }}</p>
@@ -735,7 +904,6 @@
                             </tbody>
                         </table>
                     </div>
-                    <h6>Past 7 Days</h6>
                 </div>
             </div>
         </div>

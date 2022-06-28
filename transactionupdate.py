@@ -89,6 +89,7 @@ def transaction(id_list):
     rqst = make_HTTP_request(url)
     df = make_dataframe(rqst)
     df.rename(columns={"name": "company"}, inplace=True)
+    # merge will fail if all transactions are journal entries
     df_return = df_merge.merge(df, on="companyId", how="left")
 
     return df_return
