@@ -165,7 +165,10 @@ def get_cost_per_vendor(regex, days):
             columns=["UofM", "count", "cost", "base_qty", "base_uofm"], inplace=True
         )
         table = pd.pivot_table(
-            df, values=["unit_cost", "unit_qty"], index=["company", "report_unit"], aggfunc="mean"
+            df,
+            values=["unit_cost", "unit_qty"],
+            index=["company", "report_unit"],
+            aggfunc="mean",
         )
         if not table.empty:
             table.sort_values(by=["unit_cost"], inplace=True)
@@ -235,7 +238,10 @@ def get_cost_per_store(regex, days):
             columns=["UofM", "count", "cost", "base_qty", "base_uofm"], inplace=True
         )
         table = pd.pivot_table(
-            df, values=["unit_cost", "unit_qty"], index=["name", "report_unit"], aggfunc="mean"
+            df,
+            values=["unit_cost", "unit_qty"],
+            index=["name", "report_unit"],
+            aggfunc="mean",
         )
         if not table.empty:
             table.sort_values(by=["unit_qty"], ascending=False, inplace=True)
