@@ -1,6 +1,6 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} {{ title }} {% endblock %}
+{% block title %} Template {% endblock %}
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}{% endblock stylesheets %}
@@ -9,20 +9,6 @@
 
 <div class="container-fluid py-4">
     <div class="row mt-4">
-        <div class="col-lg-3 col-md-4 mb-1">
-            <div class="card bg-info shadow-info position-relative">
-                <div class="card-body text-center">
-                    <a href="{{ url_for('purchasing_blueprint.seafood') }}"><h4 class="stretched-link mb-0">SEAFOOD</h4></a>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-4 mb-1">
-            <div class="card bg-primary shadow-primary position-relative">
-                <div class="card-body text-center">
-                    <a href="{{ url_for('purchasing_blueprint.beef') }}"><h4 class="stretched-link mb-0">BEEF</h4></a>
-                </div>
-            </div>
-        </div>
         <div class="col-lg-3 col-md-4 mb-1">
             <div class="card bg-light shadow-info position-relative">
                 <div class="card-body text-center">
@@ -59,6 +45,20 @@
             </div>
         </div>
         <div class="col-lg-3 col-md-4 mb-1">
+            <div class="card bg-info shadow-info position-relative">
+                <div class="card-body text-center">
+                    <a href="{{ url_for('purchasing_blueprint.seafood') }}"><h4 class="stretched-link mb-0">SEAFOOD</h4></a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-4 mb-1">
+            <div class="card bg-primary shadow-primary position-relative">
+                <div class="card-body text-center">
+                    <a href="{{ url_for('purchasing_blueprint.beef') }}"><h4 class="stretched-link mb-0">BEEF</h4></a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-4 mb-1">
             <div class="card bg-secondary shadow-secondary position-relative">
                 <div class="card-body text-center">
                     <a href="{{ url_for('purchasing_blueprint.purchasing') }}"><h4 class="stretched-link mb-0">FOOD</h4></a>
@@ -66,14 +66,14 @@
             </div>
         </div>
     </div>
-    <!-- Fish Row -Charts -->
+    <!-- First Row -Charts -->
     <div class="row mt-4">
         <div class="col-lg-4 col-md-6 mt-4 mb-4">
-            <div class="card z-index-2 shadow-info h-100">
-                <div class="card-body shadow-info">
+            <div class="card z-index-2 h-100">
+                <div class="card-body shadow-info boarder-info">
                     <h4 class="mb-0 ">Top 10 Products</h4>
                     <div class="table-responsive table-hover">
-                        <table class="table-sm ">
+                        <table class="table-sm">
                             <caption>Last 30 Days</caption>
                             <thead>
                                 <tr>
@@ -106,10 +106,10 @@
         </div>
         <div class="col-lg-4 col-md-6 mt-4 mb-4">
             <div class="card z-index-2 h-100">
-                <div class="card-body shadow-info">
+                <div class="card-body shadow-info boarder-info">
                     <h4 class="mb-0 ">Purchases per Restaurant</h4>
                     <div class="table-responsive table-hover">
-                        <table class="table-sm ">
+                        <table class="table-sm">
                             <caption>Last 30 Days</caption>
                             <thead>
                                 <tr>
@@ -138,11 +138,11 @@
         </div>
         <div class="col-lg-4 col-md-6 mt-4 mb-4">
             <div class="card z-index-2 h-100">
-                <div class="card-body shadow-info">
+                <div class="card-body shadow-info boarder-info">
                     <h4 class="mb-0 ">Purchases per Vendor</h4>
                     <div class="table-responsive table-hover">
-                        <table class="table-sm ">
-                            <caption>Last 30 Days</caption>
+                        <table class="table-sm">
+                        <caption>Last 30 Days</caption>
                             <thead>
                                 <tr>
                                     <th scope="col">VENDOR</th>
@@ -176,7 +176,7 @@
     <!-- First Row -Charts -->
     <div class="row mt-4">
         <div class="col-lg-4 col-md-6 mt-4 mb-4">
-            <div class="card z-index-2 shadow-info">
+            <div class="card z-index-2 shadow-info boarder-info">
                 <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
                     <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
                         <div class="chart">
@@ -216,7 +216,7 @@
                             </tbody>
                         </table>
                         <hr>
-                        <table class="table-sm ">
+                        <table class="table-sm">
                             <caption>Last 7 Days</caption>
                             <thead>
                                 <tr>
@@ -250,7 +250,7 @@
             </div>
         </div>
         <div class="col-lg-4 col-md-6 mt-4 mb-4">
-            <div class="card z-index-2 shadow-info">
+            <div class="card z-index-2 shadow-info boarder-info">
                 <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
                     <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
                         <div class="chart">
@@ -261,7 +261,7 @@
                 <div class="card-body">
                     <h4 class="mb-0 ">{{ product_names[1] }}</h4>
                     <div class="table-responsive table-hover">
-                        <table class="table-sm ">
+                        <table class="table-sm">
                             <thead>
                                 <tr>
                                     <th scope="col">RESTAURANT</th>
@@ -290,7 +290,7 @@
                             </tbody>
                         </table>
                         <hr>
-                        <table class="table-sm ">
+                        <table class="table-sm">
                             <caption>Last 7 Days</caption>
                             <thead>
                                 <tr>
@@ -324,7 +324,7 @@
             </div>
         </div>
         <div class="col-lg-4 col-md-6 mt-4 mb-4">
-            <div class="card z-index-2 shadow-info">
+            <div class="card z-index-2 shadow-info boarder-info">
                 <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
                     <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
                         <div class="chart">
@@ -335,7 +335,7 @@
                 <div class="card-body">
                     <h4 class="mb-0 ">{{ product_names[2] }}</h4>
                     <div class="table-responsive table-hover">
-                        <table class="table-sm ">
+                        <table class="table-sm">
                             <thead>
                                 <tr>
                                     <th scope="col">RESTAURANT</th>
@@ -364,7 +364,7 @@
                             </tbody>
                         </table>
                         <hr>
-                        <table class="table-sm ">
+                        <table class="table-sm">
                             <caption>Last 7 Days</caption>
                             <thead>
                                 <tr>
@@ -400,7 +400,7 @@
     </div>
     <div class="row mt-4">
         <div class="col-lg-4 col-md-6 mt-4 mb-4">
-            <div class="card z-index-2 shadow-info">
+            <div class="card z-index-2 shadow-info boarder-info">
                 <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
                     <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
                         <div class="chart">
@@ -411,7 +411,7 @@
                 <div class="card-body">
                     <h4 class="mb-0 ">{{ product_names[3] }}</h4>
                     <div class="table-responsive table-hover">
-                        <table class="table-sm ">
+                        <table class="table-sm">
                             <thead>
                                 <tr>
                                     <th scope="col">RESTAURANT</th>
@@ -440,7 +440,7 @@
                             </tbody>
                         </table>
                         <hr>
-                        <table class="table-sm ">
+                        <table class="table-sm">
                             <caption>Last 7 Days</caption>
                             <thead>
                                 <tr>
@@ -474,7 +474,7 @@
             </div>
         </div>
         <div class="col-lg-4 col-md-6 mt-4 mb-4">
-            <div class="card z-index-2 shadow-info">
+            <div class="card z-index-2 shadow-info boarder-info">
                 <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
                     <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
                         <div class="chart">
@@ -485,7 +485,7 @@
                 <div class="card-body">
                     <h4 class="mb-0 ">{{ product_names[4] }}</h4>
                     <div class="table-responsive table-hover">
-                        <table class="table-sm ">
+                        <table class="table-sm">
                             <thead>
                                 <tr>
                                     <th scope="col">RESTAURANT</th>
@@ -514,7 +514,7 @@
                             </tbody>
                         </table>
                         <hr>
-                        <table class="table-sm ">
+                        <table class="table-sm">
                             <caption>Last 7 Days</caption>
                             <thead>
                                 <tr>
@@ -548,7 +548,7 @@
             </div>
         </div>
         <div class="col-lg-4 col-md-6 mt-4 mb-4">
-            <div class="card z-index-2 shadow-info">
+            <div class="card z-index-2 shadow-info boarder-info">
                 <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
                     <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
                         <div class="chart">
@@ -559,7 +559,7 @@
                 <div class="card-body">
                     <h4 class="mb-0 ">{{ product_names[5] }}</h4>
                     <div class="table-responsive table-hover">
-                        <table class="table-sm ">
+                        <table class="table-sm">
                             <thead>
                                 <tr>
                                     <th scope="col">RESTAURANT</th>
@@ -588,7 +588,7 @@
                             </tbody>
                         </table>
                         <hr>
-                        <table class="table-sm ">
+                        <table class="table-sm">
                             <caption>Last 7 Days</caption>
                             <thead>
                                 <tr>
@@ -624,7 +624,7 @@
     </div>
     <div class="row mt-4">
         <div class="col-lg-4 col-md-6 mt-4 mb-4">
-            <div class="card z-index-2 shadow-info">
+            <div class="card z-index-2 shadow-info boarder-info">
                 <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
                     <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
                         <div class="chart">
@@ -635,7 +635,7 @@
                 <div class="card-body">
                     <h4 class="mb-0 ">{{ product_names[6] }}</h4>
                     <div class="table-responsive table-hover">
-                        <table class="table-sm ">
+                        <table class="table-sm">
                             <thead>
                                 <tr>
                                     <th scope="col">RESTAURANT</th>
@@ -664,7 +664,7 @@
                             </tbody>
                         </table>
                         <hr>
-                        <table class="table-sm ">
+                        <table class="table-sm">
                             <caption>Last 7 Days</caption>
                             <thead>
                                 <tr>
@@ -698,7 +698,7 @@
             </div>
         </div>
         <div class="col-lg-4 col-md-6 mt-4 mb-4">
-            <div class="card z-index-2 shadow-info">
+            <div class="card z-index-2 shadow-info boarder-info">
                 <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
                     <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
                         <div class="chart">
@@ -709,7 +709,7 @@
                 <div class="card-body">
                     <h4 class="mb-0 ">{{ product_names[7] }}</h4>
                     <div class="table-responsive table-hover">
-                        <table class="table-sm ">
+                        <table class="table-sm">
                             <thead>
                                 <tr>
                                     <th scope="col">RESTAURANT</th>
@@ -738,7 +738,7 @@
                             </tbody>
                         </table>
                         <hr>
-                        <table class="table-sm ">
+                        <table class="table-sm">
                             <caption>Last 7 Days</caption>
                             <thead>
                                 <tr>
@@ -772,7 +772,7 @@
             </div>
         </div>
         <div class="col-lg-4 col-md-6 mt-4 mb-4">
-            <div class="card z-index-2 shadow-info">
+            <div class="card z-index-2 shadow-info boarder-info">
                 <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
                     <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
                         <div class="chart">
@@ -783,7 +783,7 @@
                 <div class="card-body">
                     <h4 class="mb-0 ">{{ product_names[8] }}</h4>
                     <div class="table-responsive table-hover">
-                        <table class="table-sm ">
+                        <table class="table-sm">
                             <thead>
                                 <tr>
                                     <th scope="col">RESTAURANT</th>
@@ -812,7 +812,7 @@
                             </tbody>
                         </table>
                         <hr>
-                        <table class="table-sm ">
+                        <table class="table-sm">
                             <caption>Last 7 Days</caption>
                             <thead>
                                 <tr>
@@ -848,7 +848,7 @@
     <div/>
     <div class="row mt-4">
         <div class="col-lg-4 col-md-6 mt-4 mb-4">
-            <div class="card z-index-2 shadow-info">
+            <div class="card z-index-2 shadow-info boarder-info">
                 <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
                     <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
                         <div class="chart">
@@ -859,7 +859,7 @@
                 <div class="card-body">
                     <h4 class="mb-0 ">{{ product_names[9] }}</h4>
                     <div class="table-responsive table-hover">
-                        <table class="table-sm ">
+                        <table class="table-sm">
                             <thead>
                                 <tr>
                                     <th scope="col">RESTAURANT</th>
@@ -888,7 +888,7 @@
                             </tbody>
                         </table>
                         <hr>
-                        <table class="table-sm ">
+                        <table class="table-sm">
                             <caption>Last 7 Days</caption>
                             <thead>
                                 <tr>
@@ -906,6 +906,9 @@
                                     </td>
                                     <td>
                                         <p class="mb-0 ms-1 text-begin">{{ v.name[1] }}</p>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 ms-1 text-end">{{ "{:,.0f}".format(v.unit_qty) }}</p>
                                     </td>
                                     <td>
                                         <p class="mb-0 ms-1 text-end">{{  "${:,.2f}".format(v.unit_cost) }}</p>

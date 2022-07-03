@@ -47,7 +47,7 @@ def purchasing():
         store_id = form3.store.data.id
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
-    food_list = ["Beef", "Food Other", "Pork", "Poultry", "Produce", "Fish"]
+    food_list = ["Beef", "Food Other", "Dairy", "Pork", "Poultry", "Produce", "Fish"]
     top_ten = get_category_topten(
         food_list,
         fiscal_dates["last_thirty"],
@@ -61,6 +61,7 @@ def purchasing():
     )
     category_items = category_costs["Account"].tolist()
     category_values = category_costs["Totals"].tolist()
+    print(category_values)
 
     category_costs.replace("Fish", "Seafood", inplace=True)
     category_costs.set_index("Account", inplace=True)
@@ -81,14 +82,15 @@ def purchasing():
         title="Purchasing",
         company_name=Config.COMPANY_NAME,
         segment="purchasing",
-        fiscal_dates=fiscal_dates,
-        form1=form1,
-        form3=form3,
-        current_user=current_user,
-        top_ten=top_ten,
-        category_items=category_items,
-        category_values=category_values,
-        top_ten_vendor=top_ten_vendor,
+        **locals(),
+        #fiscal_dates=fiscal_dates,
+        #form1=form1,
+        #form3=form3,
+        #current_user=current_user,
+        #top_ten=top_ten,
+        #category_items=category_items,
+        #category_values=category_values,
+        #top_ten_vendor=top_ten_vendor,
     )
 
 
@@ -294,6 +296,108 @@ def beef():
     )
 
 
+@blueprint.route("/purchasing/dairy", methods=["GET", "POST"])
+@login_required
+def dairy():
+
+    TODAY = datetime.date(datetime.now())
+    CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
+    YSTDAY = TODAY - timedelta(days=1)
+
+    fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
+
+    # Get list of Restaurants
+    data = Restaurants.query.all()
+    store_df = pd.DataFrame([x.as_dict() for x in data])
+
+    form1 = DateForm()
+    form3 = StoreForm()
+
+    if form1.submit1.data and form1.validate():
+        new_day = form1.selectdate.data.strftime("%Y-%m-%d")
+        session["token"] = new_day
+        return redirect(url_for("purchasing_blueprint.dairy"))
+
+    if form3.submit3.data and form3.validate():
+        session["token"] = fiscal_dates["start_day"]
+        store_id = form3.store.data.id
+        return redirect(url_for("home_blueprint.store", store_id=store_id))
+
+    top_ten = get_category_topten(
+        ["Dairy"],
+        fiscal_dates["last_thirty"],
+        fiscal_dates["start_day"],
+    )
+    top_ten_restaurant = get_restaurant_topten(
+        ["Dairy"],
+        fiscal_dates["last_thirty"],
+        fiscal_dates["start_day"],
+    )
+    top_ten_vendor = get_vendor_topten(
+        ["Dairy"],
+        fiscal_dates["last_thirty"],
+        fiscal_dates["start_day"],
+    )
+
+    category_costs = get_category_costs(
+        ["Dairy"],
+        fiscal_dates["last_thirty"],
+        fiscal_dates["start_day"],
+    )
+    category_costs_total = category_costs["Totals"].sum()
+    top_ten["percent"] = top_ten["Cost"] / category_costs_total
+    top_ten_vendor["percent"] = top_ten_vendor["Cost"] / category_costs_total
+
+    # Create charts for items in top ten list
+    product_list = top_ten["Item"].tolist()
+    product_dict = {}
+    store_cost_dict = {}
+    vendor_cost_dict = {}
+    x = 1
+    product_names = []
+    for pl in product_list:
+        this_year = period_purchases(
+            "^({})$".format(pl), fiscal_dates["start_year"], fiscal_dates["end_year"]
+        )
+        del this_year[fiscal_dates["period"] :]  # remove zeros from future periods
+        last_year = period_purchases(
+            "^({})$".format(pl),
+            fiscal_dates["start_year_ly"],
+            fiscal_dates["end_year_ly"],
+        )
+        product_dict["{}_ty".format(x)] = this_year
+        product_dict["{}_ly".format(x)] = last_year
+        product_names.append(pl)
+
+        store_cost_dict["{}".format(x)] = get_cost_per_store(
+            "^({})$".format(pl), fiscal_dates["last_seven"]
+        )
+
+        vendor_cost_dict["{}".format(x)] = get_cost_per_vendor(
+            "^({})$".format(pl), fiscal_dates["last_seven"]
+        )
+        x = x + 1
+
+    return render_template(
+        "purchasing/dairy.html",
+        title="Dairy",
+        company_name=Config.COMPANY_NAME,
+        segment="purchasing",
+        **locals(),
+        #fiscal_dates=fiscal_dates,
+        #form1=form1,
+        #form3=form3,
+        #current_user=current_user,
+        #top_ten=top_ten,
+        #top_ten_restaurant=top_ten_restaurant,
+        #top_ten_vendor=top_ten_vendor,
+        #product_dict=product_dict,
+        #product_names=product_names,
+        #store_cost_dict=store_cost_dict,
+        #vendor_cost_dict=vendor_cost_dict,
+    )
+
+
 @blueprint.route("/purchasing/poultry", methods=["GET", "POST"])
 @login_required
 def poultry():
@@ -381,17 +485,18 @@ def poultry():
         title="Poultry",
         company_name=Config.COMPANY_NAME,
         segment="purchasing",
-        fiscal_dates=fiscal_dates,
-        form1=form1,
-        form3=form3,
-        current_user=current_user,
-        top_ten=top_ten,
-        top_ten_restaurant=top_ten_restaurant,
-        top_ten_vendor=top_ten_vendor,
-        product_dict=product_dict,
-        product_names=product_names,
-        store_cost_dict=store_cost_dict,
-        vendor_cost_dict=vendor_cost_dict,
+        **locals(),
+        #fiscal_dates=fiscal_dates,
+        #form1=form1,
+        #form3=form3,
+        #current_user=current_user,
+        #top_ten=top_ten,
+        #top_ten_restaurant=top_ten_restaurant,
+        #top_ten_vendor=top_ten_vendor,
+        #product_dict=product_dict,
+        #product_names=product_names,
+        #store_cost_dict=store_cost_dict,
+        #vendor_cost_dict=vendor_cost_dict,
     )
 
 
@@ -482,17 +587,18 @@ def seafood():
         title="Seafood",
         company_name=Config.COMPANY_NAME,
         segment="purchasing",
-        fiscal_dates=fiscal_dates,
-        form1=form1,
-        form3=form3,
-        current_user=current_user,
-        top_ten=top_ten,
-        top_ten_vendor=top_ten_vendor,
-        top_ten_restaurant=top_ten_restaurant,
-        product_dict=product_dict,
-        product_names=product_names,
-        store_cost_dict=store_cost_dict,
-        vendor_cost_dict=vendor_cost_dict,
+        **locals(),
+        #fiscal_dates=fiscal_dates,
+        #form1=form1,
+        #form3=form3,
+        #current_user=current_user,
+        #top_ten=top_ten,
+        #top_ten_vendor=top_ten_vendor,
+        #top_ten_restaurant=top_ten_restaurant,
+        #product_dict=product_dict,
+        #product_names=product_names,
+        #store_cost_dict=store_cost_dict,
+        #vendor_cost_dict=vendor_cost_dict,
     )
 
 
@@ -580,20 +686,21 @@ def pork():
 
     return render_template(
         "purchasing/pork.html",
-        title="pork",
+        title="Pork",
         company_name=Config.COMPANY_NAME,
         segment="purchasing",
-        fiscal_dates=fiscal_dates,
-        form1=form1,
-        form3=form3,
-        current_user=current_user,
-        top_ten=top_ten,
-        top_ten_vendor=top_ten_vendor,
-        top_ten_restaurant=top_ten_restaurant,
-        product_dict=product_dict,
-        product_names=product_names,
-        store_cost_dict=store_cost_dict,
-        vendor_cost_dict=vendor_cost_dict,
+        **locals(),
+        #fiscal_dates=fiscal_dates,
+        #form1=form1,
+        #form3=form3,
+        #current_user=current_user,
+        #top_ten=top_ten,
+        #top_ten_vendor=top_ten_vendor,
+        #top_ten_restaurant=top_ten_restaurant,
+        #product_dict=product_dict,
+        #product_names=product_names,
+        #store_cost_dict=store_cost_dict,
+        #vendor_cost_dict=vendor_cost_dict,
     )
 
 
@@ -684,17 +791,18 @@ def produce():
         title="Produce",
         company_name=Config.COMPANY_NAME,
         segment="purchasing",
-        fiscal_dates=fiscal_dates,
-        form1=form1,
-        form3=form3,
-        current_user=current_user,
-        top_ten=top_ten,
-        top_ten_vendor=top_ten_vendor,
-        top_ten_restaurant=top_ten_restaurant,
-        product_dict=product_dict,
-        product_names=product_names,
-        store_cost_dict=store_cost_dict,
-        vendor_cost_dict=vendor_cost_dict,
+        **locals(),
+        #fiscal_dates=fiscal_dates,
+        #form1=form1,
+        #form3=form3,
+        #current_user=current_user,
+        #top_ten=top_ten,
+        #top_ten_vendor=top_ten_vendor,
+        #top_ten_restaurant=top_ten_restaurant,
+        #product_dict=product_dict,
+        #product_names=product_names,
+        #store_cost_dict=store_cost_dict,
+        #vendor_cost_dict=vendor_cost_dict,
     )
 
 
@@ -785,15 +893,16 @@ def foodother():
         title="Food Other",
         company_name=Config.COMPANY_NAME,
         segment="purchasing",
-        fiscal_dates=fiscal_dates,
-        form1=form1,
-        form3=form3,
-        current_user=current_user,
-        top_ten=top_ten,
-        top_ten_vendor=top_ten_vendor,
-        top_ten_restaurant=top_ten_restaurant,
-        product_dict=product_dict,
-        product_names=product_names,
-        store_cost_dict=store_cost_dict,
-        vendor_cost_dict=vendor_cost_dict,
+        **locals(),
+        #fiscal_dates=fiscal_dates,
+        #form1=form1,
+        #form3=form3,
+        #current_user=current_user,
+        #top_ten=top_ten,
+        #top_ten_vendor=top_ten_vendor,
+        #top_ten_restaurant=top_ten_restaurant,
+        #product_dict=product_dict,
+        #product_names=product_names,
+        #store_cost_dict=store_cost_dict,
+        #vendor_cost_dict=vendor_cost_dict,
     )

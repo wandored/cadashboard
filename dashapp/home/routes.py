@@ -32,7 +32,7 @@ def index():
     YSTDAY = TODAY - timedelta(days=1)
 
     if not "token" in session:
-        session["token"] = YSTDAY.strftime("%Y-%m-%d")
+        session["token"] = TODAY.strftime("%Y-%m-%d")
         return redirect(url_for("home_blueprint.index"))
 
     fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
@@ -513,7 +513,7 @@ def store(store_id):
     store = Restaurants.query.filter_by(id=store_id).first()
 
     if not "token" in session:
-        session["token"] = YSTDAY.strftime("%Y-%m-%d")
+        session["token"] = TODAY.strftime("%Y-%m-%d")
         return redirect(url_for("home_blueprint.store", store_id=store.id))
 
     fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))

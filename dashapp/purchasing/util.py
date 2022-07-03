@@ -2,6 +2,7 @@
 Dashboard by wandored
 """
 from numpy import NAN
+from functools import cache
 import numpy as np
 import pandas as pd
 from datetime import datetime, timedelta
@@ -102,6 +103,7 @@ def get_vendors(regex, days):
     return query
 
 
+@cache
 def get_cost_per_vendor(regex, days):
 
     query = (
@@ -177,6 +179,7 @@ def get_cost_per_vendor(regex, days):
     return df
 
 
+@cache
 def get_cost_per_store(regex, days):
 
     query = (
@@ -249,7 +252,7 @@ def get_cost_per_store(regex, days):
     df = pd.DataFrame()
     return df
 
-
+@cache
 def period_purchases(regex, start, end):
     # generate list of purchase costs per period for charts
     calendar = Calendar.query.with_entities(
