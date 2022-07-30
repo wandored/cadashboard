@@ -187,8 +187,7 @@ def write_to_database(df1, df2, df3):
     conn.commit()
 
 
-if __name__ == "__main__":
-
+def main():
     engine = create_engine(Config.SQLALCHEMY_DATABASE_URI)
     conn = psycopg2.connect(
         host="localhost",
@@ -222,3 +221,6 @@ if __name__ == "__main__":
         print(f"{start_date} completed")
 
     conn.close()
+
+if __name__ == "__main__":
+    main()

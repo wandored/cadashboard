@@ -38,20 +38,18 @@ def make_dataframe(sales):
     return df
 
 
-def removeSpecial(df):
-    """Removes specialty items from the menuitems dataframe"""
-    file = open("/usr/local/share/specialty.txt")
-    specialty_list = file.read().split("\n")
-    file.close
-    for item in specialty_list:
-        df = df.drop(df[df.menuitem == item].index)
-    return df
+def convert_datetime_to_string(col):
+    col = pd.to_datetime(col).dt.date
+    col = col.astype(str)
+    return col
 
 
 def sales_detail(start, end):
 
-    url_filter = "$filter=date ge {}T00:00:00Z and date le {}T00:00:00Z".format(
-        start, end
+    url_filter = (
+        "$filter=modifiedOn ge {}T00:00:00Z and modifiedOn le {}T00:00:00Z".format(
+            start, end
+        )
     )
     query = "$select=menuitem,amount,date,quantity,category,location&{}".format(
         url_filter
@@ -91,14 +89,20 @@ def sales_detail(start, end):
     df_clean[["x", "menuitem"]] = df_clean["menuitem"].str.split(" - ", expand=True)
     df_clean.drop(columns=["category_x", "x"], inplace=True)
     df_clean.rename(columns={"category_y": "category"}, inplace=True)
-    # menuitems = removeSpecial(df_clean)
-    # Write the daily menu items to Menuitems table
+    df_clean["date"] = convert_datetime_to_string(df_clean["date"])
     menu_pivot = df_clean.pivot_table(
-        index=["name", "menuitem", "category", "menu_category"],
+        index=["date", "name", "menuitem", "category", "menu_category"],
         values=["amount", "quantity"],
         aggfunc=np.sum,
     )
-    menu_pivot.loc[:, "date"] = start
+    for index, row in menu_pivot.iterrows():
+        # delete row if date = index[0] and name = index[1] and daypart = index[2]
+        cur.execute(
+            'DELETE FROM "Menuitems" WHERE date = %s AND name = %s AND menuitem = %s AND category = %s AND menu_category = %s',
+            (index[0], index[1], index[2], index[3], index[4]),
+        )
+        conn.commit()
+
     menu_pivot.to_sql("Menuitems", engine, if_exists="append")
     conn.commit()
 
@@ -107,10 +111,14 @@ def sales_detail(start, end):
 
 def sales_employee(start, end):
 
-    url_filter = "$filter=date ge {}T00:00:00Z and date le {}T00:00:00Z".format(
-        start, end
+    url_filter = (
+        "$filter=modifiedOn ge {}T00:00:00Z and modifiedOn le {}T00:00:00Z".format(
+            start, end
+        )
     )
-    query = "$select=dayPart,netSales,numberofGuests,location&{}".format(url_filter)
+    query = "$select=date,dayPart,netSales,numberofGuests,location&{}".format(
+        url_filter
+    )
     url = "{}/SalesEmployee?{}".format(Config.SRVC_ROOT, query)
     rqst = make_HTTP_request(url)
     df = make_dataframe(rqst)
@@ -124,12 +132,22 @@ def sales_employee(start, end):
         columns={"netSales": "sales", "numberofGuests": "guests", "dayPart": "daypart"},
         inplace=True,
     )
-
-    # pivot data and write to database
+    df_merge["date"] = convert_datetime_to_string(df_merge["date"])
     df_pivot = df_merge.pivot_table(
-        index=["name", "daypart"], values=["sales", "guests"], aggfunc=np.sum
+        index=["date", "name", "daypart"], values=["sales", "guests"], aggfunc=np.sum
     )
-    df_pivot.loc[:, "date"] = start
+    for index, row in df_pivot.iterrows():
+        # delete row if date = index[0] and name = index[1] and daypart = index[2]
+        cur.execute(
+            'DELETE FROM "Sales" WHERE date = %s AND name = %s AND daypart = %s',
+            (
+                index[0],
+                index[1],
+                index[2],
+            ),
+        )
+        conn.commit()
+
     df_pivot.to_sql("Sales", engine, if_exists="append")
     conn.commit()
 
@@ -139,11 +157,11 @@ def sales_employee(start, end):
 def labor_datail(start, end):
 
     url_filter = (
-        "$filter=dateWorked ge {}T00:00:00Z and dateWorked le {}T00:00:00Z".format(
+        "$filter=modifiedOn ge {}T00:00:00Z and modifiedOn le {}T00:00:00Z".format(
             start, end
         )
     )
-    query = "$select=jobTitle,hours,total,location_ID&{}".format(url_filter)
+    query = "$select=dateWorked,jobTitle,hours,total,location_ID&{}".format(url_filter)
     url = "{}/LaborDetail?{}".format(Config.SRVC_ROOT, query)
     rqst = make_HTTP_request(url)
     df = make_dataframe(rqst)
@@ -161,11 +179,25 @@ def labor_datail(start, end):
     df_merge.rename(columns={"jobTitle": "job", "total": "dollars"}, inplace=True)
     df_merge = df_merge.merge(df_cats, on="job")
 
-    # pivot data and write to database
+    df_merge["date"] = convert_datetime_to_string(df_merge["dateWorked"])
     df_pivot = df_merge.pivot_table(
-        index=["name", "category", "job"], values=["hours", "dollars"], aggfunc=np.sum
+        index=["date", "name", "category", "job"],
+        values=["hours", "dollars"],
+        aggfunc=np.sum,
     )
-    df_pivot.loc[:, "date"] = start
+    for index, row in df_pivot.iterrows():
+        # delete row if date = index[0] and name = index[1] and daypart = index[2]
+        cur.execute(
+            'DELETE FROM "Labor" WHERE date = %s AND name = %s AND category = %s AND job = %s',
+            (
+                index[0],
+                index[1],
+                index[2],
+                index[3],
+            ),
+        )
+        conn.commit()
+
     df_pivot.to_sql("Labor", engine, if_exists="append")
     conn.commit()
 
@@ -234,15 +266,30 @@ def potato_sales(start):
             df.loc[:, "time"] = t[0]
             df.loc[:, "in_time"] = t[1]
             df.loc[:, "out_time"] = t[4]
+            df.loc[:, "date"] = convert_datetime_to_string(df["date"])
             df_pot = df_pot.append(df)
 
+        # df_pot['date'] = convert_datetime_to_string(df_pot['date'])
         # Write the daily menu items to Menuitems table
+        print(df_pot.head(50))
         menu_pivot = df_pot.pivot_table(
-            index=["time", "name", "in_time", "out_time"],
+            index=["date", "name", "time", "in_time", "out_time"],
             values=["quantity"],
             aggfunc=np.sum,
         )
-    menu_pivot.loc[:, "date"] = start
+    for index, row in menu_pivot.iterrows():
+        print(index[0], index[1], index[2])
+        cur.execute(
+            'DELETE FROM "Potatoes" WHERE date = %s AND name = %s AND time = %s',
+            (
+                index[0],
+                index[1],
+                index[2],
+            ),
+        )
+        conn.commit()
+
+    print(menu_pivot.head(50))
     menu_pivot.to_sql("Potatoes", engine, if_exists="append")
     conn.commit()
 
@@ -251,8 +298,10 @@ def potato_sales(start):
 
 def sales_payments(start, end):
 
-    url_filter = "$filter=date ge {}T00:00:00Z and date le {}T00:00:00Z".format(
-        start, end
+    url_filter = (
+        "$filter=modifiedOn ge {}T00:00:00Z and modifiedOn le {}T00:00:00Z".format(
+            start, end
+        )
     )
     query = "$select=amount,date,location,paymenttype&{}".format(url_filter)
     url = "{}/SalesPayment?{}".format(Config.SRVC_ROOT, query)
@@ -267,13 +316,24 @@ def sales_payments(start, end):
     )
     df_merge = df_loc.merge(df, on="location")
 
-    # pivot data and write to database
+    df_merge["date"] = convert_datetime_to_string(df_merge["date"])
     df_pivot = df_merge.pivot_table(
-        index=["restaurant_id", "location", "paymenttype"],
+        index=["date", "restaurant_id", "location", "paymenttype"],
         values="amount",
         aggfunc=np.sum,
     )
-    df_pivot.loc[:, "date"] = start
+    for index, row in df_pivot.iterrows():
+        # delete row if date = index[0] and name = index[1] and daypart = index[2]
+        cur.execute(
+            'DELETE FROM "Payments" WHERE date = %s AND location = %s AND paymenttype = %s',
+            (
+                index[0],
+                index[2],
+                index[3],
+            ),
+        )
+        conn.commit()
+
     df_pivot.to_sql("Payments", engine, if_exists="append")
     conn.commit()
 
@@ -294,20 +354,22 @@ if __name__ == "__main__":
 
     TODAY = datetime.date(datetime.now())
     YSTDAY = TODAY - timedelta(days=1)
-    start_date = YSTDAY.strftime("%Y-%m-%d")
-    end_date = TODAY.strftime("%Y-%m-%d")
+    TMRDAY = TODAY + timedelta(days=1)
+    today = TODAY.strftime("%Y-%m-%d")
+    tonight = TMRDAY.strftime("%Y-%m-%d")
+    yesterday = YSTDAY.strftime("%Y-%m-%d")
 
-    cur.execute('DELETE FROM "Payments" WHERE date = %s', (start_date,))
-    cur.execute('DELETE FROM "Sales" WHERE date = %s', (start_date,))
-    cur.execute('DELETE FROM "Labor" WHERE date = %s', (start_date,))
-    cur.execute('DELETE FROM "Menuitems" WHERE date = %s', (start_date,))
-    cur.execute('DELETE FROM "Potatoes" WHERE date = %s', (start_date,))
-    conn.commit()
+    # cur.execute('DELETE FROM "Payments" WHERE date = %s', (yesterday,))
+    # cur.execute('DELETE FROM "Sales" WHERE date = %s', (yesterday,))
+    # cur.execute('DELETE FROM "Labor" WHERE date = %s', (yesterday,))
+    # cur.execute('DELETE FROM "Menuitems" WHERE date = %s', (yesterday,))
+    # cur.execute('DELETE FROM "Potatoes" WHERE date = %s', (yesterday,))
+    # conn.commit()
 
-    sales_payments(start_date, end_date)
-    sales_detail(start_date, end_date)
-    sales_employee(start_date, end_date)
-    labor_datail(start_date, end_date)
-    potato_sales(start_date)
+    sales_payments(today, tonight)
+    sales_detail(today, tonight)
+    sales_employee(today, tonight)
+    labor_datail(today, tonight)
+    potato_sales(yesterday)
 
     conn.close()
