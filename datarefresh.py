@@ -271,14 +271,12 @@ def potato_sales(start):
 
         # df_pot['date'] = convert_datetime_to_string(df_pot['date'])
         # Write the daily menu items to Menuitems table
-        print(df_pot.head(50))
         menu_pivot = df_pot.pivot_table(
             index=["date", "name", "time", "in_time", "out_time"],
             values=["quantity"],
             aggfunc=np.sum,
         )
     for index, row in menu_pivot.iterrows():
-        print(index[0], index[1], index[2])
         cur.execute(
             'DELETE FROM "Potatoes" WHERE date = %s AND name = %s AND time = %s',
             (
@@ -289,7 +287,6 @@ def potato_sales(start):
         )
         conn.commit()
 
-    print(menu_pivot.head(50))
     menu_pivot.to_sql("Potatoes", engine, if_exists="append")
     conn.commit()
 
@@ -358,13 +355,6 @@ if __name__ == "__main__":
     today = TODAY.strftime("%Y-%m-%d")
     tonight = TMRDAY.strftime("%Y-%m-%d")
     yesterday = YSTDAY.strftime("%Y-%m-%d")
-
-    # cur.execute('DELETE FROM "Payments" WHERE date = %s', (yesterday,))
-    # cur.execute('DELETE FROM "Sales" WHERE date = %s', (yesterday,))
-    # cur.execute('DELETE FROM "Labor" WHERE date = %s', (yesterday,))
-    # cur.execute('DELETE FROM "Menuitems" WHERE date = %s', (yesterday,))
-    # cur.execute('DELETE FROM "Potatoes" WHERE date = %s', (yesterday,))
-    # conn.commit()
 
     sales_payments(today, tonight)
     sales_detail(today, tonight)

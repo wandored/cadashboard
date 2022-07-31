@@ -188,15 +188,6 @@ def write_to_database(df1, df2, df3):
 
 
 def main():
-    engine = create_engine(Config.SQLALCHEMY_DATABASE_URI)
-    conn = psycopg2.connect(
-        host="localhost",
-        database="dashboard",
-        user=Config.PSYCOPG2_USER,
-        password=Config.PSYCOPG2_PASS,
-    )
-    cur = conn.cursor()
-    rest_query = 'select * from "Restaurants"'
 
     TODAY = datetime.date(datetime.now())
     YSTDAY = TODAY - timedelta(days=1)
@@ -223,4 +214,13 @@ def main():
     conn.close()
 
 if __name__ == "__main__":
+    engine = create_engine(Config.SQLALCHEMY_DATABASE_URI)
+    conn = psycopg2.connect(
+        host="localhost",
+        database="dashboard",
+        user=Config.PSYCOPG2_USER,
+        password=Config.PSYCOPG2_PASS,
+    )
+    cur = conn.cursor()
+    rest_query = 'select * from "Restaurants"'
     main()
