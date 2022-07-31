@@ -527,10 +527,12 @@ def store(store_id):
     store_df = pd.DataFrame([x.as_dict() for x in data])
 
     if not Sales.query.filter_by(
-        date=fiscal_dates["start_day"], name=store.name
+        date=fiscal_dates["start_day"], 
+        name=store.name
     ).first():
         session["token"] = find_day_with_sales(
-            day=fiscal_dates["start_day"], store=store.name
+            day=fiscal_dates["start_day"],
+            store=store.name
         )
         return redirect(url_for("home_blueprint.store", store_id=store.id))
 

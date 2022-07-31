@@ -1,13 +1,12 @@
 """
 Dashboard by wandored
 """
-from numpy import NAN
 from functools import lru_cache
 import numpy as np
 import pandas as pd
 from datetime import datetime, timedelta
 from dashapp.authentication.models import *
-from sqlalchemy import or_, func
+from sqlalchemy import func
 
 
 def get_lastyear(date):
@@ -103,7 +102,7 @@ def get_vendors(regex, days):
     return query
 
 
-@lru_cache
+@lru_cache(maxsize=128)
 def get_cost_per_vendor(regex, days):
 
     query = (
@@ -179,7 +178,7 @@ def get_cost_per_vendor(regex, days):
     return df
 
 
-@lru_cache
+@lru_cache(maxsize=128)
 def get_cost_per_store(regex, days):
 
     query = (
@@ -252,7 +251,7 @@ def get_cost_per_store(regex, days):
     df = pd.DataFrame()
     return df
 
-@lru_cache
+@lru_cache(maxsize=128)
 def period_purchases(regex, start, end):
     # generate list of purchase costs per period for charts
     calendar = Calendar.query.with_entities(
@@ -299,7 +298,7 @@ def period_purchases(regex, start, end):
                 row_dict["count"] * row_dict["base_qty"],
             ),
         )
-        row_dict["unit_qty"] = np.float(row_dict["unit_qty"])
+        row_dict["unit_qty"] = np.single(row_dict["unit_qty"])
         item_list.append(row_dict)
     df = pd.DataFrame(item_list)
 
