@@ -113,7 +113,7 @@ def sales_employee(start, end):
     url_filter = "$filter=date ge {}T00:00:00Z and date le {}T00:00:00Z".format(
         start, end
     )
-    query = "$select=dayPart,netSales,numberofGuests,location&{}".format(url_filter)
+    query = "$select=date,dayPart,netSales,numberofGuests,location&{}".format(url_filter)
     url = "{}/SalesEmployee?{}".format(Config.SRVC_ROOT, query)
     print(url)
     rqst = make_HTTP_request(url)
@@ -136,9 +136,10 @@ def sales_employee(start, end):
 
     # pivot data and write to database
     df_pivot = df_merge.pivot_table(
-        index=["name", "daypart"], values=["sales", "guests"], aggfunc=np.sum
+        index=["date", "name", "daypart"], values=["sales", "guests"], aggfunc=np.sum
     )
 
+    print(df_pivot)
     df_pivot.to_sql("Sales", engine, if_exists="append")
     conn.commit()
 
@@ -307,14 +308,11 @@ if __name__ == "__main__":
 
     date_list = [365, 364, 363]
     for d in date_list:
-        dt = YSTDAY - timedelta(days=d)
+        dt = TODAY - timedelta(days=d)
         tmrw = dt + timedelta(days=1)
-        new_date = TODAY.strftime("%Y-%m-%d")
-        new_end_date = TMRDAY.strftime("%Y-%m-%d")
         start_date = dt.strftime("%Y-%m-%d")
         end_date = tmrw.strftime("%Y-%m-%d")
-        print(dt)
-        print()
+        print(start_date, end_date)
 
         cur.execute('DELETE FROM "Payments" WHERE date = %s', (start_date,))
         cur.execute('DELETE FROM "Sales" WHERE date = %s', (start_date,))
@@ -325,7 +323,7 @@ if __name__ == "__main__":
 
         sales_payments(start_date, end_date)
         sales_detail(start_date, end_date)
-        sales_employee(new_date, new_end_date)
+        sales_employee(start_date, end_date)
         labor_detail(start_date)
         potato_sales(start_date)
 
