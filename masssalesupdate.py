@@ -110,7 +110,7 @@ def sales_detail(start, end):
 
 def sales_employee(start, end):
 
-    url_filter = "$filter=modifiedOn ge {}T00:00:00Z and modifiedOn le {}T00:00:00Z".format(
+    url_filter = "$filter=date ge {}T00:00:00Z and date le {}T00:00:00Z".format(
         start, end
     )
     query = "$select=dayPart,netSales,numberofGuests,location&{}".format(url_filter)
@@ -138,13 +138,6 @@ def sales_employee(start, end):
     df_pivot = df_merge.pivot_table(
         index=["name", "daypart"], values=["sales", "guests"], aggfunc=np.sum
     )
-    for index, row in df_pivot.iterrows():
-        # delete row if date = index[0] and name = index[1] and daypart = index[2]
-        cur.execute(
-            'DELETE FROM "Sales" WHERE date = %s AND name = %s AND daypart = %s',
-            (index[0], index[1], index[2],)
-        )
-        conn.commit()
 
     df_pivot.to_sql("Sales", engine, if_exists="append")
     conn.commit()
@@ -312,7 +305,7 @@ if __name__ == "__main__":
     YSTDAY = TODAY - timedelta(days=1)
     TMRDAY = TODAY + timedelta(days=1)
 
-    date_list = [0, 1, 2, 3, 4, 5, 6, 7, 8 ]
+    date_list = [365, 364, 363]
     for d in date_list:
         dt = YSTDAY - timedelta(days=d)
         tmrw = dt + timedelta(days=1)
@@ -324,7 +317,7 @@ if __name__ == "__main__":
         print()
 
         cur.execute('DELETE FROM "Payments" WHERE date = %s', (start_date,))
-        #cur.execute('DELETE FROM "Sales" WHERE date = %s', (start_date,))
+        cur.execute('DELETE FROM "Sales" WHERE date = %s', (start_date,))
         cur.execute('DELETE FROM "Labor" WHERE date = %s', (start_date,))
         cur.execute('DELETE FROM "Menuitems" WHERE date = %s', (start_date,))
         cur.execute('DELETE FROM "Potatoes" WHERE date = %s', (start_date,))
