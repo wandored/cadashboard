@@ -58,7 +58,6 @@ def sales_detail(start, end):
         url_filter
     )
     url = "{}/SalesDetail?{}".format(Config.SRVC_ROOT, query)
-    print(url)
     rqst = make_HTTP_request(url)
     df = make_dataframe(rqst)
     if df.empty:
@@ -115,7 +114,6 @@ def sales_employee(start, end):
     )
     query = "$select=date,dayPart,netSales,numberofGuests,location&{}".format(url_filter)
     url = "{}/SalesEmployee?{}".format(Config.SRVC_ROOT, query)
-    print(url)
     rqst = make_HTTP_request(url)
     df = make_dataframe(rqst)
     if df.empty:
@@ -139,7 +137,6 @@ def sales_employee(start, end):
         index=["date", "name", "daypart"], values=["sales", "guests"], aggfunc=np.sum
     )
 
-    print(df_pivot)
     df_pivot.to_sql("Sales", engine, if_exists="append")
     conn.commit()
 
@@ -151,7 +148,6 @@ def labor_detail(start):
     url_filter = "$filter=dateWorked eq {}T00:00:00Z".format(start)
     query = "$select=jobTitle,hours,total,location_ID&{}".format(url_filter)
     url = "{}/LaborDetail?{}".format(Config.SRVC_ROOT, query)
-    print(url)
     rqst = make_HTTP_request(url)
     df = make_dataframe(rqst)
     if df.empty:

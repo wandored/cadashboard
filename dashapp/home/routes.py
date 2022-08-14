@@ -1028,7 +1028,7 @@ def store(store_id):
         query = (
             db.session.query(
                 func.sum(Transactions.credit).label("credits"),
-                func.sum(Transactions.amount).label("costs"),
+                func.sum(Transactions.debit).label("costs"),
             )
             .select_from(Transactions)
             .join(Calendar, Calendar.date == Transactions.date)
@@ -1036,7 +1036,7 @@ def store(store_id):
             .order_by(Calendar.period)
             .filter(
                 Transactions.date.between(start, end),
-                Transactions.category2.in_(cat),
+                Transactions.account.in_(cat),
                 Transactions.name == store.name,
             )
         )
@@ -1057,7 +1057,7 @@ def store(store_id):
         fiscal_dates["end_year"],
         period_sales_list,
         cat=[
-            "Rest. Supplies",
+            "Restaurant Supplies",
             "Kitchen Supplies",
             "Cleaning Supplies",
             "Office Supplies",
@@ -1069,7 +1069,7 @@ def store(store_id):
         fiscal_dates["end_year_ly"],
         period_sales_list_ly,
         cat=[
-            "Rest. Supplies",
+            "Restaurant Supplies",
             "Kitchen Supplies",
             "Cleaning Supplies",
             "Office Supplies",
@@ -1521,7 +1521,7 @@ def alcohol():
         query = (
             Transactions.query.with_entities(Transactions.company)
             .filter(
-                Transactions.category2 == cat,
+                Transactions.account == cat,
                 Transactions.company != "None",
                 Transactions.store_id.in_(concept),
                 Transactions.date >= time,
@@ -1541,7 +1541,7 @@ def alcohol():
                 func.sum(Transactions.amount).label("cost"),
             )
             .filter(
-                Transactions.category2 == cat,
+                Transactions.account == cat,
                 Transactions.date.between(start, end),
                 Transactions.store_id.in_(concept),
                 Transactions.type == "AP Invoice",
