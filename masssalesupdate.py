@@ -58,7 +58,6 @@ def sales_detail(start, end):
         url_filter
     )
     url = "{}/SalesDetail?{}".format(Config.SRVC_ROOT, query)
-    print(url)
     rqst = make_HTTP_request(url)
     df = make_dataframe(rqst)
     if df.empty:
@@ -110,12 +109,11 @@ def sales_detail(start, end):
 
 def sales_employee(start, end):
 
-    url_filter = "$filter=modifiedOn ge {}T00:00:00Z and modifiedOn le {}T00:00:00Z".format(
+    url_filter = "$filter=date ge {}T00:00:00Z and date le {}T00:00:00Z".format(
         start, end
     )
-    query = "$select=dayPart,netSales,numberofGuests,location&{}".format(url_filter)
+    query = "$select=date,dayPart,netSales,numberofGuests,location&{}".format(url_filter)
     url = "{}/SalesEmployee?{}".format(Config.SRVC_ROOT, query)
-    print(url)
     rqst = make_HTTP_request(url)
     df = make_dataframe(rqst)
     if df.empty:
@@ -136,15 +134,8 @@ def sales_employee(start, end):
 
     # pivot data and write to database
     df_pivot = df_merge.pivot_table(
-        index=["name", "daypart"], values=["sales", "guests"], aggfunc=np.sum
+        index=["date", "name", "daypart"], values=["sales", "guests"], aggfunc=np.sum
     )
-    for index, row in df_pivot.iterrows():
-        # delete row if date = index[0] and name = index[1] and daypart = index[2]
-        cur.execute(
-            'DELETE FROM "Sales" WHERE date = %s AND name = %s AND daypart = %s',
-            (index[0], index[1], index[2],)
-        )
-        conn.commit()
 
     df_pivot.to_sql("Sales", engine, if_exists="append")
     conn.commit()
@@ -157,7 +148,6 @@ def labor_detail(start):
     url_filter = "$filter=dateWorked eq {}T00:00:00Z".format(start)
     query = "$select=jobTitle,hours,total,location_ID&{}".format(url_filter)
     url = "{}/LaborDetail?{}".format(Config.SRVC_ROOT, query)
-    print(url)
     rqst = make_HTTP_request(url)
     df = make_dataframe(rqst)
     if df.empty:
@@ -312,19 +302,16 @@ if __name__ == "__main__":
     YSTDAY = TODAY - timedelta(days=1)
     TMRDAY = TODAY + timedelta(days=1)
 
-    date_list = [0, 1, 2, 3, 4, 5, 6, 7, 8 ]
+    date_list = [365, 364, 363]
     for d in date_list:
-        dt = YSTDAY - timedelta(days=d)
+        dt = TODAY - timedelta(days=d)
         tmrw = dt + timedelta(days=1)
-        new_date = TODAY.strftime("%Y-%m-%d")
-        new_end_date = TMRDAY.strftime("%Y-%m-%d")
         start_date = dt.strftime("%Y-%m-%d")
         end_date = tmrw.strftime("%Y-%m-%d")
-        print(dt)
-        print()
+        print(start_date, end_date)
 
         cur.execute('DELETE FROM "Payments" WHERE date = %s', (start_date,))
-        #cur.execute('DELETE FROM "Sales" WHERE date = %s', (start_date,))
+        cur.execute('DELETE FROM "Sales" WHERE date = %s', (start_date,))
         cur.execute('DELETE FROM "Labor" WHERE date = %s', (start_date,))
         cur.execute('DELETE FROM "Menuitems" WHERE date = %s', (start_date,))
         cur.execute('DELETE FROM "Potatoes" WHERE date = %s', (start_date,))
@@ -332,7 +319,7 @@ if __name__ == "__main__":
 
         sales_payments(start_date, end_date)
         sales_detail(start_date, end_date)
-        sales_employee(new_date, new_end_date)
+        sales_employee(start_date, end_date)
         labor_detail(start_date)
         potato_sales(start_date)
 
