@@ -242,13 +242,13 @@
                     {% if v.guests >= v.guests_ly %}
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex flex-column">
-                            <h6 class="mb-0 text-sm text-end"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ v.guests }}</h6>
+                            <h6 class="mb-0 text-sm text-end"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ v.guests | int }}</h6>
                           </div>
                         </div>
                     {% else %}
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex flex-column">
-                            <h6 class="mb-0 text-sm text-end"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ v.guests }}</h6>
+                            <h6 class="mb-0 text-sm text-end"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ v.guests | int }}</h6>
                           </div>
                         </div>
                     {% endif %}
@@ -263,7 +263,7 @@
                   <td>
                     <div class="d-flex px-2 py-1">
                       <div class="d-flex flex-column">
-                        <h6 class="mb-0 text-sm">{{ "${:,.2f}".format(v.entree_check_avg) }}</h6>
+                        <h6 class="mb-0 text-sm">{{ "${:,.2f}".format(v.guest_check_avg) }}</h6>
                       </div>
                     </div>
                   </td>
