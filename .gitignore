@@ -2,6 +2,7 @@ dashapp/*.db
 *.sql
 /output
 /scripts
+datarecovery.py
 
 
 # Byte-compiled / optimized / DLL files
