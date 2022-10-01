@@ -64,7 +64,7 @@ def sales_detail(start, end):
     data = cur.fetchall()
     df_loc = pd.DataFrame.from_records(data, columns=["id", "location", "name"])
     df_merge = df_loc.merge(df, on="location")
-    df_merge.drop(columns=["location"], inplace=True)
+    df_merge = df_merge.drop(columns=["location"])
 
     with open("/usr/local/share/major_categories.json") as file:
         major_cats = json.load(file)
@@ -87,8 +87,8 @@ def sales_detail(start, end):
     dafilter = df_menu["menuitem"].str.contains("VOID")
     df_clean = df_menu[~dafilter]
     df_clean[["x", "menuitem"]] = df_clean["menuitem"].str.split(" - ", expand=True)
-    df_clean.drop(columns=["category_x", "x"], inplace=True)
-    df_clean.rename(columns={"category_y": "category"}, inplace=True)
+    df_clean = df_clean.drop(columns=["category_x", "x"])
+    df_clean = df_clean.rename(columns={"category_y": "category"})
     df_clean["date"] = convert_datetime_to_string(df_clean["date"])
     menu_pivot = df_clean.pivot_table(
         index=["date", "name", "menuitem", "category", "menu_category"],
@@ -128,9 +128,8 @@ def sales_employee(start, end):
     data = cur.fetchall()
     df_loc = pd.DataFrame.from_records(data, columns=["id", "location", "name"])
     df_merge = df_loc.merge(df, on="location")
-    df_merge.rename(
-        columns={"netSales": "sales", "numberofGuests": "guests", "dayPart": "daypart"},
-        inplace=True,
+    df_merge = df_merge.rename(
+        columns={"netSales": "sales", "numberofGuests": "guests", "dayPart": "daypart"}
     )
     df_merge["date"] = convert_datetime_to_string(df_merge["date"])
     df_pivot = df_merge.pivot_table(
@@ -176,7 +175,7 @@ def labor_datail(start, end):
     data = cur.fetchall()
     df_location = pd.DataFrame.from_records(data, columns=["id", "location", "name"])
     df_merge = df_location.merge(df, left_on="location", right_on="location_ID")
-    df_merge.rename(columns={"jobTitle": "job", "total": "dollars"}, inplace=True)
+    df_merge = df_merge.rename(columns={"jobTitle": "job", "total": "dollars"})
     df_merge = df_merge.merge(df_cats, on="job")
 
     df_merge["date"] = convert_datetime_to_string(df_merge["dateWorked"])
@@ -230,7 +229,7 @@ def potato_sales(start):
                     continue
                 df_pot.loc[t[0]] = [0]
                 continue
-            df_merge.drop(columns=["location"], inplace=True)
+            df_merge = df_merge.drop(columns=["location"])
             df_menu = df_merge
             df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(
                 r"CHOPHOUSE - NOLA", "CHOPHOUSE-NOLA", regex=True
@@ -259,6 +258,10 @@ def potato_sales(start):
                 "S-BAKED POTATO",
                 "SUB BAKED POTATO IN KIDS",
                 "SUB KID POT",
+                "Baked Potato",
+                "Baked Potato (After 4:00 PM)",
+                "Kid Baked Potato",
+                "Kid Baked Potato (After 4:00 PM)",
             ]
             df = df_clean[df_clean["menuitem"].isin(pot_list)]
             if df.empty:

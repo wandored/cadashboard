@@ -221,10 +221,10 @@ def index():
     daily_table = sales_table.merge(labor_table, how="outer", sort=True)
 
     daily_table = daily_table.merge(store_df, how="left")
-    daily_table.set_index("name", inplace=True)
+    daily_table = daily_table.set_index("name")
 
     # Grab top sales over last year before we add totals
-    daily_table.fillna(0, inplace=True)
+    daily_table = daily_table.fillna(0)
     daily_table["doly"] = daily_table.sales - daily_table.sales_ly
     daily_table["poly"] = (
         (daily_table.sales - daily_table.sales_ly) / daily_table.sales_ly * 100
@@ -241,7 +241,7 @@ def index():
     )
     daily_table["labor_pct"] = daily_table.dollars / daily_table.sales
     daily_table["labor_pct_ly"] = daily_table.dollars_ly / daily_table.sales_ly
-    daily_table.fillna(0, inplace=True)
+    daily_table = daily_table.fillna(0)
     daily_totals = daily_table.sum()
     print(daily_table)
 
@@ -309,10 +309,10 @@ def index():
     labor_table_wk = df_labor_week.merge(df_labor_week_ly, how="outer", sort=True)
 
     weekly_table = sales_table_wk.merge(labor_table_wk, how="outer", sort=True)
-    weekly_table.set_index("name", inplace=True)
+    weekly_table = weekly_table.set_index("name")
 
     # Grab top sales over last year before we add totals
-    weekly_table.fillna(0, inplace=True)
+    weekly_table = weekly_table.fillna(0)
     weekly_table["doly"] = weekly_table.sales - weekly_table.sales_ly
     weekly_table["poly"] = (
         (weekly_table.sales - weekly_table.sales_ly) / weekly_table.sales_ly * 100
@@ -388,10 +388,10 @@ def index():
     labor_table_pd = df_labor_period.merge(df_labor_period_ly, how="outer", sort=True)
 
     period_table = sales_table_pd.merge(labor_table_pd, how="outer", sort=True)
-    period_table.set_index("name", inplace=True)
+    period_table = period_table.set_index("name")
 
     # Grab top sales over last year before we add totals
-    period_table.fillna(0, inplace=True)
+    period_table = period_table.fillna(0)
     period_table["doly"] = period_table.sales - period_table.sales_ly
     period_table["poly"] = (
         (period_table.sales - period_table.sales_ly) / period_table.sales_ly * 100
@@ -467,10 +467,10 @@ def index():
     labor_table_yr = df_labor_yearly.merge(df_labor_yearly_ly, how="outer", sort=True)
 
     yearly_table = sales_table_yr.merge(labor_table_yr, how="outer", sort=True)
-    yearly_table.set_index("name", inplace=True)
+    yearly_table = yearly_table.set_index("name")
 
     # Grab top sales over last year before we add totals
-    yearly_table.fillna(0, inplace=True)
+    yearly_table = yearly_table.fillna(0)
     yearly_table["doly"] = yearly_table.sales - yearly_table.sales_ly
     yearly_table["poly"] = (
         (yearly_table.sales - yearly_table.sales_ly) / yearly_table.sales_ly * 100
