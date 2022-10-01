@@ -193,6 +193,7 @@
                   <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Restaurant</th>
                   <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Sales</th>
                   <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Sales SPLY</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Guest Count</th>
                   <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Entree Count</th>
                   <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Check Avg</th>
                   <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor %</th>
@@ -238,16 +239,31 @@
                     </div>
                   </td>
                   <td>
+                    {% if v.guests >= v.guests_ly %}
+                        <div class="d-flex px-2 py-1">
+                          <div class="d-flex flex-column">
+                            <h6 class="mb-0 text-sm text-end"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ v.guests | int }}</h6>
+                          </div>
+                        </div>
+                    {% else %}
+                        <div class="d-flex px-2 py-1">
+                          <div class="d-flex flex-column">
+                            <h6 class="mb-0 text-sm text-end"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ v.guests | int }}</h6>
+                          </div>
+                        </div>
+                    {% endif %}
+                  </td>
+                  <td>
                     <div class="d-flex px-2 py-1">
                       <div class="d-flex flex-column">
-                        <h6 class="mb-0 text-sm text-end">{{ v.guest_count }}</h6>
+                        <h6 class="mb-0 text-sm text-end">{{ v.entree_count }}</h6>
                       </div>
                     </div>
                   </td>
                   <td>
                     <div class="d-flex px-2 py-1">
                       <div class="d-flex flex-column">
-                        <h6 class="mb-0 text-sm">{{ "${:,.2f}".format(v.check_avg) }}</h6>
+                        <h6 class="mb-0 text-sm">{{ "${:,.2f}".format(v.guest_check_avg) }}</h6>
                       </div>
                     </div>
                   </td>

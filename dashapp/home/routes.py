@@ -113,14 +113,22 @@ def index():
 
     # Daily Sales Table
     sales_day = (
-        db.session.query(Sales.name, func.sum(Sales.sales).label("total_sales"))
+        db.session.query(
+            Sales.name,
+            func.sum(Sales.sales).label("total_sales"),
+            func.sum(Sales.guests).label("total_guests")
+        )
         .filter(Sales.date == fiscal_dates["start_day"])
         .group_by(Sales.name)
         .all()
     )
 
     sales_day_ly = (
-        db.session.query(Sales.name, func.sum(Sales.sales).label("total_sales_ly"))
+        db.session.query(
+            Sales.name,
+            func.sum(Sales.sales).label("total_sales_ly"),
+            func.sum(Sales.guests).label("total_guests_ly")
+        )
         .filter(Sales.date == fiscal_dates["start_day_ly"])
         .group_by(Sales.name)
         .all()
@@ -129,7 +137,7 @@ def index():
     entree_count = (
         db.session.query(
             Menuitems.name,
-            func.sum(Menuitems.quantity).label("guest_count"),
+            func.sum(Menuitems.quantity).label("entree_count"),
         )
         .filter(
             Menuitems.date == fiscal_dates["start_day"],
@@ -142,7 +150,7 @@ def index():
     entree_count_ly = (
         db.session.query(
             Menuitems.name,
-            func.sum(Menuitems.quantity).label("guest_count"),
+            func.sum(Menuitems.quantity).label("entree_count"),
         )
         .filter(
             Menuitems.date == fiscal_dates["start_day_ly"],
@@ -165,15 +173,15 @@ def index():
         top_sales_list, columns=["name", "top_sales"]
     )
 
-    df_sales_day = pd.DataFrame.from_records(sales_day, columns=["name", "sales"])
+    df_sales_day = pd.DataFrame.from_records(sales_day, columns=["name", "sales", "guests"])
     df_sales_day_ly = pd.DataFrame.from_records(
-        sales_day_ly, columns=["name", "sales_ly"]
+        sales_day_ly, columns=["name", "sales_ly", "guests_ly"]
     )
     df_entree_count = pd.DataFrame.from_records(
-        entree_count, columns=["name", "guest_count"]
+        entree_count, columns=["name", "entree_count"]
     )
     df_entree_count_ly = pd.DataFrame.from_records(
-        entree_count_ly, columns=["name", "guest_count_ly"]
+        entree_count_ly, columns=["name", "entree_count_ly"]
     )
     sales_table = df_sales_day.merge(df_sales_day_ly, how="outer", sort=True)
     sales_table = sales_table.merge(df_entree_count, how="outer", sort=True)
@@ -213,10 +221,10 @@ def index():
     daily_table = sales_table.merge(labor_table, how="outer", sort=True)
 
     daily_table = daily_table.merge(store_df, how="left")
-    daily_table.set_index("name", inplace=True)
+    daily_table = daily_table.set_index("name")
 
     # Grab top sales over last year before we add totals
-    daily_table.fillna(0, inplace=True)
+    daily_table = daily_table.fillna(0)
     daily_table["doly"] = daily_table.sales - daily_table.sales_ly
     daily_table["poly"] = (
         (daily_table.sales - daily_table.sales_ly) / daily_table.sales_ly * 100
@@ -225,13 +233,17 @@ def index():
     daily_top = daily_top.nlargest(5, "poly", keep="all")
 
     # daily_table.loc["TOTALS"] = daily_table.sum(numeric_only=True)
-    daily_table["check_avg"] = daily_table["sales"] / daily_table["guest_count"].astype(
+    daily_table["guest_check_avg"] = daily_table["sales"] / daily_table["guests"].astype(
+        float
+    )
+    daily_table["entree_check_avg"] = daily_table["sales"] / daily_table["entree_count"].astype(
         float
     )
     daily_table["labor_pct"] = daily_table.dollars / daily_table.sales
     daily_table["labor_pct_ly"] = daily_table.dollars_ly / daily_table.sales_ly
-    daily_table.fillna(0, inplace=True)
+    daily_table = daily_table.fillna(0)
     daily_totals = daily_table.sum()
+    print(daily_table)
 
     # Weekly Sales Table
     sales_week = (
@@ -297,10 +309,10 @@ def index():
     labor_table_wk = df_labor_week.merge(df_labor_week_ly, how="outer", sort=True)
 
     weekly_table = sales_table_wk.merge(labor_table_wk, how="outer", sort=True)
-    weekly_table.set_index("name", inplace=True)
+    weekly_table = weekly_table.set_index("name")
 
     # Grab top sales over last year before we add totals
-    weekly_table.fillna(0, inplace=True)
+    weekly_table = weekly_table.fillna(0)
     weekly_table["doly"] = weekly_table.sales - weekly_table.sales_ly
     weekly_table["poly"] = (
         (weekly_table.sales - weekly_table.sales_ly) / weekly_table.sales_ly * 100
@@ -376,10 +388,10 @@ def index():
     labor_table_pd = df_labor_period.merge(df_labor_period_ly, how="outer", sort=True)
 
     period_table = sales_table_pd.merge(labor_table_pd, how="outer", sort=True)
-    period_table.set_index("name", inplace=True)
+    period_table = period_table.set_index("name")
 
     # Grab top sales over last year before we add totals
-    period_table.fillna(0, inplace=True)
+    period_table = period_table.fillna(0)
     period_table["doly"] = period_table.sales - period_table.sales_ly
     period_table["poly"] = (
         (period_table.sales - period_table.sales_ly) / period_table.sales_ly * 100
@@ -455,10 +467,10 @@ def index():
     labor_table_yr = df_labor_yearly.merge(df_labor_yearly_ly, how="outer", sort=True)
 
     yearly_table = sales_table_yr.merge(labor_table_yr, how="outer", sort=True)
-    yearly_table.set_index("name", inplace=True)
+    yearly_table = yearly_table.set_index("name")
 
     # Grab top sales over last year before we add totals
-    yearly_table.fillna(0, inplace=True)
+    yearly_table = yearly_table.fillna(0)
     yearly_table["doly"] = yearly_table.sales - yearly_table.sales_ly
     yearly_table["poly"] = (
         (yearly_table.sales - yearly_table.sales_ly) / yearly_table.sales_ly * 100
@@ -474,31 +486,32 @@ def index():
         "home/index.html",
         title=Config.COMPANY_NAME,
         company_name=Config.COMPANY_NAME,
-        form1=form1,
-        form3=form3,
+        #form1=form1,
+        #form3=form3,
         segment="index",
-        current_user=current_user,
+        #current_user=current_user,
         roles=current_user.roles,
-        fiscal_dates=fiscal_dates,
-        daily_sales_list=daily_sales_list,
-        daily_sales_list_ly=daily_sales_list_ly,
-        weekly_sales_list=weekly_sales_list,
-        weekly_sales_list_ly=weekly_sales_list_ly,
-        period_sales_list=period_sales_list,
-        period_sales_list_ly=period_sales_list_ly,
-        budgets3=budgets3,
-        daily_table=daily_table,
-        daily_totals=daily_totals,
-        #        weekly_table=weekly_table,
-        weekly_totals=weekly_totals,
-        #        period_table=period_table,
-        period_totals=period_totals,
-        #        yearly_table=yearly_table,
-        yearly_totals=yearly_totals,
-        daily_top=daily_top,
-        weekly_top=weekly_top,
-        period_top=period_top,
-        #        yearly_top=yearly_top
+        **locals(),
+        #fiscal_dates=fiscal_dates,
+        #daily_sales_list=daily_sales_list,
+        #daily_sales_list_ly=daily_sales_list_ly,
+        #weekly_sales_list=weekly_sales_list,
+        #weekly_sales_list_ly=weekly_sales_list_ly,
+        #period_sales_list=period_sales_list,
+        #period_sales_list_ly=period_sales_list_ly,
+        #budgets3=budgets3,
+        #daily_table=daily_table,
+        #daily_totals=daily_totals,
+        ##        weekly_table=weekly_table,
+        #weekly_totals=weekly_totals,
+        ##        period_table=period_table,
+        #period_totals=period_totals,
+        ##        yearly_table=yearly_table,
+        #yearly_totals=yearly_totals,
+        #daily_top=daily_top,
+        #weekly_top=weekly_top,
+        #period_top=period_top,
+        ##        yearly_top=yearly_top
     )
 
 

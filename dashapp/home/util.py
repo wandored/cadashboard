@@ -161,9 +161,8 @@ def sales_employee(start, end):
         [(x.name, x.location) for x in data], columns=["name", "location"]
     )
     df_merge = df_loc.merge(df, on="location")
-    df_merge.rename(
-        columns={"netSales": "sales", "numberofGuests": "guests", "dayPart": "daypart"},
-        inplace=True,
+    df_merge = df_merge.rename(
+        columns={"netSales": "sales", "numberofGuests": "guests", "dayPart": "daypart"}
     )
 
     # pivot data and write to database
@@ -195,7 +194,7 @@ def labor_detail(start):
         [(x.name, x.location) for x in data], columns=["name", "location"]
     )
     df_merge = df_loc.merge(df, left_on="location", right_on="location_ID")
-    df_merge.rename(columns={"jobTitle": "job", "total": "dollars"}, inplace=True)
+    df_merge = df_merge.rename(columns={"jobTitle": "job", "total": "dollars"})
     df_merge = df_merge.merge(df_cats, on="job")
     df_pivot = df_merge.pivot_table(
         index=["name", "category", "job"], values=["hours", "dollars"], aggfunc=np.sum
@@ -230,7 +229,7 @@ def sales_detail(start, end):
         [(x.name, x.location) for x in data], columns=["name", "location"]
     )
     df_merge = df_loc.merge(df, on="location")
-    df_merge.drop(columns=["location"], inplace=True)
+    df_merge = df_merge.drop(columns=["location"])
 
     df_menu = df_merge.merge(df_cats, left_on="category", right_on="menu_category")
 
@@ -247,8 +246,8 @@ def sales_detail(start, end):
     dafilter = df_menu["menuitem"].str.contains("VOID")
     df_clean = df_menu[~dafilter]
     df_clean[["x", "menuitem"]] = df_clean["menuitem"].str.split(" - ", expand=True)
-    df_clean.drop(columns=["category_x", "x"], inplace=True)
-    df_clean.rename(columns={"category_y": "category"}, inplace=True)
+    df_clean = df_clean.drop(columns=["category_x", "x"])
+    df_clean = df_clean.rename(columns={"category_y": "category"})
     #    menuitems = removeSpecial(df_clean)  ### fix the file location before making this active
     # Write the daily menu items to Menuitems table
     menu_pivot = df_clean.pivot_table(
@@ -416,7 +415,7 @@ def potato_sales(start):
                     continue
                 df_pot.loc[i[0]] = [0]
                 continue
-            df_merge.drop(columns=["location"], inplace=True)
+            df_merge = df_merge.drop(columns=["location"])
             df_menu = df_merge
             df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(
                 r"CHOPHOUSE - NOLA", "CHOPHOUSE-NOLA", regex=True
@@ -492,8 +491,8 @@ def update_recipe_costs():
     df.loc[:, "Name"] = df["Name"].str.replace(r"CAFÉ", "CAFE", regex=True)
     df.loc[:, "Name"] = df["Name"].str.replace(r"^(?:.*?( -)){2}", "-", regex=True)
     df[["name", "menuitem"]] = df["Name"].str.split(" - ", expand=True)
-    df.drop(columns=["Name", "__count", "Barcode"], inplace=True)
-    df.rename(
+    df = df.drop(columns=["Name", "__count", "Barcode"])
+    df = df.rename(
         columns={
             "RecipeId": "recipeid",
             "Recipe": "recipe",
@@ -501,8 +500,7 @@ def update_recipe_costs():
             "Category2": "category2",
             "POSID": "posid",
             "MenuItemId": "menuitemid",
-        },
-        inplace=True,
+        }
     )
     df = df[
         [
@@ -532,8 +530,7 @@ def update_recipe_costs():
     df_cost[["name", "menuitem"]] = df_cost["MenuItemName"].str.split(
         " - ", expand=True
     )
-
-    df_cost.drop(
+    df_cost = df_cost.drop(
         columns=[
             "AvgPrice1",
             "Profit1",
@@ -550,10 +547,9 @@ def update_recipe_costs():
             "Variance",
             "PriceNeeded",
             "MenuItemName",
-        ],
-        inplace=True,
+        ]
     )
-    df_cost.rename(columns={"Cost": "cost"}, inplace=True)
+    df_cost = df_cost.rename(columns={"Cost": "cost"})
     df_cost = df_cost[["name", "menuitem", "cost"]]
 
     recipes = pd.merge(df_cost, df, on=["name", "menuitem"], how="left")
