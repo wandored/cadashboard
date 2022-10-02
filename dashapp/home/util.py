@@ -8,28 +8,8 @@ import pandas as pd
 import numpy as np
 from dashapp.config import Config
 from datetime import datetime, timedelta
-from dashapp.authentication.models import (
-    Calendar,
-    Sales,
-    Labor,
-    Restaurants,
-    db,
-    Menuitems,
-    Potatoes,
-    Unitsofmeasure,
-    Transactions,
-)
+from dashapp.authentication.models import *
 from sqlalchemy import or_, func
-
-
-pd.option_context(
-    "display.max_rows",
-    None,
-    "display.max_columns",
-    None,
-    "display.precision",
-    3,
-)
 
 
 def sales_record(store):
@@ -596,24 +576,27 @@ def set_dates(startdate):
         d["end_day"] = day_end.strftime("%Y-%m-%d")
         d["start_week"] = i.week_start
         d["end_week"] = i.week_end
+        d["week_to_date"] = i.date
         d["last_seven"] = seven.strftime("%Y-%m-%d")
         d["start_period"] = i.period_start
         d["end_period"] = i.period_end
+        d["period_to_date"] = i.date
         d["last_thirty"] = thirty.strftime("%Y-%m-%d")
         d["start_year"] = i.year_start
         d["end_year"] = i.year_end
+        d["year_to_date"] = i.date
         d["last_threesixtyfive"] = threesixtyfive.strftime("%Y-%m-%d")
         d["start_day_ly"] = get_lastyear(i.date)
         d["end_day_ly"] = get_lastyear(day_end.strftime("%Y-%m-%d"))
         d["start_week_ly"] = get_lastyear(i.week_start)
         d["end_week_ly"] = get_lastyear(i.week_end)
-        d["week_to_date"] = get_lastyear(i.date)
+        d["week_to_date_ly"] = get_lastyear(i.date)
         d["start_period_ly"] = get_lastyear(i.period_start)
         d["end_period_ly"] = get_lastyear(i.period_end)
-        d["period_to_date"] = get_lastyear(i.date)
+        d["period_to_date_ly"] = get_lastyear(i.date)
         d["start_year_ly"] = get_lastyear(i.year_start)
         d["end_year_ly"] = get_lastyear(i.year_end)
-        d["year_to_date"] = get_lastyear(i.date)
+        d["year_to_date_ly"] = get_lastyear(i.date)
         d["start_previous_week"] = lws.strftime("%Y-%m-%d")
         d["end_previous_week"] = lwe.strftime("%Y-%m-%d")
 

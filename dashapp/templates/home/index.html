@@ -40,17 +40,17 @@
           </div>
             <div class="text-end pt-1">
               <p class="text-sm mb-0 text-capitalize">Week {{ fiscal_dates["week"] }} Sales</p>
-              <h4 class="mb-0">{{ "${:,.0f}".format(weekly_totals.sales) }}</h4>
+              <h4 class="mb-0">{{ "${:,.0f}".format(weekly_sales) }}</h4>
             </div>
         </div>
         <hr class="dark horizontal my-0">
-          {% if weekly_totals.sales >= weekly_totals.sales_ly %}
+          {% if weekly_sales >= wtd_sales_ly %}
           <div class="card-footer p-3">
-            <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((weekly_totals.sales - weekly_totals.sales_ly) / weekly_totals.sales_ly) * 100) }} - {{ "${:,.0f}".format(weekly_totals.sales_ly) }}</span> WTD</p>
+            <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((weekly_sales - wtd_sales_ly) / wtd_sales_ly) * 100) }} - {{ "${:,.0f}".format(wtd_sales_ly) }}</span> WTD</p>
           </div>
           {% else %}
           <div class="card-footer p-3">
-            <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((weekly_totals.sales - weekly_totals.sales_ly)|abs / weekly_totals.sales_ly) * 100) }} - {{ "${:,.0f}".format(weekly_totals.sales_ly) }}</span> WTD</p>
+            <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((weekly_sales - wtd_sales_ly)|abs / wtd_sales_ly) * 100) }} - {{ "${:,.0f}".format(wtd_sales_ly) }}</span> WTD</p>
           </div>
           {% endif %}
       </div>
@@ -63,17 +63,17 @@
           </div>
             <div class="text-end pt-1">
               <p class="text-sm mb-0 text-capitalize">Period {{ fiscal_dates["period"] }} Sales</p>
-              <h4 class="mb-0">{{ "${:,.0f}".format(period_totals.sales) }}</h4>
+              <h4 class="mb-0">{{ "${:,.0f}".format(period_sales) }}</h4>
             </div>
         </div>
         <hr class="dark horizontal my-0">
-          {% if period_totals.sales >= period_totals.sales_ly %}
+          {% if period_sales >= ptd_sales_ly %}
           <div class="card-footer p-3">
-            <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((period_totals.sales - period_totals.sales_ly) / period_totals.sales_ly) * 100) }} - {{ "${:,.0f}".format(period_totals.sales_ly) }}</span> PTD</p>
+            <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((period_sales - ptd_sales_ly) / ptd_sales_ly) * 100) }} - {{ "${:,.0f}".format(ptd_sales_ly) }}</span> PTD</p>
           </div>
           {% else %}
           <div class="card-footer p-3">
-            <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((period_totals.sales - period_totals.sales_ly)|abs / period_totals.sales_ly) * 100) }} - {{ "${:,.0f}".format(period_totals.sales_ly) }}</span> PTD</p>
+            <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((period_sales - ptd_sales_ly)|abs / ptd_sales_ly) * 100) }} - {{ "${:,.0f}".format(ptd_sales_ly) }}</span> PTD</p>
           </div>
           {% endif %}
       </div>
@@ -86,17 +86,17 @@
           </div>
             <div class="text-end pt-1">
               <p class="text-sm mb-0 text-capitalize">Fiscal {{ fiscal_dates["year"] }} Sales</p>
-              <h4 class="mb-0"> {{ "${:,.0f}".format(yearly_totals.sales) }}</h4>
+              <h4 class="mb-0"> {{ "${:,.0f}".format(yearly_sales) }}</h4>
             </div>
         </div>
         <hr class="dark horizontal my-0">
-          {% if yearly_totals.sales >= yearly_totals.sales_ly %}
+          {% if yearly_sales >= ytd_sales_ly %}
           <div class="card-footer p-3">
-            <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((yearly_totals.sales - yearly_totals.sales_ly) / yearly_totals.sales_ly) * 100) }} - {{ "${:,.0f}".format(yearly_totals.sales_ly) }}</span> YTD</p>
+            <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((yearly_sales - ytd_sales_ly) / ytd_sales_ly) * 100) }} - {{ "${:,.0f}".format(ytd_sales_ly) }}</span> YTD</p>
           </div>
           {% else %}
           <div class="card-footer p-3">
-            <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((yearly_totals.sales - yearly_totals.sales_ly)|abs / yearly_totals.sales_ly) * 100) }} - {{ "${:,.0f}".format(yearly_totals.sales_ly) }}</span> YTD</p>
+            <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((yearly_sales - ytd_sales_ly)|abs / ytd_sales_ly) * 100) }} - {{ "${:,.0f}".format(ytd_sales_ly) }}</span> YTD</p>
           </div>
           {% endif %}
       </div>
@@ -115,10 +115,10 @@
         </div>
         <div class="card-body">
           <h6 class="mb-0 ">Week to Date Sales</h6>
-          {% if weekly_totals.sales > weekly_totals.sales_ly %}
-          <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.0f}".format(weekly_totals.sales - weekly_totals.sales_ly) }} over last year</p>
+          {% if weekly_sales > wtd_sales_ly %}
+          <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.0f}".format(weekly_sales - wtd_sales_ly) }} over last year</p>
           {% else %}
-          <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.0f}".format(weekly_totals.sales - weekly_totals.sales_ly) }} below last year</p>
+          <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.0f}".format(weekly_sales - wtd_sales_ly) }} below last year</p>
           {% endif %}
         </div>
       </div>
@@ -134,10 +134,10 @@
         </div>
         <div class="card-body">
           <h6 class="mb-0 ">Period to Date Sales</h6>
-          {% if period_totals.sales > period_totals.sales_ly %}
-          <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.0f}".format(period_totals.sales - period_totals.sales_ly) }} over last year</p>
+          {% if period_sales > ptd_sales_ly %}
+          <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.0f}".format(period_sales - ptd_sales_ly) }} over last year</p>
           {% else %}
-          <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.0f}".format(period_totals.sales - period_totals.sales_ly) }} below last year</p>
+          <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.0f}".format(period_sales - ptd_sales_ly) }} below last year</p>
           {% endif %}
         </div>
       </div>
@@ -153,10 +153,10 @@
         </div>
         <div class="card-body">
           <h6 class="mb-0 ">Year to Date Sales</h6>
-          {% if yearly_totals.sales > yearly_totals.sales_ly %}
-          <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.0f}".format(yearly_totals.sales - yearly_totals.sales_ly) }} over last year</p>
+          {% if yearly_sales > ytd_sales_ly %}
+          <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.0f}".format(yearly_sales - ytd_sales_ly) }} over last year</p>
           {% else %}
-          <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.0f}".format(yearly_totals.sales - yearly_totals.sales_ly) }} below last year</p>
+          <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.0f}".format(yearly_sales - ytd_sales_ly) }} below last year</p>
           {% endif %}
         </div>
       </div>

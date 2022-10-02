@@ -49,7 +49,7 @@ def get_glaccount():
     url = "{}/GlAccount?{}".format(Config.SRVC_ROOT, query)
     rqst = make_HTTP_request(url)
     df = make_dataframe(rqst)
-    df.rename(columns={"name": "account"}, inplace=True)
+    df = df.rename(columns={"name": "account"})
 
     return df
 
@@ -70,7 +70,7 @@ def transaction(id_list):
             pass
 
     df = make_dataframe(rqst_list)
-    # df.dropna(axis=0, how="any", subset=["companyId"], inplace=True)
+    # df = df.dropna(axis=0, how="any", subset=["companyId"])
     if df.empty:
         return
 
@@ -81,14 +81,14 @@ def transaction(id_list):
     data = cur.fetchall()
     df_loc = pd.DataFrame.from_records(data, columns=["id", "location", "name"])
     df_merge = df_loc.merge(df, left_on="location", right_on="locationId")
-    df_merge.rename(columns={"name_x": "name", "name_y": "item"}, inplace=True)
-    df_merge.drop(columns=["location", "locationId"], inplace=True)
+    df_merge = df_merge.rename(columns={"name_x": "name", "name_y": "item"})
+    df_merge = df_merge.drop(columns=["location", "locationId"])
 
     query = "$select=companyId,name"
     url = "{}/Company?{}".format(Config.SRVC_ROOT, query)
     rqst = make_HTTP_request(url)
     df = make_dataframe(rqst)
-    df.rename(columns={"name": "company"}, inplace=True)
+    df = df.rename(columns={"name": "company"})
     # merge will fail if all transactions are journal entries
     df_return = df_merge.merge(df, on="companyId", how="left")
 
@@ -103,7 +103,7 @@ def Items():
     df = make_dataframe(rqst)
     if df.empty:
         return
-    df.rename(columns={"name": "item"}, inplace=True)
+    df = df.rename(columns={"name": "item"})
 
     return df
 
@@ -127,7 +127,7 @@ def transactionDetails(start, end):
     df_loc = pd.DataFrame.from_records(data, columns=["id", "location", "name"])
     df_merge = df_loc.merge(df, left_on="location", right_on="locationId")
     df_merge[["modified", "m"]] = df_merge["modifiedOn"].str.split("T", expand=True)
-    df_merge.drop(columns=["location", "locationId", "m", "modifiedOn"], inplace=True)
+    df_merge = df_merge.drop(columns=["location", "locationId", "m", "modifiedOn"])
 
     return df_merge
 
@@ -138,17 +138,16 @@ def write_to_database(df1, df2, df3):
     df = df3.merge(gl, on="glAccountId")
     df = df.merge(df2, how="left", on=["itemId"])
     df = df.merge(df1, on=["transactionId", "id", "name"])
-    df.rename(
+    df = df.rename(
         columns={
             "id": "store_id",
             "item_x": "item",
             "unitOfMeasureName": "UofM",
             "transactionId": "trans_id",
             "companyId": "companyid",
-        },
-        inplace=True,
+        }
     )
-    df.drop(columns=["itemId", "item_y"], inplace=True)
+    df = df.drop(columns=["itemId", "item_y"])
     df = df[
         [
             "date",

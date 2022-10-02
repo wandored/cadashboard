@@ -80,25 +80,44 @@ def index():
         return value
 
     daily_sales_list = get_chart_values(
-        fiscal_dates["start_week"], fiscal_dates["end_week"], Calendar.date
+        fiscal_dates["start_week"], fiscal_dates["start_day"], Calendar.date
     )
+    # sum daily sales list
+    weekly_sales = sum(daily_sales_list)
     daily_sales_list_ly = get_chart_values(
         fiscal_dates["start_week_ly"], fiscal_dates["end_week_ly"], Calendar.date
     )
+    weekly_sales_ly = sum(daily_sales_list_ly)
+    week_to_date_sales_ly = get_chart_values(
+        fiscal_dates["start_week_ly"], fiscal_dates["start_day_ly"], Calendar.date
+    )
+    wtd_sales_ly = sum(week_to_date_sales_ly)
 
     weekly_sales_list = get_chart_values(
-        fiscal_dates["start_period"], fiscal_dates["end_period"], Calendar.week
+        fiscal_dates["start_period"], fiscal_dates["start_day"], Calendar.week
     )
+    period_sales = sum(weekly_sales_list)
     weekly_sales_list_ly = get_chart_values(
         fiscal_dates["start_period_ly"], fiscal_dates["end_period_ly"], Calendar.week
     )
+    period_sales_ly = sum(weekly_sales_list_ly)
+    period_to_date_sales_ly = get_chart_values(
+        fiscal_dates["start_period_ly"], fiscal_dates["start_day_ly"], Calendar.week
+    )
+    ptd_sales_ly = sum(period_to_date_sales_ly)
 
     period_sales_list = get_chart_values(
-        fiscal_dates["start_year"], fiscal_dates["end_year"], Calendar.period
+        fiscal_dates["start_year"], fiscal_dates["start_day"], Calendar.period
     )
+    yearly_sales = sum(period_sales_list)
     period_sales_list_ly = get_chart_values(
         fiscal_dates["start_year_ly"], fiscal_dates["end_year_ly"], Calendar.period
     )
+    yearly_sales_ly = sum(period_sales_list_ly)
+    year_to_date_sales_ly = get_chart_values(
+        fiscal_dates["start_year_ly"], fiscal_dates["start_day_ly"], Calendar.period
+    )
+    ytd_sales_ly = sum(year_to_date_sales_ly)
 
     budget_chart = (
         db.session.query(func.sum(Budgets.total_sales).label("total_sales"))
@@ -116,7 +135,7 @@ def index():
         db.session.query(
             Sales.name,
             func.sum(Sales.sales).label("total_sales"),
-            func.sum(Sales.guests).label("total_guests")
+            func.sum(Sales.guests).label("total_guests"),
         )
         .filter(Sales.date == fiscal_dates["start_day"])
         .group_by(Sales.name)
@@ -127,7 +146,7 @@ def index():
         db.session.query(
             Sales.name,
             func.sum(Sales.sales).label("total_sales_ly"),
-            func.sum(Sales.guests).label("total_guests_ly")
+            func.sum(Sales.guests).label("total_guests_ly"),
         )
         .filter(Sales.date == fiscal_dates["start_day_ly"])
         .group_by(Sales.name)
@@ -173,7 +192,9 @@ def index():
         top_sales_list, columns=["name", "top_sales"]
     )
 
-    df_sales_day = pd.DataFrame.from_records(sales_day, columns=["name", "sales", "guests"])
+    df_sales_day = pd.DataFrame.from_records(
+        sales_day, columns=["name", "sales", "guests"]
+    )
     df_sales_day_ly = pd.DataFrame.from_records(
         sales_day_ly, columns=["name", "sales_ly", "guests_ly"]
     )
@@ -233,12 +254,12 @@ def index():
     daily_top = daily_top.nlargest(5, "poly", keep="all")
 
     # daily_table.loc["TOTALS"] = daily_table.sum(numeric_only=True)
-    daily_table["guest_check_avg"] = daily_table["sales"] / daily_table["guests"].astype(
-        float
-    )
-    daily_table["entree_check_avg"] = daily_table["sales"] / daily_table["entree_count"].astype(
-        float
-    )
+    daily_table["guest_check_avg"] = daily_table["sales"] / daily_table[
+        "guests"
+    ].astype(float)
+    daily_table["entree_check_avg"] = daily_table["sales"] / daily_table[
+        "entree_count"
+    ].astype(float)
     daily_table["labor_pct"] = daily_table.dollars / daily_table.sales
     daily_table["labor_pct_ly"] = daily_table.dollars_ly / daily_table.sales_ly
     daily_table = daily_table.fillna(0)
@@ -486,32 +507,12 @@ def index():
         "home/index.html",
         title=Config.COMPANY_NAME,
         company_name=Config.COMPANY_NAME,
-        #form1=form1,
-        #form3=form3,
+        # form1=form1,
+        # form3=form3,
         segment="index",
-        #current_user=current_user,
+        # current_user=current_user,
         roles=current_user.roles,
         **locals(),
-        #fiscal_dates=fiscal_dates,
-        #daily_sales_list=daily_sales_list,
-        #daily_sales_list_ly=daily_sales_list_ly,
-        #weekly_sales_list=weekly_sales_list,
-        #weekly_sales_list_ly=weekly_sales_list_ly,
-        #period_sales_list=period_sales_list,
-        #period_sales_list_ly=period_sales_list_ly,
-        #budgets3=budgets3,
-        #daily_table=daily_table,
-        #daily_totals=daily_totals,
-        ##        weekly_table=weekly_table,
-        #weekly_totals=weekly_totals,
-        ##        period_table=period_table,
-        #period_totals=period_totals,
-        ##        yearly_table=yearly_table,
-        #yearly_totals=yearly_totals,
-        #daily_top=daily_top,
-        #weekly_top=weekly_top,
-        #period_top=period_top,
-        ##        yearly_top=yearly_top
     )
 
 
@@ -540,12 +541,10 @@ def store(store_id):
     store_df = pd.DataFrame([x.as_dict() for x in data])
 
     if not Sales.query.filter_by(
-        date=fiscal_dates["start_day"], 
-        name=store.name
+        date=fiscal_dates["start_day"], name=store.name
     ).first():
         session["token"] = find_day_with_sales(
-            day=fiscal_dates["start_day"],
-            store=store.name
+            day=fiscal_dates["start_day"], store=store.name
         )
         return redirect(url_for("home_blueprint.store", store_id=store.id))
 
