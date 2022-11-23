@@ -1751,9 +1751,9 @@ def potato(store_id):
         pot_df = pot_df.merge(df, on="time", how="outer")
 
     pot_df.fillna(0, inplace=True)
-    pot_df.loc[:, "AVG"] = pot_df.mean(axis=1)
-    pot_df.loc[:, "MEDIAN"] = pot_df.median(axis=1)
-    pot_df.loc[:, "MAX"] = pot_df.max(axis=1)
+    pot_df.loc[:, "AVG"] = pot_df.mean(numeric_only=True, axis=1)
+    pot_df.loc[:, "MEDIAN"] = pot_df.median(numeric_only=True, axis=1)
+    pot_df.loc[:, "MAX"] = pot_df.max(numeric_only=True, axis=1)
     out_times = pd.read_csv(
         "/usr/local/share/potatochart.csv", usecols=["time", "in_time", "out_time"]
     )
