@@ -103,7 +103,7 @@ def get_vendors(regex, days):
 
 
 @lru_cache(maxsize=128)
-def get_cost_per_vendor(regex, days):
+def get_cost_per_vendor(regex, days, stores):
 
     query = (
         db.session.query(
@@ -115,6 +115,7 @@ def get_cost_per_vendor(regex, days):
         .filter(
             Transactions.item.regexp_match(regex),
             Transactions.date >= days,
+            Transactions.store_id.in_(stores),
             Transactions.type == "AP Invoice",
         )
         .group_by(
@@ -179,7 +180,7 @@ def get_cost_per_vendor(regex, days):
 
 
 @lru_cache(maxsize=128)
-def get_cost_per_store(regex, days):
+def get_cost_per_store(regex, days, stores):
 
     query = (
         db.session.query(
@@ -191,6 +192,7 @@ def get_cost_per_store(regex, days):
         .filter(
             Transactions.item.regexp_match(regex),
             Transactions.date >= days,
+            Transactions.store_id.in_(stores),
             Transactions.type == "AP Invoice",
         )
         .group_by(
@@ -251,8 +253,9 @@ def get_cost_per_store(regex, days):
     df = pd.DataFrame()
     return df
 
+
 @lru_cache(maxsize=128)
-def period_purchases(regex, start, end):
+def period_purchases(regex, start, end, stores):
     # generate list of purchase costs per period for charts
     calendar = Calendar.query.with_entities(
         Calendar.date, Calendar.week, Calendar.period, Calendar.year
@@ -271,6 +274,7 @@ def period_purchases(regex, start, end):
         .filter(
             Transactions.item.regexp_match(regex),
             Transactions.date.between(start, end),
+            Transactions.store_id.in_(stores),
             Transactions.type == "AP Invoice",
         )
         .group_by(
@@ -311,7 +315,7 @@ def period_purchases(regex, start, end):
         return df_list
 
 
-def get_category_costs(regex, start, end):
+def get_category_costs(regex, start, end, stores):
     # Return list of sales
     query = (
         db.session.query(
@@ -322,6 +326,7 @@ def get_category_costs(regex, start, end):
         .filter(
             Transactions.account.in_(regex),
             Transactions.date.between(start, end),
+            Transactions.store_id.in_(stores),
             Transactions.type == "AP Invoice",
         )
         .group_by(Transactions.account)
@@ -332,7 +337,7 @@ def get_category_costs(regex, start, end):
     return results
 
 
-def get_category_topten(regex, start, end):
+def get_category_topten(regex, start, end, stores):
 
     query = (
         db.session.query(
@@ -342,6 +347,7 @@ def get_category_topten(regex, start, end):
         .filter(
             Transactions.account.in_(regex),
             Transactions.date.between(start, end),
+            Transactions.store_id.in_(stores),
             Transactions.type == "AP Invoice",
         )
         .group_by(Transactions.item)
@@ -352,7 +358,7 @@ def get_category_topten(regex, start, end):
     return df
 
 
-def get_restaurant_topten(regex, start, end):
+def get_restaurant_topten(regex, start, end, stores):
 
     query = (
         db.session.query(
@@ -362,6 +368,7 @@ def get_restaurant_topten(regex, start, end):
         .filter(
             Transactions.account.in_(regex),
             Transactions.date.between(start, end),
+            Transactions.store_id.in_(stores),
             Transactions.type == "AP Invoice",
         )
         .group_by(Transactions.name)
@@ -372,7 +379,7 @@ def get_restaurant_topten(regex, start, end):
     return dframe
 
 
-def get_vendor_topten(regex, start, end):
+def get_vendor_topten(regex, start, end, stores):
 
     query = (
         db.session.query(
@@ -382,6 +389,7 @@ def get_vendor_topten(regex, start, end):
         .filter(
             Transactions.account.in_(regex),
             Transactions.date.between(start, end),
+            Transactions.store_id.in_(stores),
             Transactions.type == "AP Invoice",
         )
         .group_by(Transactions.company)
@@ -392,7 +400,7 @@ def get_vendor_topten(regex, start, end):
     return dframe
 
 
-def get_item_topten(regex, start, end):
+def get_item_topten(regex, start, end, stores):
 
     query = (
         db.session.query(
@@ -402,6 +410,7 @@ def get_item_topten(regex, start, end):
         .filter(
             Transactions.item.regexp_match(regex),
             Transactions.date.between(start, end),
+            Transactions.store_id.in_(stores),
             Transactions.type == "AP Invoice",
         )
         .group_by(Transactions.item)

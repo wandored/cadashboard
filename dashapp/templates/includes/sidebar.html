@@ -22,29 +22,14 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-white {% if 'store' in segment %} active bg-gradient-primary {% endif %}">
                     <form method="POST" action="" style="text-align:center">
-                        {{ form3.hidden_tag() }}
-                        <fieldset id="" class="form-group mb-0">
-                            <div class="form-group mb-1">
-                                {{ form3.store.label(class="form=control-label") }}
-                                {% if form3.store.errors %}
-                                {{ form3.store(class="form=control form-control-md is-invalid") }}
-                                <div class="invalid-feedback">
-                                    {% for error in form3.store.errors %}
-                                    <span>{{ error }}</span>
-                                    {% endfor %}
-                                </div>
-                                {% else %}
-                                {{ form3.store(class="form=control form-control-md") }}
-                                {% endif %}
-                            </div>
-                        </fieldset>
-                        <div class="form-group">
-                            {{ form3.submit3(class="btn btn-info btn-sm col-0") }}
-                        </div>
+                      <select class="selectpicker" multiple aria-label="Store Selection">
+                        <option value="1">All Casual Stores</option>
+                        <option value="2">All Steakhouse Stores</option>
+                        <option value="3">Carolina Roadhouse</option>
+                        <option value="4">CD Augusta</option>
+                      </select>
                     </form>
-                </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link text-white {% if 'purchasing' in segment %} active bg-gradient-primary {% endif %}"
