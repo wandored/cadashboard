@@ -35,6 +35,10 @@ def index():
         session["token"] = TODAY.strftime("%Y-%m-%d")
         return redirect(url_for("home_blueprint.index"))
 
+    if not "store_list" in session:
+        session["store_list"] = (4, 9, 11, 16, 17, 3, 5, 6, 10, 12, 13, 14, 15, 18)
+        return redirect(url_for("home_blueprint.index"))
+
     fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
     # List of stores to add ID so i can pass to other templates
     data = Restaurants.query.all()
@@ -59,9 +63,8 @@ def index():
     if form3.submit3.data and form3.validate():
 
         session["token"] = fiscal_dates["start_day"]
-        store_id = form3.store.data.id
-
-        return redirect(url_for("home_blueprint.store", store_id=store_id))
+        session["store_list"] = tuple([form3.store.data.id])
+        return redirect(url_for("home_blueprint.index"))
 
     # Sales Chart
     def get_chart_values(start, end, time):
@@ -264,7 +267,6 @@ def index():
     daily_table["labor_pct_ly"] = daily_table.dollars_ly / daily_table.sales_ly
     daily_table = daily_table.fillna(0)
     daily_totals = daily_table.sum()
-    print(daily_table)
 
     # Weekly Sales Table
     sales_week = (
