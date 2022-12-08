@@ -4,8 +4,9 @@ Copyright (c) 2019 - present AppSeed.us
 """
 
 from flask_wtf import FlaskForm
+from datetime import datetime
 from wtforms import SubmitField, StringField, PasswordField
-from wtforms.fields.html5 import DateField  # wftforms 2.3.3 is necessary until bug fix
+from wtforms.fields import DateField
 from wtforms_sqlalchemy.fields import QuerySelectField
 from wtforms.validators import Email, DataRequired
 from dashapp.authentication.models import Restaurants
@@ -55,12 +56,12 @@ class CreateAccountForm(FlaskForm):
 
 
 class DateForm(FlaskForm):
-    selectdate = DateField("", format="%Y-%m-%d")
+    selectdate = DateField("", format="%Y-%m-%d", default=datetime.today())
     submit1 = SubmitField("Submit")
 
 
 class UpdateForm(FlaskForm):
-    selectdate = DateField("Data Update", format="%Y-%m-%d")
+    selectdate = DateField("Data Update", format="%Y-%m-%d", default=datetime.today())
     submit2 = SubmitField("Submit")
 
 

@@ -500,6 +500,8 @@ def seafood():
         )
         x = x + 1
 
+    
+
     return render_template(
         "purchasing/seafood.html",
         title="Seafood",

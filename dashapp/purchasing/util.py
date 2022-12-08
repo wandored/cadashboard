@@ -307,7 +307,8 @@ def period_purchases(regex, start, end, stores):
     df = pd.DataFrame(item_list)
 
     if not df.empty:
-        df = df.merge(cal_df, on="date", how="inner")
+        # fills in months with no purchases
+        df = df.merge(cal_df, on="date", how="outer")
         df = df.groupby(["period"]).sum()
         df["unit_cost"] = (df["cost"] / df["unit_qty"]).astype(float)
         df["unit_cost"] = df["unit_cost"].fillna(0)
