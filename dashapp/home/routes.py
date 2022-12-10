@@ -156,31 +156,31 @@ def index():
         .all()
     )
 
-    entree_count = (
-        db.session.query(
-            Menuitems.name,
-            func.sum(Menuitems.quantity).label("entree_count"),
-        )
-        .filter(
-            Menuitems.date == fiscal_dates["start_day"],
-            Menuitems.menu_category.regexp_match("ENTREE*"),
-        )
-        .group_by(Menuitems.name)
-        .all()
-    )
-    # replace ly with guest check average
-    entree_count_ly = (
-        db.session.query(
-            Menuitems.name,
-            func.sum(Menuitems.quantity).label("entree_count"),
-        )
-        .filter(
-            Menuitems.date == fiscal_dates["start_day_ly"],
-            Menuitems.menu_category.regexp_match("ENTREE*"),
-        )
-        .group_by(Menuitems.name)
-        .all()
-    )
+    #entree_count = (
+    #    db.session.query(
+    #        Menuitems.name,
+    #        func.sum(Menuitems.quantity).label("entree_count"),
+    #    )
+    #    .filter(
+    #        Menuitems.date == fiscal_dates["start_day"],
+    #        Menuitems.menu_category.regexp_match("ENTREE*"),
+    #    )
+    #    .group_by(Menuitems.name)
+    #    .all()
+    #)
+    ## replace ly with guest check average
+    #entree_count_ly = (
+    #    db.session.query(
+    #        Menuitems.name,
+    #        func.sum(Menuitems.quantity).label("entree_count"),
+    #    )
+    #    .filter(
+    #        Menuitems.date == fiscal_dates["start_day_ly"],
+    #        Menuitems.menu_category.regexp_match("ENTREE*"),
+    #    )
+    #    .group_by(Menuitems.name)
+    #    .all()
+    #)
 
     # Get the top sales for each store
     store_list = store_df["name"]
@@ -201,15 +201,15 @@ def index():
     df_sales_day_ly = pd.DataFrame.from_records(
         sales_day_ly, columns=["name", "sales_ly", "guests_ly"]
     )
-    df_entree_count = pd.DataFrame.from_records(
-        entree_count, columns=["name", "entree_count"]
-    )
-    df_entree_count_ly = pd.DataFrame.from_records(
-        entree_count_ly, columns=["name", "entree_count_ly"]
-    )
+    #df_entree_count = pd.DataFrame.from_records(
+    #    entree_count, columns=["name", "entree_count"]
+    #)
+    #df_entree_count_ly = pd.DataFrame.from_records(
+    #    entree_count_ly, columns=["name", "entree_count_ly"]
+    #)
     sales_table = df_sales_day.merge(df_sales_day_ly, how="outer", sort=True)
-    sales_table = sales_table.merge(df_entree_count, how="outer", sort=True)
-    sales_table = sales_table.merge(df_entree_count_ly, how="outer", sort=True)
+    #sales_table = sales_table.merge(df_entree_count, how="outer", sort=True)
+    #sales_table = sales_table.merge(df_entree_count_ly, how="outer", sort=True)
     sales_table = sales_table.merge(top_sales_df, how="left")
 
     labor_day = (
@@ -260,9 +260,9 @@ def index():
     daily_table["guest_check_avg"] = daily_table["sales"] / daily_table[
         "guests"
     ].astype(float)
-    daily_table["entree_check_avg"] = daily_table["sales"] / daily_table[
-        "entree_count"
-    ].astype(float)
+    #daily_table["entree_check_avg"] = daily_table["sales"] / daily_table[
+    #    "entree_count"
+    #].astype(float)
     daily_table["labor_pct"] = daily_table.dollars / daily_table.sales
     daily_table["labor_pct_ly"] = daily_table.dollars_ly / daily_table.sales_ly
     daily_table = daily_table.fillna(0)
