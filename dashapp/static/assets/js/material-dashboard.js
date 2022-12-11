@@ -651,9 +651,21 @@ function sidenavTypeOnResize() {
   }
 }
 
+// check if the user has previously enabled dark mode
+if (localStorage.getItem("darkMode") === "enabled") {
+  // apply dark mode styles
+  darkMode(document.getElementById("dark-version"));
+}
+
 // Light Mode / Dark Mode
 function darkMode(el) {
+  // get the body element
   const body = document.getElementsByTagName('body')[0];
+  // get the checkbox element's checked property
+  const isDarkModeEnabled = el.checked;
+  // apply the dark-version class to the body element based on the value of the checked property
+  body.classList.toggle("dark-version", isDarkModeEnabled);
+  // get all elements that need to have their classes updated when dark mode is enabled or disabled
   const hr = document.querySelectorAll('div:not(.sidenav) > hr');
   const hr_card = document.querySelectorAll('div:not(.bg-gradient-dark) hr');
   const text_btn = document.querySelectorAll('button:not(.btn) > .text-dark');
@@ -805,4 +817,23 @@ function darkMode(el) {
     }
     el.removeAttribute("checked");
   }
+  // check if the dark mode checkbox is checked
+  if (el.getAttribute("checked")) {
+    // save the user's preference in local storage
+    localStorage.setItem("darkMode", "enabled");
+  } else {
+    // remove the user's preference from local storage
+    localStorage.removeItem("darkMode");
 };
+const checkbox = document.getElementById("dark-version");
+
+// add an event listener to the dark mode checkbox
+checkbox.addEventListener("click", () => {
+  darkMode(checkbox);
+});
+// update local storage to remember the user's preference for dark mode
+if (isDarkModeEnabled) {
+  localStorage.setItem("darkMode", "enabled");
+} else {
+  localStorage.removeItem("darkMode");
+}

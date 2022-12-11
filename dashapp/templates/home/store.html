@@ -354,7 +354,22 @@
             <div class="card">
               <form method="POST" action="" style="text-align:center">
                 <h6>Click Submit to generate a potato loading chart</h6>
-                {{ form4.hidden_tag() }}
+                    {{ form4.hidden_tag() }}
+                    <fieldset id="" class="form-group mb-0">
+                        <div class="form-group mb-1">
+                            {{ form4.store.label(class="form=control-label") }}
+                            {% if form4.store.errors %}
+                            {{ form4.store(class="form=control form-control-md is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form4.store.errors %}
+                                <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            {{ form4.store(class="form=control form-control-md") }}
+                            {% endif %}
+                        </div>
+                    </fieldset>
                 <div class="form-group">
                   {{ form4.submit4(class="btn btn-info") }}
                 </div>

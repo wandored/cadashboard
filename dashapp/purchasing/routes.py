@@ -44,7 +44,8 @@ def purchasing():
 
     if form3.submit3.data and form3.validate():
         session["token"] = fiscal_dates["start_day"]
-        session["store_list"] = tuple([form3.store.data.id])
+        data = (form3.stores.data)
+        session["store_list"] = tuple([x.id for x in data])
         return redirect(url_for("purchasing_blueprint.purchasing"))
 
     food_list = ["Beef", "Food Other", "Dairy", "Pork", "Poultry", "Produce", "Fish"]
@@ -80,6 +81,14 @@ def purchasing():
     top_ten["percent"] = top_ten["Cost"] / category_costs_total
     top_ten_vendor["percent"] = top_ten_vendor["Cost"] / category_costs_total
 
+    # get name from Restaurants table based on session["store_list"]
+    store_names = db.session.query(Restaurants.name).filter(
+        Restaurants.id.in_(session["store_list"])
+    )
+    store_names = [x[0] for x in store_names]
+    store_names = ", ".join(store_names)
+
+
     return render_template(
         "purchasing/purchasing.html",
         title="Purchasing",
@@ -113,8 +122,9 @@ def beef():
 
     if form3.submit3.data and form3.validate():
         session["token"] = fiscal_dates["start_day"]
-        store_id = form3.store.data.id
-        return redirect(url_for("home_blueprint.store", store_id=store_id))
+        data = (form3.stores.data)
+        session["store_list"] = tuple([x.id for x in data])
+        return redirect(url_for("purchasing_blueprint.beef"))
 
 
     top_ten = get_category_topten(
@@ -218,8 +228,9 @@ def dairy():
 
     if form3.submit3.data and form3.validate():
         session["token"] = fiscal_dates["start_day"]
-        store_id = form3.store.data.id
-        return redirect(url_for("home_blueprint.store", store_id=store_id))
+        data = (form3.stores.data)
+        session["store_list"] = tuple([x.id for x in data])
+        return redirect(url_for("purchasing_blueprint.dairy"))
 
 
     top_ten = get_category_topten(
@@ -323,8 +334,9 @@ def poultry():
 
     if form3.submit3.data and form3.validate():
         session["token"] = fiscal_dates["start_day"]
-        store_id = form3.store.data.id
-        return redirect(url_for("home_blueprint.store", store_id=store_id))
+        data = (form3.stores.data)
+        session["store_list"] = tuple([x.id for x in data])
+        return redirect(url_for("purchasing_blueprint.poultry"))
 
 
     top_ten = get_category_topten(
@@ -428,8 +440,9 @@ def seafood():
 
     if form3.submit3.data and form3.validate():
         session["token"] = fiscal_dates["start_day"]
-        store_id = form3.store.data.id
-        return redirect(url_for("home_blueprint.store", store_id=store_id))
+        data = (form3.stores.data)
+        session["store_list"] = tuple([x.id for x in data])
+        return redirect(url_for("purchasing_blueprint.seafood"))
 
 
     top_ten = get_category_topten(
@@ -535,8 +548,9 @@ def pork():
 
     if form3.submit3.data and form3.validate():
         session["token"] = fiscal_dates["start_day"]
-        store_id = form3.store.data.id
-        return redirect(url_for("home_blueprint.store", store_id=store_id))
+        data = (form3.stores.data)
+        session["store_list"] = tuple([x.id for x in data])
+        return redirect(url_for("purchasing_blueprint.pork"))
 
 
     top_ten = get_category_topten(
@@ -640,8 +654,9 @@ def produce():
 
     if form3.submit3.data and form3.validate():
         session["token"] = fiscal_dates["start_day"]
-        store_id = form3.store.data.id
-        return redirect(url_for("home_blueprint.store", store_id=store_id))
+        data = (form3.stores.data)
+        session["store_list"] = tuple([x.id for x in data])
+        return redirect(url_for("purchasing_blueprint.produce"))
 
 
     top_ten = get_category_topten(
@@ -745,8 +760,9 @@ def foodother():
 
     if form3.submit3.data and form3.validate():
         session["token"] = fiscal_dates["start_day"]
-        store_id = form3.store.data.id
-        return redirect(url_for("home_blueprint.store", store_id=store_id))
+        data = (form3.stores.data)
+        session["store_list"] = tuple([x.id for x in data])
+        return redirect(url_for("purchasing_blueprint.foodother"))
 
 
     top_ten = get_category_topten(

@@ -38,6 +38,7 @@ def index():
     if not "store_list" in session:
         session["store_list"] = (4, 9, 11, 16, 17, 3, 5, 6, 10, 12, 13, 14, 15, 18)
         return redirect(url_for("home_blueprint.index"))
+    print(session['store_list'])
 
     fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
     # List of stores to add ID so i can pass to other templates
@@ -61,9 +62,10 @@ def index():
         return redirect(url_for("home_blueprint.index"))
 
     if form3.submit3.data and form3.validate():
-
         session["token"] = fiscal_dates["start_day"]
-        session["store_list"] = tuple([form3.store.data.id])
+        data = (form3.stores.data)
+        print(data)
+        session["store_list"] = tuple([x.id for x in data])
         return redirect(url_for("home_blueprint.index"))
 
     # Sales Chart
@@ -565,13 +567,13 @@ def store(store_id):
         return redirect(url_for("home_blueprint.store", store_id=store.id))
 
     if form3.submit3.data and form3.validate():
-
         session["token"] = fiscal_dates["start_day"]
-        store_id = form3.store.data.id
+        data = (form3.store.data)
+        session["store_list"] = tuple([x.id for x in data])
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
-    if form4.validate_on_submit():
-
+    if form4.submit4.data and form4.validate():
+        store_id = form4.store.data.id
         return redirect(url_for("home_blueprint.potato", store_id=store.id))
 
     # sales cards
@@ -1245,9 +1247,9 @@ def marketing():
 
     form3 = StoreForm()
     if form3.submit3.data and form3.validate():
-
         session["token"] = fiscal_dates["start_day"]
-        store_id = form3.store.data.id
+        data = (form3.store.data)
+        session["store_list"] = tuple([x.id for x in data])
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
     # Gift Card Sales
@@ -1439,9 +1441,9 @@ def support():
         return redirect(url_for("home_blueprint.support"))
 
     if form3.submit3.data and form3.validate():
-
         session["token"] = fiscal_dates["start_day"]
-        store_id = form3.store.data.id
+        data = (form3.store.data)
+        session["store_list"] = tuple([x.id for x in data])
 
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
@@ -1520,7 +1522,8 @@ def alcohol():
 
     if form3.submit3.data and form3.validate():
         session["token"] = fiscal_dates["start_day"]
-        store_id = form3.store.data.id
+        data = (form3.store.data)
+        session["store_list"] = tuple([x.id for x in data])
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
     steakhouse = [4, 9, 11, 17, 16]
@@ -1711,8 +1714,9 @@ def profile():
 
     if form3.submit3.data and form3.validate():
         session["token"] = fiscal_dates["start_day"]
-        store_id = form3.store.data.id
-        return redirect(url_for("home_blueprint.store", store_id=store_id))
+        data = (form3.store.data)
+        session["store_list"] = tuple([x.id for x in data])
+        return redirect(url_for("home_blueprint.profile"))
 
     return render_template(
         "home/profile.html",
@@ -1729,6 +1733,7 @@ def profile():
 @login_required
 def potato(store_id):
 
+    # TODO need to fix store ID
     TODAY = datetime.date(datetime.now())
     CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
     YSTDAY = TODAY - timedelta(days=1)
