@@ -64,7 +64,6 @@ def index():
     if form3.submit3.data and form3.validate():
         session["token"] = fiscal_dates["start_day"]
         data = (form3.stores.data)
-        print(data)
         session["store_list"] = tuple([x.id for x in data])
         return redirect(url_for("home_blueprint.index"))
 

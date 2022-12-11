@@ -37,7 +37,7 @@
         </ul>
     </div>
     <hr class="horizontal light mt-0 mb-2">
-    <div class="collapse navbar-collapse  w-auto  max-height-vh-100" id="sidenav-collapse-main">
+    <div class="collapse navbar-collapse  w-auto  max-height-vh-80" id="sidenav-collapse-main">
         <ul class="navbar-nav">
             <li class="nav-item">
                 <a class="nav-link text-white {% if 'index' in segment %} active bg-gradient-primary {% endif %}"
@@ -126,8 +126,13 @@
                     <span class="nav-link-text ms-1">Logout</span>
                 </a>
             </li>
-            <hr>
         </ul>
+    </div>
+    <hr class="horizontal light mt-0 mb-2">
+    <div>
+        <p class="text-white text-center mt-1 mb-1">Week - {{ fiscal_dates["week"] }}</p>
+        <p class="text-white text-center mt-1 mb-1">Period - {{ fiscal_dates["period"] }}</p>
+        <p class="text-white text-center mt-1 mb-1">Year - {{ fiscal_dates["year"] }}</p>
     </div>
     <li>
         <form method="POST" action="" style="text-align:center">

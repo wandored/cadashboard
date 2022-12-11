@@ -195,6 +195,12 @@ def beef():
         )
         x = x + 1
 
+    store_names = db.session.query(Restaurants.name).filter(
+        Restaurants.id.in_(session["store_list"])
+    )
+    store_names = [x[0] for x in store_names]
+    store_names = ", ".join(store_names)
+
     return render_template(
         "purchasing/beef.html",
         title="Beef",
@@ -300,6 +306,13 @@ def dairy():
             session["store_list"],
         )
         x = x + 1
+
+    store_names = db.session.query(Restaurants.name).filter(
+        Restaurants.id.in_(session["store_list"])
+    )
+    store_names = [x[0] for x in store_names]
+    store_names = ", ".join(store_names)
+
 
     return render_template(
         "purchasing/dairy.html",
@@ -407,6 +420,13 @@ def poultry():
         )
         x = x + 1
 
+    store_names = db.session.query(Restaurants.name).filter(
+        Restaurants.id.in_(session["store_list"])
+    )
+    store_names = [x[0] for x in store_names]
+    store_names = ", ".join(store_names)
+
+
     return render_template(
         "purchasing/poultry.html",
         title="Poultry",
@@ -513,7 +533,12 @@ def seafood():
         )
         x = x + 1
 
-    
+    store_names = db.session.query(Restaurants.name).filter(
+        Restaurants.id.in_(session["store_list"])
+    )
+    store_names = [x[0] for x in store_names]
+    store_names = ", ".join(store_names)
+
 
     return render_template(
         "purchasing/seafood.html",
@@ -621,6 +646,12 @@ def pork():
         )
         x = x + 1
 
+    store_names = db.session.query(Restaurants.name).filter(
+        Restaurants.id.in_(session["store_list"])
+    )
+    store_names = [x[0] for x in store_names]
+    store_names = ", ".join(store_names)
+
     return render_template(
         "purchasing/pork.html",
         title="Pork",
@@ -727,6 +758,12 @@ def produce():
         )
         x = x + 1
 
+    store_names = db.session.query(Restaurants.name).filter(
+        Restaurants.id.in_(session["store_list"])
+    )
+    store_names = [x[0] for x in store_names]
+    store_names = ", ".join(store_names)
+
     return render_template(
         "purchasing/produce.html",
         title="Produce",
@@ -832,6 +869,12 @@ def foodother():
             session["store_list"],
         )
         x = x + 1
+
+    store_names = db.session.query(Restaurants.name).filter(
+        Restaurants.id.in_(session["store_list"])
+    )
+    store_names = [x[0] for x in store_names]
+    store_names = ", ".join(store_names)
 
     return render_template(
         "purchasing/foodother.html",

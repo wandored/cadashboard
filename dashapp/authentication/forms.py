@@ -10,35 +10,23 @@ from wtforms.fields import DateField
 from wtforms_sqlalchemy.fields import QuerySelectMultipleField, QuerySelectField
 from wtforms.validators import Email, DataRequired
 from dashapp.authentication.models import Restaurants
-from sqlalchemy import or_
 
 # login and registration
 
-
+# TODO pull id's directly from Restaurants table
 def store_query():
-    store_ids = [3, 4, 5, 6, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
-    stores = (
-        Restaurants.query.filter(Restaurants.id.in_(store_ids))
-        .order_by(Restaurants.name)
-        .all()
-    )
-    return stores
+    closed_stores = [1, 2, 7, 8]
+    return Restaurants.query.filter(Restaurants.id.notin_(closed_stores)).order_by(Restaurants.name).all()
 
 
 class LoginForm(FlaskForm):
-    email = StringField(
-        "Email Address", id="email_login", validators=[DataRequired(), Email()]
-    )
+    email = StringField("Email Address", id="email_login", validators=[DataRequired(), Email()])
     password = PasswordField("Password", id="pwd_login", validators=[DataRequired()])
 
 
 class CreateAccountForm(FlaskForm):
-    username = StringField(
-        "Username", id="username_create", validators=[DataRequired()]
-    )
-    email = StringField(
-        "Email", id="email_create", validators=[DataRequired(), Email()]
-    )
+    username = StringField("Username", id="username_create", validators=[DataRequired()])
+    email = StringField("Email", id="email_create", validators=[DataRequired(), Email()])
     password = PasswordField("Password", id="pwd_create", validators=[DataRequired()])
 
 
@@ -56,6 +44,7 @@ class MultiCheckboxField(QuerySelectMultipleField):
     widget = widgets.ListWidget(prefix_label=False)
     option_widget = widgets.CheckboxInput()
 
+
 class StoreForm(FlaskForm):
     stores = MultiCheckboxField(
         "Select Stores",
@@ -63,15 +52,6 @@ class StoreForm(FlaskForm):
         get_label="name",
     )
     submit3 = SubmitField("Submit")
-
-#class StoreForm(FlaskForm):
-#    store = QuerySelectMultipleField(
-#        "",
-#        query_factory=store_query,
-#        get_label="name",
-#        blank_text="Select Store",
-#    )
-#    submit3 = SubmitField("Submit")
 
 
 class PotatoForm(FlaskForm):
