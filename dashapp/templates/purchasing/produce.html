@@ -7,71 +7,13 @@
 
 {% block content %}
 
-<div class="container-fluid py-4">
-    <div class="row mt-4">
-        <div class="col-lg-3 col-md-4 mb-1">
-            <div class="card bg-success shadow-success position-relative">
-                <div class="card-body text-center">
-                    <a href="{{ url_for('purchasing_blueprint.produce') }}"><h4 class="stretched-link mb-0">PRODUCE</h4></a>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-4 mb-1">
-            <div class="card bg-info shadow-info position-relative">
-                <div class="card-body text-center">
-                    <a href="{{ url_for('purchasing_blueprint.seafood') }}"><h4 class="stretched-link mb-0">SEAFOOD</h4></a>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-4 mb-1">
-            <div class="card bg-primary shadow-primary position-relative">
-                <div class="card-body text-center">
-                    <a href="{{ url_for('purchasing_blueprint.beef') }}"><h4 class="stretched-link mb-0">BEEF</h4></a>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-4 mb-1">
-            <div class="card bg-light shadow-info position-relative">
-                <div class="card-body text-center">
-                    <a href="{{ url_for('purchasing_blueprint.dairy') }}"><h4 class="stretched-link mb-0">DAIRY</h4></a>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-4 mb-1">
-            <div class="card bg-secondary shadow-secondary position-relative">
-                <div class="card-body text-center">
-                    <a href="{{ url_for('purchasing_blueprint.foodother') }}"><h4 class="stretched-link mb-0">FOOD OTHER</h4></a>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-4 mb-1">
-            <div class="card bg-danger shadow-danger position-relative">
-                <div class="card-body text-center">
-                    <a href="{{ url_for('purchasing_blueprint.pork') }}"><h4 class="stretched-link mb-0">PORK</h4></a>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-4 mb-1">
-            <div class="card bg-warning shadow-warning position-relative">
-                <div class="card-body text-center">
-                    <a href="{{ url_for('purchasing_blueprint.poultry') }}"><h4 class="stretched-link mb-0">POULTRY</h4></a>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-4 mb-1">
-            <div class="card bg-secondary shadow-secondary position-relative">
-                <div class="card-body text-center">
-                    <a href="{{ url_for('purchasing_blueprint.purchasing') }}"><h4 class="stretched-link mb-0">FOOD</h4></a>
-                </div>
-            </div>
-        </div>
-    </div>
+<div class="container-fluid py-4" id="top">
     <!-- First Row -Charts -->
-    <div class="row mt-4">
+    <div class="row mt-0">
         <div class="col-lg-4 col-md-6 mt-4 mb-4">
             <div class="card z-index-2 h-100">
                 <div class="card-body shadow-success">
-                    <h4 class="mb-0 ">Top 10 Products</h4>
+                    <h4 class="mb-0 ">Top 10 Products Period - {{ fiscal_dates["period"]}}</h4>
                     <div class="table-responsive table-hover">
                         <table class="table-sm">
                             <caption>Period To Date</caption>
@@ -107,7 +49,7 @@
         <div class="col-lg-4 col-md-6 mt-4 mb-4">
             <div class="card z-index-2 h-100">
                 <div class="card-body shadow-success">
-                    <h4 class="mb-0 ">Purchases per Restaurant</h4>
+                    <h4 class="mb-0 ">Purchases per Restaurant Period - {{ fiscal_dates["period"]}}</h4>
                     <div class="table-responsive table-hover">
                         <table class="table-sm">
                             <caption>Period To Date</caption>
@@ -139,7 +81,7 @@
         <div class="col-lg-4 col-md-6 mt-4 mb-4">
             <div class="card z-index-2 h-100">
                 <div class="card-body shadow-success">
-                    <h4 class="mb-0 ">Purchases per Vendor</h4>
+                    <h4 class="mb-0 ">Purchases per Vendor Period - {{ fiscal_dates["period"]}}</h4>
                     <div class="table-responsive table-hover">
                         <table class="table-sm">
                             <caption>Period To Date</caption>
@@ -251,6 +193,7 @@
                 </div>
             </div>
         {% endfor %}
+        <a href="#top">Return to top of page</a>
     <div/>
 
     {% include 'includes/footer.html' %}

@@ -11,7 +11,7 @@
     </div>
     <hr class="horizontal light mt-0 mb-2">
     <div class="dropdown" style="text-align: center;">
-        <button class="btn btn-info dropdown-toggle" type="button" id="dropdownTable" data-bs-toggle="dropdown">Select Stores</button>
+        <button class="btn btn-info dropdown-toggle" type="button" id="dropdownTable" data-bs-toggle="dropdown", data-bs-auto-close="false">Select Stores</button>
         <ul class="dropdown-menu ms-1" aria-labelledby="dropdownTable">
         <form method="POST" action="" style="text-align:left">
             {{ form3.hidden_tag() }}
@@ -37,7 +37,25 @@
         </ul>
     </div>
     <hr class="horizontal light mt-0 mb-2">
-    <div class="collapse navbar-collapse  w-auto  max-height-vh-80" id="sidenav-collapse-main">
+    <div class="dropdown" style="text-align: center;">
+        <button class="btn btn-success dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Purchasing</button>
+        <ul class="dropdown-menu">
+            <li><a class="dropdown-item font-weight-bold text-primary" href="/purchasing/">Food</a></li>
+            <li><a class="dropdown-item" href="/purchasing/beef">Beef</a></li>
+            <li><a class="dropdown-item" href="/purchasing/dairy">Dairy</a></li>
+            <li><a class="dropdown-item" href="/purchasing/foodother">Food Other</a></li>
+            <li><a class="dropdown-item" href="/purchasing/pork">Pork</a></li>
+            <li><a class="dropdown-item" href="/purchasing/poultry">Poultry</a></li>
+            <li><a class="dropdown-item" href="/purchasing/produce">Produce</a></li>
+            <li><a class="dropdown-item" href="/purchasing/seafood">Seafood</a></li>
+            <li><a class="dropdown-item" href="/purchasing/beer">Beer</a></li>
+            <li><a class="dropdown-item" href="/purchasing/wine">Wine</a></li>
+            <li><a class="dropdown-item" href="/purchasing/liquor">Liquor</a></li>
+            <li><a class="dropdown-item" href="/supplies">Supplies</a></li>
+        </ul>
+    </div>
+    <hr class="horizontal light mt-0 mb-2">
+    <div class="collapse navbar-collapse  w-auto max-height-vh-40" id="sidenav-collapse-main">
         <ul class="navbar-nav">
             <li class="nav-item">
                 <a class="nav-link text-white {% if 'index' in segment %} active bg-gradient-primary {% endif %}"
@@ -46,42 +64,6 @@
                         <i class="material-icons opacity-10">dashboard</i>
                     </div>
                     <span class="nav-link-text ms-1">Dashboard</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-white {% if 'purchasing' in segment %} active bg-gradient-primary {% endif %}"
-                    href="/purchasing">
-                    <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="material-icons opacity-10">restaurant_menu</i>
-                    </div>
-                    <span class="nav-link-text ms-1">Food</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-white {% if 'alcohol' in segment %} active bg-gradient-primary {% endif %}"
-                    href="/alcohol">
-                    <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="material-icons opacity-10">liquor</i>
-                    </div>
-                    <span class="nav-link-text ms-1">Alcohol</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-white {% if 'supplies' in segment %} active bg-gradient-primary {% endif %}"
-                    href="/supplies">
-                    <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="material-icons opacity-10">blender</i>
-                    </div>
-                    <span class="nav-link-text ms-1">Supplies</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-white {% if 'marketing' in segment %} active bg-gradient-primary {% endif %}"
-                    href="/marketing">
-                    <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="material-icons opacity-10">newspaper</i>
-                    </div>
-                    <span class="nav-link-text ms-1">Marketing</span>
                 </a>
             </li>
             <li class="nav-item mt-3">

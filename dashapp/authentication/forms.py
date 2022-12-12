@@ -5,7 +5,7 @@ Copyright (c) 2019 - present AppSeed.us
 
 from flask_wtf import FlaskForm
 from datetime import datetime
-from wtforms import widgets, SelectMultipleField, SubmitField, StringField, PasswordField
+from wtforms import widgets, SelectField, SubmitField, StringField, PasswordField
 from wtforms.fields import DateField
 from wtforms_sqlalchemy.fields import QuerySelectMultipleField, QuerySelectField
 from wtforms.validators import Email, DataRequired
@@ -66,3 +66,11 @@ class PotatoForm(FlaskForm):
 
 class RecipeForm(FlaskForm):
     submit5 = SubmitField("Submit")
+
+
+class PageForm(FlaskForm):
+    page = SelectField(
+        "Page",
+        choices=["Beef", "Dairy", "Food Other", "Pork", "Poultry", "Produce", "Seafood"],
+    )
+    submit6 = SubmitField("Submit")
