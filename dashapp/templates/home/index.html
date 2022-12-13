@@ -174,12 +174,12 @@
             <div class="col-lg-6 col-5 my-auto text-end">
               <div class="dropdown float-lg-end pe-4">
                 <a class="cursor-pointer" id="dropdownTable" data-bs-toggle="dropdown" aria-expanded="false">
-                  <i class="fa fa-ellipsis-v text-secondary"></i>
+                  <i class="fa fa-calendar text-secondary"></i>
                 </a>
                 <ul class="dropdown-menu px-2 py-3 ms-sm-n4 ms-n5" aria-labelledby="dropdownTable">
-                  <li><a class="dropdown-item border-radius-md" href="javascript:;">Action</a></li>
-                  <li><a class="dropdown-item border-radius-md" href="javascript:;">Another action</a></li>
-                  <li><a class="dropdown-item border-radius-md" href="javascript:;">Something else here</a></li>
+                    <li><a class="dropdown-item border-radius-md" href="{{ url_for('home_blueprint.index') }}">Day</a></li>
+                    <li><a class="dropdown-item border-radius-md" href="{{ url_for('home_blueprint.index') }}">Week</a></li>
+                  <li><a class="dropdown-item border-radius-md" href="{{ url_for('home_blueprint.index') }}">Period</a></li>
                 </ul>
               </div>
             </div>
@@ -194,7 +194,7 @@
                   <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Sales</th>
                   <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Sales SPLY</th>
                   <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Guest Count</th>
-                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Check Avg</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Guest Check Avg</th>
                   <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor %</th>
                   <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor SPLY</th>
                 </tr>

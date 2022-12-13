@@ -8,11 +8,11 @@ import json
 import pandas as pd
 from fpdf import FPDF
 from flask.helpers import url_for
-from flask_security.decorators import roles_accepted
+from flask_security.core import current_user
+from flask_security.decorators import roles_accepted, login_required
 from pandas.core.algorithms import isin
 from flask import flash, render_template, session, redirect, url_for
 from flask.wrappers import Response
-from flask_security import login_required, current_user
 from datetime import datetime, timedelta
 from sqlalchemy import and_, or_, func
 from dashapp.config import Config
@@ -36,9 +36,13 @@ def index():
         return redirect(url_for("home_blueprint.index"))
 
     if not "store_list" in session:
-        session["store_list"] = (4, 9, 11, 16, 17, 3, 5, 6, 10, 12, 13, 14, 15, 18)
+        closed_stores = [1, 2, 7, 8]
+        session["store_list"] = [
+            store.id
+            for store in Restaurants.query.filter(Restaurants.id.notin_(closed_stores)).order_by(Restaurants.name).all()
+        ]
+        print(session["store_list"])
         return redirect(url_for("home_blueprint.index"))
-    print(session["store_list"])
 
     fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
     # List of stores to add ID so i can pass to other templates
@@ -84,19 +88,22 @@ def index():
         return value
 
     daily_sales_list = get_chart_values(fiscal_dates["start_week"], fiscal_dates["start_day"], Calendar.date)
-    # sum daily sales list
     weekly_sales = sum(daily_sales_list)
+
     daily_sales_list_ly = get_chart_values(fiscal_dates["start_week_ly"], fiscal_dates["end_week_ly"], Calendar.date)
     weekly_sales_ly = sum(daily_sales_list_ly)
+
     week_to_date_sales_ly = get_chart_values(fiscal_dates["start_week_ly"], fiscal_dates["start_day_ly"], Calendar.date)
     wtd_sales_ly = sum(week_to_date_sales_ly)
 
     weekly_sales_list = get_chart_values(fiscal_dates["start_period"], fiscal_dates["start_day"], Calendar.week)
     period_sales = sum(weekly_sales_list)
+
     weekly_sales_list_ly = get_chart_values(
         fiscal_dates["start_period_ly"], fiscal_dates["end_period_ly"], Calendar.week
     )
     period_sales_ly = sum(weekly_sales_list_ly)
+
     period_to_date_sales_ly = get_chart_values(
         fiscal_dates["start_period_ly"], fiscal_dates["start_day_ly"], Calendar.week
     )
@@ -104,8 +111,10 @@ def index():
 
     period_sales_list = get_chart_values(fiscal_dates["start_year"], fiscal_dates["start_day"], Calendar.period)
     yearly_sales = sum(period_sales_list)
+
     period_sales_list_ly = get_chart_values(fiscal_dates["start_year_ly"], fiscal_dates["end_year_ly"], Calendar.period)
     yearly_sales_ly = sum(period_sales_list_ly)
+
     year_to_date_sales_ly = get_chart_values(
         fiscal_dates["start_year_ly"], fiscal_dates["start_day_ly"], Calendar.period
     )
@@ -420,14 +429,16 @@ def index():
     yearly_table["labor_pct"] = yearly_table.dollars / yearly_table.sales
     yearly_table["labor_pct_ly"] = yearly_table.dollars_ly / yearly_table.sales_ly
 
+    print(daily_table)
+    print(weekly_table)
+    print(period_table)
+    print(yearly_table)
+
     return render_template(
         "home/index.html",
         title=Config.COMPANY_NAME,
         company_name=Config.COMPANY_NAME,
-        # form1=form1,
-        # form3=form3,
         segment="index",
-        # current_user=current_user,
         roles=current_user.roles,
         **locals(),
     )

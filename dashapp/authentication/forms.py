@@ -5,7 +5,7 @@ Copyright (c) 2019 - present AppSeed.us
 
 from flask_wtf import FlaskForm
 from datetime import datetime
-from wtforms import widgets, SelectField, SubmitField, StringField, PasswordField
+from wtforms import widgets, SubmitField, StringField, PasswordField
 from wtforms.fields import DateField
 from wtforms_sqlalchemy.fields import QuerySelectMultipleField, QuerySelectField
 from wtforms.validators import Email, DataRequired
@@ -13,7 +13,7 @@ from dashapp.authentication.models import Restaurants
 
 # login and registration
 
-# TODO pull id's directly from Restaurants table
+
 def store_query():
     closed_stores = [1, 2, 7, 8]
     return Restaurants.query.filter(Restaurants.id.notin_(closed_stores)).order_by(Restaurants.name).all()
@@ -31,7 +31,7 @@ class CreateAccountForm(FlaskForm):
 
 
 class DateForm(FlaskForm):
-    selectdate = DateField("", format="%Y-%m-%d", default=datetime.today())
+    selectdate = DateField("", format="%Y-%m-%d")
     submit1 = SubmitField("Submit")
 
 
@@ -66,11 +66,3 @@ class PotatoForm(FlaskForm):
 
 class RecipeForm(FlaskForm):
     submit5 = SubmitField("Submit")
-
-
-class PageForm(FlaskForm):
-    page = SelectField(
-        "Page",
-        choices=["Beef", "Dairy", "Food Other", "Pork", "Poultry", "Produce", "Seafood"],
-    )
-    submit6 = SubmitField("Submit")
