@@ -18,9 +18,7 @@ def get_lastyear(date):
         period = i.period
         week = i.week
         day = i.day
-        ly_target = Calendar.query.filter_by(
-            year=lst_year, period=period, week=week, day=day
-        )
+        ly_target = Calendar.query.filter_by(year=lst_year, period=period, week=week, day=day)
         for x in ly_target:
             dt_date = x.date
     return dt_date
@@ -52,24 +50,27 @@ def set_dates(startdate):
         d["end_day"] = day_end.strftime("%Y-%m-%d")
         d["start_week"] = i.week_start
         d["end_week"] = i.week_end
+        d["week_to_date"] = i.date
         d["last_seven"] = seven.strftime("%Y-%m-%d")
         d["start_period"] = i.period_start
         d["end_period"] = i.period_end
+        d["period_to_date"] = i.date
         d["last_thirty"] = thirty.strftime("%Y-%m-%d")
         d["start_year"] = i.year_start
         d["end_year"] = i.year_end
+        d["year_to_date"] = i.date
         d["last_threesixtyfive"] = threesixtyfive.strftime("%Y-%m-%d")
         d["start_day_ly"] = get_lastyear(i.date)
         d["end_day_ly"] = get_lastyear(day_end.strftime("%Y-%m-%d"))
         d["start_week_ly"] = get_lastyear(i.week_start)
         d["end_week_ly"] = get_lastyear(i.week_end)
-        d["week_to_date"] = get_lastyear(i.date)
+        d["week_to_date_ly"] = get_lastyear(i.date)
         d["start_period_ly"] = get_lastyear(i.period_start)
         d["end_period_ly"] = get_lastyear(i.period_end)
-        d["period_to_date"] = get_lastyear(i.date)
+        d["period_to_date_ly"] = get_lastyear(i.date)
         d["start_year_ly"] = get_lastyear(i.year_start)
         d["end_year_ly"] = get_lastyear(i.year_end)
-        d["year_to_date"] = get_lastyear(i.date)
+        d["year_to_date_ly"] = get_lastyear(i.date)
         d["start_previous_week"] = lws.strftime("%Y-%m-%d")
         d["end_previous_week"] = lwe.strftime("%Y-%m-%d")
 
@@ -78,11 +79,7 @@ def set_dates(startdate):
 
 def convert_uofm(unit):
     # convert the unit uofm to base quantity
-    pack_size = (
-        db.session.query(Unitsofmeasure)
-        .filter(Unitsofmeasure.name == unit.UofM)
-        .first()
-    )
+    pack_size = db.session.query(Unitsofmeasure).filter(Unitsofmeasure.name == unit.UofM).first()
     if pack_size:
         return pack_size.base_qty, pack_size.base_uofm
     else:
@@ -163,9 +160,7 @@ def get_cost_per_vendor(regex, days, stores):
                 "Each",
             ),
         )
-        df.drop(
-            columns=["UofM", "count", "cost", "base_qty", "base_uofm"], inplace=True
-        )
+        df.drop(columns=["UofM", "count", "cost", "base_qty", "base_uofm"], inplace=True)
         table = pd.pivot_table(
             df,
             values=["unit_cost", "unit_qty"],
@@ -238,9 +233,7 @@ def get_cost_per_store(regex, days, stores):
                 "Each",
             ),
         )
-        df.drop(
-            columns=["UofM", "count", "cost", "base_qty", "base_uofm"], inplace=True
-        )
+        df.drop(columns=["UofM", "count", "cost", "base_qty", "base_uofm"], inplace=True)
         table = pd.pivot_table(
             df,
             values=["unit_cost", "unit_qty"],
@@ -257,9 +250,7 @@ def get_cost_per_store(regex, days, stores):
 @lru_cache(maxsize=128)
 def period_purchases(regex, start, end, stores):
     # generate list of purchase costs per period for charts
-    calendar = Calendar.query.with_entities(
-        Calendar.date, Calendar.week, Calendar.period, Calendar.year
-    ).all()
+    calendar = Calendar.query.with_entities(Calendar.date, Calendar.week, Calendar.period, Calendar.year).all()
     cal_df = pd.DataFrame(calendar, columns=["date", "week", "period", "year"])
 
     query = (
@@ -309,7 +300,8 @@ def period_purchases(regex, start, end, stores):
     if not df.empty:
         # fills in months with no purchases
         df = df.merge(cal_df, on="date", how="outer")
-        df = df.groupby(["period"]).sum()
+        df = df.sort_values("period")
+        df = df.groupby(["period"]).sum(numeric_only=True)
         df["unit_cost"] = (df["cost"] / df["unit_qty"]).astype(float)
         df["unit_cost"] = df["unit_cost"].fillna(0)
         df_list = df["unit_cost"].tolist()

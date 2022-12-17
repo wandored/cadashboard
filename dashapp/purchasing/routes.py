@@ -141,7 +141,6 @@ def beef():
         fiscal_dates["start_day"],
         session["store_list"],
     )
-
     category_costs = get_category_costs(
         ["Beef"],
         fiscal_dates["start_period"],
