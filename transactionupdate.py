@@ -3,6 +3,7 @@ transactionupdate imports the previous days data and
 uploads it to the local database.  This is run
 from a cron job
 """
+import sys
 import json
 from sqlalchemy.engine.create import create_engine
 from datetime import datetime, timedelta
@@ -59,9 +60,7 @@ def transaction(id_list):
     rqst_list = []
     for i in id_list:
         url_filter = "$filter=transactionId eq {}".format(i)
-        query = "$select=date,name,type,locationId,transactionId,companyId&{}".format(
-            url_filter
-        )
+        query = "$select=date,name,type,locationId,transactionId,companyId&{}".format(url_filter)
         url = "{}/Transaction?{}".format(Config.SRVC_ROOT, query)
         rqst = make_HTTP_request(url)
         try:
@@ -70,13 +69,10 @@ def transaction(id_list):
             pass
 
     df = make_dataframe(rqst_list)
-    # df = df.dropna(axis=0, how="any", subset=["companyId"])
     if df.empty:
         return
 
-    df["date"] = df["date"].dt.strftime(
-        "%Y-%m-%d"
-    )  # convert datetime to string and format
+    df["date"] = df["date"].dt.strftime("%Y-%m-%d")  # convert datetime to string and format
     cur.execute(rest_query)
     data = cur.fetchall()
     df_loc = pd.DataFrame.from_records(data, columns=["id", "location", "name"])
@@ -90,9 +86,10 @@ def transaction(id_list):
     df = make_dataframe(rqst)
     df = df.rename(columns={"name": "company"})
     # merge will fail if all transactions are journal entries
-    df_return = df_merge.merge(df, on="companyId", how="left")
-
-    return df_return
+    try:
+        return df_merge.merge(df, on="companyId", how="left")
+    except KeyError:
+        sys.exit(1)
 
 
 def Items():
@@ -189,7 +186,6 @@ def write_to_database(df1, df2, df3):
 def main():
 
     TODAY = datetime.date(datetime.now())
-    YSTDAY = TODAY - timedelta(days=1)
     TOMROW = TODAY + timedelta(days=1)
     start_date = TODAY.strftime("%Y-%m-%d")
     end_date = TOMROW.strftime("%Y-%m-%d")
@@ -211,6 +207,7 @@ def main():
         print(f"{start_date} completed")
 
     conn.close()
+
 
 if __name__ == "__main__":
     engine = create_engine(Config.SQLALCHEMY_DATABASE_URI)
