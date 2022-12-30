@@ -180,31 +180,33 @@ def beef(product):
         store_cost_dict["{}".format(x)] = get_cost_per_store(
             "^({})$".format(pl),
             fiscal_dates["start_period"],
+            fiscal_dates["end_day"],
             session["store_list"],
         )
 
         vendor_cost_dict["{}".format(x)] = get_cost_per_vendor(
             "^({})$".format(pl),
             fiscal_dates["start_period"],
+            fiscal_dates["end_day"],
             session["store_list"],
         )
         x = x + 1
 
     # assign color based on product value
     def color_assigner(product):
-        switch={
-            'Beef':'primary',
-            'Dairy': 'info',
-            'Food Other': 'secondary',
-            'Pork': 'danger',
-            'Poultry': 'warning',
-            'Produce': 'success',
-            'Fish': 'info',
-            'Beer': 'warning',
-            'Wine': 'danger',
-            'Liquor': 'primary',
+        switch = {
+            "Beef": "primary",
+            "Dairy": "info",
+            "Food Other": "secondary",
+            "Pork": "danger",
+            "Poultry": "warning",
+            "Produce": "success",
+            "Fish": "info",
+            "Beer": "warning",
+            "Wine": "danger",
+            "Liquor": "primary",
         }
-        return switch.get(product, 'secondary')
+        return switch.get(product, "secondary")
 
     color = color_assigner(product)
 
@@ -221,9 +223,9 @@ def beef(product):
     )
 
 
-#@blueprint.route("/purchasing/dairy", methods=["GET", "POST"])
-#@login_required
-#def dairy():
+# @blueprint.route("/purchasing/dairy", methods=["GET", "POST"])
+# @login_required
+# def dairy():
 #
 #    TODAY = datetime.date(datetime.now())
 #    CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
@@ -330,9 +332,9 @@ def beef(product):
 #    )
 #
 #
-#@blueprint.route("/purchasing/poultry", methods=["GET", "POST"])
-#@login_required
-#def poultry():
+# @blueprint.route("/purchasing/poultry", methods=["GET", "POST"])
+# @login_required
+# def poultry():
 #
 #    TODAY = datetime.date(datetime.now())
 #    CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
@@ -439,9 +441,9 @@ def beef(product):
 #    )
 #
 #
-#@blueprint.route("/purchasing/seafood", methods=["GET", "POST"])
-#@login_required
-#def seafood():
+# @blueprint.route("/purchasing/seafood", methods=["GET", "POST"])
+# @login_required
+# def seafood():
 #
 #    TODAY = datetime.date(datetime.now())
 #    CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
@@ -548,9 +550,9 @@ def beef(product):
 #    )
 #
 #
-#@blueprint.route("/purchasing/pork", methods=["GET", "POST"])
-#@login_required
-#def pork():
+# @blueprint.route("/purchasing/pork", methods=["GET", "POST"])
+# @login_required
+# def pork():
 #
 #    TODAY = datetime.date(datetime.now())
 #    CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
@@ -657,9 +659,9 @@ def beef(product):
 #    )
 #
 #
-#@blueprint.route("/purchasing/produce", methods=["GET", "POST"])
-#@login_required
-#def produce():
+# @blueprint.route("/purchasing/produce", methods=["GET", "POST"])
+# @login_required
+# def produce():
 #
 #    TODAY = datetime.date(datetime.now())
 #    CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
@@ -766,9 +768,9 @@ def beef(product):
 #    )
 #
 #
-#@blueprint.route("/purchasing/foodother", methods=["GET", "POST"])
-#@login_required
-#def foodother():
+# @blueprint.route("/purchasing/foodother", methods=["GET", "POST"])
+# @login_required
+# def foodother():
 #
 #    TODAY = datetime.date(datetime.now())
 #    CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
@@ -875,9 +877,9 @@ def beef(product):
 #    )
 #
 #
-#@blueprint.route("/purchasing/beer", methods=["GET", "POST"])
-#@login_required
-#def beer():
+# @blueprint.route("/purchasing/beer", methods=["GET", "POST"])
+# @login_required
+# def beer():
 #
 #    TODAY = datetime.date(datetime.now())
 #    CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
@@ -984,9 +986,9 @@ def beef(product):
 #    )
 #
 #
-#@blueprint.route("/purchasing/wine", methods=["GET", "POST"])
-#@login_required
-#def wine():
+# @blueprint.route("/purchasing/wine", methods=["GET", "POST"])
+# @login_required
+# def wine():
 #
 #    TODAY = datetime.date(datetime.now())
 #    CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
@@ -1093,9 +1095,9 @@ def beef(product):
 #    )
 #
 #
-#@blueprint.route("/purchasing/liquor", methods=["GET", "POST"])
-#@login_required
-#def liquor():
+# @blueprint.route("/purchasing/liquor", methods=["GET", "POST"])
+# @login_required
+# def liquor():
 #
 #    TODAY = datetime.date(datetime.now())
 #    CURRENT_DATE = TODAY.strftime("%Y-%m-%d")

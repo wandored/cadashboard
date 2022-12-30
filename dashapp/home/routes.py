@@ -1,4 +1,4 @@
-# -*- encmding: utf-8 -*-
+# -*- encoding: utf-8 -*-
 """
 Copyright (c) 2019 - present AppSeed.us
 """
@@ -52,7 +52,6 @@ def index():
     # List of stores to add ID so i can pass to other templates
     data = Restaurants.query.all()
     store_df = pd.DataFrame([x.as_dict() for x in data])
-    print(store_df)
 
     # Check for no sales
     if not Sales.query.filter_by(date=fiscal_dates["start_day"]).first():
@@ -92,7 +91,7 @@ def index():
 
         return value
 
-    daily_sales_list = get_chart_values(fiscal_dates["start_week"], fiscal_dates["start_day"], Calendar.date)
+    daily_sales_list = get_chart_values(fiscal_dates["start_week"], fiscal_dates["end_day"], Calendar.date)
     weekly_sales = sum(daily_sales_list)
 
     daily_sales_list_ly = get_chart_values(fiscal_dates["start_week_ly"], fiscal_dates["end_week_ly"], Calendar.date)

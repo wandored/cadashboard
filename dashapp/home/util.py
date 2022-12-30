@@ -91,7 +91,7 @@ def make_dataframe(sales):
 
 def get_lastyear(date):
     target = Calendar.query.filter_by(date=date)
-    dt_date = datetime.now
+    dt_date = date
 
     for i in target:
         lst_year = str(int(i.year) - 1)

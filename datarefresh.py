@@ -271,6 +271,7 @@ def potato_sales(start):
             df.loc[:, "out_time"] = t[4]
             df.loc[:, "date"] = convert_datetime_to_string(df["date"])
             df_pot = df_pot.append(df)
+            df_pot = pd.concat([df_pot, df], ignore_index=True)
 
         # df_pot['date'] = convert_datetime_to_string(df_pot['date'])
         # Write the daily menu items to Menuitems table
