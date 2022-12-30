@@ -101,6 +101,7 @@ def get_lastyear(date):
         ly_target = Calendar.query.filter_by(year=lst_year, period=period, week=week, day=day)
         for x in ly_target:
             dt_date = x.date
+            print(f'{date} - {x.date}')
     return dt_date
 
 
