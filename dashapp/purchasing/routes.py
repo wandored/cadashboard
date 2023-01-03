@@ -100,8 +100,8 @@ def purchasing():
 def beef(product):
 
     TODAY = datetime.date(datetime.now())
-    CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
-    YSTDAY = TODAY - timedelta(days=1)
+    # CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
+    # YSTDAY = TODAY - timedelta(days=1)
 
     fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
 
@@ -166,7 +166,10 @@ def beef(product):
             fiscal_dates["end_year"],
             session["store_list"],
         )
-        del this_year[fiscal_dates["period"] :]  # remove zeros from future periods
+        try:
+            del this_year[fiscal_dates["period"] :]  # remove zeros from future periods
+        except:
+            pass
         last_year = period_purchases(
             "^({})$".format(pl),
             fiscal_dates["start_year_ly"],

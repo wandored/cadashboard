@@ -166,23 +166,26 @@
   <div class="row mb-4">
     <div class="col-lg-8 col-md-6 mb-md-0 mb-4">
       <div class="card">
+          <ul class="nav nav-tabs mb-3" id="nav-tab" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="nav-day-tab" data-bs-toggle="pill" data-bs-target="#nav-day" type="button" role="tab" aria-controls="nav-day" aria-selected="true">Day</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="nav-week-tab" data-bs-toggle="pill" data-bs-target="#nav-week" type="button" role="tab" aria-controls="nav-week" aria-selected="false">Week</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="nav-period-tab" data-bs-toggle="pill" data-bs-target="#nav-period" type="button" role="tab" aria-controls="nav-period" aria-selected="false">Period</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="nav-year-tab" data-bs-toggle="pill" data-bs-target="#nav-year" type="button" role="tab" aria-controls="nav-year" aria-selected="false">Year</button>
+          </li>
+        </ul>
+        <div class="tab-content" id="nav-tabContent">
+          <div class="tab-pane fade show active" id="nav-day" role="tabpanel" aria-labelledby="nav-day-tab">
         <div class="card-header pb-0">
           <div class="row">
             <div class="col-lg-6 col-7">
               <h4>{{ fiscal_dates["date"] }}</h4>
-            </div>
-            <div class="col-lg-6 col-5 my-auto text-end">
-              <div class="dropdown float-lg-end pe-4">
-                <a class="cursor-pointer" id="dropdownTable" data-bs-toggle="dropdown" aria-expanded="false">
-                  <i class="fa fa-calendar text-secondary"></i>
-                </a>
-                <ul class="dropdown-menu px-2 py-3 ms-sm-n4 ms-n5" aria-labelledby="dropdownTable">
-                    <li><a class="dropdown-item border-radius-md" href="{{ url_for('home_blueprint.index', timeframe="day") }}">Day</a></li>
-                    <li><a class="dropdown-item border-radius-md" href="{{ url_for('home_blueprint.index', timeframe="week") }}">Week</a></li>
-                  <li><a class="dropdown-item border-radius-md" href="{{ url_for('home_blueprint.index', timeframe="period") }}">Period</a></li>
-                  <li><a class="dropdown-item border-radius-md" href="{{ url_for('home_blueprint.index', timeframe="year") }}">Year</a></li>
-                </ul>
-              </div>
             </div>
           </div>
         </div>
@@ -254,11 +257,19 @@
                     {% endif %}
                   </td>
                   <td>
-                    <div class="d-flex px-2 py-1">
-                      <div class="d-flex flex-column">
-                        <h6 class="mb-0 text-sm">{{ "${:,.2f}".format(v.guest_check_avg) }}</h6>
-                      </div>
-                    </div>
+                      {% if v.guest_check_avg >= v.guest_check_avg_ly %}
+                        <div class="d-flex px-2 py-1">
+                          <div class="d-flex flex-column">
+                            <h6 class="mb-0 text-sm text-end"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "${:,.2f}".format(v.guest_check_avg) }}</h6>
+                          </div>
+                        </div>
+                      {% else %}
+                        <div class="d-flex px-2 py-1">
+                          <div class="d-flex flex-column">
+                            <h6 class="mb-0 text-sm text-end"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "${:,.2f}".format(v.guest_check_avg) }}</h6>
+                          </div>
+                        </div>
+                      {% endif %}
                   </td>
                   <td>
                     {% if v.labor_pct <= v.labor_pct_ly %}
@@ -288,6 +299,366 @@
             </table>
           </div>
         </div>
+          </div>
+          <div class="tab-pane fade" id="nav-week" role="tabpanel" aria-labelledby="nav-week-tab">
+        <div class="card-header pb-0">
+          <div class="row">
+            <div class="col-lg-6 col-7">
+              <h4>Week - {{ fiscal_dates["week"] }}</h4>
+            </div>
+          </div>
+        </div>
+        <div class="card-body px-0 pb-2">
+          <div class="table-responsive table-hover">
+            <table class="table align-items-center mb-0">
+              <thead>
+                <tr>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Restaurant</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Sales</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Sales SPLY</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Guest Count</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Guest Check Avg</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor %</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor SPLY</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for k, v in weekly_table.iterrows() %}
+                <tr> 
+                  <td>
+                    <div class="d-flex px-2 py-1">
+                    {% if v.sales >= v.top_sales %}
+                      <div class="d-flex flex-column">
+                        <a class="me-2" href="{{ url_for('home_blueprint.store', store_id=v.id) }}"><h6 class="mb-0 text-sm">{{ v.name }} <i class="fa fa-sack-dollar text-success" aria-hidden="true"></i></h6></a>
+                      </div>
+                      {% else %}
+                      <div class="d-flex flex-column">
+                        <a class="me-2" href="{{ url_for('home_blueprint.store', store_id=v.id) }}"><h6 class="mb-0 text-sm">{{ v.name }}</h6></a>
+                      </div>
+                      {% endif %}
+                    </div>
+                  </td>
+                  <td>
+                    {% if v.sales >= v.sales_ly %}
+                    <div class="d-flex px-2 py-1">
+                      <div class="d-flex flex-column align-items-end">
+                        <h6 class="mb-0 text-sm text-end"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i> {{ "${:,.0f}".format(v.sales) }}</h6>
+                      </div>
+                    </div>
+                    {% else %}
+                    <div class="d-flex px-2 py-1">
+                      <div class="d-flex flex-column">
+                        <h6 class="mb-0 text-sm text-end"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i> {{ "${:,.0f}".format(v.sales) }}</h6>
+                      </div>
+                    </div>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <div class="d-flex px-2 py-1">
+                      <div class="d-flex flex-column">
+                        <h6 class="mb-0 text-sm text-end">{{ "${:,.0f}".format(v.sales_ly) }}</h6>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    {% if v.guests >= v.guests_ly %}
+                        <div class="d-flex px-2 py-1">
+                          <div class="d-flex flex-column">
+                            <h6 class="mb-0 text-sm text-end"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.0f}".format(v.guests) }}</h6>
+                          </div>
+                        </div>
+                    {% else %}
+                        <div class="d-flex px-2 py-1">
+                          <div class="d-flex flex-column">
+                            <h6 class="mb-0 text-sm text-end"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.0f}".format(v.guests ) }}</h6>
+                          </div>
+                        </div>
+                    {% endif %}
+                  </td>
+                  <td>
+                      {% if v.guest_check_avg >= v.guest_check_avg_ly %}
+                        <div class="d-flex px-2 py-1">
+                          <div class="d-flex flex-column">
+                            <h6 class="mb-0 text-sm text-end"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "${:,.2f}".format(v.guest_check_avg) }}</h6>
+                          </div>
+                        </div>
+                      {% else %}
+                        <div class="d-flex px-2 py-1">
+                          <div class="d-flex flex-column">
+                            <h6 class="mb-0 text-sm text-end"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "${:,.2f}".format(v.guest_check_avg) }}</h6>
+                          </div>
+                        </div>
+                      {% endif %}
+                  </td>
+                  <td>
+                    {% if v.labor_pct <= v.labor_pct_ly %}
+                    <div class="d-flex px-2 py-1">
+                      <div class="d-flex flex-column">
+                        <h6 class="mb-0 text-sm text-end"><i class="fa fa-arrow-down text-success" aria-hidden="true"></i> {{ "{:,.1f}%".format(v.labor_pct*100) }}</h6>
+                      </div>
+                    </div>
+                    {% else %}
+                    <div class="d-flex px-2 py-1">
+                      <div class="d-flex flex-column">
+                        <h6 class="mb-0 text-sm text-end"><i class="fa fa-arrow-up text-danger" aria-hidden="true"></i> {{ "{:,.1f}%".format(v.labor_pct*100) }}</h6>
+                      </div>
+                    </div>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <div class="d-flex px-2 py-1">
+                      <div class="d-flex flex-column">
+                        <h6 class="mb-0 text-sm text-end">{{ "{:,.1f}%".format(v.labor_pct_ly*100) }}</h6>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+            </div>
+          <div class="tab-pane fade" id="nav-period" role="tabpanel" aria-labelledby="nav-period-tab">
+        <div class="card-header pb-0">
+          <div class="row">
+            <div class="col-lg-6 col-7">
+              <h4>Period - {{ fiscal_dates["period"] }}</h4>
+            </div>
+          </div>
+        </div>
+        <div class="card-body px-0 pb-2">
+          <div class="table-responsive table-hover">
+            <table class="table align-items-center mb-0">
+              <thead>
+                <tr>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Restaurant</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Sales</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Sales SPLY</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Guest Count</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Guest Check Avg</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor %</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor SPLY</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for k, v in period_table.iterrows() %}
+                <tr> 
+                  <td>
+                    <div class="d-flex px-2 py-1">
+                    {% if v.sales >= v.top_sales %}
+                      <div class="d-flex flex-column">
+                        <a class="me-2" href="{{ url_for('home_blueprint.store', store_id=v.id) }}"><h6 class="mb-0 text-sm">{{ v.name }} <i class="fa fa-sack-dollar text-success" aria-hidden="true"></i></h6></a>
+                      </div>
+                      {% else %}
+                      <div class="d-flex flex-column">
+                        <a class="me-2" href="{{ url_for('home_blueprint.store', store_id=v.id) }}"><h6 class="mb-0 text-sm">{{ v.name }}</h6></a>
+                      </div>
+                      {% endif %}
+                    </div>
+                  </td>
+                  <td>
+                    {% if v.sales >= v.sales_ly %}
+                    <div class="d-flex px-2 py-1">
+                      <div class="d-flex flex-column align-items-end">
+                        <h6 class="mb-0 text-sm text-end"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i> {{ "${:,.0f}".format(v.sales) }}</h6>
+                      </div>
+                    </div>
+                    {% else %}
+                    <div class="d-flex px-2 py-1">
+                      <div class="d-flex flex-column">
+                        <h6 class="mb-0 text-sm text-end"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i> {{ "${:,.0f}".format(v.sales) }}</h6>
+                      </div>
+                    </div>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <div class="d-flex px-2 py-1">
+                      <div class="d-flex flex-column">
+                        <h6 class="mb-0 text-sm text-end">{{ "${:,.0f}".format(v.sales_ly) }}</h6>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    {% if v.guests >= v.guests_ly %}
+                        <div class="d-flex px-2 py-1">
+                          <div class="d-flex flex-column">
+                            <h6 class="mb-0 text-sm text-end"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.0f}".format(v.guests) }}</h6>
+                          </div>
+                        </div>
+                    {% else %}
+                        <div class="d-flex px-2 py-1">
+                          <div class="d-flex flex-column">
+                            <h6 class="mb-0 text-sm text-end"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.0f}".format(v.guests ) }}</h6>
+                          </div>
+                        </div>
+                    {% endif %}
+                  </td>
+                  <td>
+                      {% if v.guest_check_avg >= v.guest_check_avg_ly %}
+                        <div class="d-flex px-2 py-1">
+                          <div class="d-flex flex-column">
+                            <h6 class="mb-0 text-sm text-end"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "${:,.2f}".format(v.guest_check_avg) }}</h6>
+                          </div>
+                        </div>
+                      {% else %}
+                        <div class="d-flex px-2 py-1">
+                          <div class="d-flex flex-column">
+                            <h6 class="mb-0 text-sm text-end"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "${:,.2f}".format(v.guest_check_avg) }}</h6>
+                          </div>
+                        </div>
+                      {% endif %}
+                  </td>
+                  <td>
+                    {% if v.labor_pct <= v.labor_pct_ly %}
+                    <div class="d-flex px-2 py-1">
+                      <div class="d-flex flex-column">
+                        <h6 class="mb-0 text-sm text-end"><i class="fa fa-arrow-down text-success" aria-hidden="true"></i> {{ "{:,.1f}%".format(v.labor_pct*100) }}</h6>
+                      </div>
+                    </div>
+                    {% else %}
+                    <div class="d-flex px-2 py-1">
+                      <div class="d-flex flex-column">
+                        <h6 class="mb-0 text-sm text-end"><i class="fa fa-arrow-up text-danger" aria-hidden="true"></i> {{ "{:,.1f}%".format(v.labor_pct*100) }}</h6>
+                      </div>
+                    </div>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <div class="d-flex px-2 py-1">
+                      <div class="d-flex flex-column">
+                        <h6 class="mb-0 text-sm text-end">{{ "{:,.1f}%".format(v.labor_pct_ly*100) }}</h6>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+            </div>
+          <div class="tab-pane fade" id="nav-year" role="tabpanel" aria-labelledby="nav-year-tab">
+        <div class="card-header pb-0">
+          <div class="row">
+            <div class="col-lg-6 col-7">
+              <h4>Year - {{ fiscal_dates["year"] }}</h4>
+            </div>
+          </div>
+        </div>
+        <div class="card-body px-0 pb-2">
+          <div class="table-responsive table-hover">
+            <table class="table align-items-center mb-0">
+              <thead>
+                <tr>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Restaurant</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Sales</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Sales SPLY</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Guest Count</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Guest Check Avg</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor %</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor SPLY</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for k, v in yearly_table.iterrows() %}
+                <tr> 
+                  <td>
+                    <div class="d-flex px-2 py-1">
+                    {% if v.sales >= v.top_sales %}
+                      <div class="d-flex flex-column">
+                        <a class="me-2" href="{{ url_for('home_blueprint.store', store_id=v.id) }}"><h6 class="mb-0 text-sm">{{ v.name }} <i class="fa fa-sack-dollar text-success" aria-hidden="true"></i></h6></a>
+                      </div>
+                      {% else %}
+                      <div class="d-flex flex-column">
+                        <a class="me-2" href="{{ url_for('home_blueprint.store', store_id=v.id) }}"><h6 class="mb-0 text-sm">{{ v.name }}</h6></a>
+                      </div>
+                      {% endif %}
+                    </div>
+                  </td>
+                  <td>
+                    {% if v.sales >= v.sales_ly %}
+                    <div class="d-flex px-2 py-1">
+                      <div class="d-flex flex-column align-items-end">
+                        <h6 class="mb-0 text-sm text-end"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i> {{ "${:,.0f}".format(v.sales) }}</h6>
+                      </div>
+                    </div>
+                    {% else %}
+                    <div class="d-flex px-2 py-1">
+                      <div class="d-flex flex-column">
+                        <h6 class="mb-0 text-sm text-end"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i> {{ "${:,.0f}".format(v.sales) }}</h6>
+                      </div>
+                    </div>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <div class="d-flex px-2 py-1">
+                      <div class="d-flex flex-column">
+                        <h6 class="mb-0 text-sm text-end">{{ "${:,.0f}".format(v.sales_ly) }}</h6>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    {% if v.guests >= v.guests_ly %}
+                        <div class="d-flex px-2 py-1">
+                          <div class="d-flex flex-column">
+                            <h6 class="mb-0 text-sm text-end"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.0f}".format(v.guests) }}</h6>
+                          </div>
+                        </div>
+                    {% else %}
+                        <div class="d-flex px-2 py-1">
+                          <div class="d-flex flex-column">
+                            <h6 class="mb-0 text-sm text-end"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.0f}".format(v.guests ) }}</h6>
+                          </div>
+                        </div>
+                    {% endif %}
+                  </td>
+                  <td>
+                      {% if v.guest_check_avg >= v.guest_check_avg_ly %}
+                        <div class="d-flex px-2 py-1">
+                          <div class="d-flex flex-column">
+                            <h6 class="mb-0 text-sm text-end"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "${:,.2f}".format(v.guest_check_avg) }}</h6>
+                          </div>
+                        </div>
+                      {% else %}
+                        <div class="d-flex px-2 py-1">
+                          <div class="d-flex flex-column">
+                            <h6 class="mb-0 text-sm text-end"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "${:,.2f}".format(v.guest_check_avg) }}</h6>
+                          </div>
+                        </div>
+                      {% endif %}
+                  </td>
+                  <td>
+                    {% if v.labor_pct <= v.labor_pct_ly %}
+                    <div class="d-flex px-2 py-1">
+                      <div class="d-flex flex-column">
+                        <h6 class="mb-0 text-sm text-end"><i class="fa fa-arrow-down text-success" aria-hidden="true"></i> {{ "{:,.1f}%".format(v.labor_pct*100) }}</h6>
+                      </div>
+                    </div>
+                    {% else %}
+                    <div class="d-flex px-2 py-1">
+                      <div class="d-flex flex-column">
+                        <h6 class="mb-0 text-sm text-end"><i class="fa fa-arrow-up text-danger" aria-hidden="true"></i> {{ "{:,.1f}%".format(v.labor_pct*100) }}</h6>
+                      </div>
+                    </div>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <div class="d-flex px-2 py-1">
+                      <div class="d-flex flex-column">
+                        <h6 class="mb-0 text-sm text-end">{{ "{:,.1f}%".format(v.labor_pct_ly*100) }}</h6>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+            </div>
+        </div>
+        
       </div>
     </div>
     <!-- scorecard -->

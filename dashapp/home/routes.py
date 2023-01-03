@@ -28,8 +28,8 @@ from dashapp.authentication.models import *
 def index():
 
     TODAY = datetime.date(datetime.now())
-    CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
-    YSTDAY = TODAY - timedelta(days=1)
+    # CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
+    # YSTDAY = TODAY - timedelta(days=1)
 
     if not "token" in session:
         session["token"] = TODAY.strftime("%Y-%m-%d")
@@ -211,6 +211,7 @@ def index():
         top = table[["doly", "poly"]]
         top = top.nlargest(5, "poly", keep="all")
         table["guest_check_avg"] = table["sales"] / table["guests"].astype(float)
+        table["guest_check_avg_ly"] = table["sales_ly"] / table["guests_ly"].astype(float)
         table["labor_pct"] = table.dollars / table.sales
         table["labor_pct_ly"] = table.dollars_ly / table.sales_ly
         totals = table.sum()
