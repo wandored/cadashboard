@@ -8,30 +8,11 @@ import pandas as pd
 import numpy as np
 from dashapp.config import Config
 from datetime import datetime, timedelta
-from dashapp.authentication.models import (
-    Calendar,
-    Sales,
-    Labor,
-    Restaurants,
-    db,
-    Menuitems,
-    Potatoes,
-    Unitsofmeasure,
-    Transactions,
-)
+from dashapp.authentication.models import *
 from sqlalchemy import or_, func
 
 
-pd.option_context(
-    "display.max_rows",
-    None,
-    "display.max_columns",
-    None,
-    "display.precision",
-    3,
-)
-
-
+# TODO weekly and period sales records
 def sales_record(store):
     query = (
         db.session.query(func.sum(Sales.sales).label("top_sales"))
@@ -46,9 +27,7 @@ def sales_record(store):
 
 def find_day_with_sales(**kwargs):
     if "store" in kwargs:
-        while not Sales.query.filter_by(
-            date=kwargs["day"], name=kwargs["store"]
-        ).first():
+        while not Sales.query.filter_by(date=kwargs["day"], name=kwargs["store"]).first():
             date = datetime.strptime(kwargs["day"], "%Y-%m-%d")
             next_day = date - timedelta(days=1)
             kwargs["day"] = next_day.strftime("%Y-%m-%d")
@@ -112,18 +91,17 @@ def make_dataframe(sales):
 
 def get_lastyear(date):
     target = Calendar.query.filter_by(date=date)
-    dt_date = datetime.now
+    dt_date = date
 
     for i in target:
         lst_year = str(int(i.year) - 1)
         period = i.period
         week = i.week
         day = i.day
-        ly_target = Calendar.query.filter_by(
-            year=lst_year, period=period, week=week, day=day
-        )
+        ly_target = Calendar.query.filter_by(year=lst_year, period=period, week=week, day=day)
         for x in ly_target:
             dt_date = x.date
+            print(f'{date} - {x.date}')
     return dt_date
 
 
@@ -146,9 +124,7 @@ def removeSpecial(df):
 
 def sales_employee(start, end):
 
-    url_filter = "$filter=date ge {}T00:00:00Z and date le {}T00:00:00Z".format(
-        start, end
-    )
+    url_filter = "$filter=date ge {}T00:00:00Z and date le {}T00:00:00Z".format(start, end)
     query = "$select=dayPart,netSales,numberofGuests,location&{}".format(url_filter)
     url = "{}/SalesEmployee?{}".format(Config.SRVC_ROOT, query)
     rqst = make_HTTP_request(url)
@@ -157,18 +133,12 @@ def sales_employee(start, end):
         return 1
 
     data = db.session.query(Restaurants).all()
-    df_loc = pd.DataFrame(
-        [(x.name, x.location) for x in data], columns=["name", "location"]
-    )
+    df_loc = pd.DataFrame([(x.name, x.location) for x in data], columns=["name", "location"])
     df_merge = df_loc.merge(df, on="location")
-    df_merge = df_merge.rename(
-        columns={"netSales": "sales", "numberofGuests": "guests", "dayPart": "daypart"}
-    )
+    df_merge = df_merge.rename(columns={"netSales": "sales", "numberofGuests": "guests", "dayPart": "daypart"})
 
     # pivot data and write to database
-    df_pivot = df_merge.pivot_table(
-        index=["name", "daypart"], values=["sales", "guests"], aggfunc=np.sum
-    )
+    df_pivot = df_merge.pivot_table(index=["name", "daypart"], values=["sales", "guests"], aggfunc=np.sum)
     df_pivot.loc[:, "date"] = start
     df_pivot.to_sql("Sales", con=db.engine, if_exists="append")
     return 0
@@ -190,15 +160,11 @@ def labor_detail(start):
     df_cats = pd.DataFrame(list(labor_cats.items()), columns=["job", "category"])
 
     data = db.session.query(Restaurants).all()
-    df_loc = pd.DataFrame(
-        [(x.name, x.location) for x in data], columns=["name", "location"]
-    )
+    df_loc = pd.DataFrame([(x.name, x.location) for x in data], columns=["name", "location"])
     df_merge = df_loc.merge(df, left_on="location", right_on="location_ID")
     df_merge = df_merge.rename(columns={"jobTitle": "job", "total": "dollars"})
     df_merge = df_merge.merge(df_cats, on="job")
-    df_pivot = df_merge.pivot_table(
-        index=["name", "category", "job"], values=["hours", "dollars"], aggfunc=np.sum
-    )
+    df_pivot = df_merge.pivot_table(index=["name", "category", "job"], values=["hours", "dollars"], aggfunc=np.sum)
     df_pivot.loc[:, "date"] = start
     df_pivot.to_sql("Labor", con=db.engine, if_exists="append")
     return 0
@@ -206,12 +172,8 @@ def labor_detail(start):
 
 def sales_detail(start, end):
 
-    url_filter = "$filter=date ge {}T00:00:00Z and date le {}T00:00:00Z".format(
-        start, end
-    )
-    query = "$select=menuitem,amount,date,quantity,category,location&{}".format(
-        url_filter
-    )
+    url_filter = "$filter=date ge {}T00:00:00Z and date le {}T00:00:00Z".format(start, end)
+    query = "$select=menuitem,amount,date,quantity,category,location&{}".format(url_filter)
     url = "{}/SalesDetail?{}".format(Config.SRVC_ROOT, query)
     rqst = make_HTTP_request(url)
     df = make_dataframe(rqst)
@@ -220,28 +182,18 @@ def sales_detail(start, end):
 
     with open("/usr/local/share/major_categories.json") as file:
         major_cats = json.load(file)
-    df_cats = pd.DataFrame(
-        list(major_cats.items()), columns=["menu_category", "category"]
-    )
+    df_cats = pd.DataFrame(list(major_cats.items()), columns=["menu_category", "category"])
 
     data = db.session.query(Restaurants).all()
-    df_loc = pd.DataFrame(
-        [(x.name, x.location) for x in data], columns=["name", "location"]
-    )
+    df_loc = pd.DataFrame([(x.name, x.location) for x in data], columns=["name", "location"])
     df_merge = df_loc.merge(df, on="location")
     df_merge = df_merge.drop(columns=["location"])
 
     df_menu = df_merge.merge(df_cats, left_on="category", right_on="menu_category")
 
-    df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(
-        r"CHOPHOUSE - NOLA", "CHOPHOUSE-NOLA", regex=True
-    )
-    df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(
-        r"CAFÉ", "CAFE", regex=True
-    )
-    df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(
-        r"^(?:.*?( -)){2}", "-", regex=True
-    )
+    df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(r"CHOPHOUSE - NOLA", "CHOPHOUSE-NOLA", regex=True)
+    df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(r"CAFÉ", "CAFE", regex=True)
+    df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(r"^(?:.*?( -)){2}", "-", regex=True)
     df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.strip()
     dafilter = df_menu["menuitem"].str.contains("VOID")
     df_clean = df_menu[~dafilter]
@@ -266,9 +218,7 @@ def get_category_sales(start, end, store, cat):
 
     if cat == "GIFT CARDS":
         data = (
-            db.session.query(
-                Menuitems.date, func.sum(Menuitems.amount).label("total_sales")
-            )
+            db.session.query(Menuitems.date, func.sum(Menuitems.amount).label("total_sales"))
             .filter(
                 Menuitems.date.between(start, end),
                 Menuitems.name == store,
@@ -279,9 +229,7 @@ def get_category_sales(start, end, store, cat):
         )
     else:
         data = (
-            db.session.query(
-                Menuitems.date, func.sum(Menuitems.amount).label("total_sales")
-            )
+            db.session.query(Menuitems.date, func.sum(Menuitems.amount).label("total_sales"))
             .filter(
                 Menuitems.date.between(start, end),
                 Menuitems.name == store,
@@ -376,9 +324,7 @@ def get_category_labor(start, end, store, cat):
             Labor.date,
             func.sum(Labor.dollars).label("total_dollars"),
         )
-        .filter(
-            Labor.date.between(start, end), Labor.name == store, Labor.category == cat
-        )
+        .filter(Labor.date.between(start, end), Labor.name == store, Labor.category == cat)
         .group_by(Labor.date)
         .all()
     )
@@ -393,9 +339,7 @@ def potato_sales(start):
         times = csv.reader(f)
         next(times)
         for i in times:
-            url_filter = "$filter=date ge {}T{}Z and date le {}T{}Z".format(
-                start, i[2], start, i[3]
-            )
+            url_filter = "$filter=date ge {}T{}Z and date le {}T{}Z".format(start, i[2], start, i[3])
             query = "$select=menuitem,date,quantity,location&{}".format(url_filter)
             url = "{}/SalesDetail?{}".format(Config.SRVC_ROOT, query)
             rqst = make_HTTP_request(url)
@@ -405,9 +349,7 @@ def potato_sales(start):
                 continue
 
             data = db.session.query(Restaurants).all()
-            df_loc = pd.DataFrame(
-                [(x.name, x.location) for x in data], columns=["name", "location"]
-            )
+            df_loc = pd.DataFrame([(x.name, x.location) for x in data], columns=["name", "location"])
             df_merge = df_loc.merge(df, on="location")
             if df_merge.empty:
                 print(f"no sales at {i[0]}")
@@ -420,18 +362,12 @@ def potato_sales(start):
             df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(
                 r"CHOPHOUSE - NOLA", "CHOPHOUSE-NOLA", regex=True
             )
-            df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(
-                r"CAFÉ", "CAFE", regex=True
-            )
-            df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(
-                r"^(?:.*?( -)){2}", "-", regex=True
-            )
+            df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(r"CAFÉ", "CAFE", regex=True)
+            df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(r"^(?:.*?( -)){2}", "-", regex=True)
             df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.strip()
             dafilter = df_menu["menuitem"].str.contains("VOID")
             df_clean = df_menu[~dafilter]
-            df_clean[["x", "menuitem"]] = df_clean["menuitem"].str.split(
-                " - ", expand=True
-            )
+            df_clean[["x", "menuitem"]] = df_clean["menuitem"].str.split(" - ", expand=True)
             pot_list = [
                 "BAKED POTATO",
                 "BAKED POTATO N/C",
@@ -467,11 +403,7 @@ def potato_sales(start):
 
 def convert_uofm(unit):
     # convert the unit uofm to base quantity
-    pack_size = (
-        db.session.query(Unitsofmeasure)
-        .filter(Unitsofmeasure.name == unit.UofM)
-        .first()
-    )
+    pack_size = db.session.query(Unitsofmeasure).filter(Unitsofmeasure.name == unit.UofM).first()
     if pack_size:
         return pack_size.base_qty, pack_size.base_uofm
     else:
@@ -485,9 +417,7 @@ def update_recipe_costs():
     """
 
     df = pd.read_csv("/usr/local/share/export.csv", sep=",")
-    df.loc[:, "Name"] = df["Name"].str.replace(
-        r"CHOPHOUSE - NOLA", "CHOPHOUSE-NOLA", regex=True
-    )
+    df.loc[:, "Name"] = df["Name"].str.replace(r"CHOPHOUSE - NOLA", "CHOPHOUSE-NOLA", regex=True)
     df.loc[:, "Name"] = df["Name"].str.replace(r"CAFÉ", "CAFE", regex=True)
     df.loc[:, "Name"] = df["Name"].str.replace(r"^(?:.*?( -)){2}", "-", regex=True)
     df[["name", "menuitem"]] = df["Name"].str.split(" - ", expand=True)
@@ -515,21 +445,13 @@ def update_recipe_costs():
         ]
     ]
 
-    df_cost = pd.read_csv(
-        "/usr/local/share/Menu Price Analysis.csv", skiprows=3, sep=",", thousands=","
-    )
+    df_cost = pd.read_csv("/usr/local/share/Menu Price Analysis.csv", skiprows=3, sep=",", thousands=",")
     df_cost.loc[:, "MenuItemName"] = df_cost["MenuItemName"].str.replace(
         r"CHOPHOUSE - NOLA", "CHOPHOUSE-NOLA", regex=True
     )
-    df_cost.loc[:, "MenuItemName"] = df_cost["MenuItemName"].str.replace(
-        r"CAFÉ", "CAFE", regex=True
-    )
-    df_cost.loc[:, "MenuItemName"] = df_cost["MenuItemName"].str.replace(
-        r"^(?:.*?( -)){2}", "-", regex=True
-    )
-    df_cost[["name", "menuitem"]] = df_cost["MenuItemName"].str.split(
-        " - ", expand=True
-    )
+    df_cost.loc[:, "MenuItemName"] = df_cost["MenuItemName"].str.replace(r"CAFÉ", "CAFE", regex=True)
+    df_cost.loc[:, "MenuItemName"] = df_cost["MenuItemName"].str.replace(r"^(?:.*?( -)){2}", "-", regex=True)
+    df_cost[["name", "menuitem"]] = df_cost["MenuItemName"].str.split(" - ", expand=True)
     df_cost = df_cost.drop(
         columns=[
             "AvgPrice1",
@@ -555,15 +477,9 @@ def update_recipe_costs():
     recipes = pd.merge(df_cost, df, on=["name", "menuitem"], how="left")
     # Need to fix names to match the database
     recipes.loc[:, "name"] = recipes["name"].str.replace(r"'47", "47", regex=True)
-    recipes.loc[:, "name"] = recipes["name"].str.replace(
-        r"NEW YORK PRIME-BOCA", "NYP-BOCA", regex=True
-    )
-    recipes.loc[:, "name"] = recipes["name"].str.replace(
-        r"NEW YORK PRIME-MYRTLE BEACH", "NYP-MYRTLE BEACH", regex=True
-    )
-    recipes.loc[:, "name"] = recipes["name"].str.replace(
-        r"NEW YORK PRIME-ATLANTA", "NYP-ATLANTA", regex=True
-    )
+    recipes.loc[:, "name"] = recipes["name"].str.replace(r"NEW YORK PRIME-BOCA", "NYP-BOCA", regex=True)
+    recipes.loc[:, "name"] = recipes["name"].str.replace(r"NEW YORK PRIME-MYRTLE BEACH", "NYP-MYRTLE BEACH", regex=True)
+    recipes.loc[:, "name"] = recipes["name"].str.replace(r"NEW YORK PRIME-ATLANTA", "NYP-ATLANTA", regex=True)
 
     # TODO may need to delete by recipID if duplicates show up
     recipes.to_sql("Recipes", con=db.engine, if_exists="replace", index_label="id")
@@ -596,24 +512,27 @@ def set_dates(startdate):
         d["end_day"] = day_end.strftime("%Y-%m-%d")
         d["start_week"] = i.week_start
         d["end_week"] = i.week_end
+        d["week_to_date"] = i.date
         d["last_seven"] = seven.strftime("%Y-%m-%d")
         d["start_period"] = i.period_start
         d["end_period"] = i.period_end
+        d["period_to_date"] = i.date
         d["last_thirty"] = thirty.strftime("%Y-%m-%d")
         d["start_year"] = i.year_start
         d["end_year"] = i.year_end
+        d["year_to_date"] = i.date
         d["last_threesixtyfive"] = threesixtyfive.strftime("%Y-%m-%d")
         d["start_day_ly"] = get_lastyear(i.date)
         d["end_day_ly"] = get_lastyear(day_end.strftime("%Y-%m-%d"))
         d["start_week_ly"] = get_lastyear(i.week_start)
         d["end_week_ly"] = get_lastyear(i.week_end)
-        d["week_to_date"] = get_lastyear(i.date)
+        d["week_to_date_ly"] = get_lastyear(i.date)
         d["start_period_ly"] = get_lastyear(i.period_start)
         d["end_period_ly"] = get_lastyear(i.period_end)
-        d["period_to_date"] = get_lastyear(i.date)
+        d["period_to_date_ly"] = get_lastyear(i.date)
         d["start_year_ly"] = get_lastyear(i.year_start)
         d["end_year_ly"] = get_lastyear(i.year_end)
-        d["year_to_date"] = get_lastyear(i.date)
+        d["year_to_date_ly"] = get_lastyear(i.date)
         d["start_previous_week"] = lws.strftime("%Y-%m-%d")
         d["end_previous_week"] = lwe.strftime("%Y-%m-%d")
 

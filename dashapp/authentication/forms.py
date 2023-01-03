@@ -4,53 +4,29 @@ Copyright (c) 2019 - present AppSeed.us
 """
 
 from flask_wtf import FlaskForm
-from wtforms import SubmitField, StringField, PasswordField
-from wtforms.fields.html5 import DateField  # wftforms 2.3.3 is necessary until bug fix
-from wtforms_sqlalchemy.fields import QuerySelectField
+from datetime import datetime
+from wtforms import widgets, SubmitField, StringField, PasswordField
+from wtforms.fields import DateField
+from wtforms_sqlalchemy.fields import QuerySelectMultipleField, QuerySelectField
 from wtforms.validators import Email, DataRequired
 from dashapp.authentication.models import Restaurants
-from sqlalchemy import or_
 
 # login and registration
 
 
 def store_query():
-    filters = {
-        or_(
-            Restaurants.id == 3,
-            Restaurants.id == 4,
-            Restaurants.id == 5,
-            Restaurants.id == 6,
-            Restaurants.id == 9,
-            Restaurants.id == 10,
-            Restaurants.id == 11,
-            Restaurants.id == 12,
-            Restaurants.id == 13,
-            Restaurants.id == 14,
-            Restaurants.id == 15,
-            Restaurants.id == 16,
-            Restaurants.id == 17,
-            Restaurants.id == 18,
-        )
-    }
-    stores = Restaurants.query.filter(*filters).order_by(Restaurants.name)
-    return stores
+    closed_stores = [1, 2, 7, 8]
+    return Restaurants.query.filter(Restaurants.id.notin_(closed_stores)).order_by(Restaurants.name).all()
 
 
 class LoginForm(FlaskForm):
-    email = StringField(
-        "Email Address", id="email_login", validators=[DataRequired(), Email()]
-    )
+    email = StringField("Email Address", id="email_login", validators=[DataRequired(), Email()])
     password = PasswordField("Password", id="pwd_login", validators=[DataRequired()])
 
 
 class CreateAccountForm(FlaskForm):
-    username = StringField(
-        "Username", id="username_create", validators=[DataRequired()]
-    )
-    email = StringField(
-        "Email", id="email_create", validators=[DataRequired(), Email()]
-    )
+    username = StringField("Username", id="username_create", validators=[DataRequired()])
+    email = StringField("Email", id="email_create", validators=[DataRequired(), Email()])
     password = PasswordField("Password", id="pwd_create", validators=[DataRequired()])
 
 
@@ -60,22 +36,31 @@ class DateForm(FlaskForm):
 
 
 class UpdateForm(FlaskForm):
-    selectdate = DateField("Data Update", format="%Y-%m-%d")
+    selectdate = DateField("Data Update", format="%Y-%m-%d", default=datetime.today())
     submit2 = SubmitField("Submit")
 
 
+class MultiCheckboxField(QuerySelectMultipleField):
+    widget = widgets.ListWidget(prefix_label=False)
+    option_widget = widgets.CheckboxInput()
+
+
 class StoreForm(FlaskForm):
-    store = QuerySelectField(
-        "",
+    stores = MultiCheckboxField(
+        "Select Stores",
         query_factory=store_query,
-        allow_blank=True,
         get_label="name",
-        blank_text="Select Store",
     )
     submit3 = SubmitField("Submit")
 
 
 class PotatoForm(FlaskForm):
+    store = QuerySelectField(
+        "",
+        query_factory=store_query,
+        get_label="name",
+        blank_text="Select Store",
+    )
     submit4 = SubmitField("Submit")
 
 

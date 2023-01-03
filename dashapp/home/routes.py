@@ -1,4 +1,4 @@
-# -*- encmding: utf-8 -*-
+# -*- encoding: utf-8 -*-
 """
 Copyright (c) 2019 - present AppSeed.us
 """
@@ -8,11 +8,11 @@ import json
 import pandas as pd
 from fpdf import FPDF
 from flask.helpers import url_for
-from flask_security.decorators import roles_accepted
+from flask_security.core import current_user
+from flask_security.decorators import roles_accepted, login_required
 from pandas.core.algorithms import isin
 from flask import flash, render_template, session, redirect, url_for
 from flask.wrappers import Response
-from flask_security import login_required, current_user
 from datetime import datetime, timedelta
 from sqlalchemy import and_, or_, func
 from dashapp.config import Config
@@ -28,11 +28,24 @@ from dashapp.authentication.models import *
 def index():
 
     TODAY = datetime.date(datetime.now())
-    CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
-    YSTDAY = TODAY - timedelta(days=1)
+    # CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
+    # YSTDAY = TODAY - timedelta(days=1)
 
     if not "token" in session:
         session["token"] = TODAY.strftime("%Y-%m-%d")
+        return redirect(url_for("home_blueprint.index"))
+
+    if not "store_list" in session:
+        closed_stores = [1, 2, 7, 8]
+        session["store_list"] = tuple(
+            [
+                store.id
+                for store in Restaurants.query.filter(Restaurants.id.notin_(closed_stores))
+                .order_by(Restaurants.name)
+                .all()
+            ]
+        )
+        print(session["store_list"])
         return redirect(url_for("home_blueprint.index"))
 
     fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
@@ -57,11 +70,10 @@ def index():
         return redirect(url_for("home_blueprint.index"))
 
     if form3.submit3.data and form3.validate():
-
         session["token"] = fiscal_dates["start_day"]
-        store_id = form3.store.data.id
-
-        return redirect(url_for("home_blueprint.store", store_id=store_id))
+        data = form3.stores.data
+        session["store_list"] = tuple([x.id for x in data])
+        return redirect(url_for("home_blueprint.index"))
 
     # Sales Chart
     def get_chart_values(start, end, time):
@@ -79,26 +91,38 @@ def index():
 
         return value
 
-    daily_sales_list = get_chart_values(
-        fiscal_dates["start_week"], fiscal_dates["end_week"], Calendar.date
-    )
-    daily_sales_list_ly = get_chart_values(
-        fiscal_dates["start_week_ly"], fiscal_dates["end_week_ly"], Calendar.date
-    )
+    daily_sales_list = get_chart_values(fiscal_dates["start_week"], fiscal_dates["end_day"], Calendar.date)
+    weekly_sales = sum(daily_sales_list)
 
-    weekly_sales_list = get_chart_values(
-        fiscal_dates["start_period"], fiscal_dates["end_period"], Calendar.week
-    )
+    daily_sales_list_ly = get_chart_values(fiscal_dates["start_week_ly"], fiscal_dates["end_week_ly"], Calendar.date)
+    weekly_sales_ly = sum(daily_sales_list_ly)
+
+    week_to_date_sales_ly = get_chart_values(fiscal_dates["start_week_ly"], fiscal_dates["start_day_ly"], Calendar.date)
+    wtd_sales_ly = sum(week_to_date_sales_ly)
+
+    weekly_sales_list = get_chart_values(fiscal_dates["start_period"], fiscal_dates["start_day"], Calendar.week)
+    period_sales = sum(weekly_sales_list)
+
     weekly_sales_list_ly = get_chart_values(
         fiscal_dates["start_period_ly"], fiscal_dates["end_period_ly"], Calendar.week
     )
+    period_sales_ly = sum(weekly_sales_list_ly)
 
-    period_sales_list = get_chart_values(
-        fiscal_dates["start_year"], fiscal_dates["end_year"], Calendar.period
+    period_to_date_sales_ly = get_chart_values(
+        fiscal_dates["start_period_ly"], fiscal_dates["start_day_ly"], Calendar.week
     )
-    period_sales_list_ly = get_chart_values(
-        fiscal_dates["start_year_ly"], fiscal_dates["end_year_ly"], Calendar.period
+    ptd_sales_ly = sum(period_to_date_sales_ly)
+
+    period_sales_list = get_chart_values(fiscal_dates["start_year"], fiscal_dates["start_day"], Calendar.period)
+    yearly_sales = sum(period_sales_list)
+
+    period_sales_list_ly = get_chart_values(fiscal_dates["start_year_ly"], fiscal_dates["end_year_ly"], Calendar.period)
+    yearly_sales_ly = sum(period_sales_list_ly)
+
+    year_to_date_sales_ly = get_chart_values(
+        fiscal_dates["start_year_ly"], fiscal_dates["start_day_ly"], Calendar.period
     )
+    ytd_sales_ly = sum(year_to_date_sales_ly)
 
     budget_chart = (
         db.session.query(func.sum(Budgets.total_sales).label("total_sales"))
@@ -111,407 +135,121 @@ def index():
     for v in budget_chart:
         budgets3.append(v.total_sales)
 
-    # Daily Sales Table
-    sales_day = (
-        db.session.query(
-            Sales.name,
-            func.sum(Sales.sales).label("total_sales"),
-            func.sum(Sales.guests).label("total_guests")
-        )
-        .filter(Sales.date == fiscal_dates["start_day"])
-        .group_by(Sales.name)
-        .all()
-    )
+    def build_sales_table(start, end, start_ly, end_ly):
 
-    sales_day_ly = (
-        db.session.query(
-            Sales.name,
-            func.sum(Sales.sales).label("total_sales_ly"),
-            func.sum(Sales.guests).label("total_guests_ly")
-        )
-        .filter(Sales.date == fiscal_dates["start_day_ly"])
-        .group_by(Sales.name)
-        .all()
-    )
-
-    entree_count = (
-        db.session.query(
-            Menuitems.name,
-            func.sum(Menuitems.quantity).label("entree_count"),
-        )
-        .filter(
-            Menuitems.date == fiscal_dates["start_day"],
-            Menuitems.menu_category.regexp_match("ENTREE*"),
-        )
-        .group_by(Menuitems.name)
-        .all()
-    )
-    # replace ly with guest check average
-    entree_count_ly = (
-        db.session.query(
-            Menuitems.name,
-            func.sum(Menuitems.quantity).label("entree_count"),
-        )
-        .filter(
-            Menuitems.date == fiscal_dates["start_day_ly"],
-            Menuitems.menu_category.regexp_match("ENTREE*"),
-        )
-        .group_by(Menuitems.name)
-        .all()
-    )
-
-    # Get the top sales for each store
-    store_list = store_df["name"]
-    top_sales_list = []
-    for sl in store_list:
-        query = sales_record(sl)
-        if query != None:
-            row = [sl, query]
-            top_sales_list.append(row)
-
-    top_sales_df = pd.DataFrame.from_records(
-        top_sales_list, columns=["name", "top_sales"]
-    )
-
-    df_sales_day = pd.DataFrame.from_records(sales_day, columns=["name", "sales", "guests"])
-    df_sales_day_ly = pd.DataFrame.from_records(
-        sales_day_ly, columns=["name", "sales_ly", "guests_ly"]
-    )
-    df_entree_count = pd.DataFrame.from_records(
-        entree_count, columns=["name", "entree_count"]
-    )
-    df_entree_count_ly = pd.DataFrame.from_records(
-        entree_count_ly, columns=["name", "entree_count_ly"]
-    )
-    sales_table = df_sales_day.merge(df_sales_day_ly, how="outer", sort=True)
-    sales_table = sales_table.merge(df_entree_count, how="outer", sort=True)
-    sales_table = sales_table.merge(df_entree_count_ly, how="outer", sort=True)
-    sales_table = sales_table.merge(top_sales_df, how="left")
-
-    labor_day = (
-        db.session.query(
-            Labor.name,
-            func.sum(Labor.hours).label("total_hours"),
-            func.sum(Labor.dollars).label("total_dollars"),
-        )
-        .filter(Labor.date == fiscal_dates["start_day"])
-        .group_by(Labor.name)
-        .all()
-    )
-
-    labor_day_ly = (
-        db.session.query(
-            Labor.name,
-            func.sum(Labor.hours).label("total_hours_ly"),
-            func.sum(Labor.dollars).label("total_dollars_ly"),
-        )
-        .filter(Labor.date == fiscal_dates["start_day_ly"])
-        .group_by(Labor.name)
-        .all()
-    )
-
-    df_labor_day = pd.DataFrame.from_records(
-        labor_day, columns=["name", "hours", "dollars"]
-    )
-    df_labor_day_ly = pd.DataFrame.from_records(
-        labor_day_ly, columns=["name", "hours_ly", "dollars_ly"]
-    )
-    labor_table = df_labor_day.merge(df_labor_day_ly, how="outer", sort=True)
-
-    daily_table = sales_table.merge(labor_table, how="outer", sort=True)
-
-    daily_table = daily_table.merge(store_df, how="left")
-    daily_table = daily_table.set_index("name")
-
-    # Grab top sales over last year before we add totals
-    daily_table = daily_table.fillna(0)
-    daily_table["doly"] = daily_table.sales - daily_table.sales_ly
-    daily_table["poly"] = (
-        (daily_table.sales - daily_table.sales_ly) / daily_table.sales_ly * 100
-    )
-    daily_top = daily_table[["doly", "poly"]]
-    daily_top = daily_top.nlargest(5, "poly", keep="all")
-
-    # daily_table.loc["TOTALS"] = daily_table.sum(numeric_only=True)
-    daily_table["guest_check_avg"] = daily_table["sales"] / daily_table["guests"].astype(
-        float
-    )
-    daily_table["entree_check_avg"] = daily_table["sales"] / daily_table["entree_count"].astype(
-        float
-    )
-    daily_table["labor_pct"] = daily_table.dollars / daily_table.sales
-    daily_table["labor_pct_ly"] = daily_table.dollars_ly / daily_table.sales_ly
-    daily_table = daily_table.fillna(0)
-    daily_totals = daily_table.sum()
-    print(daily_table)
-
-    # Weekly Sales Table
-    sales_week = (
-        db.session.query(Sales.name, func.sum(Sales.sales).label("total_sales"))
-        .filter(
-            Sales.date.between(fiscal_dates["start_week"], fiscal_dates["end_week"])
-        )
-        .group_by(Sales.name)
-        .all()
-    )
-
-    sales_week_ly = (
-        db.session.query(Sales.name, func.sum(Sales.sales).label("total_sales_ly"))
-        .filter(
-            Sales.date.between(
-                fiscal_dates["start_week_ly"], fiscal_dates["week_to_date"]
+        sales = (
+            db.session.query(
+                Sales.name,
+                func.sum(Sales.sales).label("total_sales"),
+                func.sum(Sales.guests).label("total_guests"),
             )
+            .filter(Sales.date.between(start, end))
+            .group_by(Sales.name)
+            .all()
         )
-        .group_by(Sales.name)
-        .all()
-    )
 
-    df_sales_week = pd.DataFrame.from_records(sales_week, columns=["name", "sales"])
-    df_sales_week_ly = pd.DataFrame.from_records(
-        sales_week_ly, columns=["name", "sales_ly"]
-    )
-    sales_table_wk = df_sales_week.merge(df_sales_week_ly, how="outer", sort=True)
-
-    labor_week = (
-        db.session.query(
-            Labor.name,
-            func.sum(Labor.hours).label("total_hours"),
-            func.sum(Labor.dollars).label("total_dollars"),
-        )
-        .filter(
-            Labor.date.between(fiscal_dates["start_week"], fiscal_dates["end_week"])
-        )
-        .group_by(Labor.name)
-        .all()
-    )
-
-    labor_week_ly = (
-        db.session.query(
-            Labor.name,
-            func.sum(Labor.hours).label("total_hours_ly"),
-            func.sum(Labor.dollars).label("total_dollars_ly"),
-        )
-        .filter(
-            Labor.date.between(
-                fiscal_dates["start_week_ly"], fiscal_dates["week_to_date"]
+        sales_ly = (
+            db.session.query(
+                Sales.name,
+                func.sum(Sales.sales).label("total_sales_ly"),
+                func.sum(Sales.guests).label("total_guests_ly"),
             )
+            .filter(Sales.date.between(start_ly, end_ly))
+            .group_by(Sales.name)
+            .all()
         )
-        .group_by(Labor.name)
-        .all()
-    )
+        # Get the top sales for each store
+        store_list = store_df["name"]
+        top_sales_list = []
+        for sl in store_list:
+            query = sales_record(sl)
+            if query != None:
+                row = [sl, query]
+                top_sales_list.append(row)
 
-    df_labor_week = pd.DataFrame.from_records(
-        labor_week, columns=["name", "hours", "dollars"]
-    )
-    df_labor_week_ly = pd.DataFrame.from_records(
-        labor_week_ly, columns=["name", "hours_ly", "dollars_ly"]
-    )
-    labor_table_wk = df_labor_week.merge(df_labor_week_ly, how="outer", sort=True)
+        top_sales = pd.DataFrame.from_records(top_sales_list, columns=["name", "top_sales"])
 
-    weekly_table = sales_table_wk.merge(labor_table_wk, how="outer", sort=True)
-    weekly_table = weekly_table.set_index("name")
+        df = pd.DataFrame.from_records(sales, columns=["name", "sales", "guests"])
+        df_ly = pd.DataFrame.from_records(sales_ly, columns=["name", "sales_ly", "guests_ly"])
+        sales_table = df.merge(df_ly, how="outer", sort=True)
+        sales_table = sales_table.merge(top_sales, how="left")
 
-    # Grab top sales over last year before we add totals
-    weekly_table = weekly_table.fillna(0)
-    weekly_table["doly"] = weekly_table.sales - weekly_table.sales_ly
-    weekly_table["poly"] = (
-        (weekly_table.sales - weekly_table.sales_ly) / weekly_table.sales_ly * 100
-    )
-    weekly_top = weekly_table[["doly", "poly"]]
-    weekly_top = weekly_top.nlargest(5, "poly", keep="all")
-
-    weekly_totals = weekly_table.sum()
-    weekly_table["labor_pct"] = weekly_table.dollars / weekly_table.sales
-    weekly_table["labor_pct_ly"] = weekly_table.dollars_ly / weekly_table.sales_ly
-
-    # Period Sales Table
-    sales_period = (
-        db.session.query(Sales.name, func.sum(Sales.sales).label("total_sales"))
-        .filter(
-            Sales.date.between(fiscal_dates["start_period"], fiscal_dates["end_period"])
-        )
-        .group_by(Sales.name)
-        .all()
-    )
-
-    sales_period_ly = (
-        db.session.query(Sales.name, func.sum(Sales.sales).label("total_sales_ly"))
-        .filter(
-            Sales.date.between(
-                fiscal_dates["start_period_ly"], fiscal_dates["period_to_date"]
+        labor = (
+            db.session.query(
+                Labor.name,
+                func.sum(Labor.hours).label("total_hours"),
+                func.sum(Labor.dollars).label("total_dollars"),
             )
+            .filter(Labor.date.between(start, end))
+            .group_by(Labor.name)
+            .all()
         )
-        .group_by(Sales.name)
-        .all()
-    )
 
-    df_sales_period = pd.DataFrame.from_records(sales_period, columns=["name", "sales"])
-    df_sales_period_ly = pd.DataFrame.from_records(
-        sales_period_ly, columns=["name", "sales_ly"]
-    )
-    sales_table_pd = df_sales_period.merge(df_sales_period_ly, how="outer", sort=True)
-
-    labor_period = (
-        db.session.query(
-            Labor.name,
-            func.sum(Labor.hours).label("total_hours"),
-            func.sum(Labor.dollars).label("total_dollars"),
-        )
-        .filter(
-            Labor.date.between(fiscal_dates["start_period"], fiscal_dates["end_period"])
-        )
-        .group_by(Labor.name)
-        .all()
-    )
-
-    labor_period_ly = (
-        db.session.query(
-            Labor.name,
-            func.sum(Labor.hours).label("total_hours_ly"),
-            func.sum(Labor.dollars).label("total_dollars_ly"),
-        )
-        .filter(
-            Labor.date.between(
-                fiscal_dates["start_period_ly"], fiscal_dates["period_to_date"]
+        labor_ly = (
+            db.session.query(
+                Labor.name,
+                func.sum(Labor.hours).label("total_hours_ly"),
+                func.sum(Labor.dollars).label("total_dollars_ly"),
             )
+            .filter(Labor.date.between(start_ly, end_ly))
+            .group_by(Labor.name)
+            .all()
         )
-        .group_by(Labor.name)
-        .all()
+
+        df_labor = pd.DataFrame.from_records(labor, columns=["name", "hours", "dollars"])
+        df_labor_ly = pd.DataFrame.from_records(labor_ly, columns=["name", "hours_ly", "dollars_ly"])
+        labor_table = df_labor.merge(df_labor_ly, how="outer", sort=True)
+
+        table = sales_table.merge(labor_table, how="outer", sort=True)
+        table = table.merge(store_df, how="left")
+        table = table.set_index("name")
+
+        # Grab top sales over last year before we add totals
+        table = table.fillna(0)
+        table["doly"] = table.sales - table.sales_ly
+        table["poly"] = (table.sales - table.sales_ly) / table.sales_ly * 100
+        top = table[["doly", "poly"]]
+        top = top.nlargest(5, "poly", keep="all")
+        table["guest_check_avg"] = table["sales"] / table["guests"].astype(float)
+        table["guest_check_avg_ly"] = table["sales_ly"] / table["guests_ly"].astype(float)
+        table["labor_pct"] = table.dollars / table.sales
+        table["labor_pct_ly"] = table.dollars_ly / table.sales_ly
+        totals = table.sum()
+
+        return totals, table, top
+
+    daily_totals, daily_table, daily_top = build_sales_table(
+        fiscal_dates["start_day"], fiscal_dates["start_day"], fiscal_dates["start_day_ly"], fiscal_dates["start_day_ly"]
     )
 
-    df_labor_period = pd.DataFrame.from_records(
-        labor_period, columns=["name", "hours", "dollars"]
-    )
-    df_labor_period_ly = pd.DataFrame.from_records(
-        labor_period_ly, columns=["name", "hours_ly", "dollars_ly"]
-    )
-    labor_table_pd = df_labor_period.merge(df_labor_period_ly, how="outer", sort=True)
-
-    period_table = sales_table_pd.merge(labor_table_pd, how="outer", sort=True)
-    period_table = period_table.set_index("name")
-
-    # Grab top sales over last year before we add totals
-    period_table = period_table.fillna(0)
-    period_table["doly"] = period_table.sales - period_table.sales_ly
-    period_table["poly"] = (
-        (period_table.sales - period_table.sales_ly) / period_table.sales_ly * 100
-    )
-    period_top = period_table[["doly", "poly"]]
-    period_top = period_top.nlargest(5, "poly", keep="all")
-
-    period_totals = period_table.sum()
-    period_table["labor_pct"] = period_table.dollars / period_table.sales
-    period_table["labor_pct_ly"] = period_table.dollars_ly / period_table.sales_ly
-
-    # Yearly Sales Table
-    sales_yearly = (
-        db.session.query(Sales.name, func.sum(Sales.sales).label("total_sales"))
-        .filter(
-            Sales.date.between(fiscal_dates["start_year"], fiscal_dates["end_year"])
-        )
-        .group_by(Sales.name)
-        .all()
+    weekly_totals, weekly_table, weekly_top = build_sales_table(
+        fiscal_dates["start_week"],
+        fiscal_dates["week_to_date"],
+        fiscal_dates["start_week_ly"],
+        fiscal_dates["week_to_date_ly"],
     )
 
-    sales_yearly_ly = (
-        db.session.query(Sales.name, func.sum(Sales.sales).label("total_sales_ly"))
-        .filter(
-            Sales.date.between(
-                fiscal_dates["start_year_ly"], fiscal_dates["year_to_date"]
-            )
-        )
-        .group_by(Sales.name)
-        .all()
+    period_totals, period_table, period_top = build_sales_table(
+        fiscal_dates["start_period"],
+        fiscal_dates["period_to_date"],
+        fiscal_dates["start_period_ly"],
+        fiscal_dates["period_to_date_ly"],
     )
 
-    df_sales_yearly = pd.DataFrame.from_records(sales_yearly, columns=["name", "sales"])
-    df_sales_yearly_ly = pd.DataFrame.from_records(
-        sales_yearly_ly, columns=["name", "sales_ly"]
+    yearly_totals, yearly_table, yearly_top = build_sales_table(
+        fiscal_dates["start_year"],
+        fiscal_dates["year_to_date"],
+        fiscal_dates["start_year_ly"],
+        fiscal_dates["year_to_date_ly"],
     )
-    sales_table_yr = df_sales_yearly.merge(df_sales_yearly_ly, how="outer", sort=True)
-
-    labor_yearly = (
-        db.session.query(
-            Labor.name,
-            func.sum(Labor.hours).label("total_hours"),
-            func.sum(Labor.dollars).label("total_dollars"),
-        )
-        .filter(
-            Labor.date.between(fiscal_dates["start_year"], fiscal_dates["end_year"])
-        )
-        .group_by(Labor.name)
-        .all()
-    )
-
-    labor_yearly_ly = (
-        db.session.query(
-            Labor.name,
-            func.sum(Labor.hours).label("total_hours_ly"),
-            func.sum(Labor.dollars).label("total_dollars_ly"),
-        )
-        .filter(
-            Labor.date.between(
-                fiscal_dates["start_year_ly"], fiscal_dates["year_to_date"]
-            )
-        )
-        .group_by(Labor.name)
-        .all()
-    )
-
-    df_labor_yearly = pd.DataFrame.from_records(
-        labor_yearly, columns=["name", "hours", "dollars"]
-    )
-    df_labor_yearly_ly = pd.DataFrame.from_records(
-        labor_yearly_ly, columns=["name", "hours_ly", "dollars_ly"]
-    )
-    labor_table_yr = df_labor_yearly.merge(df_labor_yearly_ly, how="outer", sort=True)
-
-    yearly_table = sales_table_yr.merge(labor_table_yr, how="outer", sort=True)
-    yearly_table = yearly_table.set_index("name")
-
-    # Grab top sales over last year before we add totals
-    yearly_table = yearly_table.fillna(0)
-    yearly_table["doly"] = yearly_table.sales - yearly_table.sales_ly
-    yearly_table["poly"] = (
-        (yearly_table.sales - yearly_table.sales_ly) / yearly_table.sales_ly * 100
-    )
-    yearly_top = yearly_table[["doly", "poly"]]
-    yearly_top = yearly_top.nlargest(5, "poly", keep="all")
-
-    yearly_totals = yearly_table.sum()
-    yearly_table["labor_pct"] = yearly_table.dollars / yearly_table.sales
-    yearly_table["labor_pct_ly"] = yearly_table.dollars_ly / yearly_table.sales_ly
 
     return render_template(
         "home/index.html",
         title=Config.COMPANY_NAME,
         company_name=Config.COMPANY_NAME,
-        #form1=form1,
-        #form3=form3,
         segment="index",
-        #current_user=current_user,
         roles=current_user.roles,
         **locals(),
-        #fiscal_dates=fiscal_dates,
-        #daily_sales_list=daily_sales_list,
-        #daily_sales_list_ly=daily_sales_list_ly,
-        #weekly_sales_list=weekly_sales_list,
-        #weekly_sales_list_ly=weekly_sales_list_ly,
-        #period_sales_list=period_sales_list,
-        #period_sales_list_ly=period_sales_list_ly,
-        #budgets3=budgets3,
-        #daily_table=daily_table,
-        #daily_totals=daily_totals,
-        ##        weekly_table=weekly_table,
-        #weekly_totals=weekly_totals,
-        ##        period_table=period_table,
-        #period_totals=period_totals,
-        ##        yearly_table=yearly_table,
-        #yearly_totals=yearly_totals,
-        #daily_top=daily_top,
-        #weekly_top=weekly_top,
-        #period_top=period_top,
-        ##        yearly_top=yearly_top
     )
 
 
@@ -539,14 +277,8 @@ def store(store_id):
     data = Restaurants.query.all()
     store_df = pd.DataFrame([x.as_dict() for x in data])
 
-    if not Sales.query.filter_by(
-        date=fiscal_dates["start_day"], 
-        name=store.name
-    ).first():
-        session["token"] = find_day_with_sales(
-            day=fiscal_dates["start_day"],
-            store=store.name
-        )
+    if not Sales.query.filter_by(date=fiscal_dates["start_day"], name=store.name).first():
+        session["token"] = find_day_with_sales(day=fiscal_dates["start_day"], store=store.name)
         return redirect(url_for("home_blueprint.store", store_id=store.id))
 
     # Get Data
@@ -564,13 +296,13 @@ def store(store_id):
         return redirect(url_for("home_blueprint.store", store_id=store.id))
 
     if form3.submit3.data and form3.validate():
-
         session["token"] = fiscal_dates["start_day"]
-        store_id = form3.store.data.id
+        data = form3.store.data
+        session["store_list"] = tuple([x.id for x in data])
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
-    if form4.validate_on_submit():
-
+    if form4.submit4.data and form4.validate():
+        store_id = form4.store.data.id
         return redirect(url_for("home_blueprint.potato", store_id=store.id))
 
     # sales cards
@@ -585,30 +317,14 @@ def store(store_id):
             sales = i.total_sales
         return sales
 
-    sales_day = get_sales(
-        fiscal_dates["start_day"], fiscal_dates["start_day"], store.name
-    )
-    sales_day_ly = get_sales(
-        fiscal_dates["start_day_ly"], fiscal_dates["start_day_ly"], store.name
-    )
-    sales_week = get_sales(
-        fiscal_dates["start_week"], fiscal_dates["end_week"], store.name
-    )
-    sales_week_ly = get_sales(
-        fiscal_dates["start_week_ly"], fiscal_dates["week_to_date"], store.name
-    )
-    sales_period = get_sales(
-        fiscal_dates["start_period"], fiscal_dates["end_period"], store.name
-    )
-    sales_period_ly = get_sales(
-        fiscal_dates["start_period_ly"], fiscal_dates["period_to_date"], store.name
-    )
-    sales_year = get_sales(
-        fiscal_dates["start_year"], fiscal_dates["end_year"], store.name
-    )
-    sales_year_ly = get_sales(
-        fiscal_dates["start_year_ly"], fiscal_dates["year_to_date"], store.name
-    )
+    sales_day = get_sales(fiscal_dates["start_day"], fiscal_dates["start_day"], store.name)
+    sales_day_ly = get_sales(fiscal_dates["start_day_ly"], fiscal_dates["start_day_ly"], store.name)
+    sales_week = get_sales(fiscal_dates["start_week"], fiscal_dates["end_week"], store.name)
+    sales_week_ly = get_sales(fiscal_dates["start_week_ly"], fiscal_dates["week_to_date_ly"], store.name)
+    sales_period = get_sales(fiscal_dates["start_period"], fiscal_dates["end_period"], store.name)
+    sales_period_ly = get_sales(fiscal_dates["start_period_ly"], fiscal_dates["period_to_date_ly"], store.name)
+    sales_year = get_sales(fiscal_dates["start_year"], fiscal_dates["end_year"], store.name)
+    sales_year_ly = get_sales(fiscal_dates["start_year_ly"], fiscal_dates["year_to_date_ly"], store.name)
 
     # Sales Charts
     def get_chart_values(start, end, time):
@@ -626,24 +342,14 @@ def store(store_id):
 
         return value
 
-    daily_sales_list = get_chart_values(
-        fiscal_dates["start_week"], fiscal_dates["end_week"], Calendar.date
-    )
-    daily_sales_list_ly = get_chart_values(
-        fiscal_dates["start_week_ly"], fiscal_dates["end_week_ly"], Calendar.date
-    )
-    weekly_sales_list = get_chart_values(
-        fiscal_dates["start_period"], fiscal_dates["end_period"], Calendar.week
-    )
+    daily_sales_list = get_chart_values(fiscal_dates["start_week"], fiscal_dates["end_week"], Calendar.date)
+    daily_sales_list_ly = get_chart_values(fiscal_dates["start_week_ly"], fiscal_dates["end_week_ly"], Calendar.date)
+    weekly_sales_list = get_chart_values(fiscal_dates["start_period"], fiscal_dates["end_period"], Calendar.week)
     weekly_sales_list_ly = get_chart_values(
         fiscal_dates["start_period_ly"], fiscal_dates["end_period_ly"], Calendar.week
     )
-    period_sales_list = get_chart_values(
-        fiscal_dates["start_year"], fiscal_dates["end_year"], Calendar.period
-    )
-    period_sales_list_ly = get_chart_values(
-        fiscal_dates["start_year_ly"], fiscal_dates["end_year_ly"], Calendar.period
-    )
+    period_sales_list = get_chart_values(fiscal_dates["start_year"], fiscal_dates["end_year"], Calendar.period)
+    period_sales_list_ly = get_chart_values(fiscal_dates["start_year_ly"], fiscal_dates["end_year_ly"], Calendar.period)
 
     budget_chart = (
         db.session.query(func.sum(Budgets.total_sales).label("total_sales"))
@@ -936,9 +642,7 @@ def store(store_id):
         menu_list = []
         for p in prep_item_list:
             recipes = (
-                db.session.query(Recipes)
-                .filter(Recipes.recipe == p["recipe"], Recipes.name == store.name)
-                .first()
+                db.session.query(Recipes).filter(Recipes.recipe == p["recipe"], Recipes.name == store.name).first()
             )
             if recipes:
                 row_dict = dict(p)
@@ -953,9 +657,7 @@ def store(store_id):
         )
         df = df.merge(unit_sales, on="menuitem", how="outer")
         df["last_week"] = df["qty"] * df["quantity"].astype(float)
-        unit_sales = get_unit_sales(
-            fiscal_dates["start_week_ly"], fiscal_dates["end_week_ly"], unit_list
-        )
+        unit_sales = get_unit_sales(fiscal_dates["start_week_ly"], fiscal_dates["end_week_ly"], unit_list)
         df = df.merge(unit_sales, on="menuitem", how="outer")
         df["last_year"] = df["qty"] * df["quantity_y"].astype(float)
         df.drop(["recipe", "qty"], axis=1, inplace=True)
@@ -1014,20 +716,12 @@ def store(store_id):
         "Stock Count",
     )
     df_begin = pd.DataFrame(food_begin)
-    df_begin["inv_cost"] = df_begin["amount"] / (
-        df_begin["base_qty"] * df_begin["quantity"]
-    )
+    df_begin["inv_cost"] = df_begin["amount"] / (df_begin["base_qty"] * df_begin["quantity"])
     df_begin.drop(columns=["quantity", "amount"], inplace=True)
-    food_today = get_transactions_by_category(
-        "Food", fiscal_dates["start_week"], CURRENT_DATE, "AP Invoice"
-    )
+    food_today = get_transactions_by_category("Food", fiscal_dates["start_week"], CURRENT_DATE, "AP Invoice")
     df_today = pd.DataFrame(food_today)
-    df_today["current_cost"] = df_today["amount"] / (
-        df_today["base_qty"] * df_today["quantity"]
-    )
-    df_today.drop(
-        columns=["UofM", "quantity", "amount", "base_qty", "base_uofm"], inplace=True
-    )
+    df_today["current_cost"] = df_today["amount"] / (df_today["base_qty"] * df_today["quantity"])
+    df_today.drop(columns=["UofM", "quantity", "amount", "base_qty", "base_uofm"], inplace=True)
     df_merge = pd.merge(df_begin, df_today, on="item", how="left")
     df_merge["cost_diff"] = df_merge["current_cost"] - df_merge["inv_cost"]
     df_merge["pct_diff"] = (df_merge["cost_diff"] / df_merge["inv_cost"]) * 100
@@ -1244,9 +938,9 @@ def marketing():
 
     form3 = StoreForm()
     if form3.submit3.data and form3.validate():
-
         session["token"] = fiscal_dates["start_day"]
-        store_id = form3.store.data.id
+        data = form3.store.data
+        session["store_list"] = tuple([x.id for x in data])
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
     # Gift Card Sales
@@ -1301,9 +995,7 @@ def marketing():
     print(period_order)
 
     print(fiscal_dates["last_threesixtyfive"])
-    giftcard_sales = get_giftcard_sales(
-        fiscal_dates["last_threesixtyfive"], fiscal_dates["start_day"], Calendar.period
-    )
+    giftcard_sales = get_giftcard_sales(fiscal_dates["last_threesixtyfive"], fiscal_dates["start_day"], Calendar.period)
     print(giftcard_sales)
     giftcard_payments = get_giftcard_payments(
         fiscal_dates["last_threesixtyfive"], fiscal_dates["start_day"], Calendar.period
@@ -1332,9 +1024,7 @@ def marketing():
             )
             .group_by(Menuitems.name)
         ).all()
-        sales = pd.DataFrame.from_records(
-            query, columns=["store", "amount", "quantity"]
-        )
+        sales = pd.DataFrame.from_records(query, columns=["store", "amount", "quantity"])
         sales.sort_values(by=["amount"], ascending=False, inplace=True)
         sales.loc["TOTALS"] = sales.sum(numeric_only=True)
         return sales
@@ -1362,24 +1052,16 @@ def marketing():
             .group_by(Payments.restaurant_id)
         ).all()
 
-        payments = pd.DataFrame.from_records(
-            query, columns=["restaurant_id", "payment"]
-        )
+        payments = pd.DataFrame.from_records(query, columns=["restaurant_id", "payment"])
         payments.sort_values(by=["payment"], ascending=False, inplace=True)
         payments = df_loc.merge(payments, on="restaurant_id")
 
         payments.loc["TOTALS"] = payments.sum(numeric_only=True)
         return payments
 
-    gift_card_sales = get_giftcard_sales_per_store(
-        fiscal_dates["start_year"], fiscal_dates["end_year"]
-    )
-    gift_card_payments = get_giftcard_payments_per_store(
-        fiscal_dates["start_year"], fiscal_dates["end_year"]
-    )
-    gift_card_sales = gift_card_sales.merge(
-        gift_card_payments, left_on="store", right_on="name"
-    )
+    gift_card_sales = get_giftcard_sales_per_store(fiscal_dates["start_year"], fiscal_dates["end_year"])
+    gift_card_payments = get_giftcard_payments_per_store(fiscal_dates["start_year"], fiscal_dates["end_year"])
+    gift_card_sales = gift_card_sales.merge(gift_card_payments, left_on="store", right_on="name")
     gift_card_sales["diff"] = gift_card_sales["amount"] - gift_card_sales["payment"]
     gift_card_sales.sort_values(by=["diff"], ascending=False, inplace=True)
 
@@ -1438,9 +1120,9 @@ def support():
         return redirect(url_for("home_blueprint.support"))
 
     if form3.submit3.data and form3.validate():
-
         session["token"] = fiscal_dates["start_day"]
-        store_id = form3.store.data.id
+        data = form3.store.data
+        session["store_list"] = tuple([x.id for x in data])
 
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
@@ -1468,9 +1150,7 @@ def support():
         )
         .group_by(Menuitems.name, Menuitems.menuitem, Menuitems.category)
     ).all()
-    unassigned_sales = pd.DataFrame.from_records(
-        query, columns=["store", "menuitem", "category", "amount", "quantity"]
-    )
+    unassigned_sales = pd.DataFrame.from_records(query, columns=["store", "menuitem", "category", "amount", "quantity"])
     unassigned_sales.sort_values(by=["amount"], ascending=False, inplace=True)
 
     query = (
@@ -1519,15 +1199,14 @@ def alcohol():
 
     if form3.submit3.data and form3.validate():
         session["token"] = fiscal_dates["start_day"]
-        store_id = form3.store.data.id
+        data = form3.store.data
+        session["store_list"] = tuple([x.id for x in data])
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
     steakhouse = [4, 9, 11, 17, 16]
     casual = [1, 3, 7, 8, 11, 12, 14, 21, 85]
 
-    calendar = Calendar.query.with_entities(
-        Calendar.date, Calendar.week, Calendar.period, Calendar.year
-    ).all()
+    calendar = Calendar.query.with_entities(Calendar.date, Calendar.week, Calendar.period, Calendar.year).all()
     cal_df = pd.DataFrame(calendar, columns=["date", "week", "period", "year"])
 
     def get_vendors(cat, time, concept):
@@ -1579,9 +1258,7 @@ def alcohol():
         return df
 
     wine_vendors = get_vendors("Wine", fiscal_dates["start_year"], steakhouse)
-    steakhouse_wine = get_purchases(
-        "Wine", fiscal_dates["start_year"], fiscal_dates["end_year"], steakhouse
-    )
+    steakhouse_wine = get_purchases("Wine", fiscal_dates["start_year"], fiscal_dates["end_year"], steakhouse)
     steakhouse_wine_values = steakhouse_wine.merge(cal_df, on="date", how="left")
     steakhouse_wine_values = steakhouse_wine_values.groupby(["period"]).sum()
     steakhouse_wine_chart = steakhouse_wine_values["cost"].tolist()
@@ -1592,9 +1269,7 @@ def alcohol():
     # steakhouse_wine_bottle.sort_values(by=["cost"], ascending=False, inplace=True)
 
     liquor_vendors = get_vendors("Liquor", fiscal_dates["start_year"], steakhouse)
-    steakhouse_liquor = get_purchases(
-        "Liquor", fiscal_dates["start_year"], fiscal_dates["end_year"], steakhouse
-    )
+    steakhouse_liquor = get_purchases("Liquor", fiscal_dates["start_year"], fiscal_dates["end_year"], steakhouse)
     steakhouse_liquor_values = steakhouse_liquor.merge(cal_df, on="date", how="left")
     steakhouse_liquor_values = steakhouse_liquor_values.groupby(["period"]).sum()
     steakhouse_liquor_chart = steakhouse_liquor_values["cost"].tolist()
@@ -1605,9 +1280,7 @@ def alcohol():
     steakhouse_liquor_bottle = steakhouse_liquor_bottle.head(10)
 
     beer_vendors = get_vendors("Beer", fiscal_dates["start_year"], steakhouse)
-    steakhouse_beer = get_purchases(
-        "Beer", fiscal_dates["start_year"], fiscal_dates["end_year"], steakhouse
-    )
+    steakhouse_beer = get_purchases("Beer", fiscal_dates["start_year"], fiscal_dates["end_year"], steakhouse)
     steakhouse_beer_values = steakhouse_beer.merge(cal_df, on="date", how="left")
     steakhouse_beer_values = steakhouse_beer_values.groupby(["period"]).sum()
     steakhouse_beer_chart = steakhouse_beer_values["cost"].tolist()
@@ -1618,9 +1291,7 @@ def alcohol():
     steakhouse_beer_bottle = steakhouse_beer_bottle.head(10)
 
     wine_vendors = get_vendors("Wine", fiscal_dates["start_year"], casual)
-    casual_wine = get_purchases(
-        "Wine", fiscal_dates["start_year"], fiscal_dates["end_year"], casual
-    )
+    casual_wine = get_purchases("Wine", fiscal_dates["start_year"], fiscal_dates["end_year"], casual)
     casual_wine_values = casual_wine.merge(cal_df, on="date", how="left")
     casual_wine_values = casual_wine_values.groupby(["period"]).sum()
     casual_wine_chart = casual_wine_values["cost"].tolist()
@@ -1631,9 +1302,7 @@ def alcohol():
     # casual_wine_bottle.sort_values(by=["cost"], ascending=False, inplace=True)
 
     liquor_vendors = get_vendors("Liquor", fiscal_dates["start_year"], casual)
-    casual_liquor = get_purchases(
-        "Liquor", fiscal_dates["start_year"], fiscal_dates["end_year"], casual
-    )
+    casual_liquor = get_purchases("Liquor", fiscal_dates["start_year"], fiscal_dates["end_year"], casual)
     casual_liquor_values = casual_liquor.merge(cal_df, on="date", how="left")
     casual_liquor_values = casual_liquor_values.groupby(["period"]).sum()
     casual_liquor_chart = casual_liquor_values["cost"].tolist()
@@ -1644,9 +1313,7 @@ def alcohol():
     casual_liquor_bottle = casual_liquor_bottle.head(10)
 
     beer_vendors = get_vendors("Beer", fiscal_dates["start_year"], casual)
-    casual_beer = get_purchases(
-        "Beer", fiscal_dates["start_year"], fiscal_dates["end_year"], casual
-    )
+    casual_beer = get_purchases("Beer", fiscal_dates["start_year"], fiscal_dates["end_year"], casual)
     casual_beer_values = casual_beer.merge(cal_df, on="date", how="left")
     casual_beer_values = casual_beer_values.groupby(["period"]).sum()
     casual_beer_chart = casual_beer_values["cost"].tolist()
@@ -1710,8 +1377,9 @@ def profile():
 
     if form3.submit3.data and form3.validate():
         session["token"] = fiscal_dates["start_day"]
-        store_id = form3.store.data.id
-        return redirect(url_for("home_blueprint.store", store_id=store_id))
+        data = form3.store.data
+        session["store_list"] = tuple([x.id for x in data])
+        return redirect(url_for("home_blueprint.profile"))
 
     return render_template(
         "home/profile.html",
@@ -1728,6 +1396,7 @@ def profile():
 @login_required
 def potato(store_id):
 
+    # TODO need to fix store ID
     TODAY = datetime.date(datetime.now())
     CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
     YSTDAY = TODAY - timedelta(days=1)
@@ -1752,12 +1421,10 @@ def potato(store_id):
         pot_df = pot_df.merge(df, on="time", how="outer")
 
     pot_df.fillna(0, inplace=True)
-    pot_df.loc[:, "AVG"] = pot_df.mean(axis=1)
-    pot_df.loc[:, "MEDIAN"] = pot_df.median(axis=1)
-    pot_df.loc[:, "MAX"] = pot_df.max(axis=1)
-    out_times = pd.read_csv(
-        "/usr/local/share/potatochart.csv", usecols=["time", "in_time", "out_time"]
-    )
+    pot_df.loc[:, "AVG"] = pot_df.mean(numeric_only=True, axis=1)
+    pot_df.loc[:, "MEDIAN"] = pot_df.median(numeric_only=True, axis=1)
+    pot_df.loc[:, "MAX"] = pot_df.max(numeric_only=True, axis=1)
+    out_times = pd.read_csv("/usr/local/share/potatochart.csv", usecols=["time", "in_time", "out_time"])
     rotation = pot_df.merge(out_times, on="time", how="left")
     rotation.loc["TOTALS"] = rotation.sum()
 
@@ -1823,9 +1490,7 @@ def potato(store_id):
 
     pdf.ln(5)
     pdf.set_font("Times", "", 10.0)
-    pdf.cell(
-        page_width, 0.0, "* Calculated from previous 4 weeks same day sales", align="L"
-    )
+    pdf.cell(page_width, 0.0, "* Calculated from previous 4 weeks same day sales", align="L")
     pdf.ln(5)
     pdf.cell(page_width, 0.0, "- end of report -", align="C")
 

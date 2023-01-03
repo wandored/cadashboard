@@ -193,7 +193,7 @@ if __name__ == "__main__":
     rest_query = 'select * from "Restaurants"'
 
     TODAY = date.today()
-    for d in range(359, 365, 1):
+    for d in range(1, 7, 1):
         dt = TODAY - timedelta(days=d)
         print(f"date {dt}")
         tmrw = dt + timedelta(days=1)

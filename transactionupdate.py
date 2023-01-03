@@ -3,6 +3,7 @@ transactionupdate imports the previous days data and
 uploads it to the local database.  This is run
 from a cron job
 """
+import sys
 import json
 from sqlalchemy.engine.create import create_engine
 from datetime import datetime, timedelta
@@ -49,7 +50,7 @@ def get_glaccount():
     url = "{}/GlAccount?{}".format(Config.SRVC_ROOT, query)
     rqst = make_HTTP_request(url)
     df = make_dataframe(rqst)
-    df.rename(columns={"name": "account"}, inplace=True)
+    df = df.rename(columns={"name": "account"})
 
     return df
 
@@ -59,9 +60,7 @@ def transaction(id_list):
     rqst_list = []
     for i in id_list:
         url_filter = "$filter=transactionId eq {}".format(i)
-        query = "$select=date,name,type,locationId,transactionId,companyId&{}".format(
-            url_filter
-        )
+        query = "$select=date,name,type,locationId,transactionId,companyId&{}".format(url_filter)
         url = "{}/Transaction?{}".format(Config.SRVC_ROOT, query)
         rqst = make_HTTP_request(url)
         try:
@@ -70,29 +69,27 @@ def transaction(id_list):
             pass
 
     df = make_dataframe(rqst_list)
-    # df.dropna(axis=0, how="any", subset=["companyId"], inplace=True)
     if df.empty:
         return
 
-    df["date"] = df["date"].dt.strftime(
-        "%Y-%m-%d"
-    )  # convert datetime to string and format
+    df["date"] = df["date"].dt.strftime("%Y-%m-%d")  # convert datetime to string and format
     cur.execute(rest_query)
     data = cur.fetchall()
     df_loc = pd.DataFrame.from_records(data, columns=["id", "location", "name"])
     df_merge = df_loc.merge(df, left_on="location", right_on="locationId")
-    df_merge.rename(columns={"name_x": "name", "name_y": "item"}, inplace=True)
-    df_merge.drop(columns=["location", "locationId"], inplace=True)
+    df_merge = df_merge.rename(columns={"name_x": "name", "name_y": "item"})
+    df_merge = df_merge.drop(columns=["location", "locationId"])
 
     query = "$select=companyId,name"
     url = "{}/Company?{}".format(Config.SRVC_ROOT, query)
     rqst = make_HTTP_request(url)
     df = make_dataframe(rqst)
-    df.rename(columns={"name": "company"}, inplace=True)
+    df = df.rename(columns={"name": "company"})
     # merge will fail if all transactions are journal entries
-    df_return = df_merge.merge(df, on="companyId", how="left")
-
-    return df_return
+    try:
+        return df_merge.merge(df, on="companyId", how="left")
+    except KeyError:
+        sys.exit(1)
 
 
 def Items():
@@ -103,7 +100,7 @@ def Items():
     df = make_dataframe(rqst)
     if df.empty:
         return
-    df.rename(columns={"name": "item"}, inplace=True)
+    df = df.rename(columns={"name": "item"})
 
     return df
 
@@ -127,7 +124,7 @@ def transactionDetails(start, end):
     df_loc = pd.DataFrame.from_records(data, columns=["id", "location", "name"])
     df_merge = df_loc.merge(df, left_on="location", right_on="locationId")
     df_merge[["modified", "m"]] = df_merge["modifiedOn"].str.split("T", expand=True)
-    df_merge.drop(columns=["location", "locationId", "m", "modifiedOn"], inplace=True)
+    df_merge = df_merge.drop(columns=["location", "locationId", "m", "modifiedOn"])
 
     return df_merge
 
@@ -138,17 +135,16 @@ def write_to_database(df1, df2, df3):
     df = df3.merge(gl, on="glAccountId")
     df = df.merge(df2, how="left", on=["itemId"])
     df = df.merge(df1, on=["transactionId", "id", "name"])
-    df.rename(
+    df = df.rename(
         columns={
             "id": "store_id",
             "item_x": "item",
             "unitOfMeasureName": "UofM",
             "transactionId": "trans_id",
             "companyId": "companyid",
-        },
-        inplace=True,
+        }
     )
-    df.drop(columns=["itemId", "item_y"], inplace=True)
+    df = df.drop(columns=["itemId", "item_y"])
     df = df[
         [
             "date",
@@ -190,7 +186,6 @@ def write_to_database(df1, df2, df3):
 def main():
 
     TODAY = datetime.date(datetime.now())
-    YSTDAY = TODAY - timedelta(days=1)
     TOMROW = TODAY + timedelta(days=1)
     start_date = TODAY.strftime("%Y-%m-%d")
     end_date = TOMROW.strftime("%Y-%m-%d")
@@ -212,6 +207,7 @@ def main():
         print(f"{start_date} completed")
 
     conn.close()
+
 
 if __name__ == "__main__":
     engine = create_engine(Config.SQLALCHEMY_DATABASE_URI)

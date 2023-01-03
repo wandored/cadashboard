@@ -3,7 +3,11 @@ dashapp/*.db
 /output
 /scripts
 datarecovery.py
+config.json
 
+# Docker
+Dockerfile
+docker-compose.yml
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
