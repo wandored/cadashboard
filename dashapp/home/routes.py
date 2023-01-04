@@ -45,7 +45,6 @@ def index():
                 .all()
             ]
         )
-        print(session["store_list"])
         return redirect(url_for("home_blueprint.index"))
 
     fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
@@ -972,7 +971,6 @@ def marketing():
         for p in period_order:
             for v in chart:
                 if v.period == p:
-                    print(v)
                     value.append(int(v.sales))
 
         return value
@@ -993,7 +991,6 @@ def marketing():
         for p in period_order:
             for v in chart:
                 if v.period == p:
-                    print(v)
                     value.append(int(v.sales))
 
         return value
@@ -1003,22 +1000,17 @@ def marketing():
     slice1 = period_list[fiscal_dates["period"] :]
     slice2 = period_list[: fiscal_dates["period"]]
     period_order = slice1 + slice2
-    print(period_order)
 
-    print(fiscal_dates["last_threesixtyfive"])
     giftcard_sales = get_giftcard_sales(fiscal_dates["last_threesixtyfive"], fiscal_dates["start_day"], Calendar.period)
-    print(giftcard_sales)
     giftcard_payments = get_giftcard_payments(
         fiscal_dates["last_threesixtyfive"], fiscal_dates["start_day"], Calendar.period
     )
-    print(giftcard_payments)
 
     # TODO set to trailing year beginning in 2023
     giftcard_diff = []
     dif = 0
     for ii in range(len(giftcard_sales)):
         dif = (giftcard_sales[ii] - giftcard_payments[ii]) + dif
-        print(dif)
         giftcard_diff.append(dif)
     giftcard_payments[:] = [-abs(x) for x in giftcard_payments]
 
@@ -1411,9 +1403,6 @@ def potato(store_id):
     TODAY = datetime.date(datetime.now())
     CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
     YSTDAY = TODAY - timedelta(days=1)
-
-    print(TODAY)
-    print(session["token"])
 
     store = Restaurants.query.filter_by(id=store_id).first()
 
