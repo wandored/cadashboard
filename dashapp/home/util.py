@@ -13,14 +13,42 @@ from sqlalchemy import or_, func
 
 
 # TODO weekly and period sales records
-def sales_record(store):
-    query = (
-        db.session.query(func.sum(Sales.sales).label("top_sales"))
-        .filter(Sales.name == store)
-        .group_by(Sales.date)
-        .order_by(func.sum(Sales.sales).desc())
-        .first()
-    )
+def sales_record(store, time_frame):
+    if time_frame == "daily":
+        query = (
+            db.session.query(func.sum(Sales.sales).label("top_sales"))
+            .filter(Sales.name == store)
+            .group_by(Sales.date)
+            .order_by(func.sum(Sales.sales).desc())
+            .first()
+        )
+    elif time_frame == "weekly":
+        query = (
+            db.session.query(func.sum(Sales.sales).label("top_sales"))
+            .filter(Sales.name == store)
+            .join(Calendar, Calendar.date == Sales.date)
+            .group_by(Calendar.week, Calendar.period, Calendar.year)
+            .order_by(func.sum(Sales.sales).desc())
+            .first()
+        )
+    elif time_frame == "period":
+        query = (
+            db.session.query(func.sum(Sales.sales).label("top_sales"))
+            .filter(Sales.name == store)
+            .join(Calendar, Calendar.date == Sales.date)
+            .group_by(Calendar.period, Calendar.year)
+            .order_by(func.sum(Sales.sales).desc())
+            .first()
+        )
+    elif time_frame == "year":
+        query = (
+            db.session.query(func.sum(Sales.sales).label("top_sales"))
+            .filter(Sales.name == store)
+            .join(Calendar, Calendar.date == Sales.date)
+            .group_by(Calendar.year)
+            .order_by(func.sum(Sales.sales).desc())
+            .first()
+        )
     if query:
         return query["top_sales"]
 
@@ -51,7 +79,6 @@ def refresh_data(start, end):
     Menuitems.query.filter_by(date=start).delete()
     Potatoes.query.filter_by(date=start).delete()
     db.session.commit()
-    print(start)
 
     # refres the sales data and check to make sure there are sales for that day
     baddates = sales_employee(start, end)
@@ -101,7 +128,6 @@ def get_lastyear(date):
         ly_target = Calendar.query.filter_by(year=lst_year, period=period, week=week, day=day)
         for x in ly_target:
             dt_date = x.date
-            print(f'{date} - {x.date}')
     return dt_date
 
 
@@ -149,7 +175,6 @@ def labor_detail(start):
     url_filter = "$filter=dateWorked eq {}T00:00:00Z".format(start)
     query = "$select=jobTitle,hours,total,location_ID&{}".format(url_filter)
     url = "{}/LaborDetail?{}".format(Config.SRVC_ROOT, query)
-    print(url)
     rqst = make_HTTP_request(url)
     df = make_dataframe(rqst)
     if df.empty:
@@ -197,8 +222,9 @@ def sales_detail(start, end):
     df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.strip()
     dafilter = df_menu["menuitem"].str.contains("VOID")
     df_clean = df_menu[~dafilter]
-    df_clean[["x", "menuitem"]] = df_clean["menuitem"].str.split(" - ", expand=True)
-    df_clean = df_clean.drop(columns=["category_x", "x"])
+    df_temp = df_clean.copy()
+    df_temp[["x", "menuitem"]] = df_clean["menuitem"].str.split(" - ", expand=True)
+    df_clean = df_temp.drop(columns=["category_x", "x"])
     df_clean = df_clean.rename(columns={"category_y": "category"})
     #    menuitems = removeSpecial(df_clean)  ### fix the file location before making this active
     # Write the daily menu items to Menuitems table
@@ -367,7 +393,8 @@ def potato_sales(start):
             df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.strip()
             dafilter = df_menu["menuitem"].str.contains("VOID")
             df_clean = df_menu[~dafilter]
-            df_clean[["x", "menuitem"]] = df_clean["menuitem"].str.split(" - ", expand=True)
+            df_temp = df_clean.copy()
+            df_temp[["x", "menuitem"]] = df_clean["menuitem"].str.split(" - ", expand=True)
             pot_list = [
                 "BAKED POTATO",
                 "BAKED POTATO N/C",
@@ -380,14 +407,20 @@ def potato_sales(start):
                 "S-BAKED POTATO",
                 "SUB BAKED POTATO IN KIDS",
                 "SUB KID POT",
+                "Baked Potato",
+                "Baked Potato (After 4:00 PM)",
+                "Kid Baked Potato",
+                "Kid Baked Potato (After 4:00 PM)",
+                "Loaded Baked Potato",
             ]
-            df = df_clean[df_clean["menuitem"].isin(pot_list)]
+            df = df_temp[df_temp["menuitem"].isin(pot_list)]
             if df.empty:
                 continue
             df.loc[:, "time"] = i[0]
             df.loc[:, "in_time"] = i[1]
             df.loc[:, "out_time"] = i[4]
-            df_pot = df_pot.append(df)
+            df_pot = pd.concat([df_pot, df], ignore_index=True)
+            # df_pot = df_pot.append(df)
 
         # Write the daily menu items to Menuitems table
         menu_pivot = df_pot.pivot_table(

@@ -262,6 +262,7 @@ def potato_sales(start):
                 "Baked Potato (After 4:00 PM)",
                 "Kid Baked Potato",
                 "Kid Baked Potato (After 4:00 PM)",
+                "Loaded Baked Potato",
             ]
             df = df_clean[df_clean["menuitem"].isin(pot_list)]
             if df.empty:
