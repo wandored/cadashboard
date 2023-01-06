@@ -55,7 +55,6 @@ def purchasing():
         fiscal_dates["start_day"],
         session["store_list"],
     )
-    print(top_ten)
 
     category_costs = get_category_costs(
         food_list,
@@ -63,10 +62,8 @@ def purchasing():
         fiscal_dates["start_day"],
         session["store_list"],
     )
-    print(category_costs)
     category_items = category_costs["Account"].tolist()
     category_values = category_costs["Totals"].tolist()
-    print(category_values)
 
     category_costs.replace("Fish", "Seafood", inplace=True)
     category_costs.set_index("Account", inplace=True)

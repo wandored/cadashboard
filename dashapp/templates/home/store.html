@@ -162,66 +162,6 @@
         </div>
       </div>
     </div>
-    <!-- Supplies Costs -->
-    <div class="row mb-4">
-      <div class="col-lg-4 mt-4 mb-3">
-        <div class="card z-index-2 ">
-          <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-            <div class="bg-gradient-primary shadow-primary border-radius-lg py-3 pe-1">
-              <div class="chart">
-                <canvas id="chart-supplies" class="chart-canvas" height="170"></canvas>
-              </div>
-            </div>
-          </div>
-          <div class="card-body">
-              <h6 class="mb-0 ">Total Supply Costs Period {{ fiscal_dates["period"] }}</h6>
-            {% if current_supply_budget > current_supply_cost %}
-            <p class="text-sm "><i class="fa fa-thumbs-up text-success" aria-hidden="true"></i> {{ "{:,.0f}".format(current_supply_budget - current_supply_cost) }} remaining budget</p>
-            {% else %}
-            <p class="text-sm "><i class="fa fa-thumbs-down text-danger" aria-hidden="true"></i> {{ "{:,.0f}".format(current_supply_cost - current_supply_budget) }} over budget</p>
-            {% endif %}
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-4 mt-4 mb-3">
-        <div class="card z-index-2 ">
-          <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-            <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
-              <div class="chart">
-                <canvas id="chart-smallwares" class="chart-canvas" height="170"></canvas>
-              </div>
-            </div>
-          </div>
-          <div class="card-body">
-              <h6 class="mb-0 ">Total Smallware Costs Period {{ fiscal_dates["period"] }}</h6>
-            {% if current_smallware_budget > current_smallware_cost %}
-            <p class="text-sm "><i class="fa fa-thumbs-up text-success" aria-hidden="true"></i> {{ "{:,.0f}".format(current_smallware_budget - current_smallware_cost) }} remaining budget</p>
-            {% else %}
-            <p class="text-sm "><i class="fa fa-thumbs-down text-danger" aria-hidden="true"></i> {{ "{:,.0f}".format(current_smallware_cost - current_smallware_budget) }} over budget</p>
-            {% endif %}
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-4 mt-4 mb-3">
-        <div class="card z-index-2 ">
-          <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-            <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
-              <div class="chart">
-                <canvas id="chart-linen" class="chart-canvas" height="170"></canvas>
-              </div>
-            </div>
-          </div>
-          <div class="card-body">
-            <h6 class="mb-0 ">Total Linen Costs Period {{ fiscal_dates["period"] }}</h6>
-            {% if period_linen_cost_ly > period_linen_cost %}
-            <p class="text-sm "><i class="fa fa-thumbs-up text-success" aria-hidden="true"></i> {{ "{:,.0f}".format(period_linen_cost_ly - period_linen_cost) }} less then last year</p>
-            {% else %}
-            <p class="text-sm "><i class="fa fa-thumbs-down text-danger" aria-hidden="true"></i> {{ "{:,.0f}".format(period_linen_cost_ly - period_linen_cost) }} over last year</p>
-            {% endif %}
-          </div>
-        </div>
-      </div>
-    </div>
     <div class="row mb-4">
         <div class="col-lg-4 col-md-6">
           <div class="card">

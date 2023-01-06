@@ -45,7 +45,6 @@ def index():
                 .all()
             ]
         )
-        print(session["store_list"])
         return redirect(url_for("home_blueprint.index"))
 
     fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
@@ -135,7 +134,7 @@ def index():
     for v in budget_chart:
         budgets3.append(v.total_sales)
 
-    def build_sales_table(start, end, start_ly, end_ly):
+    def build_sales_table(start, end, start_ly, end_ly, time_frame):
 
         sales = (
             db.session.query(
@@ -162,7 +161,7 @@ def index():
         store_list = store_df["name"]
         top_sales_list = []
         for sl in store_list:
-            query = sales_record(sl)
+            query = sales_record(sl, time_frame)
             if query != None:
                 row = [sl, query]
                 top_sales_list.append(row)
@@ -219,7 +218,11 @@ def index():
         return totals, table, top
 
     daily_totals, daily_table, daily_top = build_sales_table(
-        fiscal_dates["start_day"], fiscal_dates["start_day"], fiscal_dates["start_day_ly"], fiscal_dates["start_day_ly"]
+        fiscal_dates["start_day"],
+        fiscal_dates["start_day"],
+        fiscal_dates["start_day_ly"],
+        fiscal_dates["start_day_ly"],
+        "daily",
     )
 
     weekly_totals, weekly_table, weekly_top = build_sales_table(
@@ -227,6 +230,7 @@ def index():
         fiscal_dates["week_to_date"],
         fiscal_dates["start_week_ly"],
         fiscal_dates["week_to_date_ly"],
+        "weekly",
     )
 
     period_totals, period_table, period_top = build_sales_table(
@@ -234,6 +238,7 @@ def index():
         fiscal_dates["period_to_date"],
         fiscal_dates["start_period_ly"],
         fiscal_dates["period_to_date_ly"],
+        "period",
     )
 
     yearly_totals, yearly_table, yearly_top = build_sales_table(
@@ -241,6 +246,7 @@ def index():
         fiscal_dates["year_to_date"],
         fiscal_dates["start_year_ly"],
         fiscal_dates["year_to_date_ly"],
+        "year",
     )
 
     return render_template(
@@ -297,7 +303,11 @@ def store(store_id):
 
     if form3.submit3.data and form3.validate():
         session["token"] = fiscal_dates["start_day"]
-        data = form3.store.data
+        data = form3.stores.data
+        for x in data:
+            # select only 1 store for store page
+            store_id = x.id
+            break
         session["store_list"] = tuple([x.id for x in data])
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
@@ -846,9 +856,9 @@ def store(store_id):
     )
 
     current_supply_cost = supply_cost_dol[fiscal_dates["period"] - 1]
-    current_supply_budget = supply_budget[fiscal_dates["period"] - 1]
+    # current_supply_budget = supply_budget[fiscal_dates["period"] - 1]
     current_smallware_cost = smallware_cost_dol[fiscal_dates["period"] - 1]
-    current_smallware_budget = smallware_budget[fiscal_dates["period"] - 1]
+    # current_smallware_budget = smallware_budget[fiscal_dates["period"] - 1]
     period_linen_cost = linen_cost_dol[fiscal_dates["period"] - 1]
     period_linen_cost_ly = linen_cost_dol_ly[fiscal_dates["period"] - 1]
 
@@ -865,58 +875,58 @@ def store(store_id):
         "home/store.html",
         title=store.name,
         company_name=Config.COMPANY_NAME,
-        store_id=store.id,
         segment="store.name",
-        concept=concept,
-        form1=form1,
-        form3=form3,
-        form4=form4,
-        current_user=current_user,
         roles=current_user.roles,
-        fiscal_dates=fiscal_dates,
-        sales_day=sales_day,
-        sales_day_ly=sales_day_ly,
-        sales_week=sales_week,
-        sales_week_ly=sales_week_ly,
-        sales_period=sales_period,
-        sales_period_ly=sales_period_ly,
-        sales_year=sales_year,
-        sales_year_ly=sales_year_ly,
-        daily_sales_list=daily_sales_list,
-        daily_sales_list_ly=daily_sales_list_ly,
-        weekly_sales_list=weekly_sales_list,
-        weekly_sales_list_ly=weekly_sales_list_ly,
-        period_sales_list=period_sales_list,
-        period_sales_list_ly=period_sales_list_ly,
-        budgets3=budgets3,
-        supply_cost_dol=supply_cost_dol,
-        supply_cost_dol_ly=supply_cost_dol_ly,
-        supply_budget=supply_budget,
-        smallware_cost_dol=smallware_cost_dol,
-        smallware_cost_dol_ly=smallware_cost_dol_ly,
-        smallware_budget=smallware_budget,
-        current_supply_cost=current_supply_cost,
-        current_supply_budget=current_supply_budget,
-        current_smallware_cost=current_smallware_cost,
-        current_smallware_budget=current_smallware_budget,
-        linen_cost_dol=linen_cost_dol,
-        linen_cost_dol_ly=linen_cost_dol_ly,
-        period_linen_cost=period_linen_cost,
-        period_linen_cost_ly=period_linen_cost_ly,
-        # weekly_totals=weekly_totals,
-        # period_totals=period_totals,
-        lobster_items=lobster_items,
-        live_lobster_avg_cost=live_lobster_avg_cost,
-        stone_items=stone_items,
-        stone_claw_avg_cost=stone_claw_avg_cost,
-        sea_bass=sea_bass,
-        salmon=salmon,
-        feature=feature,
-        steak_order=steak_order,
-        # chicken_order=chicken_order,
-        price_increase=price_increase,
-        price_decrease=price_decrease,
-        do_not_use=do_not_use,
+        **locals(),
+        # concept=concept,
+        # form1=form1,
+        # form3=form3,
+        # form4=form4,
+        # current_user=current_user,
+        # fiscal_dates=fiscal_dates,
+        # sales_day=sales_day,
+        # sales_day_ly=sales_day_ly,
+        # sales_week=sales_week,
+        # sales_week_ly=sales_week_ly,
+        # sales_period=sales_period,
+        # sales_period_ly=sales_period_ly,
+        # sales_year=sales_year,
+        # sales_year_ly=sales_year_ly,
+        # daily_sales_list=daily_sales_list,
+        # daily_sales_list_ly=daily_sales_list_ly,
+        # weekly_sales_list=weekly_sales_list,
+        # weekly_sales_list_ly=weekly_sales_list_ly,
+        # period_sales_list=period_sales_list,
+        # period_sales_list_ly=period_sales_list_ly,
+        # budgets3=budgets3,
+        # supply_cost_dol=supply_cost_dol,
+        # supply_cost_dol_ly=supply_cost_dol_ly,
+        # supply_budget=supply_budget,
+        # smallware_cost_dol=smallware_cost_dol,
+        # smallware_cost_dol_ly=smallware_cost_dol_ly,
+        # smallware_budget=smallware_budget,
+        # current_supply_cost=current_supply_cost,
+        # current_supply_budget=current_supply_budget,
+        # current_smallware_cost=current_smallware_cost,
+        # current_smallware_budget=current_smallware_budget,
+        # linen_cost_dol=linen_cost_dol,
+        # linen_cost_dol_ly=linen_cost_dol_ly,
+        # period_linen_cost=period_linen_cost,
+        # period_linen_cost_ly=period_linen_cost_ly,
+        ## weekly_totals=weekly_totals,
+        ## period_totals=period_totals,
+        # lobster_items=lobster_items,
+        # live_lobster_avg_cost=live_lobster_avg_cost,
+        # stone_items=stone_items,
+        # stone_claw_avg_cost=stone_claw_avg_cost,
+        # sea_bass=sea_bass,
+        # salmon=salmon,
+        # feature=feature,
+        # steak_order=steak_order,
+        ## chicken_order=chicken_order,
+        # price_increase=price_increase,
+        # price_decrease=price_decrease,
+        # do_not_use=do_not_use,
     )
 
 
@@ -961,7 +971,6 @@ def marketing():
         for p in period_order:
             for v in chart:
                 if v.period == p:
-                    print(v)
                     value.append(int(v.sales))
 
         return value
@@ -982,7 +991,6 @@ def marketing():
         for p in period_order:
             for v in chart:
                 if v.period == p:
-                    print(v)
                     value.append(int(v.sales))
 
         return value
@@ -992,22 +1000,17 @@ def marketing():
     slice1 = period_list[fiscal_dates["period"] :]
     slice2 = period_list[: fiscal_dates["period"]]
     period_order = slice1 + slice2
-    print(period_order)
 
-    print(fiscal_dates["last_threesixtyfive"])
     giftcard_sales = get_giftcard_sales(fiscal_dates["last_threesixtyfive"], fiscal_dates["start_day"], Calendar.period)
-    print(giftcard_sales)
     giftcard_payments = get_giftcard_payments(
         fiscal_dates["last_threesixtyfive"], fiscal_dates["start_day"], Calendar.period
     )
-    print(giftcard_payments)
 
     # TODO set to trailing year beginning in 2023
     giftcard_diff = []
     dif = 0
     for ii in range(len(giftcard_sales)):
         dif = (giftcard_sales[ii] - giftcard_payments[ii]) + dif
-        print(dif)
         giftcard_diff.append(dif)
     giftcard_payments[:] = [-abs(x) for x in giftcard_payments]
 
@@ -1400,9 +1403,6 @@ def potato(store_id):
     TODAY = datetime.date(datetime.now())
     CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
     YSTDAY = TODAY - timedelta(days=1)
-
-    print(TODAY)
-    print(session["token"])
 
     store = Restaurants.query.filter_by(id=store_id).first()
 
