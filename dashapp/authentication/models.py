@@ -216,18 +216,6 @@ class Labor(db.Model):
     dollars = db.Column(db.Float)
 
 
-# this is deprecated
-# class Categories(db.Model):
-#
-#    __tablename__ = "Categories"
-#
-#    id = db.Column(db.Integer, primary_key=True)
-#    date = db.Column(db.String(64))
-#    category = db.Column(db.String(64))
-#    name = db.Column(db.String(64))
-#    amount = db.Column(db.Integer)
-
-
 class Menuitems(db.Model):
 
     __tablename__ = "Menuitems"

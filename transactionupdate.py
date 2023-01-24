@@ -5,6 +5,7 @@ from a cron job
 """
 import sys
 import json
+import argparse
 from sqlalchemy.engine.create import create_engine
 from datetime import datetime, timedelta
 import requests
@@ -185,9 +186,21 @@ def write_to_database(df1, df2, df3):
 
 def main():
 
-    TODAY = datetime.date(datetime.now())
-    TOMROW = TODAY + timedelta(days=1)
-    start_date = TODAY.strftime("%Y-%m-%d")
+    # creat and argument parser object
+    parser = argparse.ArgumentParser()
+    
+    # check for user provide argument
+    parser.add_argument("-d", "--date", help="Date to run the script")
+    args = parser.parse_args()
+
+    # if user provide argument use it else use today's date
+    if args.date:
+        DATE = datetime.strptime(args.date, "%Y-%m-%d")
+    else:
+        DATE = datetime.date(datetime.now())
+
+    TOMROW = DATE + timedelta(days=1)
+    start_date = DATE.strftime("%Y-%m-%d")
     end_date = TOMROW.strftime("%Y-%m-%d")
     print(f"date {start_date}")
 
