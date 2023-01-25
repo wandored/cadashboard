@@ -60,6 +60,7 @@ def index():
     # Get Data
     form1 = DateForm()
     form3 = StoreForm()
+    form4 = PotatoForm()
     if form1.submit1.data and form1.validate():
         """
         Change token
