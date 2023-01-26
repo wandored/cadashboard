@@ -375,7 +375,7 @@
                             <p class="mb-0 ms-1 text-end">{{ "${:,.2f}".format(live_lobster_avg_cost*v.factor) }}</p>
                           </td>
                           <td>
-                            <p class="mb-0 ms-1 text-end">${{ (((live_lobster_avg_cost*v.factor)/0.4) | round) - 0.05 }}</p>
+                            <p class="mb-0 ms-1 text-end">${{ (((live_lobster_avg_cost*v.factor)/0.4) | round) }}</p>
                           </td>
                       </tr>
                     {% endfor %}
@@ -410,7 +410,7 @@
                             <p class="mb-0 ms-1 text-end">{{ "${:,.2f}".format(stone_claw_avg_cost*v.factor) }}</p>
                           </td>
                           <td>
-                            <p class="mb-0 ms-1 text-end">${{ (((stone_claw_avg_cost*v.factor)/0.4) | round) - 0.05 }}</p>
+                            <p class="mb-0 ms-1 text-end">${{ (((stone_claw_avg_cost*v.factor)/0.4) | round) }}</p>
                           </td>
                       </tr>
                     {% endfor %}

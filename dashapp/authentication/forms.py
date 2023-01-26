@@ -64,5 +64,25 @@ class PotatoForm(FlaskForm):
     submit4 = SubmitField("Submit")
 
 
-class RecipeForm(FlaskForm):
+class LobsterForm(FlaskForm):
+    store = QuerySelectField(
+        "",
+        query_factory=store_query,
+        get_label="name",
+        blank_text="Select Store",
+    )
     submit5 = SubmitField("Submit")
+
+
+class StoneForm(FlaskForm):
+    store = QuerySelectField(
+        "",
+        query_factory=store_query,
+        get_label="name",
+        blank_text="Select Store",
+    )
+    submit6 = SubmitField("Submit")
+
+
+class RecipeForm(FlaskForm):
+    submit9 = SubmitField("Submit")
