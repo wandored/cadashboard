@@ -209,6 +209,10 @@ def beef(product):
             fiscal_dates["end_year_ly"],
             session["store_list"],
         )
+        # if last year is empty, fill with zeros
+        if len(last_year) == 0:
+            last_year = [0] * len(this_year)
+
         product_dict_ty["{}".format(x)] = this_year
         product_dict_ly["{}".format(x)] = last_year
         product_names.append(pl)

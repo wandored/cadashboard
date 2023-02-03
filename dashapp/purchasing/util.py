@@ -328,6 +328,8 @@ def period_purchases(regex, start, end, stores):
         df["unit_cost"] = df["unit_cost"].fillna(0)
         df_list = df["unit_cost"].tolist()
         return df_list
+    else:
+        return [0] * len(cal_df.period.unique().tolist())
 
 
 def get_category_costs(regex, start, end, stores):

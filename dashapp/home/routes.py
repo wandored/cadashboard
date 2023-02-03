@@ -430,33 +430,33 @@ def store(store_id):
         )
         return fish
 
-    live_lobster_avg_cost = get_item_avg_cost(
-        "SEAFOOD Lobster Live*",
-        fiscal_dates["last_thirty"],
-        fiscal_dates["start_day"],
-        store_id,
-    )
-    with open("./lobster_items.json") as file:
-        lobster_items = json.load(file)
+    #live_lobster_avg_cost = get_item_avg_cost(
+    #    "SEAFOOD Lobster Live*",
+    #    fiscal_dates["last_thirty"],
+    #    fiscal_dates["start_day"],
+    #    store_id,
+    #)
+    #with open("./lobster_items.json") as file:
+    #    lobster_items = json.load(file)
 
-    stone_claw_avg_cost = get_item_avg_cost(
-        "^(SEAFOOD Crab Stone Claw)",
-        fiscal_dates["last_thirty"],
-        fiscal_dates["start_day"],
-        store_id,
-    )
-    with open("./stone_claw_items.json") as file:
-        stone_items = json.load(file)
+    #stone_claw_avg_cost = get_item_avg_cost(
+    #    "^(SEAFOOD Crab Stone Claw)",
+    #    fiscal_dates["last_thirty"],
+    #    fiscal_dates["start_day"],
+    #    store_id,
+    #)
+    #with open("./stone_claw_items.json") as file:
+    #    stone_items = json.load(file)
 
-    if concept == "steakhouse":
-        # lobster_items = get_shellfish("SEAFOOD Lobster Live*")
-        # stone_items = get_shellfish("^(SEAFOOD Crab Stone Claw)")
-        sea_bass = get_fish("SEAFOOD Sea Bass Chilean")
-        salmon = get_fish("SEAFOOD Sea Bass Chilean")
+    #if concept == "steakhouse":
+    #    # lobster_items = get_shellfish("SEAFOOD Lobster Live*")
+    #    # stone_items = get_shellfish("^(SEAFOOD Crab Stone Claw)")
+    #    sea_bass = get_fish("SEAFOOD Sea Bass Chilean")
+    #    salmon = get_fish("SEAFOOD Sea Bass Chilean")
 
-    if concept == "casual":
-        feature = get_fish("SEAFOOD Feature Fish")
-        salmon = get_fish("^(SEAFOOD) (Salmon)$")
+    #if concept == "casual":
+    #    feature = get_fish("SEAFOOD Feature Fish")
+    #    salmon = get_fish("^(SEAFOOD) (Salmon)$")
 
     # Chicken & Steak Order
     def get_purchases(regex, days):
@@ -1249,7 +1249,7 @@ def lobster(store_id):
 
     live_lobster_avg_cost = get_item_avg_cost(
         "SEAFOOD Lobster Live*",
-        fiscal_dates["last_thirty"],
+        fiscal_dates["last_seven"],
         fiscal_dates["start_day"],
         store_id,
     )
@@ -1293,7 +1293,7 @@ def lobster(store_id):
 
     pdf.ln(5)
     pdf.set_font("Times", "", 10.0)
-    pdf.cell(page_width, 0.0, "* Calculated from previous 30 days purchases", align="L")
+    pdf.cell(page_width, 0.0, "* Calculated from previous 7 days purchases", align="L")
     pdf.ln(5)
     pdf.cell(page_width, 0.0, "- end of report -", align="C")
 
@@ -1315,7 +1315,7 @@ def stone(store_id):
 
     stone_claw_avg_cost = get_item_avg_cost(
         "^(SEAFOOD Crab Stone Claw)",
-        fiscal_dates["last_thirty"],
+        fiscal_dates["last_seven"],
         fiscal_dates["start_day"],
         store_id,
     )
@@ -1357,7 +1357,7 @@ def stone(store_id):
 
     pdf.ln(5)
     pdf.set_font("Times", "", 10.0)
-    pdf.cell(page_width, 0.0, "* Calculated from previous 30 days purchases", align="L")
+    pdf.cell(page_width, 0.0, "* Calculated from previous 7 days purchases", align="L")
     pdf.ln(5)
     pdf.cell(page_width, 0.0, "- end of report -", align="C")
 
