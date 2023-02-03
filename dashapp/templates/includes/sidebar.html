@@ -84,6 +84,135 @@
         </ul>
     </div>
     <hr class="horizontal light mt-0 mb-2" />
+    <!-- Toolbox list -->
+    <div class="dropdown" style="text-align: center">
+        <button class="btn btn-warning dropdown-toggle" type="button" id="dropdownModals" data-bs-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
+            Toolbox
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownModals">
+            <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modal1">Potato Chart</a>
+            <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modal2">Lobster Price</a>
+            <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modal3">Stone Claw Price</a>
+        </div>
+    </div>
+
+    <div class="modal" tabindex="-1" id="modal1" data-bs-backdrop="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Potato Rotation Loading Chart</h5>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="" style="text-align: center">
+                        <h6>Select a store and click Submit to generate a PDF</h6>
+                        {{ form4.hidden_tag() }}
+                        <fieldset id="" class="form-group mb-0">
+                            <div class="form-group mb-1">
+                                {{ form4.store.label(class="form=control-label") }} {% if
+                                form4.store.errors %} {{ form4.store(class="form=control
+                                form-control-md is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form4.store.errors %}
+                                    <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                                {% else %} {{ form4.store(class="form=control form-control-md")
+                                }} {% endif %}
+                            </div>
+                        </fieldset>
+                        <div class="form-group">
+                            {{ form4.submit4(class="btn btn-info") }}
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-info" data-bs-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" tabindex="-1" id="modal2" data-bs-backdrop="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Modal 2</h5>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="" style="text-align: center">
+                        <h6>Select a store and click Submit to generate a PDF</h6>
+                        {{ form5.hidden_tag() }}
+                        <fieldset id="" class="form-group mb-0">
+                            <div class="form-group mb-1">
+                                {{ form5.store.label(class="form=control-label") }} {% if
+                                form5.store.errors %} {{ form5.store(class="form=control
+                                form-control-md is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form5.store.errors %}
+                                    <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                                {% else %} {{ form5.store(class="form=control form-control-md")
+                                }} {% endif %}
+                            </div>
+                        </fieldset>
+                        <div class="form-group">
+                            {{ form5.submit5(class="btn btn-info") }}
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-info" data-bs-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr class="horizontal light mt-0 mb-2" />
+
+    <div class="modal" tabindex="-1" id="modal3" data-bs-backdrop="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Stone Claw Menu Price Chart</h5>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="" style="text-align: center">
+                        <h6>Select a store and click Submit to generate PDF</h6>
+                        {{ form6.hidden_tag() }}
+                        <fieldset id="" class="form-group mb-0">
+                            <div class="form-group mb-1">
+                                {{ form6.store.label(class="form=control-label") }} {% if
+                                form6.store.errors %} {{ form6.store(class="form=control
+                                form-control-md is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form6.store.errors %}
+                                    <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                                {% else %} {{ form6.store(class="form=control form-control-md")
+                                }} {% endif %}
+                            </div>
+                        </fieldset>
+                        <div class="form-group">
+                            {{ form6.submit6(class="btn btn-info") }}
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-info" data-bs-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr class="horizontal light mt-0 mb-2" />
+
     <div class="collapse navbar-collapse w-auto max-height-vh-40" id="sidenav-collapse-main">
         <ul class="navbar-nav">
             <li class="nav-item">

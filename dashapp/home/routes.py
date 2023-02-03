@@ -60,6 +60,10 @@ def index():
     # Get Data
     form1 = DateForm()
     form3 = StoreForm()
+    form4 = PotatoForm()
+    form5 = LobsterForm()
+    form6 = StoneForm()
+
     if form1.submit1.data and form1.validate():
         """
         Change token
@@ -73,6 +77,21 @@ def index():
         data = form3.stores.data
         session["store_list"] = tuple([x.id for x in data])
         return redirect(url_for("home_blueprint.index"))
+
+    if form4.submit4.data and form4.validate():
+        store_id = form4.store.data.id
+        print(store_id)
+        return redirect(url_for("home_blueprint.potato", store_id=store_id))
+
+    if form5.submit5.data and form5.validate():
+        store_id = form5.store.data.id
+        print(store_id)
+        return redirect(url_for("home_blueprint.lobster", store_id=store_id))
+
+    if form6.submit6.data and form6.validate():
+        store_id = form6.store.data.id
+        print(store_id)
+        return redirect(url_for("home_blueprint.stone", store_id=store_id))
 
     # Sales Chart
     def get_chart_values(start, end, time):
@@ -291,6 +310,8 @@ def store(store_id):
     form1 = DateForm()
     form3 = StoreForm()
     form4 = PotatoForm()
+    form5 = LobsterForm()
+    form6 = StoneForm()
     if form1.submit1.data and form1.validate():
         """
         When new date submitted, the data for that date will be replaced with new data from R365
@@ -313,7 +334,17 @@ def store(store_id):
 
     if form4.submit4.data and form4.validate():
         store_id = form4.store.data.id
-        return redirect(url_for("home_blueprint.potato", store_id=store.id))
+        return redirect(url_for("home_blueprint.potato", store_id=store_id))
+
+    if form5.submit5.data and form5.validate():
+        store_id = form5.store.data.id
+        print(store_id)
+        return redirect(url_for("home_blueprint.lobster", store_id=store_id))
+
+    if form6.submit6.data and form6.validate():
+        store_id = form6.store.data.id
+        print(store_id)
+        return redirect(url_for("home_blueprint.stone", store_id=store_id))
 
     # sales cards
     def get_sales(start, end, store):
@@ -372,119 +403,10 @@ def store(store_id):
     for v in budget_chart:
         budgets3.append(v.total_sales)
 
-    #    def sales_labor_table(start, end):
-    #        # Build sales and labor stats for the time period given
-    #
-    #        food_sales = get_category_sales(start, end, store.name, "FOOD")
-    #        beer_sales = get_category_sales(start, end, store.name, "BEER")
-    #        liquor_sales = get_category_sales(start, end, store.name, "LIQUOR")
-    #        wine_sales = get_category_sales(start, end, store.name, "WINE")
-    #        gift_card_sales = get_category_sales(start, end, store.name, "GIFT CARDS")
-    #
-    #        sales_table = food_sales.merge(beer_sales)
-    #        sales_table = sales_table.merge(liquor_sales)
-    #        sales_table = sales_table.merge(wine_sales)
-    #        sales_table = sales_table.merge(gift_card_sales, how="outer")
-    #        sales_table.rename(
-    #            columns={
-    #                "FOOD": "food",
-    #                "BEER": "beer",
-    #                "LIQUOR": "liquor",
-    #                "WINE": "wine",
-    #                "GIFT CARDS": "gift_cards",
-    #            },
-    #            inplace=True,
-    #        )
-    #        sales_table.fillna(value=0, inplace=True)
-    #        sales_table["alcohol_sales"] = (
-    #            sales_table.beer + sales_table.liquor + sales_table.wine
-    #        )
-    #        sales_table["total_sales"] = sales_table.food + sales_table.alcohol_sales
-    #        sales_table["net_sales"] = sales_table.total_sales + sales_table.gift_cards
-    #
-    #        # Labor
-    #        bar_labor = get_category_labor(start, end, store.name, "Bar")
-    #        host_labor = get_category_labor(start, end, store.name, "Host")
-    #        restaurant_labor = get_category_labor(start, end, store.name, "Restaurant")
-    #        kitchen_labor = get_category_labor(start, end, store.name, "Kitchen")
-    #
-    #        labor_table = bar_labor.merge(host_labor)
-    #        labor_table = labor_table.merge(restaurant_labor)
-    #        labor_table = labor_table.merge(kitchen_labor)
-    #        labor_table.fillna(value=0, inplace=True)
-    #
-    #        labor_table["Total_Labor"] = (
-    #            labor_table.Bar
-    #            + labor_table.Host
-    #            + labor_table.Restaurant
-    #            + labor_table.Kitchen
-    #        )
-    #
-    #        join_data = labor_table[
-    #            [
-    #                "Bar",
-    #                "Host",
-    #                "Restaurant",
-    #                "Kitchen",
-    #                "Total_Labor",
-    #            ]
-    #        ]
-    #        _table = sales_table.join(join_data)
-    #        _table["Labor_pct"] = _table.Total_Labor / _table.total_sales
-    #        _table["Bar_pct"] = _table.Bar / (_table.alcohol_sales)
-    #        _table["Host_pct"] = _table.Host / (_table.food)
-    #        _table["Restaurant_pct"] = _table.Restaurant / (_table.food)
-    #        _table["Kitchen_pct"] = _table.Kitchen / (_table.food)
-    #        _table["name"] = store.name
-    #
-    #        _table = _table.merge(store_df, how="left")
-    #        totals = _table.sum()
-    #        return totals
-    #
-    #    weekly_totals = sales_labor_table(
-    #        fiscal_dates["start_week"], fiscal_dates["end_week"]
-    #    )
-    #    period_totals = sales_labor_table(
-    #        fiscal_dates["start_period"], fiscal_dates["end_period"]
-    #    )
-
     stone_items = []
     sea_bass = []
     salmon = []
     feature = []
-
-    # def get_shellfish(regex):
-
-    #    lst = (
-    #        db.session.query(Transactions.item)
-    #        .filter(Transactions.item.regexp_match(regex))
-    #        .group_by(Transactions.item)
-    #    ).all()
-    #    items = []
-    #    for i in lst:
-    #        cost = (
-    #            db.session.query(
-    #                Transactions.item,
-    #                Transactions.date,
-    #                Transactions.debit,
-    #                Transactions.quantity,
-    #            )
-    #            .filter(
-    #                Transactions.item == i.item,
-    #                Transactions.store_id == store_id,
-    #                Transactions.type == "AP Invoice",
-    #            )
-    #            .order_by(Transactions.date.desc())
-    #        ).first()
-    #        if cost:
-    #            row_dict = dict(cost)
-    #            ext = re.findall(r"\d*\.?\d", i.item)
-    #            if not ext:
-    #                ext = re.findall(r"\d{1,2}", i.item)
-    #            size = float(ext[0])
-    #            row_dict["size"] = size
-    #            items.append(row_dict)
-    #    return items
 
     def get_fish(regex):
 
@@ -508,33 +430,33 @@ def store(store_id):
         )
         return fish
 
-    live_lobster_avg_cost = get_item_avg_cost(
-        "SEAFOOD Lobster Live*",
-        fiscal_dates["last_thirty"],
-        fiscal_dates["start_day"],
-        store_id,
-    )
-    with open("./lobster_items.json") as file:
-        lobster_items = json.load(file)
+    #live_lobster_avg_cost = get_item_avg_cost(
+    #    "SEAFOOD Lobster Live*",
+    #    fiscal_dates["last_thirty"],
+    #    fiscal_dates["start_day"],
+    #    store_id,
+    #)
+    #with open("./lobster_items.json") as file:
+    #    lobster_items = json.load(file)
 
-    stone_claw_avg_cost = get_item_avg_cost(
-        "^(SEAFOOD Crab Stone Claw)",
-        fiscal_dates["last_thirty"],
-        fiscal_dates["start_day"],
-        store_id,
-    )
-    with open("./stone_claw_items.json") as file:
-        stone_items = json.load(file)
+    #stone_claw_avg_cost = get_item_avg_cost(
+    #    "^(SEAFOOD Crab Stone Claw)",
+    #    fiscal_dates["last_thirty"],
+    #    fiscal_dates["start_day"],
+    #    store_id,
+    #)
+    #with open("./stone_claw_items.json") as file:
+    #    stone_items = json.load(file)
 
-    if concept == "steakhouse":
-        # lobster_items = get_shellfish("SEAFOOD Lobster Live*")
-        # stone_items = get_shellfish("^(SEAFOOD Crab Stone Claw)")
-        sea_bass = get_fish("SEAFOOD Sea Bass Chilean")
-        salmon = get_fish("SEAFOOD Sea Bass Chilean")
+    #if concept == "steakhouse":
+    #    # lobster_items = get_shellfish("SEAFOOD Lobster Live*")
+    #    # stone_items = get_shellfish("^(SEAFOOD Crab Stone Claw)")
+    #    sea_bass = get_fish("SEAFOOD Sea Bass Chilean")
+    #    salmon = get_fish("SEAFOOD Sea Bass Chilean")
 
-    if concept == "casual":
-        feature = get_fish("SEAFOOD Feature Fish")
-        salmon = get_fish("^(SEAFOOD) (Salmon)$")
+    #if concept == "casual":
+    #    feature = get_fish("SEAFOOD Feature Fish")
+    #    salmon = get_fish("^(SEAFOOD) (Salmon)$")
 
     # Chicken & Steak Order
     def get_purchases(regex, days):
@@ -878,55 +800,6 @@ def store(store_id):
         segment="store.name",
         roles=current_user.roles,
         **locals(),
-        # concept=concept,
-        # form1=form1,
-        # form3=form3,
-        # form4=form4,
-        # current_user=current_user,
-        # fiscal_dates=fiscal_dates,
-        # sales_day=sales_day,
-        # sales_day_ly=sales_day_ly,
-        # sales_week=sales_week,
-        # sales_week_ly=sales_week_ly,
-        # sales_period=sales_period,
-        # sales_period_ly=sales_period_ly,
-        # sales_year=sales_year,
-        # sales_year_ly=sales_year_ly,
-        # daily_sales_list=daily_sales_list,
-        # daily_sales_list_ly=daily_sales_list_ly,
-        # weekly_sales_list=weekly_sales_list,
-        # weekly_sales_list_ly=weekly_sales_list_ly,
-        # period_sales_list=period_sales_list,
-        # period_sales_list_ly=period_sales_list_ly,
-        # budgets3=budgets3,
-        # supply_cost_dol=supply_cost_dol,
-        # supply_cost_dol_ly=supply_cost_dol_ly,
-        # supply_budget=supply_budget,
-        # smallware_cost_dol=smallware_cost_dol,
-        # smallware_cost_dol_ly=smallware_cost_dol_ly,
-        # smallware_budget=smallware_budget,
-        # current_supply_cost=current_supply_cost,
-        # current_supply_budget=current_supply_budget,
-        # current_smallware_cost=current_smallware_cost,
-        # current_smallware_budget=current_smallware_budget,
-        # linen_cost_dol=linen_cost_dol,
-        # linen_cost_dol_ly=linen_cost_dol_ly,
-        # period_linen_cost=period_linen_cost,
-        # period_linen_cost_ly=period_linen_cost_ly,
-        ## weekly_totals=weekly_totals,
-        ## period_totals=period_totals,
-        # lobster_items=lobster_items,
-        # live_lobster_avg_cost=live_lobster_avg_cost,
-        # stone_items=stone_items,
-        # stone_claw_avg_cost=stone_claw_avg_cost,
-        # sea_bass=sea_bass,
-        # salmon=salmon,
-        # feature=feature,
-        # steak_order=steak_order,
-        ## chicken_order=chicken_order,
-        # price_increase=price_increase,
-        # price_decrease=price_decrease,
-        # do_not_use=do_not_use,
     )
 
 
@@ -940,6 +813,9 @@ def marketing():
 
     fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
     form1 = DateForm()
+    form4 = PotatoForm()
+    form5 = LobsterForm()
+    form6 = StoneForm()
     if form1.submit1.data and form1.validate():
         """ """
         new_day = form1.selectdate.data.strftime("%Y-%m-%d")
@@ -952,6 +828,20 @@ def marketing():
         data = form3.store.data
         session["store_list"] = tuple([x.id for x in data])
         return redirect(url_for("home_blueprint.store", store_id=store_id))
+
+    if form4.submit4.data and form4.validate():
+        store_id = form4.store.data.id
+        return redirect(url_for("home_blueprint.potato", store_id=store_id))
+
+    if form5.submit5.data and form5.validate():
+        store_id = form5.store.data.id
+        print(store_id)
+        return redirect(url_for("home_blueprint.lobster", store_id=store_id))
+
+    if form6.submit6.data and form6.validate():
+        store_id = form6.store.data.id
+        print(store_id)
+        return redirect(url_for("home_blueprint.stone", store_id=store_id))
 
     # Gift Card Sales
 
@@ -1100,7 +990,10 @@ def support():
     form1 = DateForm()
     form2 = UpdateForm()
     form3 = StoreForm()
-    form5 = RecipeForm()
+    form4 = PotatoForm()
+    form5 = LobsterForm()
+    form6 = StoneForm()
+    form9 = RecipeForm()
     if form1.submit1.data and form1.validate():
         """ """
         new_day = form1.selectdate.data.strftime("%Y-%m-%d")
@@ -1129,7 +1022,21 @@ def support():
 
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
+    if form4.submit4.data and form4.validate():
+        store_id = form4.store.data.id
+        return redirect(url_for("home_blueprint.potato", store_id=store_id))
+
     if form5.submit5.data and form5.validate():
+        store_id = form5.store.data.id
+        print(store_id)
+        return redirect(url_for("home_blueprint.lobster", store_id=store_id))
+
+    if form6.submit6.data and form6.validate():
+        store_id = form6.store.data.id
+        print(store_id)
+        return redirect(url_for("home_blueprint.stone", store_id=store_id))
+
+    if form9.submit9.data and form9.validate():
         response = update_recipe_costs()
         if response == 0:
             flash(f"Recipe costs updated", "success")
@@ -1172,192 +1079,7 @@ def support():
         title="Support",
         company_name=Config.COMPANY_NAME,
         segment="support",
-        fiscal_dates=fiscal_dates,
-        form1=form1,
-        form2=form2,
-        form3=form3,
-        form5=form5,
-        unassigned_sales=unassigned_sales,
-        do_not_use=do_not_use,
-    )
-
-
-@blueprint.route("/alcohol/", methods=["GET", "POST"])
-@login_required
-def alcohol():
-
-    TODAY = datetime.date(datetime.now())
-    CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
-    YSTDAY = TODAY - timedelta(days=1)
-
-    fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
-
-    form1 = DateForm()
-    form3 = StoreForm()
-
-    if form1.submit1.data and form1.validate():
-        new_day = form1.selectdate.data.strftime("%Y-%m-%d")
-        session["token"] = new_day
-        return redirect(url_for("home_blueprint.alcohol"))
-
-    if form3.submit3.data and form3.validate():
-        session["token"] = fiscal_dates["start_day"]
-        data = form3.store.data
-        session["store_list"] = tuple([x.id for x in data])
-        return redirect(url_for("home_blueprint.store", store_id=store_id))
-
-    steakhouse = [4, 9, 11, 17, 16]
-    casual = [1, 3, 7, 8, 11, 12, 14, 21, 85]
-
-    calendar = Calendar.query.with_entities(Calendar.date, Calendar.week, Calendar.period, Calendar.year).all()
-    cal_df = pd.DataFrame(calendar, columns=["date", "week", "period", "year"])
-
-    def get_vendors(cat, time, concept):
-        query = (
-            Transactions.query.with_entities(Transactions.company)
-            .filter(
-                Transactions.account == cat,
-                Transactions.company != "None",
-                Transactions.store_id.in_(concept),
-                Transactions.date >= time,
-            )
-            .group_by(Transactions.company)
-        ).all()
-        return query
-
-    def get_purchases(cat, start, end, concept):
-        items = (
-            db.session.query(
-                Transactions.date,
-                Transactions.company,
-                Transactions.item,
-                Transactions.UofM,
-                func.sum(Transactions.quantity).label("count"),
-                func.sum(Transactions.amount).label("cost"),
-            )
-            .filter(
-                Transactions.account == cat,
-                Transactions.date.between(start, end),
-                Transactions.store_id.in_(concept),
-                Transactions.type == "AP Invoice",
-            )
-            .group_by(
-                Transactions.date,
-                Transactions.company,
-                Transactions.item,
-                Transactions.UofM,
-            )
-        ).all()
-        item_list = []
-        for i in items:
-            qty, uofm = convert_uofm(i)
-            # TODO fix the factor calc on purchasing
-            bottle = qty / 25.360517  # convert from quarts to 750ml
-            row_dict = dict(i)
-            row_dict["factor"] = bottle
-            item_list.append(row_dict)
-        df = pd.DataFrame(item_list)
-        df = df[(df != 0).all(1)]
-        return df
-
-    wine_vendors = get_vendors("Wine", fiscal_dates["start_year"], steakhouse)
-    steakhouse_wine = get_purchases("Wine", fiscal_dates["start_year"], fiscal_dates["end_year"], steakhouse)
-    steakhouse_wine_values = steakhouse_wine.merge(cal_df, on="date", how="left")
-    steakhouse_wine_values = steakhouse_wine_values.groupby(["period"]).sum()
-    steakhouse_wine_chart = steakhouse_wine_values["cost"].tolist()
-    steakhouse_wine_vendor = steakhouse_wine.groupby(["company"]).sum()
-    steakhouse_wine_vendor.sort_values(by=["cost"], ascending=False, inplace=True)
-    steakhouse_wine_vendor = steakhouse_wine_vendor.head(10)
-    # steakhouse_wine_bottle = steakhouse_wine.groupby(["item"]).sum()
-    # steakhouse_wine_bottle.sort_values(by=["cost"], ascending=False, inplace=True)
-
-    liquor_vendors = get_vendors("Liquor", fiscal_dates["start_year"], steakhouse)
-    steakhouse_liquor = get_purchases("Liquor", fiscal_dates["start_year"], fiscal_dates["end_year"], steakhouse)
-    steakhouse_liquor_values = steakhouse_liquor.merge(cal_df, on="date", how="left")
-    steakhouse_liquor_values = steakhouse_liquor_values.groupby(["period"]).sum()
-    steakhouse_liquor_chart = steakhouse_liquor_values["cost"].tolist()
-    # steakhouse_liquor_vendor = steakhouse_liquor.groupby(["company"]).sum()
-    # steakhouse_liquor_vendor.sort_values(by=["cost"], ascending=False, inplace=True)
-    steakhouse_liquor_bottle = steakhouse_liquor.groupby(["item"]).sum()
-    steakhouse_liquor_bottle.sort_values(by=["cost"], ascending=False, inplace=True)
-    steakhouse_liquor_bottle = steakhouse_liquor_bottle.head(10)
-
-    beer_vendors = get_vendors("Beer", fiscal_dates["start_year"], steakhouse)
-    steakhouse_beer = get_purchases("Beer", fiscal_dates["start_year"], fiscal_dates["end_year"], steakhouse)
-    steakhouse_beer_values = steakhouse_beer.merge(cal_df, on="date", how="left")
-    steakhouse_beer_values = steakhouse_beer_values.groupby(["period"]).sum()
-    steakhouse_beer_chart = steakhouse_beer_values["cost"].tolist()
-    # steakhouse_beer_vendor = steakhouse_beer.groupby(["company"]).sum()
-    # steakhouse_beer_vendor.sort_values(by=["cost"], ascending=False, inplace=True)
-    steakhouse_beer_bottle = steakhouse_beer.groupby(["item"]).sum()
-    steakhouse_beer_bottle.sort_values(by=["cost"], ascending=False, inplace=True)
-    steakhouse_beer_bottle = steakhouse_beer_bottle.head(10)
-
-    wine_vendors = get_vendors("Wine", fiscal_dates["start_year"], casual)
-    casual_wine = get_purchases("Wine", fiscal_dates["start_year"], fiscal_dates["end_year"], casual)
-    casual_wine_values = casual_wine.merge(cal_df, on="date", how="left")
-    casual_wine_values = casual_wine_values.groupby(["period"]).sum()
-    casual_wine_chart = casual_wine_values["cost"].tolist()
-    casual_wine_vendor = casual_wine.groupby(["company"]).sum()
-    casual_wine_vendor.sort_values(by=["cost"], ascending=False, inplace=True)
-    casual_wine_vendor = casual_wine_vendor.head(10)
-    # casual_wine_bottle = casual_wine.groupby(["item"]).sum()
-    # casual_wine_bottle.sort_values(by=["cost"], ascending=False, inplace=True)
-
-    liquor_vendors = get_vendors("Liquor", fiscal_dates["start_year"], casual)
-    casual_liquor = get_purchases("Liquor", fiscal_dates["start_year"], fiscal_dates["end_year"], casual)
-    casual_liquor_values = casual_liquor.merge(cal_df, on="date", how="left")
-    casual_liquor_values = casual_liquor_values.groupby(["period"]).sum()
-    casual_liquor_chart = casual_liquor_values["cost"].tolist()
-    # casual_liquor_vendor = casual_liquor.groupby(["company"]).sum()
-    # casual_liquor_vendor.sort_values(by=["cost"], ascending=False, inplace=True)
-    casual_liquor_bottle = casual_liquor.groupby(["item"]).sum()
-    casual_liquor_bottle.sort_values(by=["cost"], ascending=False, inplace=True)
-    casual_liquor_bottle = casual_liquor_bottle.head(10)
-
-    beer_vendors = get_vendors("Beer", fiscal_dates["start_year"], casual)
-    casual_beer = get_purchases("Beer", fiscal_dates["start_year"], fiscal_dates["end_year"], casual)
-    casual_beer_values = casual_beer.merge(cal_df, on="date", how="left")
-    casual_beer_values = casual_beer_values.groupby(["period"]).sum()
-    casual_beer_chart = casual_beer_values["cost"].tolist()
-    # casual_beer_vendor = casual_beer.groupby(["company"]).sum()
-    # casual_beer_vendor.sort_values(by=["cost"], ascending=False, inplace=True)
-    casual_beer_bottle = casual_beer.groupby(["item"]).sum()
-    casual_beer_bottle.sort_values(by=["cost"], ascending=False, inplace=True)
-    casual_beer_bottle = casual_beer_bottle.head(10)
-
-    return render_template(
-        "home/alcohol.html",
-        title="Alcohol",
-        company_name=Config.COMPANY_NAME,
-        segment="alcohol",
-        fiscal_dates=fiscal_dates,
-        form1=form1,
-        form3=form3,
-        steakhouse_wine_chart=steakhouse_wine_chart,
-        steakhouse_wine_chart_ly=steakhouse_wine_chart,
-        steakhouse_wine_vendor=steakhouse_wine_vendor,
-        # steakhouse_wine_bottle=steakhouse_wine_bottle,
-        steakhouse_liquor_chart=steakhouse_liquor_chart,
-        steakhouse_liquor_chart_ly=steakhouse_liquor_chart,
-        # steakhouse_liquor_vendor=steakhouse_liquor_vendor,
-        steakhouse_liquor_bottle=steakhouse_liquor_bottle,
-        steakhouse_beer_chart=steakhouse_beer_chart,
-        steakhouse_beer_chart_ly=steakhouse_beer_chart,
-        # steakhouse_beer_vendor=steakhouse_beer_vendor,
-        steakhouse_beer_bottle=steakhouse_beer_bottle,
-        casual_wine_chart=casual_wine_chart,
-        casual_wine_chart_ly=casual_wine_chart,
-        casual_wine_vendor=casual_wine_vendor,
-        # casual_wine_bottle=casual_wine_bottle,
-        casual_liquor_chart=casual_liquor_chart,
-        casual_liquor_chart_ly=casual_liquor_chart,
-        # casual_liquor_vendor=casual_liquor_vendor,
-        casual_liquor_bottle=casual_liquor_bottle,
-        casual_beer_chart=casual_beer_chart,
-        casual_beer_chart_ly=casual_beer_chart,
-        # casual_beer_vendor=casual_beer_vendor,
-        casual_beer_bottle=casual_beer_bottle,
+        **locals(),
     )
 
 
@@ -1372,6 +1094,9 @@ def profile():
     fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
     form1 = DateForm()
     form3 = StoreForm()
+    form4 = PotatoForm()
+    form5 = LobsterForm()
+    form6 = StoneForm()
 
     if form1.submit1.data and form1.validate():
         new_day = form1.selectdate.data.strftime("%Y-%m-%d")
@@ -1384,14 +1109,26 @@ def profile():
         session["store_list"] = tuple([x.id for x in data])
         return redirect(url_for("home_blueprint.profile"))
 
+    if form4.submit4.data and form4.validate():
+        store_id = form4.store.data.id
+        return redirect(url_for("home_blueprint.potato", store_id=store_id))
+
+    if form5.submit5.data and form5.validate():
+        store_id = form5.store.data.id
+        print(store_id)
+        return redirect(url_for("home_blueprint.lobster", store_id=store_id))
+
+    if form6.submit6.data and form6.validate():
+        store_id = form6.store.data.id
+        print(store_id)
+        return redirect(url_for("home_blueprint.stone", store_id=store_id))
+
     return render_template(
         "home/profile.html",
         title="Profile",
         company_name=Config.COMPANY_NAME,
         segment="profile",
-        fiscal_dates=fiscal_dates,
-        form1=form1,
-        form3=form3,
+        **locals(),
     )
 
 
@@ -1498,4 +1235,134 @@ def potato(store_id):
         pdf.output(dest="S").encode("latin-1"),
         mimetype="application/pdf",
         headers={"Content-Disposition": "attachment;filename=potato_loading.pdf"},
+    )
+
+
+@blueprint.route("/<int:store_id>/lobster/", methods=["GET", "POST"])
+@login_required
+def lobster(store_id):
+
+    TODAY = datetime.date(datetime.now())
+    fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
+
+    store = Restaurants.query.filter_by(id=store_id).first()
+
+    live_lobster_avg_cost = get_item_avg_cost(
+        "SEAFOOD Lobster Live*",
+        fiscal_dates["last_seven"],
+        fiscal_dates["start_day"],
+        store_id,
+    )
+    with open("./lobster_items.json") as file:
+        lobster_items = json.load(file)
+
+    # format pdf page
+    pdf_date = TODAY.strftime("%A, %B-%d")
+    pdf = FPDF()
+    pdf.add_page()
+    page_width = pdf.w - 2 * pdf.l_margin
+    pdf.set_font("Times", "B", 14.0)
+    pdf.cell(page_width, 0.0, "LOBSTER PRICE CHART", align="C")
+    pdf.ln(5)
+    pdf.cell(page_width, 0.0, store.name, align="C")
+    pdf.ln(5)
+    pdf.cell(page_width, 0.0, pdf_date, align="C")
+    pdf.ln(5)
+
+    pdf.set_font("Courier", "", 12)
+    col_width = page_width / 5
+    size_width = page_width / 3
+    pdf.ln(1)
+    th = pdf.font_size + 1
+
+    pdf.cell(col_width, th, str("Avg Cost/lb"), border=1)
+    pdf.cell(col_width, th, "${:,.2f}".format(round(live_lobster_avg_cost, 2)), align="R", border=1)
+    pdf.ln(2 * th)
+    pdf.cell(size_width, th, str("Size"), border=1)
+    pdf.cell(col_width, th, str("Cost"), border=1)
+    pdf.cell(col_width, th, str("Price @40%"), border=1)
+    pdf.ln(th)
+
+    for v in lobster_items["lobster_sizes"]:
+        pdf.cell(size_width, th, str(v["item"]), border=1)
+        pdf.cell(col_width, th, "${:,.2f}".format(round(live_lobster_avg_cost * v["factor"], 2)), align="R", border=1)
+        pdf.cell(
+            col_width, th, "${:,.2f}".format(round(live_lobster_avg_cost * v["factor"] / 0.4)), align="R", border=1
+        )
+        pdf.ln(th)
+
+    pdf.ln(5)
+    pdf.set_font("Times", "", 10.0)
+    pdf.cell(page_width, 0.0, "* Calculated from previous 7 days purchases", align="L")
+    pdf.ln(5)
+    pdf.cell(page_width, 0.0, "- end of report -", align="C")
+
+    return Response(
+        pdf.output(dest="S").encode("latin-1"),
+        mimetype="application/pdf",
+        headers={"Content-Disposition": "attachment;filename=lobster_prices.pdf"},
+    )
+
+
+@blueprint.route("/<int:store_id>/stone/", methods=["GET", "POST"])
+@login_required
+def stone(store_id):
+
+    TODAY = datetime.date(datetime.now())
+    fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
+
+    store = Restaurants.query.filter_by(id=store_id).first()
+
+    stone_claw_avg_cost = get_item_avg_cost(
+        "^(SEAFOOD Crab Stone Claw)",
+        fiscal_dates["last_seven"],
+        fiscal_dates["start_day"],
+        store_id,
+    )
+    with open("./stone_claw_items.json") as file:
+        stone_items = json.load(file)
+
+    # format pdf page
+    pdf_date = TODAY.strftime("%A, %B-%d")
+    pdf = FPDF()
+    pdf.add_page()
+    page_width = pdf.w - 2 * pdf.l_margin
+    pdf.set_font("Times", "B", 14.0)
+    pdf.cell(page_width, 0.0, "STONE CLAW PRICE CHART", align="C")
+    pdf.ln(5)
+    pdf.cell(page_width, 0.0, store.name, align="C")
+    pdf.ln(5)
+    pdf.cell(page_width, 0.0, pdf_date, align="C")
+    pdf.ln(5)
+
+    pdf.set_font("Courier", "", 12)
+    col_width = page_width / 5
+    size_width = page_width / 3
+    pdf.ln(1)
+    th = pdf.font_size + 1
+
+    pdf.cell(col_width, th, str("Avg Cost/lb"), border=1)
+    pdf.cell(col_width, th, "${:,.2f}".format(round(stone_claw_avg_cost, 2)), align="R", border=1)
+    pdf.ln(2 * th)
+    pdf.cell(size_width, th, str("Size"), border=1)
+    pdf.cell(col_width, th, str("Cost"), border=1)
+    pdf.cell(col_width, th, str("Price @40%"), border=1)
+    pdf.ln(th)
+
+    for v in stone_items["stone_sizes"]:
+        pdf.cell(size_width, th, str(v["item"]), border=1)
+        pdf.cell(col_width, th, "${:,.2f}".format(round(stone_claw_avg_cost * v["factor"], 2)), align="R", border=1)
+        pdf.cell(col_width, th, "${:,.2f}".format(round(stone_claw_avg_cost * v["factor"] / 0.4)), align="R", border=1)
+        pdf.ln(th)
+
+    pdf.ln(5)
+    pdf.set_font("Times", "", 10.0)
+    pdf.cell(page_width, 0.0, "* Calculated from previous 7 days purchases", align="L")
+    pdf.ln(5)
+    pdf.cell(page_width, 0.0, "- end of report -", align="C")
+
+    return Response(
+        pdf.output(dest="S").encode("latin-1"),
+        mimetype="application/pdf",
+        headers={"Content-Disposition": "attachment;filename=stone_claw_prices.pdf"},
     )

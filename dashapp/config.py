@@ -1,6 +1,6 @@
 import json
 
-with open("./config.json") as config_file:
+with open("/etc/config.json") as config_file:
     config = json.load(config_file)
 
 

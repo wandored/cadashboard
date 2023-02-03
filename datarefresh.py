@@ -5,6 +5,7 @@ hourly from a cron job
 """
 import json
 import csv
+import argparse
 from sqlalchemy.engine.create import create_engine
 from datetime import datetime, timedelta
 import requests
@@ -354,12 +355,26 @@ if __name__ == "__main__":
     cur = conn.cursor()
     rest_query = 'select * from "Restaurants"'
 
-    TODAY = datetime.date(datetime.now())
-    YSTDAY = TODAY - timedelta(days=1)
-    TMRDAY = TODAY + timedelta(days=1)
-    today = TODAY.strftime("%Y-%m-%d")
+    # creat and argument parser object
+    parser = argparse.ArgumentParser()
+    
+    # check for user provide argument
+    parser.add_argument("-d", "--date", help="Date to run the script")
+    args = parser.parse_args()
+
+    # if user provide argument use it else use today's date
+    if args.date:
+        DATE = datetime.strptime(args.date, "%Y-%m-%d")
+    else:
+        DATE = datetime.date(datetime.now())
+
+
+    YSTDAY = DATE - timedelta(days=1)
+    TMRDAY = DATE + timedelta(days=1)
+    today = DATE.strftime("%Y-%m-%d")
     tonight = TMRDAY.strftime("%Y-%m-%d")
     yesterday = YSTDAY.strftime("%Y-%m-%d")
+    print(f"Date is {today}")
 
     sales_payments(today, tonight)
     sales_detail(today, tonight)
