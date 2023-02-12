@@ -109,7 +109,7 @@ def index():
 
         return value
 
-    daily_sales_list = get_chart_values(fiscal_dates["start_week"], fiscal_dates["end_day"], Calendar.date)
+    daily_sales_list = get_chart_values(fiscal_dates["start_week"], fiscal_dates["start_day"], Calendar.date)
     weekly_sales = sum(daily_sales_list)
 
     daily_sales_list_ly = get_chart_values(fiscal_dates["start_week_ly"], fiscal_dates["end_week_ly"], Calendar.date)
@@ -284,7 +284,7 @@ def store(store_id):
 
     TODAY = datetime.date(datetime.now())
     CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
-    YSTDAY = TODAY - timedelta(days=1)
+    # YSTDAY = TODAY - timedelta(days=1)
 
     store = Restaurants.query.filter_by(id=store_id).first()
 
@@ -312,12 +312,8 @@ def store(store_id):
     form4 = PotatoForm()
     form5 = LobsterForm()
     form6 = StoneForm()
+
     if form1.submit1.data and form1.validate():
-        """
-        When new date submitted, the data for that date will be replaced with new data from R365
-        We check if there are infact sales for that day, if not, it resets to yesterday, if
-        there are sales, then labor is polled
-        """
         new_day = form1.selectdate.data.strftime("%Y-%m-%d")
         session["token"] = new_day
         return redirect(url_for("home_blueprint.store", store_id=store.id))
@@ -346,26 +342,26 @@ def store(store_id):
         print(store_id)
         return redirect(url_for("home_blueprint.stone", store_id=store_id))
 
-    # sales cards
-    def get_sales(start, end, store):
-        sales = []
-        lst = (
-            db.session.query(func.sum(Sales.sales).label("total_sales"))
-            .filter(Sales.date.between(start, end), Sales.name == store)
-            .all()
-        )
-        for i in lst:
-            sales = i.total_sales
-        return sales
+    ## sales cards
+    # def get_sales(start, end, store):
+    #    sales = []
+    #    lst = (
+    #        db.session.query(func.sum(Sales.sales).label("total_sales"))
+    #        .filter(Sales.date.between(start, end), Sales.name == store)
+    #        .all()
+    #    )
+    #    for i in lst:
+    #        sales = i.total_sales
+    #    return sales
 
-    sales_day = get_sales(fiscal_dates["start_day"], fiscal_dates["start_day"], store.name)
-    sales_day_ly = get_sales(fiscal_dates["start_day_ly"], fiscal_dates["start_day_ly"], store.name)
-    sales_week = get_sales(fiscal_dates["start_week"], fiscal_dates["end_week"], store.name)
-    sales_week_ly = get_sales(fiscal_dates["start_week_ly"], fiscal_dates["week_to_date_ly"], store.name)
-    sales_period = get_sales(fiscal_dates["start_period"], fiscal_dates["end_period"], store.name)
-    sales_period_ly = get_sales(fiscal_dates["start_period_ly"], fiscal_dates["period_to_date_ly"], store.name)
-    sales_year = get_sales(fiscal_dates["start_year"], fiscal_dates["end_year"], store.name)
-    sales_year_ly = get_sales(fiscal_dates["start_year_ly"], fiscal_dates["year_to_date_ly"], store.name)
+    # sales_day = get_sales(fiscal_dates["start_day"], fiscal_dates["start_day"], store.name)
+    # sales_day_ly = get_sales(fiscal_dates["start_day_ly"], fiscal_dates["start_day_ly"], store.name)
+    # sales_week = get_sales(fiscal_dates["start_week"], fiscal_dates["end_week"], store.name)
+    # sales_week_ly = get_sales(fiscal_dates["start_week_ly"], fiscal_dates["week_to_date_ly"], store.name)
+    # sales_period = get_sales(fiscal_dates["start_period"], fiscal_dates["end_period"], store.name)
+    # sales_period_ly = get_sales(fiscal_dates["start_period_ly"], fiscal_dates["period_to_date_ly"], store.name)
+    # sales_year = get_sales(fiscal_dates["start_year"], fiscal_dates["end_year"], store.name)
+    # sales_year_ly = get_sales(fiscal_dates["start_year_ly"], fiscal_dates["year_to_date_ly"], store.name)
 
     # Sales Charts
     def get_chart_values(start, end, time):
@@ -383,14 +379,153 @@ def store(store_id):
 
         return value
 
-    daily_sales_list = get_chart_values(fiscal_dates["start_week"], fiscal_dates["end_week"], Calendar.date)
+    daily_sales_list = get_chart_values(fiscal_dates["start_week"], fiscal_dates["start_day"], Calendar.date)
+    weekly_sales = sum(daily_sales_list)
+
     daily_sales_list_ly = get_chart_values(fiscal_dates["start_week_ly"], fiscal_dates["end_week_ly"], Calendar.date)
-    weekly_sales_list = get_chart_values(fiscal_dates["start_period"], fiscal_dates["end_period"], Calendar.week)
+    weekly_sales_ly = sum(daily_sales_list_ly)
+
+    week_to_date_sales_ly = get_chart_values(fiscal_dates["start_week_ly"], fiscal_dates["start_day_ly"], Calendar.date)
+    wtd_sales_ly = sum(week_to_date_sales_ly)
+
+    weekly_sales_list = get_chart_values(fiscal_dates["start_period"], fiscal_dates["start_day"], Calendar.week)
+    period_sales = sum(weekly_sales_list)
+
     weekly_sales_list_ly = get_chart_values(
         fiscal_dates["start_period_ly"], fiscal_dates["end_period_ly"], Calendar.week
     )
-    period_sales_list = get_chart_values(fiscal_dates["start_year"], fiscal_dates["end_year"], Calendar.period)
+    period_sales_ly = sum(weekly_sales_list_ly)
+
+    period_to_date_sales_ly = get_chart_values(
+        fiscal_dates["start_period_ly"], fiscal_dates["start_day_ly"], Calendar.week
+    )
+    ptd_sales_ly = sum(period_to_date_sales_ly)
+
+    period_sales_list = get_chart_values(fiscal_dates["start_year"], fiscal_dates["start_day"], Calendar.period)
+    yearly_sales = sum(period_sales_list)
+
     period_sales_list_ly = get_chart_values(fiscal_dates["start_year_ly"], fiscal_dates["end_year_ly"], Calendar.period)
+    yearly_sales_ly = sum(period_sales_list_ly)
+
+    year_to_date_sales_ly = get_chart_values(
+        fiscal_dates["start_year_ly"], fiscal_dates["start_day_ly"], Calendar.period
+    )
+    ytd_sales_ly = sum(year_to_date_sales_ly)
+
+    def build_sales_table(start, end, start_ly, end_ly, time_frame):
+
+        sales = (
+            db.session.query(
+                Sales.name,
+                func.sum(Sales.sales).label("total_sales"),
+                func.sum(Sales.guests).label("total_guests"),
+            )
+            .filter(Sales.date.between(start, end), Sales.name == store.name)
+            .group_by(Sales.name)
+            .all()
+        )
+
+        sales_ly = (
+            db.session.query(
+                Sales.name,
+                func.sum(Sales.sales).label("total_sales_ly"),
+                func.sum(Sales.guests).label("total_guests_ly"),
+            )
+            .filter(Sales.date.between(start_ly, end_ly), Sales.name == store.name)
+            .group_by(Sales.name)
+            .all()
+        )
+        # Get the top sales for each store
+        store_list = store_df["name"]
+        top_sales_list = []
+        for sl in store_list:
+            query = sales_record(sl, time_frame)
+            if query != None:
+                row = [sl, query]
+                top_sales_list.append(row)
+
+        top_sales = pd.DataFrame.from_records(top_sales_list, columns=["name", "top_sales"])
+
+        df = pd.DataFrame.from_records(sales, columns=["name", "sales", "guests"])
+        df_ly = pd.DataFrame.from_records(sales_ly, columns=["name", "sales_ly", "guests_ly"])
+        sales_table = df.merge(df_ly, how="outer", sort=True)
+        sales_table = sales_table.merge(top_sales, how="left")
+
+        labor = (
+            db.session.query(
+                Labor.name,
+                func.sum(Labor.hours).label("total_hours"),
+                func.sum(Labor.dollars).label("total_dollars"),
+            )
+            .filter(Labor.date.between(start, end))
+            .group_by(Labor.name)
+            .all()
+        )
+
+        labor_ly = (
+            db.session.query(
+                Labor.name,
+                func.sum(Labor.hours).label("total_hours_ly"),
+                func.sum(Labor.dollars).label("total_dollars_ly"),
+            )
+            .filter(Labor.date.between(start_ly, end_ly))
+            .group_by(Labor.name)
+            .all()
+        )
+
+        df_labor = pd.DataFrame.from_records(labor, columns=["name", "hours", "dollars"])
+        df_labor_ly = pd.DataFrame.from_records(labor_ly, columns=["name", "hours_ly", "dollars_ly"])
+        labor_table = df_labor.merge(df_labor_ly, how="outer", sort=True)
+
+        table = sales_table.merge(labor_table, how="outer", sort=True)
+        table = table.merge(store_df, how="left")
+        table = table.set_index("name")
+
+        # Grab top sales over last year before we add totals
+        table = table.fillna(0)
+        table["doly"] = table.sales - table.sales_ly
+        table["poly"] = (table.sales - table.sales_ly) / table.sales_ly * 100
+        top = table[["doly", "poly"]]
+        top = top.nlargest(5, "poly", keep="all")
+        table["guest_check_avg"] = table["sales"] / table["guests"].astype(float)
+        table["guest_check_avg_ly"] = table["sales_ly"] / table["guests_ly"].astype(float)
+        table["labor_pct"] = table.dollars / table.sales
+        table["labor_pct_ly"] = table.dollars_ly / table.sales_ly
+        totals = table.sum()
+
+        return totals, table, top
+
+    daily_totals, daily_table, daily_top = build_sales_table(
+        fiscal_dates["start_day"],
+        fiscal_dates["start_day"],
+        fiscal_dates["start_day_ly"],
+        fiscal_dates["start_day_ly"],
+        "daily",
+    )
+
+    weekly_totals, weekly_table, weekly_top = build_sales_table(
+        fiscal_dates["start_week"],
+        fiscal_dates["week_to_date"],
+        fiscal_dates["start_week_ly"],
+        fiscal_dates["week_to_date_ly"],
+        "weekly",
+    )
+
+    period_totals, period_table, period_top = build_sales_table(
+        fiscal_dates["start_period"],
+        fiscal_dates["period_to_date"],
+        fiscal_dates["start_period_ly"],
+        fiscal_dates["period_to_date_ly"],
+        "period",
+    )
+
+    yearly_totals, yearly_table, yearly_top = build_sales_table(
+        fiscal_dates["start_year"],
+        fiscal_dates["year_to_date"],
+        fiscal_dates["start_year_ly"],
+        fiscal_dates["year_to_date_ly"],
+        "year",
+    )
 
     budget_chart = (
         db.session.query(func.sum(Budgets.total_sales).label("total_sales"))
@@ -402,396 +537,6 @@ def store(store_id):
     budgets3 = []
     for v in budget_chart:
         budgets3.append(v.total_sales)
-
-    stone_items = []
-    sea_bass = []
-    salmon = []
-    feature = []
-
-    def get_fish(regex):
-
-        fish = (
-            db.session.query(
-                Transactions.item,
-                Transactions.date,
-                Transactions.UofM,
-                func.sum(Transactions.amount).label("cost"),
-                func.sum(Transactions.quantity).label("count"),
-            )
-            .filter(
-                Transactions.item.regexp_match(regex),
-                Transactions.store_id == store_id,
-                Transactions.type == "AP Invoice",
-            )
-            .group_by(Transactions.item, Transactions.date, Transactions.UofM)
-            .order_by(Transactions.date.desc())
-            .limit(5)
-            .all()
-        )
-        return fish
-
-    #live_lobster_avg_cost = get_item_avg_cost(
-    #    "SEAFOOD Lobster Live*",
-    #    fiscal_dates["last_thirty"],
-    #    fiscal_dates["start_day"],
-    #    store_id,
-    #)
-    #with open("./lobster_items.json") as file:
-    #    lobster_items = json.load(file)
-
-    #stone_claw_avg_cost = get_item_avg_cost(
-    #    "^(SEAFOOD Crab Stone Claw)",
-    #    fiscal_dates["last_thirty"],
-    #    fiscal_dates["start_day"],
-    #    store_id,
-    #)
-    #with open("./stone_claw_items.json") as file:
-    #    stone_items = json.load(file)
-
-    #if concept == "steakhouse":
-    #    # lobster_items = get_shellfish("SEAFOOD Lobster Live*")
-    #    # stone_items = get_shellfish("^(SEAFOOD Crab Stone Claw)")
-    #    sea_bass = get_fish("SEAFOOD Sea Bass Chilean")
-    #    salmon = get_fish("SEAFOOD Sea Bass Chilean")
-
-    #if concept == "casual":
-    #    feature = get_fish("SEAFOOD Feature Fish")
-    #    salmon = get_fish("^(SEAFOOD) (Salmon)$")
-
-    # Chicken & Steak Order
-    def get_purchases(regex, days):
-        #
-        item_list = []
-        items = (
-            Transactions.query.with_entities(
-                Transactions.item,
-            )
-            .distinct(Transactions.item)
-            .filter(
-                Transactions.item.regexp_match(regex),
-                Transactions.name == store.name,
-                Transactions.date >= days,
-                Transactions.type == "AP Invoice",
-            )
-            .order_by(
-                Transactions.item,
-            )
-        ).all()
-        [item_list.append(y) for x in items for y in x]
-        return item_list
-
-    def get_unit_values(start, end, time, regex, items):
-        chart = (
-            db.session.query(func.sum(Menuitems.amount).label("sales"))
-            .select_from(Menuitems)
-            .join(Calendar, Calendar.date == Menuitems.date)
-            .group_by(time)
-            .order_by(time)
-            .filter(
-                Menuitems.date.between(start, end),
-                Menuitems.menuitem.regexp_match(regex),
-                Menuitems.menuitem.in_(items),
-            )
-        )
-        value = []
-        for v in chart:
-            value.append(int(v.sales))
-
-        return value
-
-    def get_unit_sales(start, end, list):
-        query = (
-            db.session.query(
-                Menuitems.menuitem,
-                func.sum(Menuitems.quantity).label("count"),
-            )
-            .filter(
-                Menuitems.date.between(start, end),
-                Menuitems.menuitem.in_(list),
-                Menuitems.name == store.name,
-            )
-            .group_by(Menuitems.menuitem)
-        ).all()
-        sales = pd.DataFrame.from_records(query, columns=["menuitem", "quantity"])
-        return sales
-
-    def get_order_table(regex):
-        """
-        Get a list of items purchased in last 30 days
-        check if used in any prep recipesselfself.
-        Match each item with POS menuitem for last week
-        and same week last year and calculate average
-        """
-        prep_item_list = []
-        item_list = []
-        # Get list of items purchased in last 30 days
-        items = (
-            Transactions.query.with_entities(
-                Transactions.item,
-            )
-            .distinct(Transactions.item)
-            .filter(
-                Transactions.item.regexp_match(regex),
-                Transactions.name == store.name,
-                Transactions.date >= fiscal_dates["last_thirty"],
-                Transactions.type == "AP Invoice",
-            )
-            .order_by(
-                Transactions.item,
-            )
-        ).all()
-        [item_list.append(y) for x in items for y in x]
-
-        for i in item_list:
-            # Get all recipes with ingredient i
-            recipe_lst = (
-                db.session.query(
-                    Ingredients.item,
-                    Ingredients.recipe,
-                    Ingredients.qty,
-                    Ingredients.uofm,
-                ).filter(Ingredients.item == i)
-            ).all()
-            for x in recipe_lst:
-                # account for recipes with prep items for ingredients
-                if re.search(r"^PREP", x.recipe):
-                    prep_lst = (
-                        db.session.query(
-                            Ingredients.item,
-                            Ingredients.recipe,
-                            Ingredients.qty,
-                            Ingredients.uofm,
-                        ).filter(Ingredients.item == x.recipe)
-                    ).all()
-                    if not prep_lst:
-                        continue
-                    # Replace the prep item with the original steak
-                    row_dict = dict(prep_lst[0])
-                    row_dict.update(item=i)
-                    prep_item_list.append(row_dict)
-                if re.search(r"^MENU", x.recipe):
-                    prep_item_list.append(x)
-        menu_list = []
-        for p in prep_item_list:
-            recipes = (
-                db.session.query(Recipes).filter(Recipes.recipe == p["recipe"], Recipes.name == store.name).first()
-            )
-            if recipes:
-                row_dict = dict(p)
-                row_dict["menuitem"] = recipes.menuitem
-                menu_list.append(row_dict)
-        df = pd.DataFrame(menu_list)
-        unit_list = df.loc[:, "menuitem"]
-        unit_sales = get_unit_sales(
-            fiscal_dates["start_previous_week"],
-            fiscal_dates["end_previous_week"],
-            unit_list,
-        )
-        df = df.merge(unit_sales, on="menuitem", how="outer")
-        df["last_week"] = df["qty"] * df["quantity"].astype(float)
-        unit_sales = get_unit_sales(fiscal_dates["start_week_ly"], fiscal_dates["end_week_ly"], unit_list)
-        df = df.merge(unit_sales, on="menuitem", how="outer")
-        df["last_year"] = df["qty"] * df["quantity_y"].astype(float)
-        df.drop(["recipe", "qty"], axis=1, inplace=True)
-        order = df.groupby(["item", "uofm"]).sum()
-
-        return order
-
-    steak_order = get_order_table("^(BEEF Steak)")
-    # TODO multiple prep items does not work
-    # chicken_order = get_order_table("^(PLTRY Chicken)")
-
-    # Item price Change Analysis
-    def get_transactions_by_category(cat, start, end, trans_type):
-        query = (
-            Transactions.query.with_entities(
-                Transactions.item,
-                Transactions.UofM,
-                Transactions.quantity,
-                Transactions.amount,
-            )
-            .distinct(Transactions.item)
-            .filter(
-                Transactions.category1 == cat,
-                Transactions.date.between(start, end),
-                Transactions.name == store.name,
-                Transactions.type == trans_type,
-            )
-            .order_by(
-                Transactions.item,
-            )
-        ).all()
-        item_list = []
-        if not query:
-            row_dict = {
-                "item": "Null",
-                "UofM": "Null",
-                "quantity": 0,
-                "amount": 0,
-                "base_qty": 1,
-                "base_uofm": "Each",
-            }
-            item_list.append(row_dict)
-        for q in query:
-            qty, uofm = convert_uofm(q)
-            row_dict = dict(q)
-            row_dict["base_qty"] = qty
-            row_dict["base_uofm"] = uofm
-            item_list.append(row_dict)
-
-        return item_list
-
-    food_begin = get_transactions_by_category(
-        "Food",
-        fiscal_dates["end_previous_week"],
-        fiscal_dates["end_previous_week"],
-        "Stock Count",
-    )
-    df_begin = pd.DataFrame(food_begin)
-    df_begin["inv_cost"] = df_begin["amount"] / (df_begin["base_qty"] * df_begin["quantity"])
-    df_begin.drop(columns=["quantity", "amount"], inplace=True)
-    food_today = get_transactions_by_category("Food", fiscal_dates["start_week"], CURRENT_DATE, "AP Invoice")
-    df_today = pd.DataFrame(food_today)
-    df_today["current_cost"] = df_today["amount"] / (df_today["base_qty"] * df_today["quantity"])
-    df_today.drop(columns=["UofM", "quantity", "amount", "base_qty", "base_uofm"], inplace=True)
-    df_merge = pd.merge(df_begin, df_today, on="item", how="left")
-    df_merge["cost_diff"] = df_merge["current_cost"] - df_merge["inv_cost"]
-    df_merge["pct_diff"] = (df_merge["cost_diff"] / df_merge["inv_cost"]) * 100
-    df_merge.dropna(axis=0, how="any", subset=["cost_diff"], inplace=True)
-    df_merge.sort_values(by=["pct_diff"], ascending=False, inplace=True)
-    price_increase = df_merge.head(10)
-    price_decrease = df_merge.tail(10).sort_values(by="pct_diff")
-
-    # Costs charts
-    def get_category_costs(start, end, sales, cat):
-        query = (
-            db.session.query(
-                func.sum(Transactions.credit).label("credits"),
-                func.sum(Transactions.debit).label("costs"),
-            )
-            .select_from(Transactions)
-            .join(Calendar, Calendar.date == Transactions.date)
-            .group_by(Calendar.period)
-            .order_by(Calendar.period)
-            .filter(
-                Transactions.date.between(start, end),
-                Transactions.account.in_(cat),
-                Transactions.name == store.name,
-            )
-        )
-        dol_lst = []
-        for v in query:
-            amount = v.costs - v.credits
-            dol_lst.append(amount)
-        add_items = len(sales) - len(dol_lst)
-        for i in range(0, add_items):
-            dol_lst.append(0)
-        # for i in range(0, len(sales)):
-        #    pct_lst.append(dol_lst[i] / sales[i])
-        return dol_lst
-
-    # Supplies cost chart
-    supply_cost_dol = get_category_costs(
-        fiscal_dates["start_year"],
-        fiscal_dates["end_year"],
-        period_sales_list,
-        cat=[
-            "Restaurant Supplies",
-            "Kitchen Supplies",
-            "Cleaning Supplies",
-            "Office Supplies",
-            "Bar Supplies",
-        ],
-    )
-    supply_cost_dol_ly = get_category_costs(
-        fiscal_dates["start_year_ly"],
-        fiscal_dates["end_year_ly"],
-        period_sales_list_ly,
-        cat=[
-            "Restaurant Supplies",
-            "Kitchen Supplies",
-            "Cleaning Supplies",
-            "Office Supplies",
-            "Bar Supplies",
-        ],
-    )
-    query = (
-        Budgets.query.with_entities(Budgets.total_supplies)
-        .order_by(Budgets.period)
-        .filter(Budgets.year == fiscal_dates["year"], Budgets.name == store.name)
-    ).all()
-    supply_budget = []
-    for v in query:
-        supply_budget.append(v.total_supplies)
-
-    # Smallwares cost chart
-    smallware_cost_dol = get_category_costs(
-        fiscal_dates["start_year"],
-        fiscal_dates["end_year"],
-        period_sales_list,
-        cat=["China", "Silverware", "Glassware", "Smallwares"],
-    )
-    smallware_cost_dol_ly = get_category_costs(
-        fiscal_dates["start_year_ly"],
-        fiscal_dates["end_year_ly"],
-        period_sales_list_ly,
-        cat=["China", "Silverware", "Glassware", "Smallwares"],
-    )
-    query = (
-        Budgets.query.with_entities(Budgets.total_smallwares)
-        .order_by(Budgets.period)
-        .filter(Budgets.year == fiscal_dates["year"], Budgets.name == store.name)
-    ).all()
-    smallware_budget = []
-    for v in query:
-        smallware_budget.append(v.total_smallwares)
-
-    # linen cost chart
-    # linen_cost_dol = get_glaccount_costs(
-    #    fiscal_dates["start_year"],
-    #    fiscal_dates["end_year"],
-    #    "Linen",
-    #    store.name,
-    #    Calendar.period,
-    # )
-
-    # linen_cost_dol_ly = get_glaccount_costs(
-    #    fiscal_dates["start_year_ly"],
-    #    fiscal_dates["end_year_ly"],
-    #    "Linen",
-    #    store.name,
-    #    Calendar.period,
-    # )
-
-    # linen cost chart
-    linen_cost_dol = get_category_costs(
-        fiscal_dates["start_year"],
-        fiscal_dates["end_year"],
-        period_sales_list,
-        cat=["Linen"],
-    )
-    linen_cost_dol_ly = get_category_costs(
-        fiscal_dates["start_year_ly"],
-        fiscal_dates["end_year_ly"],
-        period_sales_list_ly,
-        cat=["Linen"],
-    )
-
-    current_supply_cost = supply_cost_dol[fiscal_dates["period"] - 1]
-    # current_supply_budget = supply_budget[fiscal_dates["period"] - 1]
-    current_smallware_cost = smallware_cost_dol[fiscal_dates["period"] - 1]
-    # current_smallware_budget = smallware_budget[fiscal_dates["period"] - 1]
-    period_linen_cost = linen_cost_dol[fiscal_dates["period"] - 1]
-    period_linen_cost_ly = linen_cost_dol_ly[fiscal_dates["period"] - 1]
-
-    query = (
-        Transactions.query.with_entities(Transactions.item).filter(
-            Transactions.date >= fiscal_dates["start_week"],
-            Transactions.name == store.name,
-            Transactions.item.regexp_match("^DO NOT USE*"),
-        )
-    ).all()
-    do_not_use = pd.DataFrame.from_records(query, columns=["menuitem"])
 
     return render_template(
         "home/store.html",
@@ -1037,9 +782,9 @@ def support():
         return redirect(url_for("home_blueprint.stone", store_id=store_id))
 
     if form9.submit9.data and form9.validate():
-        response = update_recipe_costs()
+        response = receiving_by_purchased_item()
         if response == 0:
-            flash(f"Recipe costs updated", "success")
+            flash(f"File has been downloaded", "success")
         session["token"] = fiscal_dates["start_day"]
         return redirect(url_for("home_blueprint.support"))
 

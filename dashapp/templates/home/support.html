@@ -45,18 +45,19 @@
         </div>
         <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
           <div class="card">
-            <div class="card-header bg-info pb-0">
-              <h4>RECIPE COST UPDATE</h4>
+            <div class="card-header bg-warning pb-0">
+              <h4>Receiving by Purchased Item</h4>
             </div>
             <div class="card">
+                <p>Format Receiving By Purchased Item Report</p>
               <form method="POST" action="" style="text-align:center">
-                {{ form5.hidden_tag() }}
+                {{ form9.hidden_tag() }}
                 <fieldset id="" class="form-group mb-1">
                   <div class="form-group mb-1">
                   </div>
                 </fieldset>
                 <div class="form-group">
-                  {{ form5.submit5(class="btn btn-info") }}
+                  {{ form9.submit9(class="btn btn-info") }}
                 </div>
                 <div class="progress">
                   <div id="progressbar" class="progress-bar " role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="0%">0%</div>
@@ -64,6 +65,19 @@
               </form>
             </div>
           </div>
+        </div>
+        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+            <div class="card">
+            <div class="card-header bg-warning pb-0">
+              <h4>Receiving by Purchased Item</h4>
+            </div>
+                <div class="card-body">
+            <div class="input-group mb-3">
+              <input type="file" class="form-control" id="inputGroupFile">
+              <label class="input-group-text bg-info" for="inputGroupFile">Upload</label>
+            </div>
+            </div>
+
         </div>
       </div>
       <div class="row mt-4">
