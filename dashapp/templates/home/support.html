@@ -49,11 +49,11 @@
               <h4>Receiving by Purchased Item</h4>
             </div>
             <div class="card">
-                <p>Format Receiving By Purchased Item Report</p>
-              <form method="POST" action="" style="text-align:center">
+              <form method="POST" action="" style="text-align:center" enctype="multipart/form-data">
                 {{ form9.hidden_tag() }}
                 <fieldset id="" class="form-group mb-1">
                   <div class="form-group mb-1">
+                    <input type="file" class="form-control-file" name="file" id="file">
                   </div>
                 </fieldset>
                 <div class="form-group">
@@ -65,19 +65,6 @@
               </form>
             </div>
           </div>
-        </div>
-        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-            <div class="card">
-            <div class="card-header bg-warning pb-0">
-              <h4>Receiving by Purchased Item</h4>
-            </div>
-                <div class="card-body">
-            <div class="input-group mb-3">
-              <input type="file" class="form-control" id="inputGroupFile">
-              <label class="input-group-text bg-info" for="inputGroupFile">Upload</label>
-            </div>
-            </div>
-
         </div>
       </div>
       <div class="row mt-4">

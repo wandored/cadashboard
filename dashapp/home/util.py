@@ -4,14 +4,14 @@ Dashboard by wandored
 import json
 import csv
 import requests
+from flask import send_file
 import pandas as pd
 import numpy as np
-import tkinter as tk
-from tkinter import filedialog
+from io import StringIO, BytesIO
 from dashapp.config import Config
 from datetime import datetime, timedelta
 from dashapp.authentication.models import *
-from sqlalchemy import or_, func
+from sqlalchemy import func
 
 
 # TODO weekly and period sales records
@@ -151,7 +151,6 @@ def removeSpecial(df):
 
 
 def sales_employee(start, end):
-
     url_filter = "$filter=date ge {}T00:00:00Z and date le {}T00:00:00Z".format(start, end)
     query = "$select=dayPart,netSales,numberofGuests,location&{}".format(url_filter)
     url = "{}/SalesEmployee?{}".format(Config.SRVC_ROOT, query)
@@ -173,7 +172,6 @@ def sales_employee(start, end):
 
 
 def labor_detail(start):
-
     url_filter = "$filter=dateWorked eq {}T00:00:00Z".format(start)
     query = "$select=jobTitle,hours,total,location_ID&{}".format(url_filter)
     url = "{}/LaborDetail?{}".format(Config.SRVC_ROOT, query)
@@ -198,7 +196,6 @@ def labor_detail(start):
 
 
 def sales_detail(start, end):
-
     url_filter = "$filter=date ge {}T00:00:00Z and date le {}T00:00:00Z".format(start, end)
     query = "$select=menuitem,amount,date,quantity,category,location&{}".format(url_filter)
     url = "{}/SalesDetail?{}".format(Config.SRVC_ROOT, query)
@@ -346,7 +343,6 @@ def get_item_avg_cost(regex, start, end, id):
 
 
 def get_category_labor(start, end, store, cat):
-
     data = (
         db.session.query(
             Labor.date,
@@ -361,7 +357,6 @@ def get_category_labor(start, end, store, cat):
 
 
 def potato_sales(start):
-
     df_pot = pd.DataFrame()
     with open("/usr/local/share/potatochart.csv") as f:
         times = csv.reader(f)
@@ -445,10 +440,23 @@ def convert_uofm(unit):
         return 0, 0
 
 
-def receiving_by_purchased_item():
+def download_file(filename):
+    output = BytesIO()
+    writer = pd.ExcelWriter(output, engine="xlsxwriter")
+    df.to_excel(writer, sheet_name="Sheet1")
+    writer.save()
+    output.seek(0)
 
+    # Send the Excel file as a response
+    response = make_response(output.read())
+    response.headres.set("Content-Disposition", "attachment", filename=filename)
+    response.headres.set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+
+    return response
+
+
+def receiving_by_purchased_item(file):
     def make_pivot(table):
-
         vendor = pd.pivot_table(
             table,
             values=["totalQuantity", "ExtCost"],
@@ -477,28 +485,28 @@ def receiving_by_purchased_item():
         )
         return [vendor, restaurant]
 
+    try:
+        file_contents = file.stream.read().decode("utf-8")  # read the file's contents into memory
+        df = pd.read_csv(
+            StringIO(file_contents),
+            skiprows=3,
+            usecols=[
+                "ItemName",
+                "LocationName",
+                "TransactionNumber",
+                "VendorName",
+                "Textbox11",
+                "TransactionDate",
+                "PurchaseUnit",
+                "Quantity",
+                "AmountEach",
+                "ExtPrice2",
+            ],
+        )
+    except:
+        print("No file selected or file error")
+        return 1
 
-    #root = tk.Tk()
-    #root.title("Select Receiving by Purchased Item Report")
-    #root.withdraw()
-    #file_path = filedialog.askopenfilename()
-
-    df = pd.read_csv(
-        file_path,
-        skiprows=3,
-        usecols=[
-            "ItemName",
-            "LocationName",
-            "TransactionNumber",
-            "VendorName",
-            "Textbox11",
-            "TransactionDate",
-            "PurchaseUnit",
-            "Quantity",
-            "AmountEach",
-            "ExtPrice2",
-        ],
-    )
     try:
         filter = df.Quantity.str.match(r"\((.+)\)")
         df = df[~filter]
@@ -550,12 +558,22 @@ def receiving_by_purchased_item():
         df_temp["unit"] = report_unit
         df_sorted = pd.concat([df_sorted, df_temp], ignore_index=True)
 
-    filename = filedialog.asksaveasfilename(filetypes=(("XLSX Files", "*.xlsx"), ("All Files", "*.*")))
-    with pd.ExcelWriter(filename) as writer:
-        vendor, restaurant = make_pivot(df_sorted)
+    vendor, restaurant = make_pivot(df_sorted)
+
+    output = BytesIO()
+    with pd.ExcelWriter(output) as writer:
         vendor.to_excel(writer, sheet_name="Vendor")
         restaurant.to_excel(writer, sheet_name="Restaurant")
         df_sorted.to_excel(writer, sheet_name="Detail", index=False)
+
+    output.seek(0)
+
+    # Send the Excel file as a response
+    return send_file(
+        output,
+        as_attachment=True,
+        download_name="receiving_by_purchased_item.xlsx",
+    )
 
 
 def update_recipe_costs():

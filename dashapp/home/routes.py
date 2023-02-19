@@ -11,7 +11,7 @@ from flask.helpers import url_for
 from flask_security.core import current_user
 from flask_security.decorators import roles_accepted, login_required
 from pandas.core.algorithms import isin
-from flask import flash, render_template, session, redirect, url_for
+from flask import flash, render_template, session, redirect, url_for, request
 from flask.wrappers import Response
 from datetime import datetime, timedelta
 from sqlalchemy import and_, or_, func
@@ -26,7 +26,6 @@ from dashapp.authentication.models import *
 @blueprint.route("/index/", methods=["GET", "POST"])
 @login_required
 def index():
-
     TODAY = datetime.date(datetime.now())
     # CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
     # YSTDAY = TODAY - timedelta(days=1)
@@ -154,7 +153,6 @@ def index():
         budgets3.append(v.total_sales)
 
     def build_sales_table(start, end, start_ly, end_ly, time_frame):
-
         sales = (
             db.session.query(
                 Sales.name,
@@ -281,7 +279,6 @@ def index():
 @blueprint.route("/<int:store_id>/store/", methods=["GET", "POST"])
 @login_required
 def store(store_id):
-
     TODAY = datetime.date(datetime.now())
     CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
     # YSTDAY = TODAY - timedelta(days=1)
@@ -413,7 +410,6 @@ def store(store_id):
     ytd_sales_ly = sum(year_to_date_sales_ly)
 
     def build_sales_table(start, end, start_ly, end_ly, time_frame):
-
         sales = (
             db.session.query(
                 Sales.name,
@@ -551,7 +547,6 @@ def store(store_id):
 @blueprint.route("/marketing/", methods=["GET", "POST"])
 @login_required
 def marketing():
-
     TODAY = datetime.date(datetime.now())
     CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
     YSTDAY = TODAY - timedelta(days=1)
@@ -668,7 +663,6 @@ def marketing():
         return sales
 
     def get_giftcard_payments_per_store(start, end):
-
         data = Restaurants.query.all()
         df_loc = pd.DataFrame([x.as_dict() for x in data])
         df_loc.rename(
@@ -725,7 +719,6 @@ def marketing():
 @login_required
 @roles_accepted("admin")
 def support():
-
     TODAY = datetime.date(datetime.now())
     CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
     YSTDAY = TODAY - timedelta(days=1)
@@ -782,9 +775,8 @@ def support():
         return redirect(url_for("home_blueprint.stone", store_id=store_id))
 
     if form9.submit9.data and form9.validate():
-        response = receiving_by_purchased_item()
-        if response == 0:
-            flash(f"File has been downloaded", "success")
+        file = request.files["file"]
+        receiving_by_purchased_item(file)
         session["token"] = fiscal_dates["start_day"]
         return redirect(url_for("home_blueprint.support"))
 
@@ -831,7 +823,6 @@ def support():
 @blueprint.route("/profile/", methods=["GET", "POST"])
 @login_required
 def profile():
-
     TODAY = datetime.date(datetime.now())
     CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
     YSTDAY = TODAY - timedelta(days=1)
@@ -880,7 +871,6 @@ def profile():
 @blueprint.route("/<int:store_id>/potato/", methods=["GET", "POST"])
 @login_required
 def potato(store_id):
-
     # TODO need to fix store ID
     TODAY = datetime.date(datetime.now())
     CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
@@ -986,7 +976,6 @@ def potato(store_id):
 @blueprint.route("/<int:store_id>/lobster/", methods=["GET", "POST"])
 @login_required
 def lobster(store_id):
-
     TODAY = datetime.date(datetime.now())
     fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
 
@@ -1052,7 +1041,6 @@ def lobster(store_id):
 @blueprint.route("/<int:store_id>/stone/", methods=["GET", "POST"])
 @login_required
 def stone(store_id):
-
     TODAY = datetime.date(datetime.now())
     fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
 
