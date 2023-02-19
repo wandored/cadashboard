@@ -576,6 +576,48 @@ def receiving_by_purchased_item(file):
     )
 
 
+def uofm_update(file):
+    try:
+        file_contents = file.stream.read().decode("utf-8")  # read the file's contents into memory
+        df = pd.read_csv(
+            StringIO(file_contents),
+            usecols=[
+                "Name",
+                "EquivalentQty",
+                "EquivalentUofM",
+                "MeasureType",
+                "BaseQty",
+                "BaseUofM",
+                "UnitOfMeasureId",
+            ],
+        )
+    except Exception as e:
+        print("Error reading file:", e)
+        return 1
+
+    df.rename(
+        columns={
+            "Name": "name",
+            "EquivalentQty": "equivalent_qty",
+            "EquivalentUofM": "equivalent_uofm",
+            "MeasureType": "measure_type",
+            "BaseQty": "base_qty",
+            "BaseUofM": "base_uofm",
+            "UnitOfMeasureid": "uofm_id",
+        },
+        inplace=True,
+    )
+    print(df)
+    # upsert data to Unitsofmeasure table
+    try:
+        df.to_sql("Unitsofmeasure", db.engine, if_exists="replace", index=False)
+    except Exception as e:
+        print("Error writing to database:", e)
+        return 1
+
+    return 0
+
+
 def update_recipe_costs():
     """
     write current recipe costs to database

@@ -66,41 +66,31 @@
             </div>
           </div>
         </div>
-      </div>
-      <div class="row mt-4">
-        <!-- unassigned sales Cards -->
-        <div class="col-lg-4 col-md-6">
-          <div class="card h-100">
-            <div class="card-header bg-primary pb-0">
-              <h4>UNASSIGNED SALES</h4>
-              <h4>{{ fiscal_dates["date"] }}</h4>
+        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+          <div class="card">
+            <div class="card-header bg-warning pb-0">
+              <h4>Units of Measure Update</h4>
             </div>
             <div class="card">
-              <table class="table-responsive table-md">
-                <thead>
-                  <tr>
-                    <th scope="col">STORE-NAME-CATEGORY</th>
-                    <th scope="col">COUNT</th>
-                    <th scope="col">SALES</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for k, v in unassigned_sales.iterrows() %}
-                    <tr>
-                      <th scope="row">{{ v.store }} - {{ v.menuitem }} - {{ v.category }}</th>
-                        <td>
-                          <p class="mb-0 ms-1 text-begin">{{ "{:,.0f}".format(v.quantity) }}</p>
-                        </td>
-                        <td>
-                          <p class="mb-0 ms-1 text-begin">{{ "${:,.0f}".format(v.amount) }}</p>
-                        </td>
-                    </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
+              <form method="POST" action="" style="text-align:center" enctype="multipart/form-data">
+                {{ uofm_form.hidden_tag() }}
+                <fieldset id="" class="form-group mb-1">
+                  <div class="form-group mb-1">
+                    <input type="file" class="form-control-file" name="file" id="file">
+                  </div>
+                </fieldset>
+                <div class="form-group">
+                  {{ uofm_form.submit_uofm(class="btn btn-info") }}
+                </div>
+                <div class="progress">
+                  <div id="progressbar" class="progress-bar " role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="0%">0%</div>
+                </div>
+              </form>
             </div>
           </div>
         </div>
+      </div>
+      <div class="row mt-4">
         <!-- DO NOT USE -->
         <div class="col-lg-4 col-md-6">
           <div class="card h-100">

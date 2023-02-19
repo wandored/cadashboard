@@ -35,7 +35,6 @@ roles_users = db.Table(
 
 # Role class
 class Roles(db.Model, RoleMixin):
-
     __tablename__ = "Roles"
 
     # Our Role has three fields, ID, name and description
@@ -54,7 +53,6 @@ class Roles(db.Model, RoleMixin):
 
 
 class Users(db.Model, UserMixin):
-
     __tablename__ = "Users"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -86,9 +84,9 @@ class Users(db.Model, UserMixin):
 user_datastore = SQLAlchemySessionUserDatastore(db.session, Users, Roles)
 security = Security()
 
+
 # Customized User model for SQL-Admin
 class UserAdmin(sqla.ModelView):
-
     # Don't display the password on the list of Users
     column_exclude_list = ("password", "fs_uniquifier")
 
@@ -97,8 +95,8 @@ class UserAdmin(sqla.ModelView):
 
     # Automatically display human-readable names for the current and available Roles when creating or editing a User
     column_auto_select_related = True
-    column_searchable_list = ['email']
-    column_filters = ['active']
+    column_searchable_list = ["email"]
+    column_filters = ["active"]
     page_size = 50
 
     # Prevent administration of Users unless the currently logged-in user has the "admin" role
@@ -109,7 +107,6 @@ class UserAdmin(sqla.ModelView):
     # There are two reasons for this. First, we want to encrypt the password before storing in the database. Second,
     # we want to use a password field (with the input masked) rather than a regular text field.
     def scaffold_form(self):
-
         # Start with the standard form as provided by Flask-Admin. We've already told Flask-Admin to exclude the
         # password field from this form.
         form_class = super(UserAdmin, self).scaffold_form()
@@ -121,10 +118,8 @@ class UserAdmin(sqla.ModelView):
     # This callback executes when the user saves changes to a newly-created or edited User -- before the changes are
     # committed to the database.
     def on_model_change(self, form, model, is_created):
-
         # If the password field isn't blank...
         if len(model.password2):
-
             # ... then encrypt the new password prior to storing it in the database. If the password field is blank,
             # the existing password in the database will be retained.
             model.password = hash_pass(model.password2)
@@ -135,7 +130,6 @@ class UserAdmin(sqla.ModelView):
 
 # Customized Role model for SQL-Admin
 class RoleAdmin(sqla.ModelView):
-
     # Prevent administration of Roles unless the currently logged-in user has the "admin" role
     def is_accessible(self):
         return current_user.has_role("admin")
@@ -147,7 +141,6 @@ admin.add_view(RoleAdmin(Roles, db.session))
 
 
 class Restaurants(db.Model):
-
     __tablename__ = "Restaurants"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -160,7 +153,6 @@ class Restaurants(db.Model):
 
 
 class Calendar(db.Model):
-
     __tablename__ = "Calendar"
 
     date = db.Column(db.String(64), primary_key=True, unique=True)
@@ -192,7 +184,6 @@ class Calendar(db.Model):
 
 
 class Sales(db.Model):
-
     __tablename__ = "Sales"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -204,7 +195,6 @@ class Sales(db.Model):
 
 
 class Labor(db.Model):
-
     __tablename__ = "Labor"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -217,7 +207,6 @@ class Labor(db.Model):
 
 
 class Menuitems(db.Model):
-
     __tablename__ = "Menuitems"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -231,7 +220,6 @@ class Menuitems(db.Model):
 
 
 class Transactions(db.Model):
-
     __tablename__ = "Transactions"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -256,7 +244,6 @@ class Transactions(db.Model):
 
 
 class Budgets(db.Model):
-
     __tablename__ = "Budgets"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -330,7 +317,6 @@ class Budgets(db.Model):
 
 
 class Potatoes(db.Model):
-
     __tablename__ = "Potatoes"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -343,10 +329,9 @@ class Potatoes(db.Model):
 
 
 class Unitsofmeasure(db.Model):
-
     __tablename__ = "Unitsofmeasure"
 
-    id = db.Column(db.Integer, primary_key=True)
+    uofm_id = db.Column(db.String(64), primary_key=True, unique=True)
     name = db.Column(db.String(64))
     equivalent_qty = db.Column(db.Float)
     equivalent_uofm = db.Column(db.String(64))
@@ -356,7 +341,6 @@ class Unitsofmeasure(db.Model):
 
 
 class Ingredients(db.Model):
-
     __tablename__ = "Ingredients"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -367,7 +351,6 @@ class Ingredients(db.Model):
 
 
 class Recipes(db.Model):
-
     __tablename__ = "Recipes"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -383,7 +366,6 @@ class Recipes(db.Model):
 
 
 class Payments(db.Model):
-
     __tablename__ = "Payments"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -391,4 +373,4 @@ class Payments(db.Model):
     date = db.Column(db.String(64))
     location = db.Column(db.String(64))
     paymenttype = db.Column(db.String(64))
-    restaurant_id = db.Column(db.Integer, db.ForeignKey('Restaurants.id'))
+    restaurant_id = db.Column(db.Integer, db.ForeignKey("Restaurants.id"))
