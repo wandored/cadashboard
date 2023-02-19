@@ -42,3 +42,5 @@ MANIFEST
 .venv
 venv/
 venv.bak/
+dashapp/static/assets/js/core/bootstrap.bundle.min.old
+dashapp/static/assets/js/core/bootstrap.min.old
