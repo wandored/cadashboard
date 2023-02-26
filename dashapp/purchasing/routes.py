@@ -24,10 +24,6 @@ from dashapp.authentication.models import *
 @login_required
 def purchasing():
 
-    TODAY = datetime.date(datetime.now())
-    CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
-    YSTDAY = TODAY - timedelta(days=1)
-
     fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
 
     # Get list of Restaurants
@@ -113,10 +109,6 @@ def purchasing():
 @blueprint.route("/purchasing/<product>", methods=["GET", "POST"])
 @login_required
 def beef(product):
-
-    TODAY = datetime.date(datetime.now())
-    # CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
-    # YSTDAY = TODAY - timedelta(days=1)
 
     fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
 

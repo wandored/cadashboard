@@ -4,12 +4,14 @@ Dashboard by wandored
 import json
 import csv
 import requests
+from flask import send_file
 import pandas as pd
 import numpy as np
+from io import StringIO, BytesIO
 from dashapp.config import Config
 from datetime import datetime, timedelta
 from dashapp.authentication.models import *
-from sqlalchemy import or_, func
+from sqlalchemy import func
 
 
 # TODO weekly and period sales records
@@ -51,6 +53,32 @@ def sales_record(store, time_frame):
         )
     if query:
         return query["top_sales"]
+
+
+def get_daypart_sales(start, end, store, day_part):
+    query = (
+        db.session.query(
+            Sales.date,
+            Sales.daypart,
+            Sales.sales,
+        )
+        .filter(Sales.date.between(start, end), Sales.daypart == (day_part), Sales.name == store)
+        .all()
+    )
+    return query
+
+
+def get_daypart_guest(start, end, store, day_part):
+    query = (
+        db.session.query(
+            Sales.date,
+            Sales.daypart,
+            Sales.guests,
+        )
+        .filter(Sales.date.between(start, end), Sales.daypart == (day_part), Sales.name == store)
+        .all()
+    )
+    return query
 
 
 def find_day_with_sales(**kwargs):
@@ -149,7 +177,6 @@ def removeSpecial(df):
 
 
 def sales_employee(start, end):
-
     url_filter = "$filter=date ge {}T00:00:00Z and date le {}T00:00:00Z".format(start, end)
     query = "$select=dayPart,netSales,numberofGuests,location&{}".format(url_filter)
     url = "{}/SalesEmployee?{}".format(Config.SRVC_ROOT, query)
@@ -171,7 +198,6 @@ def sales_employee(start, end):
 
 
 def labor_detail(start):
-
     url_filter = "$filter=dateWorked eq {}T00:00:00Z".format(start)
     query = "$select=jobTitle,hours,total,location_ID&{}".format(url_filter)
     url = "{}/LaborDetail?{}".format(Config.SRVC_ROOT, query)
@@ -196,7 +222,6 @@ def labor_detail(start):
 
 
 def sales_detail(start, end):
-
     url_filter = "$filter=date ge {}T00:00:00Z and date le {}T00:00:00Z".format(start, end)
     query = "$select=menuitem,amount,date,quantity,category,location&{}".format(url_filter)
     url = "{}/SalesDetail?{}".format(Config.SRVC_ROOT, query)
@@ -344,7 +369,6 @@ def get_item_avg_cost(regex, start, end, id):
 
 
 def get_category_labor(start, end, store, cat):
-
     data = (
         db.session.query(
             Labor.date,
@@ -359,7 +383,6 @@ def get_category_labor(start, end, store, cat):
 
 
 def potato_sales(start):
-
     df_pot = pd.DataFrame()
     with open("/usr/local/share/potatochart.csv") as f:
         times = csv.reader(f)
@@ -441,6 +464,185 @@ def convert_uofm(unit):
         return pack_size.base_qty, pack_size.base_uofm
     else:
         return 0, 0
+
+
+def download_file(filename):
+    output = BytesIO()
+    writer = pd.ExcelWriter(output, engine="xlsxwriter")
+    df.to_excel(writer, sheet_name="Sheet1")
+    writer.save()
+    output.seek(0)
+
+    # Send the Excel file as a response
+    response = make_response(output.read())
+    response.headres.set("Content-Disposition", "attachment", filename=filename)
+    response.headres.set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+
+    return response
+
+
+def receiving_by_purchased_item(file):
+    def make_pivot(table):
+        vendor = pd.pivot_table(
+            table,
+            values=["totalQuantity", "ExtCost"],
+            index=["ItemName", "VendorName", "unit"],
+            aggfunc=np.sum,
+        )
+        vendor = vendor.reset_index().sort_values(["ItemName", "VendorName"]).set_index("VendorName")
+        vendor.loc["Totals"] = vendor.sum(numeric_only=True)
+        vendor["CostPerUnit"] = vendor["ExtCost"] / vendor["totalQuantity"]
+
+        restaurant = pd.pivot_table(
+            table,
+            values=["totalQuantity", "ExtCost"],
+            index=["ItemName", "LocationName", "unit"],
+            aggfunc=np.sum,
+        )
+        restaurant = restaurant.reset_index().sort_values(["ItemName", "LocationName"]).set_index("LocationName")
+        restaurant.loc["Totals"] = restaurant.sum(numeric_only=True)
+        restaurant["CostPerUnit"] = restaurant["ExtCost"] / restaurant["totalQuantity"]
+        restaurant.style.format(
+            {
+                "ExtCost": "${:,.2f}",
+                "totalQuantity": "{:,.0f}",
+                "CostPerUnit": "${:,.2f}",
+            }
+        )
+        return [vendor, restaurant]
+
+    try:
+        file_contents = file.stream.read().decode("utf-8")  # read the file's contents into memory
+        df = pd.read_csv(
+            StringIO(file_contents),
+            skiprows=3,
+            usecols=[
+                "ItemName",
+                "LocationName",
+                "TransactionNumber",
+                "VendorName",
+                "Textbox11",
+                "TransactionDate",
+                "PurchaseUnit",
+                "Quantity",
+                "AmountEach",
+                "ExtPrice2",
+            ],
+        )
+    except:
+        print("No file selected or file error")
+        return 1
+
+    try:
+        filter = df.Quantity.str.match(r"\((.+)\)")
+        df = df[~filter]
+    except:
+        pass
+
+    item_list = [df.ItemName.unique()]
+    item_list = [item for sublist in item_list for item in sublist]
+    item_list.sort()
+
+    # TODO merge the UofM table with the df
+    with open("/usr/local/share/UofM.json") as file:
+        uofm = json.load(file)
+    units = pd.DataFrame(uofm)
+    df = df.merge(units, left_on="PurchaseUnit", right_on="Name", how="left")
+    df.rename(columns={"Textbox11": "VendorNumber"}, inplace=True)
+    try:
+        df["BaseQty"] = df["BaseQty"].str.replace(",", "").astype(float)
+    except:
+        df["BaseQty"] = df["BaseQty"].astype(float)
+    df["Quantity"] = df["Quantity"].astype(float)
+    try:
+        df["AmountEach"] = df["AmountEach"].str.replace(",", "").astype(float)
+    except:
+        df["AmountEach"] = df["AmountEach"].astype(float)
+    try:
+        df["ExtPrice2"] = df["ExtPrice2"].astype(str).str.replace(",", "").astype(float)
+    except:
+        df["ExtPrice2"] = df["ExtPrice2"].astype(float)
+    # rename df["ExtPrice2"] to df["ExtPrice"] to match other reports
+    df.rename(columns={"ExtPrice2": "ExtCost"}, inplace=True)
+    # df.loc["Totals"] = df.sum(numeric_only=True)
+    sorted_units = (
+        df.groupby(["Name"]).mean(numeric_only=True).sort_values(by=["Quantity"], ascending=False).reset_index()
+    )
+    df_sorted = pd.DataFrame()
+    for item in item_list:
+        df_temp = df[df.ItemName == item]
+        sorted_units = (
+            df_temp.groupby(["Name"])
+            .mean(numeric_only=True)
+            .sort_values(by=["Quantity"], ascending=False)
+            .reset_index()
+        )
+        report_unit = df_temp.iloc[0]["Name"]
+        base_factor = df_temp.iloc[0]["BaseQty"]
+        df_temp["reportUnit"] = report_unit
+        df_temp["base_factor"] = base_factor
+        df_temp["totalQuantity"] = df["Quantity"] * df["BaseQty"] / base_factor
+        df_temp["unit"] = report_unit
+        df_sorted = pd.concat([df_sorted, df_temp], ignore_index=True)
+
+    vendor, restaurant = make_pivot(df_sorted)
+
+    output = BytesIO()
+    with pd.ExcelWriter(output) as writer:
+        vendor.to_excel(writer, sheet_name="Vendor")
+        restaurant.to_excel(writer, sheet_name="Restaurant")
+        df_sorted.to_excel(writer, sheet_name="Detail", index=False)
+
+    output.seek(0)
+
+    # Send the Excel file as a response
+    return send_file(
+        output,
+        as_attachment=True,
+        download_name="receiving_by_purchased_item.xlsx",
+    )
+
+
+def uofm_update(file):
+    try:
+        file_contents = file.stream.read().decode("utf-8")  # read the file's contents into memory
+        df = pd.read_csv(
+            StringIO(file_contents),
+            usecols=[
+                "Name",
+                "EquivalentQty",
+                "EquivalentUofM",
+                "MeasureType",
+                "BaseQty",
+                "BaseUofM",
+                "UnitOfMeasureId",
+            ],
+        )
+    except Exception as e:
+        print("Error reading file:", e)
+        return 1
+
+    df.rename(
+        columns={
+            "Name": "name",
+            "EquivalentQty": "equivalent_qty",
+            "EquivalentUofM": "equivalent_uofm",
+            "MeasureType": "measure_type",
+            "BaseQty": "base_qty",
+            "BaseUofM": "base_uofm",
+            "UnitOfMeasureid": "uofm_id",
+        },
+        inplace=True,
+    )
+    print(df)
+    # upsert data to Unitsofmeasure table
+    try:
+        df.to_sql("Unitsofmeasure", db.engine, if_exists="replace", index=False)
+    except Exception as e:
+        print("Error writing to database:", e)
+        return 1
+
+    return 0
 
 
 def update_recipe_costs():
@@ -551,6 +753,9 @@ def set_dates(startdate):
         d["end_period"] = i.period_end
         d["period_to_date"] = i.date
         d["last_thirty"] = thirty.strftime("%Y-%m-%d")
+        d["start_quarter"] = i.quarter_start
+        d["end_quarter"] = i.quarter_end
+        d["quarter_to_date"] = i.date
         d["start_year"] = i.year_start
         d["end_year"] = i.year_end
         d["year_to_date"] = i.date
@@ -563,6 +768,9 @@ def set_dates(startdate):
         d["start_period_ly"] = get_lastyear(i.period_start)
         d["end_period_ly"] = get_lastyear(i.period_end)
         d["period_to_date_ly"] = get_lastyear(i.date)
+        d["start_quarter_ly"] = get_lastyear(i.quarter_start)
+        d["end_quarter_ly"] = get_lastyear(i.quarter_end)
+        d["quarter_to_date_ly"] = get_lastyear(i.date)
         d["start_year_ly"] = get_lastyear(i.year_start)
         d["end_year_ly"] = get_lastyear(i.year_end)
         d["year_to_date_ly"] = get_lastyear(i.date)

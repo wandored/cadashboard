@@ -56,6 +56,9 @@ def set_dates(startdate):
         d["end_period"] = i.period_end
         d["period_to_date"] = i.date
         d["last_thirty"] = thirty.strftime("%Y-%m-%d")
+        d["start_quarter"] = i.quarter_start
+        d["end_quarter"] = i.quarter_end
+        d["quarter_to_date"] = i.date
         d["start_year"] = i.year_start
         d["end_year"] = i.year_end
         d["year_to_date"] = i.date
@@ -68,6 +71,9 @@ def set_dates(startdate):
         d["start_period_ly"] = get_lastyear(i.period_start)
         d["end_period_ly"] = get_lastyear(i.period_end)
         d["period_to_date_ly"] = get_lastyear(i.date)
+        d["start_quarter_ly"] = get_lastyear(i.quarter_start)
+        d["end_quarter_ly"] = get_lastyear(i.quarter_end)
+        d["quarter_to_date_ly"] = get_lastyear(i.date)
         d["start_year_ly"] = get_lastyear(i.year_start)
         d["end_year_ly"] = get_lastyear(i.year_end)
         d["year_to_date_ly"] = get_lastyear(i.date)

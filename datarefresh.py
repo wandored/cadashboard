@@ -4,8 +4,8 @@ uploads it to the local database.  This is run
 hourly from a cron job
 """
 import json
-import csv
 import argparse
+import time
 from sqlalchemy.engine.create import create_engine
 from datetime import datetime, timedelta
 import requests
@@ -45,81 +45,9 @@ def convert_datetime_to_string(col):
     return col
 
 
-def sales_detail(start, end):
-
-    url_filter = (
-        "$filter=modifiedOn ge {}T00:00:00Z and modifiedOn le {}T00:00:00Z".format(
-            start, end
-        )
-    )
-    query = "$select=menuitem,amount,date,quantity,category,location&{}".format(
-        url_filter
-    )
-    url = "{}/SalesDetail?{}".format(Config.SRVC_ROOT, query)
-    rqst = make_HTTP_request(url)
-    df = make_dataframe(rqst)
-    if df.empty:
-        return
-
-    cur.execute(rest_query)
-    data = cur.fetchall()
-    df_loc = pd.DataFrame.from_records(data, columns=["id", "location", "name"])
-    df_merge = df_loc.merge(df, on="location")
-    df_merge = df_merge.drop(columns=["location"])
-
-    with open("/usr/local/share/major_categories.json") as file:
-        major_cats = json.load(file)
-    df_cats = pd.DataFrame(
-        list(major_cats.items()), columns=["menu_category", "category"]
-    )
-
-    # the data needs to be cleaned before it can be used
-    df_menu = df_merge.merge(df_cats, left_on="category", right_on="menu_category")
-    df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(
-        r"CHOPHOUSE - NOLA", "CHOPHOUSE-NOLA", regex=True
-    )
-    df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(
-        r"CAFÉ", "CAFE", regex=True
-    )
-    df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(
-        r"^(?:.*?( -)){2}", "-", regex=True
-    )
-    df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.strip()
-    dafilter = df_menu["menuitem"].str.contains("VOID")
-    df_clean = df_menu[~dafilter]
-    df_clean[["x", "menuitem"]] = df_clean["menuitem"].str.split(" - ", expand=True)
-    df_clean = df_clean.drop(columns=["category_x", "x"])
-    df_clean = df_clean.rename(columns={"category_y": "category"})
-    df_clean["date"] = convert_datetime_to_string(df_clean["date"])
-    menu_pivot = df_clean.pivot_table(
-        index=["date", "name", "menuitem", "category", "menu_category"],
-        values=["amount", "quantity"],
-        aggfunc=np.sum,
-    )
-    for index, row in menu_pivot.iterrows():
-        # delete row if date = index[0] and name = index[1] and daypart = index[2]
-        cur.execute(
-            'DELETE FROM "Menuitems" WHERE date = %s AND name = %s AND menuitem = %s AND category = %s AND menu_category = %s',
-            (index[0], index[1], index[2], index[3], index[4]),
-        )
-        conn.commit()
-
-    menu_pivot.to_sql("Menuitems", engine, if_exists="append")
-    conn.commit()
-
-    return
-
-
 def sales_employee(start, end):
-
-    url_filter = (
-        "$filter=modifiedOn ge {}T00:00:00Z and modifiedOn le {}T00:00:00Z".format(
-            start, end
-        )
-    )
-    query = "$select=date,dayPart,netSales,numberofGuests,location&{}".format(
-        url_filter
-    )
+    url_filter = "$filter=modifiedOn ge {}T00:00:00Z and modifiedOn le {}T00:00:00Z".format(start, end)
+    query = "$select=date,dayPart,netSales,numberofGuests,location&{}".format(url_filter)
     url = "{}/SalesEmployee?{}".format(Config.SRVC_ROOT, query)
     rqst = make_HTTP_request(url)
     df = make_dataframe(rqst)
@@ -127,15 +55,11 @@ def sales_employee(start, end):
         return
     cur.execute(rest_query)
     data = cur.fetchall()
-    df_loc = pd.DataFrame.from_records(data, columns=["id", "location", "name"])
-    df_merge = df_loc.merge(df, on="location")
-    df_merge = df_merge.rename(
-        columns={"netSales": "sales", "numberofGuests": "guests", "dayPart": "daypart"}
-    )
-    df_merge["date"] = convert_datetime_to_string(df_merge["date"])
-    df_pivot = df_merge.pivot_table(
-        index=["date", "name", "daypart"], values=["sales", "guests"], aggfunc=np.sum
-    )
+    restaurants = pd.DataFrame.from_records(data, columns=["id", "location", "name"])
+    df = restaurants.merge(df, on="location")
+    df = df.rename(columns={"netSales": "sales", "numberofGuests": "guests", "dayPart": "daypart"})
+    df["date"] = convert_datetime_to_string(df["date"])
+    df_pivot = df.pivot_table(index=["date", "name", "daypart"], values=["sales", "guests"], aggfunc=np.sum)
     for index, row in df_pivot.iterrows():
         # delete row if date = index[0] and name = index[1] and daypart = index[2]
         cur.execute(
@@ -155,12 +79,7 @@ def sales_employee(start, end):
 
 
 def labor_datail(start, end):
-
-    url_filter = (
-        "$filter=modifiedOn ge {}T00:00:00Z and modifiedOn le {}T00:00:00Z".format(
-            start, end
-        )
-    )
+    url_filter = "$filter=modifiedOn ge {}T00:00:00Z and modifiedOn le {}T00:00:00Z".format(start, end)
     query = "$select=dateWorked,jobTitle,hours,total,location_ID&{}".format(url_filter)
     url = "{}/LaborDetail?{}".format(Config.SRVC_ROOT, query)
     rqst = make_HTTP_request(url)
@@ -170,17 +89,17 @@ def labor_datail(start, end):
 
     with open("/usr/local/share/labor_categories.json") as labor_file:
         labor_cats = json.load(labor_file)
-    df_cats = pd.DataFrame(list(labor_cats.items()), columns=["job", "category"])
+    labor_categories = pd.DataFrame(list(labor_cats.items()), columns=["job", "category"])
 
     cur.execute(rest_query)
     data = cur.fetchall()
-    df_location = pd.DataFrame.from_records(data, columns=["id", "location", "name"])
-    df_merge = df_location.merge(df, left_on="location", right_on="location_ID")
-    df_merge = df_merge.rename(columns={"jobTitle": "job", "total": "dollars"})
-    df_merge = df_merge.merge(df_cats, on="job")
+    restaurantsation = pd.DataFrame.from_records(data, columns=["id", "location", "name"])
+    df = restaurantsation.merge(df, left_on="location", right_on="location_ID")
+    df = df.rename(columns={"jobTitle": "job", "total": "dollars"})
+    df = df.merge(labor_categories, on="job")
 
-    df_merge["date"] = convert_datetime_to_string(df_merge["dateWorked"])
-    df_pivot = df_merge.pivot_table(
+    df["date"] = convert_datetime_to_string(df["dateWorked"])
+    df_pivot = df.pivot_table(
         index=["date", "name", "category", "job"],
         values=["hours", "dollars"],
         aggfunc=np.sum,
@@ -204,108 +123,8 @@ def labor_datail(start, end):
     return
 
 
-def potato_sales(start):
-
-    df_pot = pd.DataFrame()
-    with open("/usr/local/share/potatochart.csv") as f:
-        times = csv.reader(f)
-        next(times)
-        for t in times:
-            url_filter = "$filter=date ge {}T{}Z and date le {}T{}Z".format(
-                start, t[2], start, t[3]
-            )
-            query = "$select=menuitem,date,quantity,location&{}".format(url_filter)
-            url = "{}/SalesDetail?{}".format(Config.SRVC_ROOT, query)
-            rqst = make_HTTP_request(url)
-            df = make_dataframe(rqst)
-            if df.empty:
-                continue
-
-            cur.execute(rest_query)
-            data = cur.fetchall()
-            df_loc = pd.DataFrame.from_records(data, columns=["id", "location", "name"])
-            df_merge = df_loc.merge(df, on="location")
-            if df_merge.empty:
-                if df_pot.empty:
-                    continue
-                df_pot.loc[t[0]] = [0]
-                continue
-            df_merge = df_merge.drop(columns=["location"])
-            df_menu = df_merge
-            df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(
-                r"CHOPHOUSE - NOLA", "CHOPHOUSE-NOLA", regex=True
-            )
-            df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(
-                r"CAFÉ", "CAFE", regex=True
-            )
-            df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(
-                r"^(?:.*?( -)){2}", "-", regex=True
-            )
-            df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.strip()
-            dafilter = df_menu["menuitem"].str.contains("VOID")
-            df_clean = df_menu[~dafilter]
-            df_clean[["x", "menuitem"]] = df_clean["menuitem"].str.split(
-                " - ", expand=True
-            )
-            pot_list = [
-                "BAKED POTATO",
-                "BAKED POTATO N/C",
-                "POTATO",
-                "POT",
-                "BAKED POTATO A SIDE",
-                "BAKED POTATO SIDE",
-                "KID SUB POT",
-                "POT-A",
-                "S-BAKED POTATO",
-                "SUB BAKED POTATO IN KIDS",
-                "SUB KID POT",
-                "Baked Potato",
-                "Baked Potato (After 4:00 PM)",
-                "Kid Baked Potato",
-                "Kid Baked Potato (After 4:00 PM)",
-                "Loaded Baked Potato",
-            ]
-            df = df_clean[df_clean["menuitem"].isin(pot_list)]
-            if df.empty:
-                continue
-            df.loc[:, "time"] = t[0]
-            df.loc[:, "in_time"] = t[1]
-            df.loc[:, "out_time"] = t[4]
-            df.loc[:, "date"] = convert_datetime_to_string(df["date"])
-            # df_pot = df_pot.append(df)
-            df_pot = pd.concat([df_pot, df], ignore_index=True)
-
-        # df_pot['date'] = convert_datetime_to_string(df_pot['date'])
-        # Write the daily menu items to Menuitems table
-        menu_pivot = df_pot.pivot_table(
-            index=["date", "name", "time", "in_time", "out_time"],
-            values=["quantity"],
-            aggfunc=np.sum,
-        )
-    for index, row in menu_pivot.iterrows():
-        cur.execute(
-            'DELETE FROM "Potatoes" WHERE date = %s AND name = %s AND time = %s',
-            (
-                index[0],
-                index[1],
-                index[2],
-            ),
-        )
-        conn.commit()
-
-    menu_pivot.to_sql("Potatoes", engine, if_exists="append")
-    conn.commit()
-
-    return
-
-
 def sales_payments(start, end):
-
-    url_filter = (
-        "$filter=modifiedOn ge {}T00:00:00Z and modifiedOn le {}T00:00:00Z".format(
-            start, end
-        )
-    )
+    url_filter = "$filter=modifiedOn ge {}T00:00:00Z and modifiedOn le {}T00:00:00Z".format(start, end)
     query = "$select=amount,date,location,paymenttype&{}".format(url_filter)
     url = "{}/SalesPayment?{}".format(Config.SRVC_ROOT, query)
     rqst = make_HTTP_request(url)
@@ -314,13 +133,11 @@ def sales_payments(start, end):
         return
     cur.execute(rest_query)
     data = cur.fetchall()
-    df_loc = pd.DataFrame.from_records(
-        data, columns=["restaurant_id", "location", "name"]
-    )
-    df_merge = df_loc.merge(df, on="location")
+    restaurants = pd.DataFrame.from_records(data, columns=["restaurant_id", "location", "name"])
+    df = restaurants.merge(df, on="location")
 
-    df_merge["date"] = convert_datetime_to_string(df_merge["date"])
-    df_pivot = df_merge.pivot_table(
+    df["date"] = convert_datetime_to_string(df["date"])
+    df_pivot = df.pivot_table(
         index=["date", "restaurant_id", "location", "paymenttype"],
         values="amount",
         aggfunc=np.sum,
@@ -344,7 +161,6 @@ def sales_payments(start, end):
 
 
 if __name__ == "__main__":
-
     engine = create_engine(Config.SQLALCHEMY_DATABASE_URI)
     conn = psycopg2.connect(
         host="localhost",
@@ -357,29 +173,42 @@ if __name__ == "__main__":
 
     # creat and argument parser object
     parser = argparse.ArgumentParser()
-    
+
     # check for user provide argument
     parser.add_argument("-d", "--date", help="Date to run the script")
     args = parser.parse_args()
 
     # if user provide argument use it else use today's date
     if args.date:
-        DATE = datetime.strptime(args.date, "%Y-%m-%d")
+        start_date = datetime.strptime(args.date, "%Y-%m-%d").date()
     else:
-        DATE = datetime.date(datetime.now())
+        start_date = datetime.now().date()
 
+    if start_date > datetime.now().date():
+        print("Date cannot be in the future")
+        exit()
 
-    YSTDAY = DATE - timedelta(days=1)
-    TMRDAY = DATE + timedelta(days=1)
-    today = DATE.strftime("%Y-%m-%d")
-    tonight = TMRDAY.strftime("%Y-%m-%d")
-    yesterday = YSTDAY.strftime("%Y-%m-%d")
-    print(f"Date is {today}")
+    current_date = start_date
+    while current_date <= datetime.now().date():
+        YSTDAY = current_date - timedelta(days=1)
+        TMRDAY = current_date + timedelta(days=1)
+        today = current_date.strftime("%Y-%m-%d")
+        tonight = TMRDAY.strftime("%Y-%m-%d")
+        yesterday = YSTDAY.strftime("%Y-%m-%d")
+        print(f"Date is {today}")
 
-    sales_payments(today, tonight)
-    sales_detail(today, tonight)
-    sales_employee(today, tonight)
-    labor_datail(today, tonight)
-    potato_sales(yesterday)
+        start_time = time.time()
+        sales_payments(today, tonight)
+        end_time = time.time()
+        print(f"Sales Payments took {end_time - start_time} seconds")
+        start_time = time.time()
+        sales_employee(today, tonight)
+        end_time = time.time()
+        print(f"Sales Employee took {end_time - start_time} seconds")
+        start_time = time.time()
+        labor_datail(today, tonight)
+        end_time = time.time()
+        print(f"Labor Detail took {end_time - start_time} seconds")
+        current_date = current_date + timedelta(days=1)
 
     conn.close()

@@ -7,288 +7,385 @@
 
 {% block content %}
 
-  <div class="container-fluid py-4">
-    <div class="row">
-      <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-        <div class="card">
-          <div class="card-header p-3 pt-2">
-            <div class="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
-              <i class="material-icons opacity-10">paid</i>
-            </div>
-              <div class="text-end pt-1">
-                <p class="text-sm mb-0 text-capitalize">{{ fiscal_dates["date"] }}</p>
-                <h4 class="mb-0">{{ "${:,.0f}".format(sales_day) }}</h4>
-              </div>
+<div class="container-fluid py-4">
+  <div class="row">
+    <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+      <div class="card">
+        <div class="card-header p-3 pt-2">
+          <div class="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
+            <i class="material-icons opacity-10">paid</i>
           </div>
-          <hr class="dark horizontal my-0">
-          {% if sales_day >= sales_day_ly %}
-            <div class="card-footer p-3">
-              <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((sales_day - sales_day_ly) / sales_day_ly) * 100) }} - {{ "${:,.0f}".format(sales_day_ly) }}</span> SDLY</p>
+            <div class="text-end pt-1">
+              <p class="text-sm mb-0 text-capitalize">{{ fiscal_dates["date"] }} </p>
+              <h4 class="mb-0">{{ "${:,.0f}".format(daily_sales) }}</h4>
             </div>
-            {% else %}
-            <div class="card-footer p-3">
-              <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((sales_day - sales_day_ly)|abs / sales_day_ly) * 100) }} - {{ "${:,.0f}".format(sales_day_ly) }}</span> SDLY</p>
-            </div>
-            {% endif %}
         </div>
-      </div>
-      <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-        <div class="card">
-          <div class="card-header p-3 pt-2">
-            <div class="icon icon-lg icon-shape bg-gradient-success shadow-success text-center border-radius-xl mt-n4 position-absolute">
-              <i class="material-icons opacity-10">paid</i>
-            </div>
-              <div class="text-end pt-1">
-                <p class="text-sm mb-0 text-capitalize">Week {{ fiscal_dates["week"] }} Sales</p>
-                <h4 class="mb-0">{{ "${:,.0f}".format(sales_week) }}</h4>
-              </div>
+        <hr class="dark horizontal my-0">
+        {% if daily_sales >= daily_sales_ly %}
+          <div class="card-footer p-3">
+            <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((daily_sales - daily_sales_ly) / daily_sales_ly) * 100) }} - {{ "${:,.0f}".format(daily_sales_ly) }}</span> SDLY</p>
           </div>
-          <hr class="dark horizontal my-0">
-            {% if sales_week >= sales_week_ly %}
-            <div class="card-footer p-3">
-              <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((sales_week - sales_week_ly) / sales_week_ly) * 100) }} - {{ "${:,.0f}".format(sales_week_ly) }}</span> WTD</p>
-            </div>
-            {% else %}
-            <div class="card-footer p-3">
-              <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((sales_week - sales_week_ly)|abs / sales_week_ly) * 100) }} - {{ "${:,.0f}".format(sales_week_ly) }}</span> WTD</p>
-            </div>
-            {% endif %}
-        </div>
-      </div>
-      <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-        <div class="card">
-          <div class="card-header p-3 pt-2">
-            <div class="icon icon-lg icon-shape bg-gradient-info shadow-info text-center border-radius-xl mt-n4 position-absolute">
-              <i class="material-icons opacity-10">paid</i>
-            </div>
-              <div class="text-end pt-1">
-                <p class="text-sm mb-0 text-capitalize">Period {{ fiscal_dates["period"] }} Sales</p>
-                <h4 class="mb-0">{{ "${:,.0f}".format(sales_period) }}</h4>
-              </div>
+          {% else %}
+          <div class="card-footer p-3">
+            <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((daily_sales - daily_sales_ly)|abs / daily_sales_ly) * 100) }} - {{ "${:,.0f}".format(daily_sales_ly) }}</span> SDLY</p>
           </div>
-          <hr class="dark horizontal my-0">
-            {% if sales_period >= sales_period_ly %}
-            <div class="card-footer p-3">
-              <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((sales_period - sales_period_ly) / sales_period_ly) * 100) }} - {{ "${:,.0f}".format(sales_period_ly) }}</span> PTD</p>
-            </div>
-            {% else %}
-            <div class="card-footer p-3">
-              <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((sales_period - sales_period_ly)|abs / sales_period_ly) * 100) }} - {{ "${:,.0f}".format(sales_period_ly) }}</span> PTD</p>
-            </div>
-            {% endif %}
-        </div>
-      </div>
-      <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-        <div class="card">
-          <div class="card-header p-3 pt-2">
-            <div class="icon icon-lg icon-shape bg-gradient-warning shadow-warning text-center border-radius-xl mt-n4 position-absolute">
-              <i class="material-icons opacity-10">paid</i>
-            </div>
-              <div class="text-end pt-1">
-                <p class="text-sm mb-0 text-capitalize">Fiscal {{ fiscal_dates["year"] }} Sales</p>
-                <h4 class="mb-0"> {{ "${:,.0f}".format(sales_year) }}</h4>
-              </div>
-          </div>
-          <hr class="dark horizontal my-0">
-            {% if sales_year >= sales_year_ly %}
-            <div class="card-footer p-3">
-              <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((sales_year - sales_year_ly) / sales_year_ly) * 100) }} - {{ "${:,.0f}".format(sales_year_ly) }}</span> YTD</p>
-            </div>
-            {% else %}
-            <div class="card-footer p-3">
-              <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((sales_year - sales_year_ly)|abs / sales_year_ly) * 100) }} - {{ "${:,.0f}".format(sales_year_ly) }}</span> YTD</p>
-            </div>
-            {% endif %}
-        </div>
+          {% endif %}
       </div>
     </div>
-    <!-- Second Row -Charts -->
-    <div class="row mt-4">
-      <div class="col-lg-4 col-md-6 mt-4 mb-4">
-        <div class="card z-index-2 ">
-          <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-            <div class="bg-gradient-primary shadow-primary border-radius-lg py-3 pe-1">
-              <div class="chart">
-                <canvas id="chart-wtd" class="chart-canvas" height="170"></canvas>
-              </div>
+    <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+      <div class="card">
+        <div class="card-header p-3 pt-2">
+          <div class="icon icon-lg icon-shape bg-gradient-success shadow-success text-center border-radius-xl mt-n4 position-absolute">
+            <i class="material-icons opacity-10">paid</i>
+          </div>
+            <div class="text-end pt-1">
+              <p class="text-sm mb-0 text-capitalize">Week {{ fiscal_dates["week"] }} Sales</p>
+              <h4 class="mb-0">{{ "${:,.0f}".format(weekly_sales) }}</h4>
             </div>
-          </div>
-          <div class="card-body">
-              <h6 class="mb-0 ">Week to Date Sales</h6>
-            {% if sales_week > sales_week_ly %}
-            <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.0f}".format(sales_week - sales_week_ly) }} over last year</p>
-            {% else %}
-            <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.0f}".format(sales_week - sales_week_ly) }} below last year</p>
-            {% endif %}
-          </div>
         </div>
-      </div>
-      <div class="col-lg-4 col-md-6 mt-4 mb-4">
-        <div class="card z-index-2  ">
-          <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-            <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
-              <div class="chart">
-                <canvas id="chart-ptd" class="chart-canvas" height="170"></canvas>
-              </div>
-            </div>
+        <hr class="dark horizontal my-0">
+          {% if weekly_sales >= wtd_sales_ly %}
+          <div class="card-footer p-3">
+            <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((weekly_sales - wtd_sales_ly) / wtd_sales_ly) * 100) }} - {{ "${:,.0f}".format(wtd_sales_ly) }}</span> WTD</p>
           </div>
-          <div class="card-body">
-              <h6 class="mb-0 ">Period to Date Sales</h6>
-            {% if sales_period > sales_period_ly %}
-            <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.0f}".format(sales_period - sales_period_ly) }} over last year</p>
-            {% else %}
-            <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.0f}".format(sales_period - sales_period_ly) }} below last year</p>
-            {% endif %}
+          {% else %}
+          <div class="card-footer p-3">
+            <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((weekly_sales - wtd_sales_ly)|abs / wtd_sales_ly) * 100) }} - {{ "${:,.0f}".format(wtd_sales_ly) }}</span> WTD</p>
           </div>
-        </div>
-      </div>
-      <div class="col-lg-4 mt-4 mb-3">
-        <div class="card z-index-2 ">
-          <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-            <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
-              <div class="chart">
-                <canvas id="chart-ytd" class="chart-canvas" height="170"></canvas>
-              </div>
-            </div>
-          </div>
-          <div class="card-body">
-              <h6 class="mb-0 ">Year to Date Sales</h6>
-            {% if sales_year > sales_year_ly %}
-            <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.0f}".format(sales_year - sales_year_ly) }} over last year</p>
-            {% else %}
-            <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.0f}".format(sales_year - sales_year_ly) }} below last year</p>
-            {% endif %}
-          </div>
-        </div>
+          {% endif %}
       </div>
     </div>
-    <div class="row mb-4">
-        <div class="col-lg-4 col-md-6">
-          <div class="card">
-            <div class="card-header bg-primary pb-0">
-              <h4>STEAK ORDER</h4>
-            </div>
-              <div class="table-responsive">
-                <table class="table-sm">
-                  <thead>
-                    <tr>
-                      <th scope="col">STEAK</th>
-                      <th scope="col">UofM</th>
-                      <th scope="col">LAST YEAR</th>
-                      <th scope="col">LAST WEEK</th>
-                      <th scope="col">AVG/DAY</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {% for k, v in steak_order.iterrows() %}
-                        <tr>
-                          <th scope="row">{{ k[0] }}</th>
-                          <td>
-                            <p class="mb-0 ms-1 text-begin">{{ k[1] }}</p>
-                          </td>
-                          <td>
-                            <p class="mb-0 ms-1 text-begin">{{ v['last_year'] }}</p>
-                          </td>
-                          <td>
-                            <p class="mb-0 ms-1 text-begin">{{ v['last_week'] }}</p>
-                          </td>
-                          <td>
-                            <p class="mb-0 ms-1 text-begin">{{ "{:,.0f}".format((v['last_week'])/7) }}</p>
-                          </td>
-                        </tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
-              </div>
+    <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+      <div class="card">
+        <div class="card-header p-3 pt-2">
+          <div class="icon icon-lg icon-shape bg-gradient-info shadow-info text-center border-radius-xl mt-n4 position-absolute">
+            <i class="material-icons opacity-10">paid</i>
           </div>
-        </div>
-      <div class="col-lg-4 col-md-6">
-        <div class="card">
-          <div class="card-header bg-success pb-0">
-            <h4>Top Price Increase {{ fiscal_dates["date"] }}</h4>
-          </div>
-            <div class="table-responsive">
-              <table class="table-sm">
-                <thead>
-                  <tr>
-                    <th scope="col">Item</th>
-                    <th scope="col">UofM</th>
-                    <th scope="col">Inv Cost</th>
-                    <th scope="col">Current Cost</th>
-                    <th scope="col">% Change</th>
-                  </tr>
-                </thead>
-                <tbody>
-                    {% for k, v in price_increase.iterrows() %}
-                  <tr>
-                      <td>
-                        <p class="mb-0 ms-1">{{ v['item'] }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1">{{ v.UofM }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1">{{ "${:,.2f}".format(v.inv_cost * v.base_qty) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1">{{ "${:,.2f}".format(v.current_cost * v.base_qty) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1">{{ "{:,.1f}%".format(v.pct_diff) }}</p>
-                      </td>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
+            <div class="text-end pt-1">
+              <p class="text-sm mb-0 text-capitalize">Period {{ fiscal_dates["period"] }} Sales</p>
+              <h4 class="mb-0">{{ "${:,.0f}".format(period_sales) }}</h4>
             </div>
         </div>
-      </div>
-      <div class="col-lg-4 col-md-6">
-        <div class="card">
-          <div class="card-header bg-info pb-0">
-            <h4>Top Price Decrease {{ fiscal_dates["date"] }}</h4>
+        <hr class="dark horizontal my-0">
+          {% if period_sales >= ptd_sales_ly %}
+          <div class="card-footer p-3">
+            <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((period_sales - ptd_sales_ly) / ptd_sales_ly) * 100) }} - {{ "${:,.0f}".format(ptd_sales_ly) }}</span> PTD</p>
           </div>
-            <div class="table-responsive">
-              <table class="table-sm">
-                <thead>
-                  <tr>
-                    <th scope="col">Item</th>
-                    <th scope="col">UofM</th>
-                    <th scope="col">Inv Cost</th>
-                    <th scope="col">Current Cost</th>
-                    <th scope="col">% Change</th>
-                  </tr>
-                </thead>
-                <tbody>
-                    {% for k, v in price_decrease.iterrows() %}
-                  <tr>
-                      <td>
-                        <p class="mb-0 ms-1">{{ v['item'] }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1">{{ v.UofM }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1">{{ "${:,.2f}".format(v.inv_cost * v.base_qty) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1">{{ "${:,.2f}".format(v.current_cost * v.base_qty) }}</p>
-                      </td>
-                      <td>
-                        <p class="mb-0 ms-1">{{ "{:,.1f}%".format(v.pct_diff) }}</p>
-                      </td>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            </div>
-        </div>
+          {% else %}
+          <div class="card-footer p-3">
+            <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((period_sales - ptd_sales_ly)|abs / ptd_sales_ly) * 100) }} - {{ "${:,.0f}".format(ptd_sales_ly) }}</span> PTD</p>
+          </div>
+          {% endif %}
       </div>
     </div>
-
-    {% include 'includes/footer.html' %}
-
+    <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+      <div class="card">
+        <div class="card-header p-3 pt-2">
+          <div class="icon icon-lg icon-shape bg-gradient-warning shadow-warning text-center border-radius-xl mt-n4 position-absolute">
+            <i class="material-icons opacity-10">paid</i>
+          </div>
+            <div class="text-end pt-1">
+              <p class="text-sm mb-0 text-capitalize">Fiscal {{ fiscal_dates["year"] }} Sales</p>
+              <h4 class="mb-0"> {{ "${:,.0f}".format(yearly_sales) }}</h4>
+            </div>
+        </div>
+        <hr class="dark horizontal my-0">
+          {% if yearly_sales >= ytd_sales_ly %}
+          <div class="card-footer p-3">
+            <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((yearly_sales - ytd_sales_ly) / ytd_sales_ly) * 100) }} - {{ "${:,.0f}".format(ytd_sales_ly) }}</span> YTD</p>
+          </div>
+          {% else %}
+          <div class="card-footer p-3">
+            <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((yearly_sales - ytd_sales_ly)|abs / ytd_sales_ly) * 100) }} - {{ "${:,.0f}".format(ytd_sales_ly) }}</span> YTD</p>
+          </div>
+          {% endif %}
+      </div>
+    </div>
   </div>
+  <!-- Second Row -Charts -->
+  <div class="row mt-4">
+    <div class="col-lg-4 col-md-6 mt-4 mb-4">
+      <div class="card z-index-2 ">
+        <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+          <div class="bg-gradient-primary shadow-primary border-radius-lg py-3 pe-1">
+            <div class="chart">
+              <canvas id="chart-bars" class="chart-canvas" height="170"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <h6 class="mb-0 ">Week to Date Sales</h6>
+          {% if weekly_sales > wtd_sales_ly %}
+          <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.0f}".format(weekly_sales - wtd_sales_ly) }} over last year</p>
+          {% else %}
+          <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.0f}".format(weekly_sales - wtd_sales_ly) }} below last year</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4 col-md-6 mt-4 mb-4">
+      <div class="card z-index-2  ">
+        <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+          <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
+            <div class="chart">
+              <canvas id="chart-line" class="chart-canvas" height="170"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <h6 class="mb-0 ">Period to Date Sales</h6>
+          {% if period_sales > ptd_sales_ly %}
+          <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.0f}".format(period_sales - ptd_sales_ly) }} over last year</p>
+          {% else %}
+          <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.0f}".format(period_sales - ptd_sales_ly) }} below last year</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4 mt-4 mb-3">
+      <div class="card z-index-2 ">
+        <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+          <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
+            <div class="chart">
+              <canvas id="chart-line-tasks" class="chart-canvas" height="170"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <h6 class="mb-0 ">Year to Date Sales</h6>
+          {% if yearly_sales > ytd_sales_ly %}
+          <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.0f}".format(yearly_sales - ytd_sales_ly) }} over last year</p>
+          {% else %}
+          <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.0f}".format(yearly_sales - ytd_sales_ly) }} below last year</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Daily Sales Table -->
+  <div class="row mb-4">
+    <div class="col-lg-8 col-md-6 mb-md-0 mb-4">
+      <div class="card">
+          <ul class="nav nav-tabs mb-0" id="nav-tab" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="nav-day-tab" data-bs-toggle="pill" data-bs-target="#nav-day" type="button" role="tab" aria-controls="nav-day" aria-selected="true">Week</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="nav-week-tab" data-bs-toggle="pill" data-bs-target="#nav-week" type="button" role="tab" aria-controls="nav-week" aria-selected="false">Period</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="nav-period-tab" data-bs-toggle="pill" data-bs-target="#nav-period" type="button" role="tab" aria-controls="nav-period" aria-selected="false">Quarter</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="nav-year-tab" data-bs-toggle="pill" data-bs-target="#nav-year" type="button" role="tab" aria-controls="nav-year" aria-selected="false">Year</button>
+          </li>
+        </ul>
+        <div class="tab-content" id="nav-tabContent">
+          <div class="tab-pane fade show active" id="nav-day" role="tabpanel" aria-labelledby="nav-day-tab">
+        <div class="card-header pb-0">
+          <div class="row">
+            <div class="col-lg-6 col-7">
+              <h4>Week-{{ fiscal_dates["week"] }}</h4>
+            </div>
+          </div>
+        </div>
+        <div class="card-body px-0 pb-2">
+          <div class="table-responsive table-hover">
+            <table class="table align-items-center mb-0">
+              <thead>
+                <tr>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Days</th>
+                {% for cat in weekly_table.columns %}
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">{{ cat }}</th>
+                {% endfor %}
+                </tr>
+              </thead>
+              <tbody>
+                {% for cat, row in weekly_table.iterrows() %}
+                <tr> 
+                  <td>
+                    {{ row["name"] }}
+                  </td>
+                    {% for _, value in row.items() %}
+                  <td>
+                        {{ "{:,.0f}".format(value) }}
+                  </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+          </div>
+          <div class="tab-pane fade" id="nav-week" role="tabpanel" aria-labelledby="nav-week-tab">
+        <div class="card-header pb-0">
+          <div class="row">
+            <div class="col-lg-6 col-7">
+              <h4>Period-{{ fiscal_dates["period"] }}</h4>
+            </div>
+          </div>
+        </div>
+        <div class="card-body px-0 pb-2">
+          <div class="table-responsive table-hover">
+            <table class="table align-items-center mb-0">
+              <thead>
+                <tr>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Weeks</th>
+                {% for cat in period_table.columns %}
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">{{ cat }}</th>
+                {% endfor %}
+                </tr>
+              </thead>
+              <tbody>
+                {% for cat, row in period_table.iterrows() %}
+                <tr> 
+                  <td>
+                    {{ row["name"] }}
+                  </td>
+                    {% for _, value in row.items() %}
+                  <td>
+                        {{ "{:,.0f}".format(value) }}
+                  </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+            </div>
+          <div class="tab-pane fade" id="nav-period" role="tabpanel" aria-labelledby="nav-period-tab">
+        <div class="card-header pb-0">
+          <div class="row">
+            <div class="col-lg-6 col-7">
+              <h4>Quarter-{{ fiscal_dates["quarter"] }}</h4>
+            </div>
+          </div>
+        </div>
+        <div class="card-body px-0 pb-2">
+          <div class="table-responsive table-hover">
+            <table class="table align-items-center mb-0">
+              <thead>
+                <tr>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Periods</th>
+                {% for cat in quarterly_table.columns %}
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">{{ cat }}</th>
+                {% endfor %}
+                </tr>
+              </thead>
+              <tbody>
+                {% for cat, row in quarterly_table.iterrows() %}
+                <tr> 
+                  <td>
+                    {{ row["name"] }}
+                  </td>
+                    {% for _, value in row.items() %}
+                  <td>
+                        {{ "{:,.0f}".format(value) }}
+                  </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+            </div>
+          <div class="tab-pane fade" id="nav-year" role="tabpanel" aria-labelledby="nav-year-tab">
+        <div class="card-header pb-0">
+          <div class="row">
+            <div class="col-lg-6 col-7">
+              <h4>Year-{{ fiscal_dates["year"] }}</h4>
+            </div>
+          </div>
+        </div>
+        <div class="card-body px-0 pb-2">
+          <div class="table-responsive table-hover">
+            <table class="table align-items-center mb-0">
+              <thead>
+                <tr>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Quarters</th>
+                {% for cat in yearly_table.columns %}
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">{{ cat }}</th>
+                {% endfor %}
+                </tr>
+              </thead>
+              <tbody>
+                {% for cat, row in yearly_table.iterrows() %}
+                <tr> 
+                  <td>
+                    {{ row["name"] }}
+                  </td>
+                    {% for _, value in row.items() %}
+                  <td>
+                        {{ "{:,.0f}".format(value) }}
+                  </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+            </div>
+        </div>
+        
+      </div>
+    </div>
+    <!-- scorecard -->
+    <div class="col-lg-4 col-md-6">
+      <div class="card h-100">
+        <div class="card-header pb-0">
+          <h6>Scorecard</h6>
+        </div>
+          <p class="text-sm">
+            <span class="font-weight-bold">Top 5 Sales Over Last Year</span>
+          </p>
+        <div class="alert alert-primary" role="alert">
+          <table class="table-responsive table-sm text-light">
+            <thead>
+              <tr>
+                <th scope="col">DAILY</th>
+                <th scope="col">% Over LY</th>
+                <th scope="col">$ Over LY</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+        <div class="alert alert-success" role="alert">
+          <table class="table-responsive table-sm text-light text-bold">
+            <thead>
+              <tr>
+                <th scope="col">WEEKLY</th>
+                <th scope="col">% Over LY</th>
+                <th scope="col">$ Over LY</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+        <div class="alert alert-info" role="alert">
+          <table class="table-responsive table-sm text-light">
+            <thead>
+              <tr>
+                <th scope="col">PERIOD</th>
+                <th scope="col">% Over LY</th>
+                <th scope="col">$ Over LY</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% include 'includes/footer.html' %}
+</div>
 
 {% endblock content %}
 
@@ -297,7 +394,7 @@
 
   <script src="/static/assets/js/plugins/chartjs.min.js"></script>
   <script>
-    var ctx = document.getElementById("chart-wtd").getContext("2d");
+    var ctx = document.getElementById("chart-bars").getContext("2d");
 
     new Chart(ctx, {
       type: "bar",
@@ -362,11 +459,11 @@
                 style: 'normal',
                 lineHeight: 2
               },
-              // Abbreviate the thousands
+              color: "#fff",
+              // Abbreviate the millions
               callback: function(value, index, values) {
                 return value / 1e3 + ' T';
               },
-              color: "#fff",
             },
           },
           x: {
@@ -396,7 +493,7 @@
     });
 
 
-    var ctx2 = document.getElementById("chart-ptd").getContext("2d");
+    var ctx2 = document.getElementById("chart-line").getContext("2d");
 
     new Chart(ctx2, {
       type: "bar",
@@ -466,9 +563,9 @@
                 style: 'normal',
                 lineHeight: 2
               },
-              // Abbreviate the thousands
+              // Abbreviate the millions
               callback: function(value, index, values) {
-                return value / 1e3 + ' T';
+                return value / 1e6 + ' M';
               },
             }
           },
@@ -497,7 +594,8 @@
       },
     });
 
-    var ctx3 = document.getElementById("chart-ytd").getContext("2d");
+    var ctx3 = document.getElementById("chart-line-tasks").getContext("2d");
+
     new Chart(ctx3, {
       type: "line",
       data: {
@@ -529,7 +627,7 @@
           fill: true,
           data: {{ period_sales_list_ly | safe }},
           maxBarThickness: 6
-        }, {
+        }, {         
           label: "budget",
           tension: 0,
           borderWidth: 0,
@@ -578,331 +676,9 @@
                 style: 'normal',
                 lineHeight: 2
               },
-              // Abbreviate the thousands
+              // Abbreviate the millions
               callback: function(value, index, values) {
-                return value / 1e3 + ' T';
-              },
-            },
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: false,
-              drawOnChartArea: false,
-              drawTicks: false,
-              borderDash: [5, 5]
-            },
-            ticks: {
-              display: true,
-              color: '#f8f9fa',
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-            }
-          },
-        },
-      },
-    });
-
-    var ctx4 = document.getElementById("chart-supplies").getContext("2d");
-    new Chart(ctx4, {
-      type: "line",
-      data: {
-        labels: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13"],
-        datasets: [{
-          label: "Total Supply Costs",
-          tension: 0,
-          borderWidth: 0,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(255, 255, 255, .8)",
-          pointBorderColor: "transparent",
-          borderColor: "rgba(255, 255, 255, .8)",
-          borderWidth: 4,
-          backgroundColor: "transparent",
-          fill: true,
-          data: {{ supply_cost_dol | safe }},
-          maxBarThickness: 6
-        }, {
-          label: "Last Year",
-          tension: 0,
-          borderWidth: 0,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(200, 200, 200, 1)",
-          pointBorderColor: "transparent",
-          borderColor: "rgba(200, 200, 200, 1)",
-          borderWidth: 4,
-          type: "line",
-          backgroundColor: "transparent",
-          fill: true,
-          data: {{ supply_cost_dol_ly | safe }},
-          maxBarThickness: 6
-        }, {
-          label: "budget",
-          tension: 0,
-          borderWidth: 0,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(100, 100, 100, 1)",
-          pointBorderColor: "transparent",
-          borderColor: "rgba(100, 100, 100, 1)",
-          borderWidth: 4,
-          type: "line",
-          backgroundColor: "transparent",
-          fill: true,
-          data: {{ supply_budget | safe }},
-          maxBarThickness: 6
-        }, ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          }
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              padding: 10,
-              color: '#f8f9fa',
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-              // Abbreviate the thousands
-              callback: function(value, index, values) {
-                return value / 1e3 + ' T';
-              },
-            },
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: false,
-              drawOnChartArea: false,
-              drawTicks: false,
-              borderDash: [5, 5]
-            },
-            ticks: {
-              display: true,
-              color: '#f8f9fa',
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-            }
-          },
-        },
-      },
-    });
-
-    var ctx5 = document.getElementById("chart-smallwares").getContext("2d");
-    new Chart(ctx5, {
-      type: "line",
-      data: {
-        labels: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13"],
-        datasets: [{
-          label: "Total Smallware Costs",
-          tension: 0,
-          borderWidth: 0,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(255, 255, 255, .8)",
-          pointBorderColor: "transparent",
-          borderColor: "rgba(255, 255, 255, .8)",
-          borderWidth: 4,
-          backgroundColor: "transparent",
-          fill: true,
-          data: {{ smallware_cost_dol | safe }},
-          maxBarThickness: 6
-        }, {
-          label: "Last Year",
-          tension: 0,
-          borderWidth: 0,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(175, 175, 175, 1)",
-          pointBorderColor: "transparent",
-          borderColor: "rgba(200, 200, 200, 1)",
-          borderWidth: 4,
-          type: "line",
-          backgroundColor: "transparent",
-          fill: true,
-          data: {{ smallware_cost_dol_ly | safe }},
-          maxBarThickness: 6
-        }, {
-          label: "budget",
-          tension: 0,
-          borderWidth: 0,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(100, 100, 100, 1)",
-          pointBorderColor: "transparent",
-          borderColor: "rgba(100, 100, 100, 1)",
-          borderWidth: 4,
-          type: "line",
-          backgroundColor: "transparent",
-          fill: true,
-          data: {{ smallware_budget | safe }},
-          maxBarThickness: 6
-        }, ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          }
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              padding: 10,
-              color: '#f8f9fa',
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-              // Abbreviate the thousands
-              callback: function(value, index, values) {
-                return value / 1e3 + ' T';
-              },
-            },
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: false,
-              drawOnChartArea: false,
-              drawTicks: false,
-              borderDash: [5, 5]
-            },
-            ticks: {
-              display: true,
-              color: '#f8f9fa',
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-            }
-          },
-        },
-      },
-    });
-
-    var ctx6 = document.getElementById("chart-linen").getContext("2d");
-    new Chart(ctx6, {
-      type: "line",
-      data: {
-        labels: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13"],
-        datasets: [{
-          label: "Total Linen Costs",
-          tension: 0,
-          borderWidth: 0,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(255, 255, 255, .8)",
-          pointBorderColor: "transparent",
-          borderColor: "rgba(255, 255, 255, .8)",
-          borderWidth: 4,
-          backgroundColor: "transparent",
-          fill: true,
-          data: {{ linen_cost_dol | safe }},
-          maxBarThickness: 6
-        }, {
-          label: "Last Year",
-          tension: 0,
-          borderWidth: 0,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(200, 200, 200, 1)",
-          pointBorderColor: "transparent",
-          borderColor: "rgba(200, 200, 200, 1)",
-          borderWidth: 4,
-          type: "line",
-          backgroundColor: "transparent",
-          fill: true,
-          data: {{ linen_cost_dol_ly | safe }},
-          maxBarThickness: 6
-        }, ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          }
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              padding: 10,
-              color: '#f8f9fa',
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-              // Abbreviate the thousands
-              callback: function(value, index, values) {
-                return value / 1e3 + ' T';
+                return value / 1e6 + ' M';
               },
             },
           },
