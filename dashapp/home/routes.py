@@ -265,6 +265,7 @@ def index():
         fiscal_dates["year_to_date_ly"],
         "year",
     )
+    print(weekly_table.columns)
 
     return render_template(
         "home/index.html",
@@ -383,115 +384,211 @@ def store(store_id):
     )
     ytd_sales_ly = sum(year_to_date_sales_ly)
 
-    #  TODO need to use Menuitems to get category sales.
-    def build_sales_table(start, end, start_ly, end_ly):
-        sales = (
+    #  TODO need to use Menuitems to get category sales
+    def build_category_sales_table(start, end, start_ly, end_ly, time_unit):
+        # query Calendar and merge with table
+        query = (
             db.session.query(
-                Sales.date,
-                Sales.daypart,
-                func.sum(Sales.sales).label("total_sales"),
-                func.sum(Sales.guests).label("total_guests"),
+                Calendar.date, Calendar.dow, Calendar.week, Calendar.period, Calendar.quarter, Calendar.year
             )
-            .filter(Sales.date.between(start, end), Sales.name == store.name)
-            .group_by(Sales.date, Sales.daypart)
+            .filter(Calendar.date.between(start_ly, end))
+            .all()
+        )
+        calendar = pd.DataFrame.from_records(query, columns=["date", "dow", "week", "period", "quarter", "year"])
+
+        lunch_sales = get_daypart_sales(start, end, store.name, "Lunch")
+        ls = pd.DataFrame.from_records(lunch_sales, columns=["date", "category", "amount"])
+        dinner_sales = get_daypart_sales(start, end, store.name, "Dinner")
+        ds = pd.DataFrame.from_records(dinner_sales, columns=["date", "category", "amount"])
+        lunch_guests = get_daypart_guest(start, end, store.name, "Lunch")
+        lg = pd.DataFrame.from_records(lunch_guests, columns=["date", "category", "amount"])
+        lg["category"] = lg["category"].str.replace("Lunch", "Lunch Guests")
+        dinner_guests = get_daypart_guest(start, end, store.name, "Dinner")
+        dg = pd.DataFrame.from_records(dinner_guests, columns=["date", "category", "amount"])
+        dg["category"] = dg["category"].str.replace("Dinner", "Dinner Guests")
+
+        # lunch_sales_ly = get_daypart_sales(start, end, store.name, "Lunch")
+        # ls_ly = pd.DataFrame.from_records(lunch_sales, columns=["date", "category", "amount"])
+        # dinner_sales_ly = get_daypart_sales(start, end, store.name, "Dinner")
+        # ds_ly = pd.DataFrame.from_records(dinner_sales, columns=["date", "category", "amount"])
+        # lunch_guests_ly = get_daypart_guest(start, end, store.name, "Lunch")
+        # lg_ly = pd.DataFrame.from_records(lunch_guests, columns=["date", "category", "amount"])
+        # lg_ly["category"] = lg_ly["category"].str.replace("Lunch", "Lunch Guests")
+        # dinner_guests_ly = get_daypart_guest(start, end, store.name, "Dinner")
+        # dg_ly = pd.DataFrame.from_records(dinner_guests, columns=["date", "category", "amount"])
+        # dg_ly["category"] = dg_ly["category"].str.replace("Dinner", "Dinner Guests")
+
+        # lunch_sales = ls.merge(ls_ly, how="outer", sort=True)
+        # dinner_sales = ds.merge(ds_ly, how="outer", sort=True)
+        # lunch_guests = lg.merge(lg_ly, how="outer", sort=True)
+        # dinner_guests = dg.merge(dg_ly, how="outer", sort=True)
+
+        sales_guests = ls.merge(ds, how="outer", sort=True)
+        sales_guests = sales_guests.merge(lg, how="outer", sort=True)
+        sales_guests = sales_guests.merge(dg, how="outer", sort=True)
+        sales_guests = sales_guests.merge(calendar, how="left", sort=True)
+        sales_guests = sales_guests.set_index("date")
+
+        menuitems = (
+            db.session.query(
+                Menuitems.date,
+                Menuitems.category,
+                func.sum(Menuitems.amount).label("sales"),
+            )
+            .filter(Menuitems.date.between(start, end), Menuitems.name == store.name)
+            .group_by(Menuitems.date, Menuitems.category)
             .all()
         )
 
-        sales_ly = (
-            db.session.query(
-                Sales.date,
-                Sales.daypart,
-                func.sum(Sales.sales).label("total_sales_ly"),
-                func.sum(Sales.guests).label("total_guests_ly"),
-            )
-            .filter(Sales.date.between(start_ly, end_ly), Sales.name == store.name)
-            .group_by(Sales.date, Sales.daypart)
-            .all()
-        )
-
-        df = pd.DataFrame.from_records(sales, columns=["date", "daypart", "sales", "guests"])
-        df_ly = pd.DataFrame.from_records(sales_ly, columns=["date", "daypart", "sales_ly", "guests_ly"])
-        sales_table = df.merge(df_ly, how="outer", sort=True)
+        # menuitems_ly = (
+        #    db.session.query(
+        #        Menuitems.date,
+        #        Menuitems.category,
+        #        func.sum(Menuitems.amount).label("sales"),
+        #    )
+        #    .filter(Menuitems.date.between(start_ly, end_ly), Menuitems.name == store.name)
+        #    .group_by(Menuitems.date, Menuitems.category)
+        #    .all()
+        # )
+        menuitems_table = pd.DataFrame.from_records(menuitems, columns=["date", "category", "amount"])
+        # df_ly = pd.DataFrame.from_records(menuitems_ly, columns=["date", "category", "amount"])
+        # menuitems_table = df.merge(df_ly, how="outer", sort=True)
+        menuitems_table = menuitems_table.merge(calendar, how="left", sort=True)
+        menuitems_table = menuitems_table.set_index("date")
 
         labor = (
             db.session.query(
                 Labor.date,
-                func.sum(Labor.hours).label("total_hours"),
+                Labor.category,
                 func.sum(Labor.dollars).label("total_dollars"),
             )
             .filter(Labor.date.between(start, end), Labor.name == store.name)
-            .group_by(Labor.date)
+            .group_by(Labor.date, Labor.category)
             .all()
         )
 
-        labor_ly = (
-            db.session.query(
-                Labor.date,
-                func.sum(Labor.hours).label("total_hours_ly"),
-                func.sum(Labor.dollars).label("total_dollars_ly"),
-            )
-            .filter(Labor.date.between(start_ly, end_ly), Labor.name == store.name)
-            .group_by(Labor.date)
-            .all()
-        )
+        # labor_ly = (
+        #    db.session.query(
+        #        Labor.date,
+        #        Labor.category,
+        #        func.sum(Labor.dollars).label("total_dollars"),
+        #    )
+        #    .filter(Labor.date.between(start_ly, end_ly), Labor.name == store.name)
+        #    .group_by(Labor.date, Labor.category)
+        #    .all()
+        # )
+        labor_table = pd.DataFrame.from_records(labor, columns=["date", "category", "amount"])
+        # df_labor_ly = pd.DataFrame.from_records(labor_ly, columns=["date", "category", "amount"])
+        # labor_table = df_labor.merge(df_labor_ly, how="outer", sort=True)
+        labor_table = labor_table.merge(calendar, how="left", sort=True)
+        labor_table = labor_table.set_index("date")
 
-        df_labor = pd.DataFrame.from_records(labor, columns=["date", "hours", "dollars"])
-        df_labor_ly = pd.DataFrame.from_records(labor_ly, columns=["date", "hours_ly", "dollars_ly"])
-        labor_table = df_labor.merge(df_labor_ly, how="outer", sort=True)
-
-        table = sales_table.merge(labor_table, how="outer", sort=True)
-        table = table.set_index("date")
+        # concat sales and labor
+        table = pd.concat([sales_guests, menuitems_table, labor_table])
 
         # Grab top sales over last year before we add totals
+        # table = table.fillna(0)
+        # table["labor_pct"] = table.dollars / table.sales
+        # table["labor_pct_ly"] = table.dollars_ly / table.sales_ly
+        # table = table.groupby(["category", time_unit]).sum()
+        # table["Total Guests"] = table["Lunch Guests"] + table["Dinner Guests"]
+        # table["Total Sales"] = table["Lunch"] + table["Dinner"]
+        # table["Alcohol Sales"] = table["BEER"] + table["WINE"] + table["LIQUOR"]
+        # table["Hourly Labor"] = (
+        #    table["Bar"]
+        #    + table["Kitchen"]
+        #    + table["Restaurant"]
+        #    + table["Catering"]
+        #    + table["Maintenance"]
+        #    + table["Training"]
+        # )
+        table = pd.pivot_table(
+            table,
+            values=["amount"],
+            index=["category"],
+            columns=[time_unit],
+            aggfunc=np.sum,
+            fill_value=0,
+        )
+        table.columns = table.columns.droplevel(0)
+        table = table.reindex(
+            [
+                "Lunch Guests",
+                "Dinner Guests",
+                "Lunch",
+                "Dinner",
+                "FOOD",
+                "BEER",
+                "WINE",
+                "LIQUOR",
+                "Bar",
+                "Host",
+                "Restaurant",
+                "Kitchen",
+                "Catering",
+                "Training",
+                "Maintenance",
+            ]
+        )
         table = table.fillna(0)
-        table["guest_check_avg"] = table["sales"] / table["guests"].astype(float)
-        table["guest_check_avg_ly"] = table["sales_ly"] / table["guests_ly"].astype(float)
-        table["labor_pct"] = table.dollars / table.sales
-        table["labor_pct_ly"] = table.dollars_ly / table.sales_ly
-        totals = table.sum()
-        print(table.info())
-        print(totals)
+        table["Totals"] = table.sum(axis=1)
 
-        return totals, table
+        return table
 
-    daily_totals, daily_table = build_sales_table(
+    daily_table = build_category_sales_table(
         fiscal_dates["start_day"],
         fiscal_dates["start_day"],
         fiscal_dates["start_day_ly"],
         fiscal_dates["start_day_ly"],
+        "date",
     )
 
-    weekly_totals, weekly_table = build_sales_table(
+    weekly_table = build_category_sales_table(
         fiscal_dates["start_week"],
         fiscal_dates["week_to_date"],
         fiscal_dates["start_week_ly"],
         fiscal_dates["week_to_date_ly"],
+        "dow",
     )
 
-    period_totals, period_table = build_sales_table(
+    period_table = build_category_sales_table(
         fiscal_dates["start_period"],
         fiscal_dates["period_to_date"],
         fiscal_dates["start_period_ly"],
         fiscal_dates["period_to_date_ly"],
+        "week",
     )
 
-    yearly_totals, yearly_table = build_sales_table(
+    quarterly_table = build_category_sales_table(
+        fiscal_dates["start_quarter"],
+        fiscal_dates["quarter_to_date"],
+        fiscal_dates["start_quarter_ly"],
+        fiscal_dates["quarter_to_date_ly"],
+        "period",
+    )
+
+    yearly_table = build_category_sales_table(
         fiscal_dates["start_year"],
         fiscal_dates["year_to_date"],
         fiscal_dates["start_year_ly"],
         fiscal_dates["year_to_date_ly"],
+        "quarter",
     )
 
-    budget_chart = (
-        db.session.query(func.sum(Budgets.total_sales).label("total_sales"))
-        .select_from(Budgets)
-        .group_by(Budgets.period)
-        .order_by(Budgets.period)
-        .filter(Budgets.year == fiscal_dates["year"], Budgets.name == store.name)
-    )
-    budgets3 = []
-    for v in budget_chart:
-        budgets3.append(v.total_sales)
+    daily_sales = daily_sales_list[-1]
+    daily_sales_ly = daily_sales_list_ly[-1]
+
+
+    #    budget_chart = (
+    #        db.session.query(func.sum(Budgets.total_sales).label("total_sales"))
+    #        .select_from(Budgets)
+    #        .group_by(Budgets.period)
+    #        .order_by(Budgets.period)
+    #        .filter(Budgets.year == fiscal_dates["year"], Budgets.name == store.name)
+    #    )
+    #    budgets3 = []
+    #    for v in budget_chart:
+    #        budgets3.append(v.total_sales)
 
     return render_template(
         "home/store.html",

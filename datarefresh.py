@@ -46,7 +46,6 @@ def convert_datetime_to_string(col):
 
 
 def sales_employee(start, end):
-
     url_filter = "$filter=modifiedOn ge {}T00:00:00Z and modifiedOn le {}T00:00:00Z".format(start, end)
     query = "$select=date,dayPart,netSales,numberofGuests,location&{}".format(url_filter)
     url = "{}/SalesEmployee?{}".format(Config.SRVC_ROOT, query)
@@ -80,7 +79,6 @@ def sales_employee(start, end):
 
 
 def labor_datail(start, end):
-
     url_filter = "$filter=modifiedOn ge {}T00:00:00Z and modifiedOn le {}T00:00:00Z".format(start, end)
     query = "$select=dateWorked,jobTitle,hours,total,location_ID&{}".format(url_filter)
     url = "{}/LaborDetail?{}".format(Config.SRVC_ROOT, query)
@@ -126,7 +124,6 @@ def labor_datail(start, end):
 
 
 def sales_payments(start, end):
-
     url_filter = "$filter=modifiedOn ge {}T00:00:00Z and modifiedOn le {}T00:00:00Z".format(start, end)
     query = "$select=amount,date,location,paymenttype&{}".format(url_filter)
     url = "{}/SalesPayment?{}".format(Config.SRVC_ROOT, query)
@@ -164,7 +161,6 @@ def sales_payments(start, end):
 
 
 if __name__ == "__main__":
-
     engine = create_engine(Config.SQLALCHEMY_DATABASE_URI)
     conn = psycopg2.connect(
         host="localhost",
@@ -184,28 +180,35 @@ if __name__ == "__main__":
 
     # if user provide argument use it else use today's date
     if args.date:
-        start_date = datetime.strptime(args.date, "%Y-%m-%d")
+        start_date = datetime.strptime(args.date, "%Y-%m-%d").date()
     else:
-        start_date = datetime.date(datetime.now())
+        start_date = datetime.now().date()
 
-    YSTDAY = start_date - timedelta(days=1)
-    TMRDAY = start_date + timedelta(days=1)
-    today = start_date.strftime("%Y-%m-%d")
-    tonight = TMRDAY.strftime("%Y-%m-%d")
-    yesterday = YSTDAY.strftime("%Y-%m-%d")
-    print(f"Date is {today}")
+    if start_date > datetime.now().date():
+        print("Date cannot be in the future")
+        exit()
 
-    start_time = time.time()
-    sales_payments(today, tonight)
-    end_time = time.time()
-    print(f"Sales Payments took {end_time - start_time} seconds")
-    start_time = time.time()
-    sales_employee(today, tonight)
-    end_time = time.time()
-    print(f"Sales Employee took {end_time - start_time} seconds")
-    start_time = time.time()
-    labor_datail(today, tonight)
-    end_time = time.time()
-    print(f"Labor Detail took {end_time - start_time} seconds")
+    current_date = start_date
+    while current_date <= datetime.now().date():
+        YSTDAY = current_date - timedelta(days=1)
+        TMRDAY = current_date + timedelta(days=1)
+        today = current_date.strftime("%Y-%m-%d")
+        tonight = TMRDAY.strftime("%Y-%m-%d")
+        yesterday = YSTDAY.strftime("%Y-%m-%d")
+        print(f"Date is {today}")
+
+        start_time = time.time()
+        sales_payments(today, tonight)
+        end_time = time.time()
+        print(f"Sales Payments took {end_time - start_time} seconds")
+        start_time = time.time()
+        sales_employee(today, tonight)
+        end_time = time.time()
+        print(f"Sales Employee took {end_time - start_time} seconds")
+        start_time = time.time()
+        labor_datail(today, tonight)
+        end_time = time.time()
+        print(f"Labor Detail took {end_time - start_time} seconds")
+        current_date = current_date + timedelta(days=1)
 
     conn.close()

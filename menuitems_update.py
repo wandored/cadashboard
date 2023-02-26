@@ -41,7 +41,6 @@ def convert_datetime_to_string(col):
 
 
 def sales_detail(start, end):
-
     url_filter = "$filter=modifiedOn ge {}T00:00:00Z and modifiedOn le {}T00:00:00Z".format(start, end)
     query = "$select=menuitem,amount,date,quantity,category,location&{}".format(url_filter)
     url = "{}/SalesDetail?{}".format(Config.SRVC_ROOT, query)
@@ -96,7 +95,6 @@ def sales_detail(start, end):
 
 
 if __name__ == "__main__":
-
     engine = create_engine(Config.SQLALCHEMY_DATABASE_URI)
     conn = psycopg2.connect(
         host="localhost",
@@ -116,18 +114,24 @@ if __name__ == "__main__":
 
     # if user provide argument use it else use today's date
     if args.date:
-        start_date = datetime.strptime(args.date, "%Y-%m-%d")
+        start_date = datetime.strptime(args.date, "%Y-%m-%d").date()
     else:
-        start_date = datetime.date(datetime.now())
+        start_date = datetime.now().date()
 
-    TMRDAY = start_date + timedelta(days=1)
-    today = start_date.strftime("%Y-%m-%d")
-    tonight = TMRDAY.strftime("%Y-%m-%d")
-    print(f"Date is {today}")
+    if start_date > datetime.now().date():
+        print("Date cannot be in the future")
+        exit()
+    current_date = start_date
+    while current_date <= datetime.now().date():
+        TMRDAY = current_date + timedelta(days=1)
+        today = current_date.strftime("%Y-%m-%d")
+        tonight = TMRDAY.strftime("%Y-%m-%d")
+        print(f"Date is {current_date}")
 
-    start_time = time.time()
-    sales_detail(today, tonight)
-    end_time = time.time()
-    print(f"Sales Detail took {end_time - start_time} seconds")
+        start_time = time.time()
+        sales_detail(today, tonight)
+        end_time = time.time()
+        print(f"Sales Detail took {end_time - start_time} seconds")
+        current_date = current_date + timedelta(days=1)
 
     conn.close()

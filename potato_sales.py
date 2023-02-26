@@ -12,6 +12,7 @@ from dashapp import Config
 
 # pd.options.mode.chained_assignment = None
 
+
 def make_HTTP_request(url):
     all_records = []
     while True:
@@ -41,7 +42,6 @@ def convert_datetime_to_string(col):
 
 
 def potato_sales(start):
-
     df_pot = pd.DataFrame()
     with open("/usr/local/share/potatochart.csv") as f:
         times = csv.reader(f)
@@ -67,9 +67,7 @@ def potato_sales(start):
                 continue
             df = df.drop(columns=["location"])
             df = df.copy()
-            df.loc[:, "menuitem"] = df["menuitem"].str.replace(
-                r"CHOPHOUSE - NOLA", "CHOPHOUSE-NOLA", regex=True
-            )
+            df.loc[:, "menuitem"] = df["menuitem"].str.replace(r"CHOPHOUSE - NOLA", "CHOPHOUSE-NOLA", regex=True)
             df.loc[:, "menuitem"] = df["menuitem"].str.replace(r"CAFÉ", "CAFE", regex=True)
             df.loc[:, "menuitem"] = df["menuitem"].str.replace(r"^(?:.*?( -)){2}", "-", regex=True)
             df.loc[:, "menuitem"] = df["menuitem"].str.strip()
@@ -127,7 +125,6 @@ def potato_sales(start):
 
 
 if __name__ == "__main__":
-
     engine = create_engine(Config.SQLALCHEMY_DATABASE_URI)
     conn = psycopg2.connect(
         host="localhost",
@@ -147,16 +144,22 @@ if __name__ == "__main__":
 
     # if user provide argument use it else use today's date
     if args.date:
-        start_date = datetime.strptime(args.date, "%Y-%m-%d")
+        start_date = datetime.strptime(args.date, "%Y-%m-%d").date()
     else:
-        start_date = datetime.date(datetime.now())
+        start_date = datetime.now().date()
 
-    YSTDAY = start_date - timedelta(days=1)
-    yesterday = YSTDAY.strftime("%Y-%m-%d")
+    if start_date > datetime.now().date():
+        print("Date cannot be in the future")
+        exit()
+    current_date = start_date
+    while current_date <= datetime.now().date():
+        YSTDAY = current_date - timedelta(days=1)
+        yesterday = YSTDAY.strftime("%Y-%m-%d")
 
-    start_time = time.time()
-    potato_sales(yesterday)
-    end_time = time.time()
-    print(f"Potato Sales took {end_time - start_time} seconds")
+        start_time = time.time()
+        potato_sales(yesterday)
+        end_time = time.time()
+        print(f"Potato Sales took {end_time - start_time} seconds")
+        current_date = current_date + timedelta(days=1)
 
     conn.close()

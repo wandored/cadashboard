@@ -55,6 +55,32 @@ def sales_record(store, time_frame):
         return query["top_sales"]
 
 
+def get_daypart_sales(start, end, store, day_part):
+    query = (
+        db.session.query(
+            Sales.date,
+            Sales.daypart,
+            Sales.sales,
+        )
+        .filter(Sales.date.between(start, end), Sales.daypart == (day_part), Sales.name == store)
+        .all()
+    )
+    return query
+
+
+def get_daypart_guest(start, end, store, day_part):
+    query = (
+        db.session.query(
+            Sales.date,
+            Sales.daypart,
+            Sales.guests,
+        )
+        .filter(Sales.date.between(start, end), Sales.daypart == (day_part), Sales.name == store)
+        .all()
+    )
+    return query
+
+
 def find_day_with_sales(**kwargs):
     if "store" in kwargs:
         while not Sales.query.filter_by(date=kwargs["day"], name=kwargs["store"]).first():
@@ -517,6 +543,7 @@ def receiving_by_purchased_item(file):
     item_list = [item for sublist in item_list for item in sublist]
     item_list.sort()
 
+    # TODO merge the UofM table with the df
     with open("/usr/local/share/UofM.json") as file:
         uofm = json.load(file)
     units = pd.DataFrame(uofm)
@@ -726,6 +753,9 @@ def set_dates(startdate):
         d["end_period"] = i.period_end
         d["period_to_date"] = i.date
         d["last_thirty"] = thirty.strftime("%Y-%m-%d")
+        d["start_quarter"] = i.quarter_start
+        d["end_quarter"] = i.quarter_end
+        d["quarter_to_date"] = i.date
         d["start_year"] = i.year_start
         d["end_year"] = i.year_end
         d["year_to_date"] = i.date
@@ -738,6 +768,9 @@ def set_dates(startdate):
         d["start_period_ly"] = get_lastyear(i.period_start)
         d["end_period_ly"] = get_lastyear(i.period_end)
         d["period_to_date_ly"] = get_lastyear(i.date)
+        d["start_quarter_ly"] = get_lastyear(i.quarter_start)
+        d["end_quarter_ly"] = get_lastyear(i.quarter_end)
+        d["quarter_to_date_ly"] = get_lastyear(i.date)
         d["start_year_ly"] = get_lastyear(i.year_start)
         d["end_year_ly"] = get_lastyear(i.year_end)
         d["year_to_date_ly"] = get_lastyear(i.date)
