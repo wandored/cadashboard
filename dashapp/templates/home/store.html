@@ -182,155 +182,202 @@
         </ul>
         <div class="tab-content" id="nav-tabContent">
           <div class="tab-pane fade show active" id="nav-day" role="tabpanel" aria-labelledby="nav-day-tab">
-        <div class="card-header pb-0">
-          <div class="row">
-            <div class="col-lg-6 col-7">
-              <h4>Week-{{ fiscal_dates["week"] }}</h4>
+            <div class="card-header pb-0">
+              <div class="row">
+                <div class="col-lg-6 col-7">
+                  <h4>Week-{{ fiscal_dates["week"] }}</h4>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-        <div class="card-body px-0 pb-2">
-          <div class="table-responsive table-hover">
-            <table class="table align-items-center mb-0">
-              <thead>
-                <tr>
-                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Days</th>
-                {% for cat in weekly_table.columns %}
-                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">{{ cat }}</th>
-                {% endfor %}
-                </tr>
-              </thead>
-              <tbody>
-                {% for cat, row in weekly_table.iterrows() %}
-                <tr> 
-                  <td>
-                    {{ row["name"] }}
-                  </td>
-                    {% for _, value in row.items() %}
-                  <td>
-                        {{ "{:,.0f}".format(value) }}
-                  </td>
+            <div class="card-body px-0 pb-2">
+              <div class="table-responsive table-hover">
+                <table class="table align-items-center mb-0">
+                  <thead>
+                    <tr>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Days</th>
+                    {% for cat in weekly_table.columns %}
+                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">{{ cat }}</th>
                     {% endfor %}
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </div>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for cat, row in weekly_table.iterrows() %}
+                    <tr> 
+                      <td>
+                        {{ row["name"] }}
+                      </td>
+                        {% for _, value in row.items() %}
+                      <td>
+                            {{ "{:,.0f}".format(value) }}
+                      </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                    {% for cat, row in weekly_labor.iterrows() %}
+                    <tr> 
+                      <td>
+                        {{ row["name"] }}
+                      </td>
+                        {% for _, value in row.items() %}
+                      <td>
+                            {{ "{:,.0f}".format(value) }}
+                      </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
           <div class="tab-pane fade" id="nav-week" role="tabpanel" aria-labelledby="nav-week-tab">
-        <div class="card-header pb-0">
-          <div class="row">
-            <div class="col-lg-6 col-7">
-              <h4>Period-{{ fiscal_dates["period"] }}</h4>
+            <div class="card-header pb-0">
+              <div class="row">
+                <div class="col-lg-6 col-7">
+                  <h4>Period-{{ fiscal_dates["period"] }}</h4>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-        <div class="card-body px-0 pb-2">
-          <div class="table-responsive table-hover">
-            <table class="table align-items-center mb-0">
-              <thead>
-                <tr>
-                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Weeks</th>
-                {% for cat in period_table.columns %}
-                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">{{ cat }}</th>
-                {% endfor %}
-                </tr>
-              </thead>
-              <tbody>
-                {% for cat, row in period_table.iterrows() %}
-                <tr> 
-                  <td>
-                    {{ row["name"] }}
-                  </td>
-                    {% for _, value in row.items() %}
-                  <td>
-                        {{ "{:,.0f}".format(value) }}
-                  </td>
+            <div class="card-body px-0 pb-2">
+              <div class="table-responsive table-hover">
+                <table class="table align-items-center mb-0">
+                  <thead>
+                    <tr>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Weeks</th>
+                    {% for cat in period_table.columns %}
+                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">{{ cat }}</th>
                     {% endfor %}
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </div>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for cat, row in period_table.iterrows() %}
+                    <tr> 
+                      <td>
+                        {{ row["name"] }}
+                      </td>
+                        {% for _, value in row.items() %}
+                      <td>
+                            {{ "{:,.0f}".format(value) }}
+                      </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                    {% for cat, row in period_labor.iterrows() %}
+                    <tr> 
+                      <td>
+                        {{ row["name"] }}
+                      </td>
+                        {% for _, value in row.items() %}
+                      <td>
+                            {{ "{:,.0f}".format(value) }}
+                      </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
             </div>
+          </div>
           <div class="tab-pane fade" id="nav-period" role="tabpanel" aria-labelledby="nav-period-tab">
-        <div class="card-header pb-0">
-          <div class="row">
-            <div class="col-lg-6 col-7">
-              <h4>Quarter-{{ fiscal_dates["quarter"] }}</h4>
+            <div class="card-header pb-0">
+              <div class="row">
+                <div class="col-lg-6 col-7">
+                  <h4>Quarter-{{ fiscal_dates["quarter"] }}</h4>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-        <div class="card-body px-0 pb-2">
-          <div class="table-responsive table-hover">
-            <table class="table align-items-center mb-0">
-              <thead>
-                <tr>
-                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Periods</th>
-                {% for cat in quarterly_table.columns %}
-                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">{{ cat }}</th>
-                {% endfor %}
-                </tr>
-              </thead>
-              <tbody>
-                {% for cat, row in quarterly_table.iterrows() %}
-                <tr> 
-                  <td>
-                    {{ row["name"] }}
-                  </td>
-                    {% for _, value in row.items() %}
-                  <td>
-                        {{ "{:,.0f}".format(value) }}
-                  </td>
+            <div class="card-body px-0 pb-2">
+              <div class="table-responsive table-hover">
+                <table class="table align-items-center mb-0">
+                  <thead>
+                    <tr>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Periods</th>
+                    {% for cat in quarterly_table.columns %}
+                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">{{ cat }}</th>
                     {% endfor %}
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </div>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for cat, row in quarterly_table.iterrows() %}
+                    <tr> 
+                      <td>
+                        {{ row["name"] }}
+                      </td>
+                        {% for _, value in row.items() %}
+                      <td>
+                            {{ "{:,.0f}".format(value) }}
+                      </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                    {% for cat, row in quarterly_labor.iterrows() %}
+                    <tr> 
+                      <td>
+                        {{ row["name"] }}
+                      </td>
+                        {% for _, value in row.items() %}
+                      <td>
+                            {{ "{:,.0f}".format(value) }}
+                      </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
             </div>
+          </div>
           <div class="tab-pane fade" id="nav-year" role="tabpanel" aria-labelledby="nav-year-tab">
-        <div class="card-header pb-0">
-          <div class="row">
-            <div class="col-lg-6 col-7">
-              <h4>Year-{{ fiscal_dates["year"] }}</h4>
+            <div class="card-header pb-0">
+              <div class="row">
+                <div class="col-lg-6 col-7">
+                  <h4>Year-{{ fiscal_dates["year"] }}</h4>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-        <div class="card-body px-0 pb-2">
-          <div class="table-responsive table-hover">
-            <table class="table align-items-center mb-0">
-              <thead>
-                <tr>
-                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Quarters</th>
-                {% for cat in yearly_table.columns %}
-                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">{{ cat }}</th>
-                {% endfor %}
-                </tr>
-              </thead>
-              <tbody>
-                {% for cat, row in yearly_table.iterrows() %}
-                <tr> 
-                  <td>
-                    {{ row["name"] }}
-                  </td>
-                    {% for _, value in row.items() %}
-                  <td>
-                        {{ "{:,.0f}".format(value) }}
-                  </td>
+            <div class="card-body px-0 pb-2">
+              <div class="table-responsive table-hover">
+                <table class="table align-items-center mb-0">
+                  <thead>
+                    <tr>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Quarters</th>
+                    {% for cat in yearly_table.columns %}
+                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">{{ cat }}</th>
                     {% endfor %}
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for cat, row in yearly_table.iterrows() %}
+                    <tr> 
+                      <td>
+                        {{ row["name"] }}
+                      </td>
+                        {% for _, value in row.items() %}
+                      <td>
+                            {{ "{:,.0f}".format(value) }}
+                      </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                    {% for cat, row in yearly_labor.iterrows() %}
+                    <tr> 
+                      <td>
+                        {{ row["name"] }}
+                      </td>
+                        {% for _, value in row.items() %}
+                      <td>
+                            {{ "{:,.0f}".format(value) }}
+                      </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
-            </div>
-        </div>
-        
       </div>
     </div>
     <!-- scorecard -->

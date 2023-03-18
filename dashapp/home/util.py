@@ -630,7 +630,7 @@ def uofm_update(file):
             "MeasureType": "measure_type",
             "BaseQty": "base_qty",
             "BaseUofM": "base_uofm",
-            "UnitOfMeasureid": "uofm_id",
+            "UnitOfMeasureId": "uofm_id",
         },
         inplace=True,
     )

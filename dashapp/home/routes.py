@@ -3,23 +3,25 @@
 Copyright (c) 2019 - present AppSeed.us
 """
 
-import re
-import json
-import pandas as pd
-from fpdf import FPDF
-from flask.helpers import url_for
-from flask_security.core import current_user
-from flask_security.decorators import roles_accepted, login_required
-from pandas.core.algorithms import isin
-from flask import flash, render_template, session, redirect, url_for, request
-from flask.wrappers import Response
 from datetime import datetime, timedelta
-from sqlalchemy import and_, or_, func
+import json
+import re
+
+from flask import flash, redirect, render_template, request, session, url_for
+from flask.helpers import url_for
+from flask.wrappers import Response
+from flask_security.core import current_user
+from flask_security.decorators import login_required, roles_accepted
+from fpdf import FPDF
+import pandas as pd
+from pandas.core.algorithms import isin
+from sqlalchemy import and_, func, or_
+
+from dashapp.authentication.forms import *
+from dashapp.authentication.models import *
 from dashapp.config import Config
 from dashapp.home import blueprint
 from dashapp.home.util import *
-from dashapp.authentication.forms import *
-from dashapp.authentication.models import *
 
 
 @blueprint.route("/", methods=["GET", "POST"])
@@ -79,17 +81,14 @@ def index():
 
     if form4.submit4.data and form4.validate():
         store_id = form4.store.data.id
-        print(store_id)
         return redirect(url_for("home_blueprint.potato", store_id=store_id))
 
     if form5.submit5.data and form5.validate():
         store_id = form5.store.data.id
-        print(store_id)
         return redirect(url_for("home_blueprint.lobster", store_id=store_id))
 
     if form6.submit6.data and form6.validate():
         store_id = form6.store.data.id
-        print(store_id)
         return redirect(url_for("home_blueprint.stone", store_id=store_id))
 
     # Sales Chart
@@ -265,7 +264,6 @@ def index():
         fiscal_dates["year_to_date_ly"],
         "year",
     )
-    print(weekly_table.columns)
 
     return render_template(
         "home/index.html",
@@ -327,12 +325,10 @@ def store(store_id):
 
     if form5.submit5.data and form5.validate():
         store_id = form5.store.data.id
-        print(store_id)
         return redirect(url_for("home_blueprint.lobster", store_id=store_id))
 
     if form6.submit6.data and form6.validate():
         store_id = form6.store.data.id
-        print(store_id)
         return redirect(url_for("home_blueprint.stone", store_id=store_id))
 
     # Sales Charts
@@ -389,12 +385,18 @@ def store(store_id):
         # query Calendar and merge with table
         query = (
             db.session.query(
-                Calendar.date, Calendar.dow, Calendar.week, Calendar.period, Calendar.quarter, Calendar.year
+                Calendar.date,
+                Calendar.dow,
+                Calendar.day,
+                Calendar.week,
+                Calendar.period,
+                Calendar.quarter,
+                Calendar.year,
             )
             .filter(Calendar.date.between(start_ly, end))
             .all()
         )
-        calendar = pd.DataFrame.from_records(query, columns=["date", "dow", "week", "period", "quarter", "year"])
+        calendar = pd.DataFrame.from_records(query, columns=["date", "dow", "day", "week", "period", "quarter", "year"])
 
         lunch_sales = get_daypart_sales(start, end, store.name, "Lunch")
         ls = pd.DataFrame.from_records(lunch_sales, columns=["date", "category", "amount"])
@@ -484,7 +486,7 @@ def store(store_id):
         labor_table = labor_table.set_index("date")
 
         # concat sales and labor
-        table = pd.concat([sales_guests, menuitems_table, labor_table])
+        # table = pd.concat([sales_guests, menuitems_table, labor_table])
 
         # Grab top sales over last year before we add totals
         # table = table.fillna(0)
@@ -502,25 +504,43 @@ def store(store_id):
         #    + table["Maintenance"]
         #    + table["Training"]
         # )
-        table = pd.pivot_table(
-            table,
+        sales = pd.pivot_table(
+            sales_guests,
             values=["amount"],
             index=["category"],
             columns=[time_unit],
             aggfunc=np.sum,
             fill_value=0,
         )
-        table.columns = table.columns.droplevel(0)
-        table = table.reindex(
+        sales.columns = sales.columns.droplevel(0)
+        sales.loc["Total Guests"] = sales.loc["Lunch Guests"] + sales.loc["Dinner Guests"]
+        sales.loc["Total Sales"] = sales.loc["Lunch"] + sales.loc["Dinner"]
+        sales = sales.reindex(
             [
                 "Lunch Guests",
                 "Dinner Guests",
+                "Total Guests",
                 "Lunch",
                 "Dinner",
-                "FOOD",
-                "BEER",
-                "WINE",
-                "LIQUOR",
+                "Total Sales",
+            ]
+        )
+        # Add Row for Total Guests
+        sales = sales.fillna(0)
+        sales["Totals"] = sales.sum(axis=1)
+
+        labor = pd.pivot_table(
+            labor_table,
+            values=["amount"],
+            index=["category"],
+            columns=[time_unit],
+            aggfunc=np.sum,
+            fill_value=0,
+        )
+        labor.columns = labor.columns.droplevel(0)
+        labor.loc["Total Hourly"] = labor.sum()
+        labor = labor.reindex(
+            [
                 "Bar",
                 "Host",
                 "Restaurant",
@@ -528,14 +548,15 @@ def store(store_id):
                 "Catering",
                 "Training",
                 "Maintenance",
+                "Total Hourly",
             ]
         )
-        table = table.fillna(0)
-        table["Totals"] = table.sum(axis=1)
+        labor = labor.fillna(0)
+        labor["Totals"] = labor.sum(axis=1)
 
-        return table
+        return sales, labor
 
-    daily_table = build_category_sales_table(
+    daily_table, daily_labor = build_category_sales_table(
         fiscal_dates["start_day"],
         fiscal_dates["start_day"],
         fiscal_dates["start_day_ly"],
@@ -543,7 +564,7 @@ def store(store_id):
         "date",
     )
 
-    weekly_table = build_category_sales_table(
+    weekly_table, weekly_labor = build_category_sales_table(
         fiscal_dates["start_week"],
         fiscal_dates["week_to_date"],
         fiscal_dates["start_week_ly"],
@@ -551,7 +572,31 @@ def store(store_id):
         "dow",
     )
 
-    period_table = build_category_sales_table(
+    # replace dow with day names 1 = "Wednesday"
+    weekly_table = weekly_table.rename(
+        columns={
+            1: "Wednesday",
+            2: "Thursday",
+            3: "Friday",
+            4: "Saturday",
+            5: "Sunday",
+            6: "Monday",
+            7: "Tuesday",
+        }
+    )
+    weekly_labor = weekly_labor.rename(
+        columns={
+            1: "Wednesday",
+            2: "Thursday",
+            3: "Friday",
+            4: "Saturday",
+            5: "Sunday",
+            6: "Monday",
+            7: "Tuesday",
+        }
+    )
+
+    period_table, period_labor = build_category_sales_table(
         fiscal_dates["start_period"],
         fiscal_dates["period_to_date"],
         fiscal_dates["start_period_ly"],
@@ -559,7 +604,7 @@ def store(store_id):
         "week",
     )
 
-    quarterly_table = build_category_sales_table(
+    quarterly_table, quarterly_labor = build_category_sales_table(
         fiscal_dates["start_quarter"],
         fiscal_dates["quarter_to_date"],
         fiscal_dates["start_quarter_ly"],
@@ -567,7 +612,7 @@ def store(store_id):
         "period",
     )
 
-    yearly_table = build_category_sales_table(
+    yearly_table, yearly_labor = build_category_sales_table(
         fiscal_dates["start_year"],
         fiscal_dates["year_to_date"],
         fiscal_dates["start_year_ly"],
@@ -578,17 +623,16 @@ def store(store_id):
     daily_sales = daily_sales_list[-1]
     daily_sales_ly = daily_sales_list_ly[-1]
 
-
-    #    budget_chart = (
-    #        db.session.query(func.sum(Budgets.total_sales).label("total_sales"))
-    #        .select_from(Budgets)
-    #        .group_by(Budgets.period)
-    #        .order_by(Budgets.period)
-    #        .filter(Budgets.year == fiscal_dates["year"], Budgets.name == store.name)
-    #    )
-    #    budgets3 = []
-    #    for v in budget_chart:
-    #        budgets3.append(v.total_sales)
+    budget_chart = (
+        db.session.query(func.sum(Budgets.total_sales).label("total_sales"))
+        .select_from(Budgets)
+        .group_by(Budgets.period)
+        .order_by(Budgets.period)
+        .filter(Budgets.year == fiscal_dates["year"], Budgets.name == store.name)
+    )
+    budgets3 = []
+    for v in budget_chart:
+        budgets3.append(v.total_sales)
 
     return render_template(
         "home/store.html",
@@ -631,12 +675,10 @@ def marketing():
 
     if form5.submit5.data and form5.validate():
         store_id = form5.store.data.id
-        print(store_id)
         return redirect(url_for("home_blueprint.lobster", store_id=store_id))
 
     if form6.submit6.data and form6.validate():
         store_id = form6.store.data.id
-        print(store_id)
         return redirect(url_for("home_blueprint.stone", store_id=store_id))
 
     # Gift Card Sales
@@ -824,12 +866,10 @@ def support():
 
     if form5.submit5.data and form5.validate():
         store_id = form5.store.data.id
-        print(store_id)
         return redirect(url_for("home_blueprint.lobster", store_id=store_id))
 
     if form6.submit6.data and form6.validate():
         store_id = form6.store.data.id
-        print(store_id)
         return redirect(url_for("home_blueprint.stone", store_id=store_id))
 
     if uofm_form.submit_uofm.data and uofm_form.validate():
@@ -915,12 +955,10 @@ def profile():
 
     if form5.submit5.data and form5.validate():
         store_id = form5.store.data.id
-        print(store_id)
         return redirect(url_for("home_blueprint.lobster", store_id=store_id))
 
     if form6.submit6.data and form6.validate():
         store_id = form6.store.data.id
-        print(store_id)
         return redirect(url_for("home_blueprint.stone", store_id=store_id))
 
     return render_template(
