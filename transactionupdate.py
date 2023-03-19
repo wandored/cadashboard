@@ -57,7 +57,6 @@ def get_glaccount():
 
 
 def transaction(id_list):
-
     rqst_list = []
     for i in id_list:
         url_filter = "$filter=transactionId eq {}".format(i)
@@ -94,7 +93,6 @@ def transaction(id_list):
 
 
 def Items():
-
     query = "$select=itemId,name,category1,category2,category3"
     url = "{}/Item?{}".format(Config.SRVC_ROOT, query)
     rqst = make_HTTP_request(url)
@@ -107,7 +105,6 @@ def Items():
 
 
 def transactionDetails(start, end):
-
     url_filter = "$filter=modifiedOn ge {}T00:00:00Z and modifiedOn le {}T00:00:00Z and rowType eq 'Detail'".format(
         start, end
     )
@@ -131,7 +128,6 @@ def transactionDetails(start, end):
 
 
 def write_to_database(df1, df2, df3):
-
     gl = get_glaccount()
     df = df3.merge(gl, on="glAccountId")
     df = df.merge(df2, how="left", on=["itemId"])
@@ -185,10 +181,9 @@ def write_to_database(df1, df2, df3):
 
 
 def main():
-
     # creat and argument parser object
     parser = argparse.ArgumentParser()
-    
+
     # check for user provide argument
     parser.add_argument("-d", "--date", help="Date to run the script")
     args = parser.parse_args()
