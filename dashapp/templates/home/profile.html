@@ -24,6 +24,9 @@
               <h5 class="mb-1">
                 {{ current_user.email }}
               </h5>
+                <p class="mb-0 font-weight-bold text-sm">
+                   Last Login: {{ current_user.last_login_at }}
+                </p>
               <p class="mb-0 font-weight-normal text-sm">
                 <a class="btn btn-info" href="/change" role="button">Change Password</a>
               </p>

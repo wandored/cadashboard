@@ -61,6 +61,12 @@ class Users(db.Model, UserMixin):
     active = db.Column(db.Boolean())
     fs_uniquifier = db.Column(db.String(64), unique=True)
     roles = db.relationship("Roles", secondary=roles_users, backref="users", lazy=True)
+    confirmed_at = db.Column(db.DateTime())
+    last_login_at = db.Column(db.DateTime())
+    current_login_at = db.Column(db.DateTime())
+    last_login_ip = db.Column(db.String(100))
+    current_login_ip = db.Column(db.String(100))
+    login_count = db.Column(db.Integer)
 
 
 #    def __init__(self, **kwargs):
@@ -91,7 +97,13 @@ class UserAdmin(sqla.ModelView):
     column_exclude_list = ("password", "fs_uniquifier")
 
     # Don't include the standard password field when creating or editing a User (but see below)
-    form_excluded_columns = ("password",)
+    form_excluded_columns = ("password",
+                             "fs_uniquifier",
+                             "last_login_at",
+                             "current_login_at",
+                             "last_login_ip",
+                             "current_login_ip",
+                             "login_count")
 
     # Automatically display human-readable names for the current and available Roles when creating or editing a User
     column_auto_select_related = True
