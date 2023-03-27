@@ -778,3 +778,30 @@ def set_dates(startdate):
         d["end_previous_week"] = lwe.strftime("%Y-%m-%d")
 
     return d
+
+def get_user_list():
+    query = (
+            db.session.query(
+                Users.id,
+                Users.email,
+                Users.active,
+                Users.confirmed_at,
+                Users.last_login_at,
+                Users.login_count,
+                )
+            .order_by(Users.last_login_at.desc()
+            ).all()
+    )
+    #user_table = pd.DataFrame.from_records(
+    #        query,
+    #        columns=
+    #              [
+    #                  "id",
+    #                  "email",
+    #                  "active",
+    #                  "confirmed_at",
+    #                  "last_login_at",
+    #                  "login_count"
+    #                  ]
+    #              )
+    return query

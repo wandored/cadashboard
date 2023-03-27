@@ -90,3 +90,7 @@ class UofMForm(FlaskForm):
 
 class RecipeForm(FlaskForm):
     submit9 = SubmitField("Submit")
+
+
+class UserForm(FlaskForm):
+    submit_user = SubmitField("Submit")
