@@ -10,13 +10,13 @@ import re
 from flask import flash, redirect, render_template, request, session, url_for
 from flask.helpers import url_for
 from flask.wrappers import Response
-from flask_security.core import current_user
-from flask_security.decorators import login_required, roles_accepted
+from flask_security import current_user
+from flask_security import login_required, roles_accepted
 from fpdf import FPDF
 import pandas as pd
 from pandas.core.algorithms import isin
 from sqlalchemy import and_, func, or_
-from tkinter import filedialog
+#from tkinter import filedialog
 
 from dashapp.authentication.forms import *
 from dashapp.authentication.models import *
@@ -1215,54 +1215,54 @@ def users():
 
     user_list = get_user_list()
     # ask user to select directory to save file
-    file_path = filedialog.askdirectory()
-    # export user_list to csv file
-    with open(f"{file_path}/user_list.csv", "w", newline="") as file:
-        writer = csv.writer(file)
-        writer.writerow(["ID", "Email", "Active", "Confirmed", "Last Login", "Login Count"])
-        for row in user_list:
-            writer.writerow(row)
+#    file_path = filedialog.askdirectory()
+#    # export user_list to csv file
+#    with open(f"{file_path}/user_list.csv", "w", newline="") as file:
+#        writer = csv.writer(file)
+#        writer.writerow(["ID", "Email", "Active", "Confirmed", "Last Login", "Login Count"])
+#        for row in user_list:
+#            writer.writerow(row)
+#
+#    return redirect(url_for("home_blueprint.support"))
 
-    return redirect(url_for("home_blueprint.support"))
 
+   # format pdf page
+    pdf_date = TODAY.strftime("%A, %B-%d")
+    pdf = FPDF()
+    pdf.add_page()
+    page_width = pdf.w - 2 * pdf.l_margin
+    pdf.set_font("Times", "B", 14.0)
+    pdf.cell(page_width, 0.0, "User Activity List", align="C")
+    pdf.ln(5)
+    pdf.cell(page_width, 0.0, pdf_date, align="C")
+    pdf.ln(5)
 
-#   # format pdf page
-#   pdf_date = TODAY.strftime("%A, %B-%d")
-#   pdf = FPDF()
-#   pdf.add_page()
-#   page_width = pdf.w - 2 * pdf.l_margin
-#   pdf.set_font("Times", "B", 14.0)
-#   pdf.cell(page_width, 0.0, "User Activity List", align="C")
-#   pdf.ln(5)
-#   pdf.cell(page_width, 0.0, pdf_date, align="C")
-#   pdf.ln(5)
+    pdf.set_font("Courier", "", 12)
+    col_width = page_width / 4
+    id_width = page_width / 8
+    pdf.ln(1)
+    th = pdf.font_size + 1
 
-#   pdf.set_font("Courier", "", 12)
-#   col_width = page_width / 4
-#   id_width = page_width / 8
-#   pdf.ln(1)
-#   th = pdf.font_size + 1
+    pdf.cell(col_width, th, str("Email"), border=1)
+    pdf.cell(id_width, th, str("Active"), border=1)
+    pdf.cell(col_width, th, str("Confirimed"), border=1)
+    pdf.cell(col_width, th, str("Last Login"), border=1)
+    pdf.cell(col_width, th, str("Login Count"), border=1)
+    pdf.ln(th)
 
-#   pdf.cell(col_width, th, str("Email"), border=1)
-#   pdf.cell(id_width, th, str("Active"), border=1)
-#   pdf.cell(col_width, th, str("Confirimed"), border=1)
-#   pdf.cell(col_width, th, str("Last Login"), border=1)
-#   pdf.cell(col_width, th, str("Login Count"), border=1)
-#   pdf.ln(th)
+    for v in user_table:
+        pdf.cell(col_width, th, str(v["email"]), border=1)
+        pdf.cell(id_width, th, str(v["active"]), border=1)
+        pdf.cell(col_width, th, str(v["confirmed_at"]), border=1)
+        pdf.cell(col_width, th, str(v["last_login_at"]), border=1)
+        pdf.cell(col_width, th, str(v["login_count"]), border=1)
+        pdf.ln(th)
 
-#   for v in user_table:
-#       pdf.cell(col_width, th, str(v["email"]), border=1)
-#       pdf.cell(id_width, th, str(v["active"]), border=1)
-#       pdf.cell(col_width, th, str(v["confirmed_at"]), border=1)
-#       pdf.cell(col_width, th, str(v["last_login_at"]), border=1)
-#       pdf.cell(col_width, th, str(v["login_count"]), border=1)
-#       pdf.ln(th)
+    pdf.ln(5)
+    pdf.cell(page_width, 0.0, "- end of report -", align="C")
 
-#   pdf.ln(5)
-#   pdf.cell(page_width, 0.0, "- end of report -", align="C")
-
-#   return Response(
-#       pdf.output(dest="S").encode("latin-1"),
-#       mimetype="application/pdf",
-#       headers={"Content-Disposition": "attachment;filename=user_activity_report.pdf"},
-#   )
+    return Response(
+        pdf.output(dest="S").encode("latin-1"),
+        mimetype="application/pdf",
+        headers={"Content-Disposition": "attachment;filename=user_activity_report.pdf"},
+    )
