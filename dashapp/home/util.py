@@ -52,7 +52,7 @@ def sales_record(store, time_frame):
             .first()
         )
     if query:
-        return query["top_sales"]
+        return query[0]
 
 
 def get_daypart_sales(start, end, store, day_part):

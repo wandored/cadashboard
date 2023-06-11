@@ -141,16 +141,16 @@ def index():
     )
     ytd_sales_ly = sum(year_to_date_sales_ly)
 
-    budget_chart = (
-        db.session.query(func.sum(Budgets.total_sales).label("total_sales"))
-        .select_from(Budgets)
-        .group_by(Budgets.period)
-        .order_by(Budgets.period)
-        .filter(Budgets.year == fiscal_dates["year"])
-    )
-    budgets3 = []
-    for v in budget_chart:
-        budgets3.append(v.total_sales)
+    #budget_chart = (
+    #    db.session.query(func.sum(Budgets.total_sales).label("total_sales"))
+    #    .select_from(Budgets)
+    #    .group_by(Budgets.period)
+    #    .order_by(Budgets.period)
+    #    .filter(Budgets.year == fiscal_dates["year"])
+    #)
+    #budgets3 = []
+    #for v in budget_chart:
+    #    budgets3.append(v.total_sales)
 
     def build_sales_table(start, end, start_ly, end_ly, time_frame):
         sales = (
@@ -624,16 +624,16 @@ def store(store_id):
     daily_sales = daily_sales_list[-1]
     daily_sales_ly = daily_sales_list_ly[-1]
 
-    budget_chart = (
-        db.session.query(func.sum(Budgets.total_sales).label("total_sales"))
-        .select_from(Budgets)
-        .group_by(Budgets.period)
-        .order_by(Budgets.period)
-        .filter(Budgets.year == fiscal_dates["year"], Budgets.name == store.name)
-    )
-    budgets3 = []
-    for v in budget_chart:
-        budgets3.append(v.total_sales)
+    #budget_chart = (
+    #    db.session.query(func.sum(Budgets.total_sales).label("total_sales"))
+    #    .select_from(Budgets)
+    #    .group_by(Budgets.period)
+    #    .order_by(Budgets.period)
+    #    .filter(Budgets.year == fiscal_dates["year"], Budgets.name == store.name)
+    #)
+    #budgets3 = []
+    #for v in budget_chart:
+    #    budgets3.append(v.total_sales)
 
     return render_template(
         "home/store.html",
