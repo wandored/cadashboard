@@ -23,8 +23,8 @@ def register_blueprints(app):
 
 
 def configure_database(app):
-    def initialize_database():
-        db.create_all()
+    with app.app_context():
+        db.reflect()
 
     @app.teardown_request
     def shutdown_session(exception=None):
@@ -37,5 +37,5 @@ def create_app(config_class=Config):
     register_extensions(app)
     register_blueprints(app)
     configure_database(app)
-    asgi_app = WsgiToAsgi(app) # added for uvicorn
+#    asgi_app = WsgiToAsgi(app) # added for uvicorn
     return app
