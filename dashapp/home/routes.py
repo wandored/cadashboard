@@ -29,29 +29,27 @@ from dashapp.home.util import *
 @login_required
 def index():
     TODAY = datetime.date(datetime.now())
-    # CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
-    # YSTDAY = TODAY - timedelta(days=1)
 
     if not "date_selected" in session:
-        session["date_selected"] = TODAY.strftime("%Y-%m-%d")
+        session["date_selected"] = TODAY
         return redirect(url_for("home_blueprint.index"))
 
+    # TODO fix restaurant list selection
     if not "store_list" in session:
-        closed_stores = [1, 2, 7, 8]
+        closed_stores = [
+                "91", "21B", "12B", "2B", "17B", "7B", "18", "10", "3B", "28", "8B", "1B", "85B", "15B", "15", "4B", "19", "25B", "14B", "11B", "95", "99", "5B", "10B", "18B" 
+                ]
         session["store_list"] = tuple(
             [
-                store.id
-                for store in Restaurants.query.filter(Restaurants.id.notin_(closed_stores))
-                .order_by(Restaurants.name)
+                store.locationid
+                for store in location.query.filter(location.locationnumber.notin_(closed_stores))
+                .order_by(location.name)
                 .all()
             ]
         )
         return redirect(url_for("home_blueprint.index"))
 
-    fiscal_dates = set_dates(datetime.strptime(session["date_selected"], "%Y-%m-%d"))
-    # List of stores to add ID so i can pass to other templates
-    data = Restaurants.query.all()
-    store_df = pd.DataFrame([x.as_dict() for x in data])
+    fiscal_dates = set_dates(session["date_selected"])
 
     # Check for no sales
     if not sales_totals.query.filter_by(date=fiscal_dates["start_day"]).all():
@@ -141,17 +139,6 @@ def index():
     )
     ytd_sales_ly = sum(year_to_date_sales_ly)
 
-    #budget_chart = (
-    #    db.session.query(func.sum(Budgets.total_sales).label("total_sales"))
-    #    .select_from(Budgets)
-    #    .group_by(Budgets.period)
-    #    .order_by(Budgets.period)
-    #    .filter(Budgets.year == fiscal_dates["year"])
-    #)
-    #budgets3 = []
-    #for v in budget_chart:
-    #    budgets3.append(v.total_sales)
-
     def build_sales_table(start, end, start_ly, end_ly, time_frame):
         sales = (
             db.session.query(
@@ -174,13 +161,11 @@ def index():
             .group_by(sales_totals.store)
             .all()
         )
-        # Get the top sales for each store
-        table_class = globals()[f'sales_records_{time_frame}']
+        # Get the top sales for each store and merge with sales_table
+        table_class = globals()[f'sales_records_{time_frame}'] # how you use a variable in query
         sales_query = table_class.query.with_entities(table_class.store, table_class.net_sales).all()
-
-        top_sales = pd.DataFrame.from_records(sales_query, columns=['store', time_frame])
+        top_sales = pd.DataFrame.from_records(sales_query, columns=['store', 'top_sales'])
         top_sales.set_index('store', inplace=True)
-
         sales_table = pd.DataFrame.from_records(sales, columns=["store", "sales", "guests"])
         sales_table_ly = pd.DataFrame.from_records(sales_ly, columns=["store", "sales_ly", "guests_ly"])
         sales_table = sales_table.merge(sales_table_ly, how="outer", sort=True)
@@ -211,8 +196,12 @@ def index():
         df_labor = pd.DataFrame.from_records(labor, columns=["store", "hours", "dollars"])
         df_labor_ly = pd.DataFrame.from_records(labor_ly, columns=["store", "hours_ly", "dollars_ly"])
         labor_table = df_labor.merge(df_labor_ly, how="outer", sort=True)
-
         table = sales_table.merge(labor_table, how="outer", sort=True)
+
+        # List of stores to add ID so i can pass to other templates
+        data = location.query.with_entities(location.name, location.locationnumber).all()
+        location_list = pd.DataFrame.from_records(data, columns=['store', 'id'])
+        table = table.merge(location_list, on='store')
         table = table.set_index("store")
 
         # Grab top sales over last year before we add totals

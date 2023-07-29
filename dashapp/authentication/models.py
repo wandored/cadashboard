@@ -5,12 +5,12 @@ Copyright (c) 2019 - present AppSeed.us
 
 # from flask_login import LoginManager
 from flask import current_app
-from flask_security import (
+from flask_security import current_user
+from flask_security.datastore import SQLAlchemySessionUserDatastore
+from flask_security.core import (
     UserMixin,
-    current_user,
     RoleMixin,
     Security,
-    SQLAlchemySessionUserDatastore,
 )
 from flask_sqlalchemy import SQLAlchemy
 from flask_admin import Admin
@@ -269,8 +269,8 @@ class Potatoes(db.Model):
     quantity = db.Column(db.Integer)
 
 
-class Unitsofmeasure(db.Model):
-    __tablename__ = "Unitsofmeasure"
+class unitsofmeasure(db.Model):
+    __tablename__ = "unitsofmeasure"
 
     uofm_id = db.Column(db.String(64), primary_key=True, unique=True)
     name = db.Column(db.String(64))
