@@ -3,7 +3,7 @@ dashapp/*.db
 /output
 /scripts
 datarecovery.py
-config.json
+/etc/config.json
 
 # Docker
 Dockerfile

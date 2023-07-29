@@ -1,4 +1,5 @@
 """
+home/util.py
 Dashboard by wandored
 """
 import json
@@ -28,8 +29,8 @@ def sales_record(store, time_frame):
         query = (
             db.session.query(func.sum(Sales.sales).label("top_sales"))
             .filter(Sales.name == store)
-            .join(Calendar, Calendar.date == Sales.date)
-            .group_by(Calendar.week, Calendar.period, Calendar.year)
+            .join(calendar, calendar.date == Sales.date)
+            .group_by(calendar.week, calendar.period, calendar.year)
             .order_by(func.sum(Sales.sales).desc())
             .first()
         )
@@ -37,8 +38,8 @@ def sales_record(store, time_frame):
         query = (
             db.session.query(func.sum(Sales.sales).label("top_sales"))
             .filter(Sales.name == store)
-            .join(Calendar, Calendar.date == Sales.date)
-            .group_by(Calendar.period, Calendar.year)
+            .join(calendar, calendar.date == Sales.date)
+            .group_by(calendar.period, calendar.year)
             .order_by(func.sum(Sales.sales).desc())
             .first()
         )
@@ -46,13 +47,13 @@ def sales_record(store, time_frame):
         query = (
             db.session.query(func.sum(Sales.sales).label("top_sales"))
             .filter(Sales.name == store)
-            .join(Calendar, Calendar.date == Sales.date)
-            .group_by(Calendar.year)
+            .join(calendar, calendar.date == Sales.date)
+            .group_by(calendar.year)
             .order_by(func.sum(Sales.sales).desc())
             .first()
         )
     if query:
-        return query["top_sales"]
+        return query[0]
 
 
 def get_daypart_sales(start, end, store, day_part):
@@ -82,17 +83,23 @@ def get_daypart_guest(start, end, store, day_part):
 
 
 def find_day_with_sales(**kwargs):
+    """
+    when a date is submitted on the dashboard, we first check if the date
+    has sales, if not it goes back one and checks until if finds a day with sales
+    """
     if "store" in kwargs:
-        while not Sales.query.filter_by(date=kwargs["day"], name=kwargs["store"]).first():
-            date = datetime.strptime(kwargs["day"], "%Y-%m-%d")
-            next_day = date - timedelta(days=1)
-            kwargs["day"] = next_day.strftime("%Y-%m-%d")
+        while not sales_totals.query.filter_by(date=kwargs["day"], name=kwargs["store"]).first():
+            #date = datetime.strptime(kwargs["day"], "%Y-%m-%d")
+            next_day = kwargs['day'] - timedelta(days=1)
+            print(next_day)
+            kwargs["day"] = next_day
     else:
-        while not Sales.query.filter_by(date=kwargs["day"]).first():
-            date = datetime.strptime(kwargs["day"], "%Y-%m-%d")
-            next_day = date - timedelta(days=1)
-            kwargs["day"] = next_day.strftime("%Y-%m-%d")
-    return kwargs["day"]
+        while not sales_totals.query.filter_by(date=kwargs["day"]).first():
+            #date = datetime.date(kwargs["day"])
+            next_day = kwargs['day'] - timedelta(days=1)
+            print(next_day)
+            kwargs["day"] = next_day
+    return next_day
 
 
 def refresh_data(start, end):
@@ -145,7 +152,7 @@ def make_dataframe(sales):
 
 
 def get_lastyear(date):
-    target = Calendar.query.filter_by(date=date)
+    target = calendar.query.filter_by(date=date)
     dt_date = date
 
     for i in target:
@@ -153,15 +160,18 @@ def get_lastyear(date):
         period = i.period
         week = i.week
         day = i.day
-        ly_target = Calendar.query.filter_by(year=lst_year, period=period, week=week, day=day)
+        ly_target = calendar.query.filter_by(year=lst_year, period=period, week=week, day=day)
         for x in ly_target:
             dt_date = x.date
     return dt_date
 
 
 def get_period(startdate):
-    start = startdate.strftime("%Y-%m-%d")
-    target = Calendar.query.filter_by(date=start)
+    """
+    returns the period integer for the current startdate
+    """
+#    start = startdate.strftime("%Y-%m-%d")
+    target = calendar.query.filter_by(date=startdate)
 
     return target
 
@@ -301,7 +311,7 @@ def get_glaccount_costs(start, end, acct, store, epoch):
             func.sum(Transactions.debit).label("costs"),
         )
         .select_from(Transactions)
-        .join(Calendar, Calendar.date == Transactions.date)
+        .join(calendar, calendar.date == Transactions.date)
         .group_by(epoch)
         .order_by(epoch)
         .filter(
@@ -325,9 +335,9 @@ def get_glaccount_costs(start, end, acct, store, epoch):
 #            func.sum(Transactions.debit).label("costs"),
 #        )
 #        .select_from(Transactions)
-#        .join(Calendar, Calendar.date == Transactions.date)
-#        .group_by(Calendar.period)
-#        .order_by(Calendar.period)
+#        .join(calendar, calendar.date == Transactions.date)
+#        .group_by(calendar.period)
+#        .order_by(calendar.period)
 #        .filter(
 #            Transactions.date.between(start, end),
 #            Transactions.category2.in_(cat),
@@ -459,7 +469,7 @@ def potato_sales(start):
 
 def convert_uofm(unit):
     # convert the unit uofm to base quantity
-    pack_size = db.session.query(Unitsofmeasure).filter(Unitsofmeasure.name == unit.UofM).first()
+    pack_size = db.session.query(unitsofmeasure).filter(unitsofmeasure.name == unit.UofM).first()
     if pack_size:
         return pack_size.base_qty, pack_size.base_uofm
     else:
@@ -634,10 +644,9 @@ def uofm_update(file):
         },
         inplace=True,
     )
-    print(df)
     # upsert data to Unitsofmeasure table
     try:
-        df.to_sql("Unitsofmeasure", db.engine, if_exists="replace", index=False)
+        df.to_sql("unitsofmeasure", db.engine, if_exists="replace", index=False)
     except Exception as e:
         print("Error writing to database:", e)
         return 1
@@ -722,46 +731,51 @@ def update_recipe_costs():
 
 
 def set_dates(startdate):
-    start = startdate.strftime("%Y-%m-%d")
-    target = Calendar.query.filter_by(date=start)
+#    start = startdate.strftime("%Y-%m-%d")
+    target = calendar.query.filter_by(date=startdate)
+    d = {}
 
     for i in target:
-        day_start = datetime.strptime(i.date, "%Y-%m-%d")
-        day_end = day_start + timedelta(days=1)
-        seven = day_start - timedelta(days=7)
-        thirty = day_start - timedelta(days=30)
-        threesixtyfive = day_start - timedelta(days=365)
-        week_start = datetime.strptime(i.week_start, "%Y-%m-%d")
-        lws = week_start - timedelta(days=7)
-        week_end = datetime.strptime(i.week_end, "%Y-%m-%d")
-        lwe = week_end - timedelta(days=7)
+        #day_start = datetime.strptime(i.date, "%Y-%m-%d")
+        #day_start = i.date
+        day_end = i.date + timedelta(days=1)
+        seven = i.date - timedelta(days=7)
+        thirty = i.date - timedelta(days=30)
+        threesixtyfive = i.date - timedelta(days=365)
+#        week_start = datetime.strptime(i.week_start, "%Y-%m-%d")
+#        lws = i.week_start - timedelta(days=7)
+#        week_end = datetime.strptime(i.week_end, "%Y-%m-%d")
+#        lwe = i.week_end - timedelta(days=7)
 
-        d = dict()
         d["day"] = i.day
         d["week"] = i.week
         d["period"] = i.period
         d["year"] = i.year
         d["quarter"] = i.quarter
-        d["date"] = day_start.strftime("%A, %B %d %Y")
+        d["date"] = i.date.strftime("%A, %B %d %Y")
         d["start_day"] = i.date
-        d["end_day"] = day_end.strftime("%Y-%m-%d")
-        d["start_week"] = i.week_start
+        #d["end_day"] = day_end.strftime("%Y-%m-%d")
+        d["end_day"] = i.date + timedelta(days=1)
+        d['start_week'] = i.week_start
         d["end_week"] = i.week_end
         d["week_to_date"] = i.date
-        d["last_seven"] = seven.strftime("%Y-%m-%d")
+#        d["last_seven"] = seven.strftime("%Y-%m-%d")
+        d["last_seven"] = i.date - timedelta(days=7)
         d["start_period"] = i.period_start
         d["end_period"] = i.period_end
         d["period_to_date"] = i.date
-        d["last_thirty"] = thirty.strftime("%Y-%m-%d")
+#        d["last_thirty"] = thirty.strftime("%Y-%m-%d")
+        d["last_thirty"] = i.date - timedelta(days=30)
         d["start_quarter"] = i.quarter_start
         d["end_quarter"] = i.quarter_end
         d["quarter_to_date"] = i.date
         d["start_year"] = i.year_start
         d["end_year"] = i.year_end
         d["year_to_date"] = i.date
-        d["last_threesixtyfive"] = threesixtyfive.strftime("%Y-%m-%d")
+#        d["last_threesixtyfive"] = threesixtyfive.strftime("%Y-%m-%d")
+        d["last_threesixtyfive"] = i.date - timedelta(days=365) 
         d["start_day_ly"] = get_lastyear(i.date)
-        d["end_day_ly"] = get_lastyear(day_end.strftime("%Y-%m-%d"))
+        d["end_day_ly"] = get_lastyear(d["end_day"])
         d["start_week_ly"] = get_lastyear(i.week_start)
         d["end_week_ly"] = get_lastyear(i.week_end)
         d["week_to_date_ly"] = get_lastyear(i.date)
@@ -774,8 +788,10 @@ def set_dates(startdate):
         d["start_year_ly"] = get_lastyear(i.year_start)
         d["end_year_ly"] = get_lastyear(i.year_end)
         d["year_to_date_ly"] = get_lastyear(i.date)
-        d["start_previous_week"] = lws.strftime("%Y-%m-%d")
-        d["end_previous_week"] = lwe.strftime("%Y-%m-%d")
+#        d["start_previous_week"] = lws.strftime("%Y-%m-%d")
+        d["start_previous_week"] = i.week_start - timedelta(days=7)
+#        d["end_previous_week"] = lwe.strftime("%Y-%m-%d")
+        d["end_previous_week"] = i.week_end - timedelta(days=7)
 
     return d
 

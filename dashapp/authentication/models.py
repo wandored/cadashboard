@@ -4,16 +4,18 @@ Copyright (c) 2019 - present AppSeed.us
 """
 
 # from flask_login import LoginManager
-from flask_security import (
+from flask import current_app
+from flask_security import current_user
+from flask_security.datastore import SQLAlchemySessionUserDatastore
+from flask_security.core import (
     UserMixin,
-    current_user,
     RoleMixin,
     Security,
-    SQLAlchemySessionUserDatastore,
 )
 from flask_sqlalchemy import SQLAlchemy
 from flask_admin import Admin
 from flask_admin.contrib import sqla
+from sqlalchemy import Column
 from dashapp.authentication.util import hash_pass
 from wtforms.fields import PasswordField
 from flask_mail import Mail
@@ -164,8 +166,8 @@ class Restaurants(db.Model):
         return {"id": self.id, "name": self.name, "location": self.location}
 
 
-class Calendar(db.Model):
-    __tablename__ = "Calendar"
+class calendar(db.Model):
+    __tablename__ = "calendar"
 
     date = db.Column(db.String(64), primary_key=True, unique=True)
     week = db.Column(db.Integer)
@@ -255,79 +257,6 @@ class Transactions(db.Model):
     account = db.Column(db.String(64))
 
 
-class Budgets(db.Model):
-    __tablename__ = "Budgets"
-
-    id = db.Column(db.Integer, primary_key=True)
-    period = db.Column(db.Integer)
-    name = db.Column(db.String(64))
-    year = db.Column(db.Integer)
-    lunch_food_sales = db.Column(db.Integer)
-    dinner_food_sales = db.Column(db.Integer)
-    to_go_sales = db.Column(db.Integer)
-    catering_sales = db.Column(db.Integer)
-    total_food_sales = db.Column(db.Integer)
-    liquor_sales = db.Column(db.Integer)
-    beer_sales = db.Column(db.Integer)
-    wine_sales = db.Column(db.Integer)
-    total_alcohol_sales = db.Column(db.Integer)
-    total_sales = db.Column(db.Integer)
-    beef = db.Column(db.Integer)
-    pork = db.Column(db.Integer)
-    poultry = db.Column(db.Integer)
-    fish = db.Column(db.Integer)
-    produce = db.Column(db.Integer)
-    dairy = db.Column(db.Integer)
-    food_other = db.Column(db.Integer)
-    total_food_cost = db.Column(db.Integer)
-    liquor = db.Column(db.Integer)
-    beer = db.Column(db.Integer)
-    wine = db.Column(db.Integer)
-    total_alcohol_cost = db.Column(db.Integer)
-    total_cost_of_sales = db.Column(db.Integer)
-    gross_profit = db.Column(db.Integer)
-    total_crew_training = db.Column(db.Integer)
-    kitchen = db.Column(db.Integer)
-    restaurant = db.Column(db.Integer)
-    host = db.Column(db.Integer)
-    bar = db.Column(db.Integer)
-    catering = db.Column(db.Integer)
-    total_crew = db.Column(db.Integer)
-    total_crew_all = db.Column(db.Integer)
-    total_management = db.Column(db.Integer)
-    total_labor = db.Column(db.Integer)
-    total_labor_benefits = db.Column(db.Integer)
-    food_comp = db.Column(db.Integer)
-    drink_comp = db.Column(db.Integer)
-    serv_atm_comp = db.Column(db.Integer)
-    high_time_comp = db.Column(db.Integer)
-    comp_certificates_pr = db.Column(db.Integer)
-    outside_delivery_service = db.Column(db.Integer)
-    total_comps = db.Column(db.Integer)
-    kitchen_supplies = db.Column(db.Integer)
-    restaurant_supplies = db.Column(db.Integer)
-    bar_supplies = db.Column(db.Integer)
-    catering_supplies_expense = db.Column(db.Integer)
-    cleaning_supplies = db.Column(db.Integer)
-    office_supplies = db.Column(db.Integer)
-    total_supplies = db.Column(db.Integer)
-    china = db.Column(db.Integer)
-    glassware = db.Column(db.Integer)
-    silverware = db.Column(db.Integer)
-    smallware = db.Column(db.Integer)
-    total_smallwares = db.Column(db.Integer)
-    total_repair_maint = db.Column(db.Integer)
-    total_advertising_coupons = db.Column(db.Integer)
-    total_other_op_expense = db.Column(db.Integer)
-    gift_card_income = db.Column(db.Integer)
-    gift_card_expense = db.Column(db.Integer)
-    total_income_expense = db.Column(db.Integer)
-    total_operating_expense = db.Column(db.Integer)
-    total_labor_and_operating_expense = db.Column(db.Integer)
-    gross_operating_profit = db.Column(db.Integer)
-    net_profit = db.Column(db.Integer)
-
-
 class Potatoes(db.Model):
     __tablename__ = "Potatoes"
 
@@ -340,8 +269,8 @@ class Potatoes(db.Model):
     quantity = db.Column(db.Integer)
 
 
-class Unitsofmeasure(db.Model):
-    __tablename__ = "Unitsofmeasure"
+class unitsofmeasure(db.Model):
+    __tablename__ = "unitsofmeasure"
 
     uofm_id = db.Column(db.String(64), primary_key=True, unique=True)
     name = db.Column(db.String(64))
@@ -386,3 +315,164 @@ class Payments(db.Model):
     location = db.Column(db.String(64))
     paymenttype = db.Column(db.String(64))
     restaurant_id = db.Column(db.Integer, db.ForeignKey("Restaurants.id"))
+
+"""
+new database tables -------------------------------------------------
+"""
+
+class company(db.Model):
+    __tablename__ = 'company'
+
+    companyid = db.Column(db.String, primary_key=True)
+    name = db.Column(db.String)
+
+class glaccount(db.Model):
+    __tablename__ = 'glaccount'
+
+    glaccountid = db.Column(db.String, primary_key=True)
+    name = db.Column(db.String)
+    glaccountnumber = db.Column(db.String)
+    gltyp = db.Column(db.String)
+
+class item(db.Model):
+    __tablename__ = 'item'
+
+    itemid = db.Column(db.String, primary_key=True)
+    name = db.Column(db.String)
+    category1 = db.Column(db.String)
+    category2 = db.Column(db.String)
+    category3 = db.Column(db.String)
+
+class job_title(db.Model):
+    __tablename__ = 'job_title'
+
+    jobtitleid = db.Column(db.String, primary_key=True)
+    name = db.Column(db.String)
+    jobcode = db.Column(db.String)
+    glaccount_id = db.Column(db.String, db.ForeignKey("glaccount.glaccountid"))
+    location_id = db.Column(db.String, db.ForeignKey("location.locationid"))
+
+class location(db.Model):
+    __tablename__ = 'location'
+
+    locationid = db.Column(db.String, primary_key=True)
+    name = db.Column(db.String)
+    locationnumber = db.Column(db.String)
+
+## Table Views
+
+class sales_totals(db.Model):
+    __tablename__ = 'sales_totals'
+
+    store = db.Column(db.String, primary_key=True)
+    date = db.Column(db.Date, primary_key=True)
+    net_sales = db.Column(db.Float)
+    guest_count = db.Column(db.Integer)
+
+
+class labor_totals(db.Model):
+    __tablename__ = 'labor_totals'
+
+    store = db.Column(db.String, primary_key=True)
+    job = db.Column(db.String, primary_key=True)
+    category = db.Column(db.String)
+    date = db.Column(db.Date)
+    total_hours = db.Column(db.Float)
+    total_dollars = db.Column(db.Integer)
+
+
+class menuitems(db.Model):
+    __tablename__ = 'menuitems'
+
+    store = db.Column(db.String, primary_key=True)
+    menuitem = db.Column(db.String, primary_key=True)
+    date = db.Column(db.Date)
+    total_sales = db.Column(db.Float)
+    total_count = db.Column(db.Integer)
+
+
+class purchases(db.Model):
+    __tablename__ = 'purchases'
+
+    transactionid = db.Column(db.String, primary_key=True)
+    date = db.Column(db.Date, primary_key=True)
+    store = db.Column(db.String)
+    item = db.Column(db.String)
+    category1 = db.Column(db.String)
+    category2 = db.Column(db.String)
+    category3 = db.Column(db.String)
+    quantity = db.Column(db.Float)
+    uofm = db.Column(db.String)
+    credit = db.Column(db.Integer)
+    debit = db.Column(db.Integer)
+    amount = db.Column(db.Integer)
+    account = db.Column(db.String)
+
+
+class sales_category(db.Model):
+    __tablename__ = 'sales_category'
+
+    store = db.Column(db.String)
+    date = db.Column(db.Date, primary_key=True)
+    item = db.Column(db.String)
+    quantity = db.Column(db.Float)
+
+
+class sales_daypart(db.Model):
+    __tablename__ = 'sales_daypart'
+
+    store = db.Column(db.String, primary_key=True)
+    daypart = db.Column(db.String, primary_key=True)
+    date = db.Column(db.Date, primary_key=True)
+    net_sales = db.Column(db.Float)
+    guest_count = db.Column(db.Integer)
+
+
+class sales_hourly(db.Model):
+    __tablename__ = 'sales_hourly'
+
+    store = db.Column(db.String, primary_key=True)
+    order_hour = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.Date, primary_key=True)
+    net_sales = db.Column(db.Float)
+    guest_count = db.Column(db.Integer)
+
+
+class sales_records_day(db.Model):
+    __tablename__ = 'sales_records_day'
+
+    store = db.Column(db.String, primary_key=True)
+    date = db.Column(db.Date)
+    week = db.Column(db.Integer)
+    period = db.Column(db.Integer)
+    year = db.Column(db.Integer)
+    net_sales = db.Column(db.Float)
+
+
+class sales_records_week(db.Model):
+    __tablename__ = 'sales_records_week'
+
+    store = db.Column(db.String, primary_key=True)
+    week = db.Column(db.Integer)
+    period = db.Column(db.Integer)
+    year = db.Column(db.Integer)
+    net_sales = db.Column(db.Float)
+
+
+class sales_records_period(db.Model):
+    __tablename__ = 'sales_records_period'
+
+    store = db.Column(db.String, primary_key=True)
+    period = db.Column(db.Integer)
+    year = db.Column(db.Integer)
+    net_sales = db.Column(db.Float)
+
+
+class sales_records_year(db.Model):
+    __tablename__ = 'sales_records_year'
+
+    store = db.Column(db.String, primary_key=True)
+    year = db.Column(db.Integer)
+    net_sales = db.Column(db.Float)
+
+

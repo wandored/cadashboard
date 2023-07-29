@@ -9,14 +9,16 @@ from wtforms import widgets, SubmitField, StringField, PasswordField
 from wtforms.fields import DateField
 from wtforms_sqlalchemy.fields import QuerySelectMultipleField, QuerySelectField
 from wtforms.validators import Email, DataRequired
-from dashapp.authentication.models import Restaurants
+from dashapp.authentication.models import *
 
 # login and registration
 
 
 def store_query():
-    closed_stores = [1, 2, 7, 8]
-    return Restaurants.query.filter(Restaurants.id.notin_(closed_stores)).order_by(Restaurants.name).all()
+    closed_stores = [
+            "91", "21B", "12B", "2B", "17B", "7B", "18", "10", "3B", "28", "8B", "1B", "85B", "15B", "15", "4B", "19", "25B", "14B", "11B", "95", "99", "5B", "10B", "18B" 
+            ]
+    return location.query.filter(location.locationnumber.notin_(closed_stores)).order_by(location.name).all()
 
 
 class LoginForm(FlaskForm):
