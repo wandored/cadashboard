@@ -24,7 +24,7 @@ from dashapp.authentication.models import *
 @login_required
 def purchasing():
 
-    fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
+    fiscal_dates = set_dates(session["date_selected"])
 
     # Get list of Restaurants
     data = Restaurants.query.all()
@@ -109,7 +109,7 @@ def purchasing():
 @login_required
 def beef(product):
 
-    fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
+    fiscal_dates = set_dates(session["date_selected"])
 
     # Get list of Restaurants
     data = Restaurants.query.all()

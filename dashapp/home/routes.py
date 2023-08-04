@@ -262,16 +262,14 @@ def index():
 @login_required
 def store(store_id):
     TODAY = datetime.date(datetime.now())
-    CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
-    # YSTDAY = TODAY - timedelta(days=1)
 
     store = Restaurants.query.filter_by(id=store_id).first()
 
     if not "date_selected" in session:
-        session["date_selected"] = TODAY.strftime("%Y-%m-%d")
+        session["date_selected"] = TODAY
         return redirect(url_for("home_blueprint.store", store_id=store.id))
 
-    fiscal_dates = set_dates(datetime.strptime(session["date_selected"], "%Y-%m-%d"))
+    fiscal_dates = set_dates(session["date_selected"])
 
     data = Restaurants.query.all()
     store_df = pd.DataFrame([x.as_dict() for x in data])
@@ -630,10 +628,8 @@ def store(store_id):
 @login_required
 def marketing():
     TODAY = datetime.date(datetime.now())
-    CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
-    YSTDAY = TODAY - timedelta(days=1)
 
-    fiscal_dates = set_dates(datetime.strptime(session["date_selected"], "%Y-%m-%d"))
+    fiscal_dates = set_dates(session["date_selected"])
     form1 = DateForm()
     form4 = PotatoForm()
     form5 = LobsterForm()
@@ -799,10 +795,8 @@ def marketing():
 @roles_accepted("admin")
 def support():
     TODAY = datetime.date(datetime.now())
-    CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
-    YSTDAY = TODAY - timedelta(days=1)
 
-    fiscal_dates = set_dates(datetime.strptime(session["date_selected"], "%Y-%m-%d"))
+    fiscal_dates = set_dates(session["date_selected"])
 
     form1 = DateForm()
     form2 = UpdateForm()
@@ -821,9 +815,8 @@ def support():
 
     if form2.submit2.data and form2.validate():
         """ """
-        new_start_day = form2.selectdate.data.strftime("%Y-%m-%d")
-        day_end = form2.selectdate.data + timedelta(days=1)
-        new_end_day = day_end.strftime("%Y-%m-%d")
+        new_start_day = form2.selectdate.data
+        new_end_day = form2.selectdate.data + timedelta(days=1)
 
         baddates = refresh_data(new_start_day, new_end_day)
         if baddates == 1:
@@ -913,10 +906,8 @@ def support():
 @login_required
 def profile():
     TODAY = datetime.date(datetime.now())
-    CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
-    YSTDAY = TODAY - timedelta(days=1)
 
-    fiscal_dates = set_dates(datetime.strptime(session["date_selected"], "%Y-%m-%d"))
+    fiscal_dates = set_dates(session["date_selected"])
     form1 = DateForm()
     form3 = StoreForm()
     form4 = PotatoForm()
@@ -959,8 +950,6 @@ def profile():
 def potato(store_id):
     # TODO need to fix store ID
     TODAY = datetime.date(datetime.now())
-    CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
-    YSTDAY = TODAY - timedelta(days=1)
 
     store = Restaurants.query.filter_by(id=store_id).first()
 
@@ -968,11 +957,9 @@ def potato(store_id):
 
     for i in [28, 21, 14, 7]:
         target = TODAY - timedelta(days=i)
-        start = target.strftime("%Y-%m-%d")
-        # TODO switch queries to "with_entities"
         query = (
             Potatoes.query.with_entities(Potatoes.time, Potatoes.quantity).filter(
-                Potatoes.date == start, Potatoes.name == store.name
+                Potatoes.date == target, Potatoes.name == store.name
             )
         ).all()
         df = pd.DataFrame.from_records(query, columns=["time", i])
@@ -1063,7 +1050,7 @@ def potato(store_id):
 @login_required
 def lobster(store_id):
     TODAY = datetime.date(datetime.now())
-    fiscal_dates = set_dates(datetime.strptime(session["date_selected"], "%Y-%m-%d"))
+    fiscal_dates = set_dates(session["date_selected"])
 
     store = Restaurants.query.filter_by(id=store_id).first()
 
@@ -1128,7 +1115,7 @@ def lobster(store_id):
 @login_required
 def stone(store_id):
     TODAY = datetime.date(datetime.now())
-    fiscal_dates = set_dates(datetime.strptime(session["date_selected"], "%Y-%m-%d"))
+    fiscal_dates = set_dates(session["date_selected"])
 
     store = Restaurants.query.filter_by(id=store_id).first()
 
