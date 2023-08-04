@@ -38,8 +38,7 @@ def supplies():
     form3 = StoreForm()
 
     if form1.submit1.data and form1.validate():
-        new_day = form1.selectdate.data.strftime("%Y-%m-%d")
-        session["token"] = new_day
+        session["date_selected"] = form1.selectdate.data
         return redirect(url_for("supply_blueprint.supplies"))
 
     if form3.submit3.data and form3.validate():
@@ -122,8 +121,7 @@ def smallwares():
     form3 = StoreForm()
 
     if form1.submit1.data and form1.validate():
-        new_day = form1.selectdate.data.strftime("%Y-%m-%d")
-        session["token"] = new_day
+        session["date_selected"] = form1.selectdate.data
         return redirect(url_for("supply_blueprint.smallwares"))
 
     if form3.submit3.data and form3.validate():
@@ -187,8 +185,7 @@ def linen():
     form3 = StoreForm()
 
     if form1.submit1.data and form1.validate():
-        new_day = form1.selectdate.data.strftime("%Y-%m-%d")
-        session["token"] = new_day
+        session["date_selected"] = form1.selectdate.data
         return redirect(url_for("supply_blueprint.linen"))
 
     if form3.submit3.data and form3.validate():
@@ -253,8 +250,7 @@ def linen():
 #    form3 = StoreForm()
 #
 #    if form1.submit1.data and form1.validate():
-#        new_day = form1.selectdate.data.strftime("%Y-%m-%d")
-#        session["token"] = new_day
+        session["date_selected"] = form1.selectdate.data
 #        return redirect(url_for("supply_blueprint.restaurant"))
 #
 #    if form3.submit3.data and form3.validate():
@@ -315,8 +311,7 @@ def linen():
 #    form3 = StoreForm()
 #
 #    if form1.submit1.data and form1.validate():
-#        new_day = form1.selectdate.data.strftime("%Y-%m-%d")
-#        session["token"] = new_day
+        session["date_selected"] = form1.selectdate.data
 #        return redirect(url_for("supply_blueprint.kitchen"))
 #
 #    if form3.submit3.data and form3.validate():
@@ -377,8 +372,7 @@ def linen():
 #    form3 = StoreForm()
 #
 #    if form1.submit1.data and form1.validate():
-#        new_day = form1.selectdate.data.strftime("%Y-%m-%d")
-#        session["token"] = new_day
+        session["date_selected"] = form1.selectdate.data
 #        return redirect(url_for("supply_blueprint.cleaning"))
 #
 #    if form3.submit3.data and form3.validate():
@@ -439,8 +433,7 @@ def linen():
 #    form3 = StoreForm()
 #
 #    if form1.submit1.data and form1.validate():
-#        new_day = form1.selectdate.data.strftime("%Y-%m-%d")
-#        session["token"] = new_day
+        session["date_selected"] = form1.selectdate.data
 #        return redirect(url_for("supply_blueprint.catering"))
 #
 #    if form3.submit3.data and form3.validate():
@@ -501,8 +494,7 @@ def linen():
 #    form3 = StoreForm()
 #
 #    if form1.submit1.data and form1.validate():
-#        new_day = form1.selectdate.data.strftime("%Y-%m-%d")
-#        session["token"] = new_day
+        session["date_selected"] = form1.selectdate.data
 #        return redirect(url_for("supply_blueprint.bar"))
 #
 #    if form3.submit3.data and form3.validate():
@@ -563,8 +555,7 @@ def linen():
 #    form3 = StoreForm()
 #
 #    if form1.submit1.data and form1.validate():
-#        new_day = form1.selectdate.data.strftime("%Y-%m-%d")
-#        session["token"] = new_day
+        session["date_selected"] = form1.selectdate.data
 #        return redirect(url_for("supply_blueprint.smallware"))
 #
 #    if form3.submit3.data and form3.validate():

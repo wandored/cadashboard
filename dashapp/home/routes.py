@@ -15,7 +15,6 @@ from fpdf import FPDF
 import pandas as pd
 from pandas.core.algorithms import isin
 from sqlalchemy import and_, func, or_
-#from tkinter import filedialog
 
 from dashapp.authentication.forms import *
 from dashapp.authentication.models import *
@@ -68,8 +67,7 @@ def index():
         """
         Change date_selected
         """
-        new_day = form1.selectdate.data.strftime("%Y-%m-%d")
-        session["date_selected"] = new_day
+        session["date_selected"] = form1.selectdate.data
         return redirect(url_for("home_blueprint.index"))
 
     if form3.submit3.data and form3.validate():
@@ -290,8 +288,7 @@ def store(store_id):
     form6 = StoneForm()
 
     if form1.submit1.data and form1.validate():
-        new_day = form1.selectdate.data.strftime("%Y-%m-%d")
-        session["date_selected"] = new_day
+        session["date_selected"] = form1.selectdate.data
         return redirect(url_for("home_blueprint.store", store_id=store.id))
 
     if form3.submit3.data and form3.validate():
@@ -643,8 +640,7 @@ def marketing():
     form6 = StoneForm()
     if form1.submit1.data and form1.validate():
         """ """
-        new_day = form1.selectdate.data.strftime("%Y-%m-%d")
-        session["date_selected"] = new_day
+        session["date_selected"] = form1.selectdate.data
         return redirect(url_for("home_blueprint.marketing"))
 
     form3 = StoreForm()
@@ -820,8 +816,7 @@ def support():
 
     if form1.submit1.data and form1.validate():
         """ """
-        new_day = form1.selectdate.data.strftime("%Y-%m-%d")
-        session["date_selected"] = new_day
+        session["date_selected"] = form1.selectdate.data
         return redirect(url_for("home_blueprint.support"))
 
     if form2.submit2.data and form2.validate():
@@ -929,8 +924,7 @@ def profile():
     form6 = StoneForm()
 
     if form1.submit1.data and form1.validate():
-        new_day = form1.selectdate.data.strftime("%Y-%m-%d")
-        session["date_selected"] = new_day
+        session["date_selected"] = form1.selectdate.data
         return redirect(url_for("home_blueprint.profile"))
 
     if form3.submit3.data and form3.validate():

@@ -38,8 +38,7 @@ def purchasing():
 
 
     if form1.submit1.data and form1.validate():
-        new_day = form1.selectdate.data.strftime("%Y-%m-%d")
-        session["token"] = new_day
+        session["date_selected"] = form1.selectdate.data
         return redirect(url_for("purchasing_blueprint.purchasing"))
 
     if form3.submit3.data and form3.validate():
@@ -124,8 +123,7 @@ def beef(product):
 
 
     if form1.submit1.data and form1.validate():
-        new_day = form1.selectdate.data.strftime("%Y-%m-%d")
-        session["token"] = new_day
+        session["date_selected"] = form1.selectdate.data
         return redirect(url_for("purchasing_blueprint.beef", product=product))
 
     if form3.submit3.data and form3.validate():
