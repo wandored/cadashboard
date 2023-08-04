@@ -170,7 +170,6 @@ def get_period(startdate):
     """
     returns the period integer for the current startdate
     """
-#    start = startdate.strftime("%Y-%m-%d")
     target = calendar.query.filter_by(date=startdate)
 
     return target
@@ -731,21 +730,15 @@ def update_recipe_costs():
 
 
 def set_dates(startdate):
-#    start = startdate.strftime("%Y-%m-%d")
     target = calendar.query.filter_by(date=startdate)
     d = {}
 
     for i in target:
-        #day_start = datetime.strptime(i.date, "%Y-%m-%d")
-        #day_start = i.date
+
         day_end = i.date + timedelta(days=1)
         seven = i.date - timedelta(days=7)
         thirty = i.date - timedelta(days=30)
         threesixtyfive = i.date - timedelta(days=365)
-#        week_start = datetime.strptime(i.week_start, "%Y-%m-%d")
-#        lws = i.week_start - timedelta(days=7)
-#        week_end = datetime.strptime(i.week_end, "%Y-%m-%d")
-#        lwe = i.week_end - timedelta(days=7)
 
         d["day"] = i.day
         d["week"] = i.week
@@ -754,17 +747,14 @@ def set_dates(startdate):
         d["quarter"] = i.quarter
         d["date"] = i.date.strftime("%A, %B %d %Y")
         d["start_day"] = i.date
-        #d["end_day"] = day_end.strftime("%Y-%m-%d")
         d["end_day"] = i.date + timedelta(days=1)
         d['start_week'] = i.week_start
         d["end_week"] = i.week_end
         d["week_to_date"] = i.date
-#        d["last_seven"] = seven.strftime("%Y-%m-%d")
         d["last_seven"] = i.date - timedelta(days=7)
         d["start_period"] = i.period_start
         d["end_period"] = i.period_end
         d["period_to_date"] = i.date
-#        d["last_thirty"] = thirty.strftime("%Y-%m-%d")
         d["last_thirty"] = i.date - timedelta(days=30)
         d["start_quarter"] = i.quarter_start
         d["end_quarter"] = i.quarter_end
@@ -772,7 +762,6 @@ def set_dates(startdate):
         d["start_year"] = i.year_start
         d["end_year"] = i.year_end
         d["year_to_date"] = i.date
-#        d["last_threesixtyfive"] = threesixtyfive.strftime("%Y-%m-%d")
         d["last_threesixtyfive"] = i.date - timedelta(days=365) 
         d["start_day_ly"] = get_lastyear(i.date)
         d["end_day_ly"] = get_lastyear(d["end_day"])
@@ -788,9 +777,7 @@ def set_dates(startdate):
         d["start_year_ly"] = get_lastyear(i.year_start)
         d["end_year_ly"] = get_lastyear(i.year_end)
         d["year_to_date_ly"] = get_lastyear(i.date)
-#        d["start_previous_week"] = lws.strftime("%Y-%m-%d")
         d["start_previous_week"] = i.week_start - timedelta(days=7)
-#        d["end_previous_week"] = lwe.strftime("%Y-%m-%d")
         d["end_previous_week"] = i.week_end - timedelta(days=7)
 
     return d
