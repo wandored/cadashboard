@@ -154,17 +154,14 @@ admin.add_view(UserAdmin(Users, db.session))
 admin.add_view(RoleAdmin(Roles, db.session))
 
 
-class Restaurants(db.Model):
-    __tablename__ = "Restaurants"
+class restaurants(db.Model):
+    __tablename__ = "restaurants"
 
     id = db.Column(db.Integer, primary_key=True)
-    location = db.Column(db.String(64), unique=True)
+    locationid = db.Column(db.String(64), unique=True)
     name = db.Column(db.String(64), unique=True)
-    payment = db.relationship("Payments", backref="payment_types", lazy=True)
-
-    def as_dict(self):
-        return {"id": self.id, "name": self.name, "location": self.location}
-
+    toast_id = db.Column(db.Integer)
+    active = db.Column(db.Boolean())
 
 class calendar(db.Model):
     __tablename__ = "calendar"
@@ -257,8 +254,8 @@ class Transactions(db.Model):
     account = db.Column(db.String(64))
 
 
-class Potatoes(db.Model):
-    __tablename__ = "Potatoes"
+class potatoes(db.Model):
+    __tablename__ = "potatoes"
 
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.String(64))
@@ -366,6 +363,9 @@ class sales_totals(db.Model):
 
     store = db.Column(db.String, primary_key=True)
     date = db.Column(db.Date, primary_key=True)
+    week = db.Column(db.Integer)
+    period = db.Column(db.Integer)
+    year = db.Column(db.Integer)
     net_sales = db.Column(db.Float)
     guest_count = db.Column(db.Integer)
 
@@ -377,6 +377,9 @@ class labor_totals(db.Model):
     job = db.Column(db.String, primary_key=True)
     category = db.Column(db.String)
     date = db.Column(db.Date)
+    week = db.Column(db.Integer)
+    period = db.Column(db.Integer)
+    year = db.Column(db.Integer)
     total_hours = db.Column(db.Float)
     total_dollars = db.Column(db.Integer)
 
@@ -397,6 +400,7 @@ class purchases(db.Model):
     transactionid = db.Column(db.String, primary_key=True)
     date = db.Column(db.Date, primary_key=True)
     store = db.Column(db.String)
+    # TODO add date,week,year
     item = db.Column(db.String)
     category1 = db.Column(db.String)
     category2 = db.Column(db.String)
@@ -414,6 +418,9 @@ class sales_category(db.Model):
 
     store = db.Column(db.String)
     date = db.Column(db.Date, primary_key=True)
+    week = db.Column(db.Integer)
+    period = db.Column(db.Integer)
+    year = db.Column(db.Integer)
     item = db.Column(db.String)
     quantity = db.Column(db.Float)
 
@@ -424,6 +431,9 @@ class sales_daypart(db.Model):
     store = db.Column(db.String, primary_key=True)
     daypart = db.Column(db.String, primary_key=True)
     date = db.Column(db.Date, primary_key=True)
+    week = db.Column(db.Integer)
+    period = db.Column(db.Integer)
+    year = db.Column(db.Integer)
     net_sales = db.Column(db.Float)
     guest_count = db.Column(db.Integer)
 
@@ -434,6 +444,9 @@ class sales_hourly(db.Model):
     store = db.Column(db.String, primary_key=True)
     order_hour = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.Date, primary_key=True)
+    week = db.Column(db.Integer)
+    period = db.Column(db.Integer)
+    year = db.Column(db.Integer)
     net_sales = db.Column(db.Float)
     guest_count = db.Column(db.Integer)
 

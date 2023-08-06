@@ -16,54 +16,55 @@ from sqlalchemy import func
 
 
 # TODO weekly and period sales records
-def sales_record(store, time_frame):
-    if time_frame == "daily":
-        query = (
-            db.session.query(func.sum(Sales.sales).label("top_sales"))
-            .filter(Sales.name == store)
-            .group_by(Sales.date)
-            .order_by(func.sum(Sales.sales).desc())
-            .first()
-        )
-    elif time_frame == "weekly":
-        query = (
-            db.session.query(func.sum(Sales.sales).label("top_sales"))
-            .filter(Sales.name == store)
-            .join(calendar, calendar.date == Sales.date)
-            .group_by(calendar.week, calendar.period, calendar.year)
-            .order_by(func.sum(Sales.sales).desc())
-            .first()
-        )
-    elif time_frame == "period":
-        query = (
-            db.session.query(func.sum(Sales.sales).label("top_sales"))
-            .filter(Sales.name == store)
-            .join(calendar, calendar.date == Sales.date)
-            .group_by(calendar.period, calendar.year)
-            .order_by(func.sum(Sales.sales).desc())
-            .first()
-        )
-    elif time_frame == "year":
-        query = (
-            db.session.query(func.sum(Sales.sales).label("top_sales"))
-            .filter(Sales.name == store)
-            .join(calendar, calendar.date == Sales.date)
-            .group_by(calendar.year)
-            .order_by(func.sum(Sales.sales).desc())
-            .first()
-        )
-    if query:
-        return query[0]
+#def sales_record(store, time_frame):
+#    if time_frame == "daily":
+#        query = (
+#            db.session.query(func.sum(Sales.sales).label("top_sales"))
+#            .filter(Sales.name == store)
+#            .group_by(Sales.date)
+#            .order_by(func.sum(Sales.sales).desc())
+#            .first()
+#        )
+#    elif time_frame == "weekly":
+#        query = (
+#            db.session.query(func.sum(Sales.sales).label("top_sales"))
+#            .filter(Sales.name == store)
+#            .join(calendar, calendar.date == Sales.date)
+#            .group_by(calendar.week, calendar.period, calendar.year)
+#            .order_by(func.sum(Sales.sales).desc())
+#            .first()
+#        )
+#    elif time_frame == "period":
+#        query = (
+#            db.session.query(func.sum(Sales.sales).label("top_sales"))
+#            .filter(Sales.name == store)
+#            .join(calendar, calendar.date == Sales.date)
+#            .group_by(calendar.period, calendar.year)
+#            .order_by(func.sum(Sales.sales).desc())
+#            .first()
+#        )
+#    elif time_frame == "year":
+#        query = (
+#            db.session.query(func.sum(Sales.sales).label("top_sales"))
+#            .filter(Sales.name == store)
+#            .join(calendar, calendar.date == Sales.date)
+#            .group_by(calendar.year)
+#            .order_by(func.sum(Sales.sales).desc())
+#            .first()
+#        )
+#    if query:
+#        return query[0]
 
 
 def get_daypart_sales(start, end, store, day_part):
     query = (
         db.session.query(
-            Sales.date,
-            Sales.daypart,
-            Sales.sales,
+            sales_daypart.date,
+            sales_daypart.daypart,
+            sales_daypart.net_sales,
+            sales_daypart.guest_count,
         )
-        .filter(Sales.date.between(start, end), Sales.daypart == (day_part), Sales.name == store)
+        .filter(sales_daypart.date.between(start, end), sales_daypart.daypart == (day_part), sales_daypart.store == store)
         .all()
     )
     return query
