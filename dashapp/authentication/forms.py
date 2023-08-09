@@ -15,10 +15,7 @@ from dashapp.authentication.models import *
 
 
 def store_query():
-    closed_stores = [
-            "91", "21B", "12B", "2B", "17B", "7B", "18", "10", "3B", "28", "8B", "1B", "85B", "15B", "15", "4B", "19", "25B", "14B", "11B", "95", "99", "5B", "10B", "18B" 
-            ]
-    return location.query.filter(location.locationnumber.notin_(closed_stores)).order_by(location.name).all()
+    return restaurants.query.filter(restaurants.active==True).order_by(restaurants.name).all()
 
 
 class LoginForm(FlaskForm):
