@@ -27,8 +27,8 @@ def purchasing():
     fiscal_dates = set_dates(session["date_selected"])
 
     # Get list of Restaurants
-    data = Restaurants.query.all()
-    store_df = pd.DataFrame([x.as_dict() for x in data])
+    #data = restaurants.query.all()
+    #store_df = pd.DataFrame([x.as_dict() for x in data])
 
     form1 = DateForm()
     form3 = StoreForm()
@@ -42,7 +42,7 @@ def purchasing():
         return redirect(url_for("purchasing_blueprint.purchasing"))
 
     if form3.submit3.data and form3.validate():
-        session["token"] = fiscal_dates["start_day"]
+        session["date_selected"] = fiscal_dates["start_day"]
         data = form3.stores.data
         session["store_list"] = tuple([x.id for x in data])
         return redirect(url_for("purchasing_blueprint.purchasing"))
@@ -61,6 +61,7 @@ def purchasing():
         print(store_id)
         return redirect(url_for("home_blueprint.stone", store_id=store_id))
 
+    print(session['store_list'])
     food_list = ["Beef", "Food Other", "Dairy", "Pork", "Poultry", "Produce", "Fish"]
     top_ten = get_category_topten(
         food_list,
@@ -92,7 +93,7 @@ def purchasing():
     top_ten_vendor["percent"] = top_ten_vendor["Cost"] / category_costs_total
 
     # get name from Restaurants table based on session["store_list"]
-    store_names = db.session.query(Restaurants.name).filter(Restaurants.id.in_(session["store_list"]))
+    store_names = db.session.query(restaurants.name).filter(restaurants.id.in_(session["store_list"]))
     store_names = [x[0] for x in store_names]
     store_names = ", ".join(store_names)
 
@@ -112,8 +113,8 @@ def beef(product):
     fiscal_dates = set_dates(session["date_selected"])
 
     # Get list of Restaurants
-    data = Restaurants.query.all()
-    store_df = pd.DataFrame([x.as_dict() for x in data])
+    #data = Restaurants.query.all()
+    #store_df = pd.DataFrame([x.as_dict() for x in data])
 
     form1 = DateForm()
     form3 = StoreForm()
@@ -127,7 +128,7 @@ def beef(product):
         return redirect(url_for("purchasing_blueprint.beef", product=product))
 
     if form3.submit3.data and form3.validate():
-        session["token"] = fiscal_dates["start_day"]
+        session["date_selected"] = fiscal_dates["start_day"]
         data = form3.stores.data
         session["store_list"] = tuple([x.id for x in data])
         return redirect(url_for("purchasing_blueprint.beef", product=product))
@@ -240,7 +241,7 @@ def beef(product):
 
     color = color_assigner(product)
 
-    store_names = db.session.query(Restaurants.name).filter(Restaurants.id.in_(session["store_list"]))
+    store_names = db.session.query(restaurants.name).filter(restaurants.id.in_(session["store_list"]))
     store_names = [x[0] for x in store_names]
     store_names = ", ".join(store_names)
 

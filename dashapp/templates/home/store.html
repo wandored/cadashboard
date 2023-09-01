@@ -195,36 +195,9 @@
                   <thead>
                     <tr>
                       <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Days</th>
-                    {% for cat in weekly_table.columns %}
-                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">{{ cat }}</th>
-                    {% endfor %}
                     </tr>
                   </thead>
                   <tbody>
-                    {% for cat, row in weekly_table.iterrows() %}
-                    <tr> 
-                      <td>
-                        {{ row["name"] }}
-                      </td>
-                        {% for _, value in row.items() %}
-                      <td>
-                            {{ "{:,.0f}".format(value) }}
-                      </td>
-                        {% endfor %}
-                    </tr>
-                    {% endfor %}
-                    {% for cat, row in weekly_labor.iterrows() %}
-                    <tr> 
-                      <td>
-                        {{ row["name"] }}
-                      </td>
-                        {% for _, value in row.items() %}
-                      <td>
-                            {{ "{:,.0f}".format(value) }}
-                      </td>
-                        {% endfor %}
-                    </tr>
-                    {% endfor %}
                   </tbody>
                 </table>
               </div>
@@ -244,36 +217,9 @@
                   <thead>
                     <tr>
                       <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Weeks</th>
-                    {% for cat in period_table.columns %}
-                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">{{ cat }}</th>
-                    {% endfor %}
                     </tr>
                   </thead>
                   <tbody>
-                    {% for cat, row in period_table.iterrows() %}
-                    <tr> 
-                      <td>
-                        {{ row["name"] }}
-                      </td>
-                        {% for _, value in row.items() %}
-                      <td>
-                            {{ "{:,.0f}".format(value) }}
-                      </td>
-                        {% endfor %}
-                    </tr>
-                    {% endfor %}
-                    {% for cat, row in period_labor.iterrows() %}
-                    <tr> 
-                      <td>
-                        {{ row["name"] }}
-                      </td>
-                        {% for _, value in row.items() %}
-                      <td>
-                            {{ "{:,.0f}".format(value) }}
-                      </td>
-                        {% endfor %}
-                    </tr>
-                    {% endfor %}
                   </tbody>
                 </table>
               </div>
@@ -293,36 +239,9 @@
                   <thead>
                     <tr>
                       <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Periods</th>
-                    {% for cat in quarterly_table.columns %}
-                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">{{ cat }}</th>
-                    {% endfor %}
                     </tr>
                   </thead>
                   <tbody>
-                    {% for cat, row in quarterly_table.iterrows() %}
-                    <tr> 
-                      <td>
-                        {{ row["name"] }}
-                      </td>
-                        {% for _, value in row.items() %}
-                      <td>
-                            {{ "{:,.0f}".format(value) }}
-                      </td>
-                        {% endfor %}
-                    </tr>
-                    {% endfor %}
-                    {% for cat, row in quarterly_labor.iterrows() %}
-                    <tr> 
-                      <td>
-                        {{ row["name"] }}
-                      </td>
-                        {% for _, value in row.items() %}
-                      <td>
-                            {{ "{:,.0f}".format(value) }}
-                      </td>
-                        {% endfor %}
-                    </tr>
-                    {% endfor %}
                   </tbody>
                 </table>
               </div>
@@ -342,36 +261,9 @@
                   <thead>
                     <tr>
                       <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Quarters</th>
-                    {% for cat in yearly_table.columns %}
-                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">{{ cat }}</th>
-                    {% endfor %}
                     </tr>
                   </thead>
                   <tbody>
-                    {% for cat, row in yearly_table.iterrows() %}
-                    <tr> 
-                      <td>
-                        {{ row["name"] }}
-                      </td>
-                        {% for _, value in row.items() %}
-                      <td>
-                            {{ "{:,.0f}".format(value) }}
-                      </td>
-                        {% endfor %}
-                    </tr>
-                    {% endfor %}
-                    {% for cat, row in yearly_labor.iterrows() %}
-                    <tr> 
-                      <td>
-                        {{ row["name"] }}
-                      </td>
-                        {% for _, value in row.items() %}
-                      <td>
-                            {{ "{:,.0f}".format(value) }}
-                      </td>
-                        {% endfor %}
-                    </tr>
-                    {% endfor %}
                   </tbody>
                 </table>
               </div>

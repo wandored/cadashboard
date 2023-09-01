@@ -363,6 +363,7 @@ class sales_totals(db.Model):
 
     store = db.Column(db.String, primary_key=True)
     date = db.Column(db.Date, primary_key=True)
+    dow = db.Column(db.Integer)
     week = db.Column(db.Integer)
     period = db.Column(db.Integer)
     year = db.Column(db.Integer)
@@ -377,6 +378,7 @@ class labor_totals(db.Model):
     job = db.Column(db.String, primary_key=True)
     category = db.Column(db.String)
     date = db.Column(db.Date)
+    dow = db.Column(db.Integer)
     week = db.Column(db.Integer)
     period = db.Column(db.Integer)
     year = db.Column(db.Integer)
@@ -399,6 +401,7 @@ class purchases(db.Model):
 
     transactionid = db.Column(db.String, primary_key=True)
     date = db.Column(db.Date, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     store = db.Column(db.String)
     # TODO add date,week,year
     item = db.Column(db.String)
@@ -411,13 +414,15 @@ class purchases(db.Model):
     debit = db.Column(db.Integer)
     amount = db.Column(db.Integer)
     account = db.Column(db.String)
+    company = db.Column(db.String)
 
 
 class sales_category(db.Model):
     __tablename__ = 'sales_category'
 
-    store = db.Column(db.String)
+    store = db.Column(db.String, primary_key=True)
     date = db.Column(db.Date, primary_key=True)
+    dow = db.Column(db.Integer)
     week = db.Column(db.Integer)
     period = db.Column(db.Integer)
     year = db.Column(db.Integer)
@@ -431,6 +436,7 @@ class sales_daypart(db.Model):
     store = db.Column(db.String, primary_key=True)
     daypart = db.Column(db.String, primary_key=True)
     date = db.Column(db.Date, primary_key=True)
+    dow = db.Column(db.Integer)
     week = db.Column(db.Integer)
     period = db.Column(db.Integer)
     year = db.Column(db.Integer)
@@ -444,6 +450,7 @@ class sales_hourly(db.Model):
     store = db.Column(db.String, primary_key=True)
     order_hour = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.Date, primary_key=True)
+    dow = db.Column(db.Integer)
     week = db.Column(db.Integer)
     period = db.Column(db.Integer)
     year = db.Column(db.Integer)
@@ -456,6 +463,7 @@ class sales_records_day(db.Model):
 
     store = db.Column(db.String, primary_key=True)
     date = db.Column(db.Date)
+    dow = db.Column(db.Integer)
     week = db.Column(db.Integer)
     period = db.Column(db.Integer)
     year = db.Column(db.Integer)

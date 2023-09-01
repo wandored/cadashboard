@@ -127,8 +127,8 @@ def potato_sales(start):
 if __name__ == "__main__":
     engine = create_engine(Config.SQLALCHEMY_DATABASE_URI)
     conn = psycopg2.connect(
-        host="localhost",
-        database="dashboard",
+        host=Config.HOST_SERVER,
+        database=Config.PSYCOPG2_DATABASE,
         user=Config.PSYCOPG2_USER,
         password=Config.PSYCOPG2_PASS,
     )

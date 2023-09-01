@@ -81,7 +81,7 @@ def set_dates(startdate):
 
 def convert_uofm(unit):
     # convert the unit uofm to base quantity
-    pack_size = db.session.query(Unitsofmeasure).filter(Unitsofmeasure.name == unit.UofM).first()
+    pack_size = db.session.query(unitsofmeasure).filter(unitsofmeasure.name == unit.uofm).first()
     if pack_size:
         return pack_size.base_qty, pack_size.base_uofm
     else:
@@ -90,13 +90,13 @@ def convert_uofm(unit):
 
 def get_vendors(regex, days):
     query = (
-        Transactions.query.with_entities(Transactions.company)
+        purchases.query.with_entities(purchases.company)
         .filter(
-            Transactions.item.regexp_match(regex),
-            Transactions.company != "None",
-            Transactions.date >= days,
+            purchases.item.regexp_match(regex),
+            purchases.company != "None",
+            purchases.date >= days,
         )
-        .group_by(Transactions.company)
+        .group_by(purchases.company)
     ).all()
     return query
 
@@ -106,62 +106,66 @@ def get_cost_per_vendor(regex, start, end, stores):
 
     query = (
         db.session.query(
-            Transactions.company,
-            Transactions.UofM,
-            func.sum(Transactions.quantity).label("quantity"),
-            func.sum(Transactions.amount).label("cost"),
+            purchases.company,
+            purchases.uofm,
+            func.sum(purchases.quantity).label("count"),
+            func.sum(purchases.amount).label("cost"),
         )
         .filter(
-            Transactions.item.regexp_match(regex),
-            Transactions.date.between(start, end),
-            Transactions.store_id.in_(stores),
-            Transactions.type == "AP Invoice",
+            purchases.item.regexp_match(regex),
+            purchases.date.between(start, end),
+            purchases.id.in_(stores),
         )
         .group_by(
-            Transactions.company,
-            Transactions.UofM,
+            purchases.company,
+            purchases.uofm,
         )
     ).all()
     item_list = []
     for q in query:
         qty, uofm = convert_uofm(q)
-        row_dict = dict(q)
-        row_dict["base_qty"] = qty
-        row_dict["base_uofm"] = uofm
+        row_dict = {
+            "company": q[0],
+            "uofm": q[1],
+            "count": q[2],
+            "cost": q[3],
+            "base_qty": qty,
+            "base_uofm": uofm
+        }
         item_list.append(row_dict)
     df = pd.DataFrame(item_list)
     sorted_units = (
-        df.groupby(["UofM"]).mean(["quantity", "cost"]).sort_values(by=["quantity"], ascending=False).reset_index()
+        df.groupby(["uofm"]).mean(["count", "cost"]).sort_values(by=["count"], ascending=False).reset_index()
     )
     report = sorted_units.iloc[0]
-    df = df.groupby(["company"]).sum(["quantity", "cost"]).reset_index()
+    df = df.groupby(["company"]).sum(["count", "cost"]).reset_index()
 
     if not df.empty:
-        df["unit_cost"] = ((df["cost"] / df["quantity"]) / df["base_qty"]) * report["base_qty"]
-        df["unit_qty"] = (df["quantity"] * df["base_qty"]) / report["base_qty"]
-        df["report_unit"] = report.UofM
+        df["unit_cost"] = ((df["cost"] / df["count"]) / df["base_qty"]) * report["base_qty"]
+        df["unit_qty"] = (df["count"] * df["base_qty"]) / report["base_qty"]
+        df["report_unit"] = report.uofm
 
-        #df["base_cost"] = (df["cost"] / df["quantity"]) / df["base_qty"]
-        ## df["unit_qty"] = (df["quantity"] * df["base_qty"])
+        #df["base_cost"] = (df["cost"] / df["count"]) / df["base_qty"]
+        ## df["unit_qty"] = (df["count"] * df["base_qty"])
         #df["unit_cost"] = df["base_cost"] * df["base_qty"]
         #df["report_unit"] = report.UofM
         # calculate the unit cost based on base_uofm value
         # df["unit_cost"] = np.where(
         #   df["base_uofm"] == "OZ-wt",
-        #   ((df["cost"] / df["quantity"]) / df["base_qty"] * 16).astype(float),
+        #   ((df["cost"] / df["count"]) / df["base_qty"] * 16).astype(float),
         #   np.where(
         #       df["base_uofm"] == "OZ-fl",
-        #       ((df["cost"] / df["quantity"]) / df["base_qty"] * 128).astype(float),
-        #       ((df["cost"] / df["quantity"]) / df["base_qty"] * 1).astype(float),
+        #       ((df["cost"] / df["count"]) / df["base_qty"] * 128).astype(float),
+        #       ((df["cost"] / df["count"]) / df["base_qty"] * 1).astype(float),
         #   ),
         # )
         # df["unit_qty"] = np.where(
         #   df["base_uofm"] == "OZ-wt",
-        #   (df["quantity"] * df["base_qty"] / 16).astype(float),
+        #   (df["count"] * df["base_qty"] / 16).astype(float),
         #   np.where(
         #       df["base_uofm"] == "OZ-fl",
-        #       (df["quantity"] * df["base_qty"] / 128).astype(float),
-        #       (df["quantity"] * df["base_qty"]).astype(float),
+        #       (df["count"] * df["base_qty"] / 128).astype(float),
+        #       (df["count"] * df["base_qty"]).astype(float),
         #   ),
         # )
         # df["report_unit"] = np.where(
@@ -174,7 +178,7 @@ def get_cost_per_vendor(regex, start, end, stores):
         #   ),
         # )
 
-        df.drop(columns=["quantity", "cost", "base_qty"], inplace=True)
+        df.drop(columns=["count", "cost", "base_qty"], inplace=True)
         table = pd.pivot_table(
             df,
             values=["unit_cost", "unit_qty"],
@@ -193,40 +197,44 @@ def get_cost_per_store(regex, start, end, stores):
 
     query = (
         db.session.query(
-            Transactions.name,
-            Transactions.UofM,
-            func.sum(Transactions.quantity).label("quantity"),
-            func.sum(Transactions.amount).label("cost"),
+            purchases.store,
+            purchases.uofm,
+            func.sum(purchases.quantity).label("count"),
+            func.sum(purchases.amount).label("cost"),
         )
         .filter(
-            Transactions.item.regexp_match(regex),
-            Transactions.date.between(start, end),
-            Transactions.store_id.in_(stores),
-            Transactions.type == "AP Invoice",
+            purchases.item.regexp_match(regex),
+            purchases.date.between(start, end),
+            purchases.id.in_(stores),
         )
         .group_by(
-            Transactions.name,
-            Transactions.UofM,
+            purchases.store,
+            purchases.uofm,
         )
     ).all()
     item_list = []
     for q in query:
         qty, uofm = convert_uofm(q)
-        row_dict = dict(q)
-        row_dict["base_qty"] = qty
-        row_dict["base_uofm"] = uofm
+        row_dict = {
+            "store": q[0],
+            "uofm": q[1],
+            "count": q[2],
+            "cost": q[3],
+            "base_qty": qty,
+            "base_uofm": uofm
+        }
         item_list.append(row_dict)
     df = pd.DataFrame(item_list)
     sorted_units = (
-        df.groupby(["UofM"]).mean(["quantity", "cost"]).sort_values(by=["quantity"], ascending=False).reset_index()
+        df.groupby(["uofm"]).mean(["count", "cost"]).sort_values(by=["count"], ascending=False).reset_index()
     )
     report = sorted_units.iloc[0]
-    df = df.groupby(["name"]).sum(["quantity", "cost"]).reset_index()
+    df = df.groupby(["store"]).sum(["count", "cost"]).reset_index()
 
     if not df.empty:
-        df["unit_cost"] = ((df["cost"] / df["quantity"]) / df["base_qty"]) * report["base_qty"]
-        df["unit_qty"] = (df["quantity"] * df["base_qty"]) / report["base_qty"]
-        df["report_unit"] = report.UofM
+        df["unit_cost"] = ((df["cost"] / df["count"]) / df["base_qty"]) * report["base_qty"]
+        df["unit_qty"] = (df["count"] * df["base_qty"]) / report["base_qty"]
+        df["report_unit"] = report.uofm
 
         # calculate the unit cost based on base_uofm value
         # df["unit_cost"] = np.where(
@@ -237,7 +245,7 @@ def get_cost_per_store(regex, start, end, stores):
         #        ((df["cost"] / df["count"]) / df["base_qty"] * report.count).astype(float),
         #        ((df["cost"] / df["count"]) / df["base_qty"] * report.count).astype(float),
         #    ),
-        # )
+        # name)
         # df["unit_qty"] = np.where(
         #    df["base_uofm"] == "OZ-wt",
         #    (df["count"] * df["base_qty"] / report.cost).astype(float),
@@ -256,11 +264,11 @@ def get_cost_per_store(regex, start, end, stores):
         #        report.UofM,
         #    ),
         # )
-        df.drop(columns=["quantity", "cost", "base_qty"], inplace=True)
+        df.drop(columns=["count", "cost", "base_qty"], inplace=True)
         table = pd.pivot_table(
             df,
             values=["unit_cost", "unit_qty"],
-            index=["name", "report_unit"],
+            index=["store", "report_unit"],
             aggfunc={"unit_cost": np.mean, "unit_qty": np.sum},
         )
         if not table.empty:
@@ -273,41 +281,46 @@ def get_cost_per_store(regex, start, end, stores):
 @lru_cache
 def period_purchases(regex, start, end, stores):
     # generate list of purchase costs per period for charts
-    calendar = calendar.query.with_entities(calendar.date, calendar.week, calendar.period, calendar.year).all()
-    cal_df = pd.DataFrame(calendar, columns=["date", "week", "period", "year"])
+    cal_query = calendar.query.with_entities(calendar.date, calendar.week, calendar.period, calendar.year).all()
+    cal_df = pd.DataFrame(cal_query, columns=["date", "week", "period", "year"])
 
     query = (
         db.session.query(
-            Transactions.date,
-            Transactions.company,
-            Transactions.name,
-            Transactions.UofM,
-            func.sum(Transactions.quantity).label("count"),
-            func.sum(Transactions.amount).label("cost"),
+            purchases.date,
+            purchases.company,
+            purchases.store,
+            purchases.uofm,
+            func.sum(purchases.quantity).label("count"),
+            func.sum(purchases.amount).label("cost"),
         )
         .filter(
-            Transactions.item.regexp_match(regex),
-            Transactions.date.between(start, end),
-            Transactions.store_id.in_(stores),
-            Transactions.type == "AP Invoice",
+            purchases.item.regexp_match(regex),
+            purchases.date.between(start, end),
+            purchases.id.in_(stores),
         )
         .group_by(
-            Transactions.date,
-            Transactions.company,
-            Transactions.name,
-            Transactions.UofM,
+            purchases.date,
+            purchases.company,
+            purchases.store,
+            purchases.uofm,
         )
     ).all()
 
     item_list = []
     for q in query:
-        if not q.UofM:
+        if not q.uofm:
             continue
         qty, uofm = convert_uofm(q)
-        row_dict = dict(q)
-        row_dict["base_qty"] = qty
-        row_dict["base_uofm"] = uofm
-
+        row_dict = {
+            "date": q[0],
+            "company": q[1],
+            "store": q[2],
+            "uofm": q[3],
+            "count": q[4],
+            "cost": q[5],
+            "base_qty": qty,
+            "base_uofm": uofm
+        }
         row_dict["unit_qty"] = np.where(
             row_dict["base_uofm"] == "OZ-wt",
             row_dict["count"] * row_dict["base_qty"] / 16,
@@ -338,18 +351,17 @@ def get_category_costs(regex, start, end, stores):
     # Return list of sales
     query = (
         db.session.query(
-            Transactions.account,
-            func.sum(Transactions.credit).label("credits"),
-            func.sum(Transactions.debit).label("costs"),
+            purchases.account,
+            func.sum(purchases.credit).label("credits"),
+            func.sum(purchases.debit).label("costs"),
         )
         .filter(
-            Transactions.account.in_(regex),
-            Transactions.date.between(start, end),
-            Transactions.store_id.in_(stores),
-            Transactions.type == "AP Invoice",
+            purchases.account.in_(regex),
+            purchases.date.between(start, end),
+            purchases.id.in_(stores),
         )
-        .group_by(Transactions.account)
-        .order_by(func.sum(Transactions.debit).desc())
+        .group_by(purchases.account)
+        .order_by(func.sum(purchases.debit).desc())
     ).all()
     results = pd.DataFrame(query, columns=["Account", "Credits", "Costs"])
     results["Totals"] = results["Costs"] - results["Credits"]
@@ -360,17 +372,16 @@ def get_category_topten(regex, start, end, stores):
 
     query = (
         db.session.query(
-            Transactions.item,
-            func.sum(Transactions.debit).label("cost"),
+            purchases.item,
+            func.sum(purchases.debit).label("cost"),
         )
         .filter(
-            Transactions.account.in_(regex),
-            Transactions.date.between(start, end),
-            Transactions.store_id.in_(stores),
-            Transactions.type == "AP Invoice",
+            purchases.account.in_(regex),
+            purchases.date.between(start, end),
+            purchases.id.in_(stores),
         )
-        .group_by(Transactions.item)
-        .order_by(func.sum(Transactions.debit).desc())
+        .group_by(purchases.item)
+        .order_by(func.sum(purchases.debit).desc())
     ).limit(10)
     df = pd.DataFrame(query, columns=["Item", "Cost"])
 
@@ -381,17 +392,16 @@ def get_restaurant_topten(regex, start, end, stores):
 
     query = (
         db.session.query(
-            Transactions.name,
-            func.sum(Transactions.debit).label("cost"),
+            purchases.store,
+            func.sum(purchases.debit).label("cost"),
         )
         .filter(
-            Transactions.account.in_(regex),
-            Transactions.date.between(start, end),
-            Transactions.store_id.in_(stores),
-            Transactions.type == "AP Invoice",
+            purchases.account.in_(regex),
+            purchases.date.between(start, end),
+            purchases.id.in_(stores),
         )
-        .group_by(Transactions.name)
-        .order_by(func.sum(Transactions.debit).desc())
+        .group_by(purchases.store)
+        .order_by(func.sum(purchases.debit).desc())
     ).all()
     dframe = pd.DataFrame(query, columns=["Restaurant", "Cost"])
 
@@ -402,17 +412,16 @@ def get_vendor_topten(regex, start, end, stores):
 
     query = (
         db.session.query(
-            Transactions.company,
-            func.sum(Transactions.debit).label("cost"),
+            purchases.company,
+            func.sum(purchases.debit).label("cost"),
         )
         .filter(
-            Transactions.account.in_(regex),
-            Transactions.date.between(start, end),
-            Transactions.store_id.in_(stores),
-            Transactions.type == "AP Invoice",
+            purchases.account.in_(regex),
+            purchases.date.between(start, end),
+            purchases.id.in_(stores),
         )
-        .group_by(Transactions.company)
-        .order_by(func.sum(Transactions.debit).desc())
+        .group_by(purchases.company)
+        .order_by(func.sum(purchases.debit).desc())
     ).limit(10)
     dframe = pd.DataFrame(query, columns=["Vendor", "Cost"])
 
@@ -423,17 +432,16 @@ def get_item_topten(regex, start, end, stores):
 
     query = (
         db.session.query(
-            Transactions.item,
-            func.sum(Transactions.debit).label("cost"),
+            purchases.item,
+            func.sum(purchases.debit).label("cost"),
         )
         .filter(
-            Transactions.item.regexp_match(regex),
-            Transactions.date.between(start, end),
-            Transactions.store_id.in_(stores),
-            Transactions.type == "AP Invoice",
+            purchases.item.regexp_match(regex),
+            purchases.date.between(start, end),
+            purchases.id.in_(stores),
         )
-        .group_by(Transactions.item)
-        .order_by(func.sum(Transactions.debit).desc())
+        .group_by(purchases.item)
+        .order_by(func.sum(purchases.debit).desc())
     ).limit(10)
     dframe = pd.DataFrame(query, columns=["Item", "Cost"])
 

@@ -60,11 +60,17 @@ def get_daypart_sales(start, end, store, day_part):
     query = (
         db.session.query(
             sales_daypart.date,
+            sales_daypart.dow,
+            sales_daypart.week,
+            sales_daypart.period,
+            sales_daypart.year,
             sales_daypart.daypart,
             sales_daypart.net_sales,
             sales_daypart.guest_count,
         )
-        .filter(sales_daypart.date.between(start, end), sales_daypart.daypart == (day_part), sales_daypart.store == store)
+        .filter(sales_daypart.date.between(start, end),
+                sales_daypart.daypart == (day_part),
+                sales_daypart.store == store)
         .all()
     )
     return query
