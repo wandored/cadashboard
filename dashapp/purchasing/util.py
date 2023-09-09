@@ -1,7 +1,7 @@
 """
 Dashboard by wandored
 """
-from functools import lru_cache
+from functools import cache
 import numpy as np
 import pandas as pd
 from datetime import datetime, timedelta
@@ -101,7 +101,7 @@ def get_vendors(regex, days):
     return query
 
 
-@lru_cache
+@cache
 def get_cost_per_vendor(regex, start, end, stores):
 
     query = (
@@ -192,7 +192,7 @@ def get_cost_per_vendor(regex, start, end, stores):
     return df
 
 
-@lru_cache
+@cache
 def get_cost_per_store(regex, start, end, stores):
 
     query = (
@@ -278,7 +278,7 @@ def get_cost_per_store(regex, start, end, stores):
     return df
 
 
-@lru_cache
+@cache
 def period_purchases(regex, start, end, stores):
     # generate list of purchase costs per period for charts
     cal_query = calendar.query.with_entities(calendar.date, calendar.week, calendar.period, calendar.year).all()

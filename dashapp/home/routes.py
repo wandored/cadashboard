@@ -28,7 +28,6 @@ import time
 @blueprint.route("/index/", methods=["GET", "POST"])
 @login_required
 def index():
-    TODAY = datetime.date(datetime.now())
 
     if not "date_selected" in session:
         session["date_selected"] = TODAY
@@ -88,17 +87,13 @@ def index():
 
     # Sales Chart
     def get_chart_values(start, end, time_frame):
-        chart = (
+        query = (
             db.session.query(func.sum(sales_totals.net_sales).label("total_sales"))
             .select_from(sales_totals)
-            .group_by(time_frame)
-            .group_by(time_frame)
             .filter(sales_totals.date.between(start, end))
+            .group_by(time_frame)
         )
-        value = []
-        for v in chart:
-            value.append(v.total_sales)
-
+        value = [v.total_sales for v in query]
         return value
 
     daily_sales_list = get_chart_values(
@@ -180,6 +175,7 @@ def index():
         # Get the top sales for each store and merge with sales_table
         table_class = globals()[f'sales_records_{time_frame}'] # how you use a variable in query
         sales_query = table_class.query.with_entities(table_class.store, table_class.net_sales).all()
+
         top_sales = pd.DataFrame.from_records(sales_query, columns=['store', 'top_sales'])
         top_sales.set_index('store', inplace=True)
         sales_table = pd.DataFrame.from_records(sales, columns=["store", "sales", "guests"])
@@ -976,13 +972,16 @@ def potato(store_id):
 
     store = restaurants.query.filter_by(id=store_id).first()
 
-    pot_df = pd.read_csv("/usr/local/share/potatochart.csv", usecols=["time"])
+    #pot_df = pd.read_csv("/usr/local/share/potatochart.csv", usecols=["time"])
+    #TODO database error
+    pot_df = pd.read_sql_table(potato_load_times, con=db.engine)
+    print(pot_df)
 
     for i in [28, 21, 14, 7]:
         target = TODAY - timedelta(days=i)
         query = (
-            Potatoes.query.with_entities(Potatoes.time, Potatoes.quantity).filter(
-                Potatoes.date == target, Potatoes.name == store.name
+            potato_sales.query.with_entities(potato_sales.time, potato_sales.quantity).filter(
+                potato_sales.date == target, potato_sales.name == store.name
             )
         ).all()
         df = pd.DataFrame.from_records(query, columns=["time", i])
@@ -1075,7 +1074,7 @@ def lobster(store_id):
     TODAY = datetime.date(datetime.now())
     fiscal_dates = set_dates(session["date_selected"])
 
-    store = Restaurants.query.filter_by(id=store_id).first()
+    store = restaurants.query.filter_by(id=store_id).first()
 
     live_lobster_avg_cost = get_item_avg_cost(
         "SEAFOOD Lobster Live*",

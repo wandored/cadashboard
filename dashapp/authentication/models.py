@@ -254,7 +254,7 @@ class Transactions(db.Model):
     account = db.Column(db.String(64))
 
 
-class potatoes(db.Model):
+class Potatoes(db.Model):
     __tablename__ = "potatoes"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -264,6 +264,24 @@ class potatoes(db.Model):
     in_time = db.Column(db.String(64))
     out_time = db.Column(db.String(64))
     quantity = db.Column(db.Integer)
+
+
+class potato_sales(db.Model):
+    __tablename__ = "potato_sales"
+
+    date = db.Column(db.Date, primary_key=True)
+    time = db.Column(db.Time(), primary_key=True)
+    name = db.Column(db.String(64))
+    quantity = db.Column(db.Integer)
+
+class potato_load_times(db.Model):
+    __tablename__ = 'potato_load_times'
+
+    time = db.Column(db.Time(), primary_key=True)
+    in_time = db.Column(db.Time())
+    start_time = db.Column(db.Time())
+    stop_time = db.Column(db.Time())
+    out_time = db.Column(db.Time())
 
 
 class unitsofmeasure(db.Model):
