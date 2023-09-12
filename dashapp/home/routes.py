@@ -29,6 +29,7 @@ import time
 @login_required
 def index():
 
+    TODAY = datetime.date(datetime.now())
     if not "date_selected" in session:
         session["date_selected"] = TODAY
         return redirect(url_for("home_blueprint.index"))
@@ -881,36 +882,36 @@ def support():
         session["date_selected"] = fiscal_dates["start_day"]
         return redirect(url_for("home_blueprint.users"))
 
-    query = (
-        db.session.query(
-            Menuitems.name,
-            Menuitems.menuitem,
-            Menuitems.category,
-            func.sum(Menuitems.amount).label("sales"),
-            func.sum(Menuitems.quantity).label("count"),
-        )
-        .filter(
-            Menuitems.date == fiscal_dates["start_day"],
-            or_(
-                Menuitems.menuitem == "Unassigned",
-                Menuitems.category == "Unassigned",
-            ),
-        )
-        .group_by(Menuitems.name, Menuitems.menuitem, Menuitems.category)
-    ).all()
-    unassigned_sales = pd.DataFrame.from_records(query, columns=["store", "menuitem", "category", "amount", "quantity"])
-    unassigned_sales.sort_values(by=["amount"], ascending=False, inplace=True)
+#    query = (
+#        db.session.query(
+#            menuitems.store,
+#            menuitems.menuitem,
+#            Menuitems.category,
+#            func.sum(Menuitems.amount).label("sales"),
+#            func.sum(Menuitems.quantity).label("count"),
+#        )
+#        .filter(
+#            Menuitems.date == fiscal_dates["start_day"],
+#            or_(
+#                Menuitems.menuitem == "Unassigned",
+#                Menuitems.category == "Unassigned",
+#            ),
+#        )
+#        .group_by(Menuitems.name, Menuitems.menuitem, Menuitems.category)
+#    ).all()
+#    unassigned_sales = pd.DataFrame.from_records(query, columns=["store", "menuitem", "category", "amount", "quantity"])
+#    unassigned_sales.sort_values(by=["amount"], ascending=False, inplace=True)
 
-    query = (
-        db.session.query(Transactions.name, Transactions.item)
-        .filter(
-            Transactions.date >= fiscal_dates["start_week"],
-            Transactions.item.regexp_match("^DO NOT USE*"),
-        )
-        .group_by(Transactions.name, Transactions.item)
-    ).all()
-    do_not_use = pd.DataFrame.from_records(query, columns=["store", "menuitem"])
-    do_not_use.sort_values(by=["store"], inplace=True)
+#    query = (
+#        db.session.query(purchases.name, purchases.item)
+#        .filter(
+#            purchases.date >= fiscal_dates["start_week"],
+#            purchases.item.regexp_match("^DO NOT USE*"),
+#        )
+#        .group_by(purchases.name, purchases.item)
+#    ).all()
+#    do_not_use = pd.DataFrame.from_records(query, columns=["store", "menuitem"])
+#    do_not_use.sort_values(by=["store"], inplace=True)
 
     return render_template(
         "home/support.html",
@@ -969,31 +970,35 @@ def profile():
 def potato(store_id):
     # TODO need to fix store ID
     TODAY = datetime.date(datetime.now())
+    fiscal_dates = set_dates(datetime.date(datetime.now()))
 
     store = restaurants.query.filter_by(id=store_id).first()
 
-    #pot_df = pd.read_csv("/usr/local/share/potatochart.csv", usecols=["time"])
-    #TODO database error
-    pot_df = pd.read_sql_table(potato_load_times, con=db.engine)
-    print(pot_df)
-
-    for i in [28, 21, 14, 7]:
-        target = TODAY - timedelta(days=i)
-        query = (
-            potato_sales.query.with_entities(potato_sales.time, potato_sales.quantity).filter(
-                potato_sales.date == target, potato_sales.name == store.name
-            )
-        ).all()
-        df = pd.DataFrame.from_records(query, columns=["time", i])
-        pot_df = pot_df.merge(df, on="time", how="outer")
+    load_times = pd.read_sql_table('potato_load_times', con=db.engine)
+    pot_df = pd.DataFrame(columns=['time', 'in_time', 'out_time'])
+    for num in [7, 14, 21, 28]:
+        day_pot_sales = pd.DataFrame(columns=['time', 'in_time', 'out_time', 'quantity'])
+        for index, row in load_times.iterrows():
+            query = (
+                db.session.query(func.sum(potato_sales.quantity).label("quantity"))
+                .filter(
+                    potato_sales.time.between(row['start_time'], row['stop_time']),
+                    potato_sales.dow == fiscal_dates['dow'],
+                    potato_sales.name == store.name,
+                    potato_sales.date == TODAY - timedelta(days=num))
+                ).all()
+            day_pot_sales = pd.concat([day_pot_sales, pd.DataFrame({'time': [row['time']], 'in_time': [row['in_time']], 'out_time': [row['out_time']], 'quantity': [query[0][0]]})], ignore_index=True)
+        pot_df = pot_df.merge(day_pot_sales, on=['time', 'in_time', 'out_time'], how='outer', suffixes=('', f'_{num}'))
 
     pot_df.fillna(0, inplace=True)
     pot_df.loc[:, "AVG"] = pot_df.mean(numeric_only=True, axis=1)
     pot_df.loc[:, "MEDIAN"] = pot_df.median(numeric_only=True, axis=1)
     pot_df.loc[:, "MAX"] = pot_df.max(numeric_only=True, axis=1)
-    out_times = pd.read_csv("/usr/local/share/potatochart.csv", usecols=["time", "in_time", "out_time"])
-    rotation = pot_df.merge(out_times, on="time", how="left")
-    rotation.loc["TOTALS"] = rotation.sum()
+
+    #out_times = pd.read_csv("/usr/local/share/potatochart.csv", usecols=["time", "in_time", "out_time"])
+    #out_times = pd.read_sql_table('potato_load_times', con=db.engine, columns=["time", "in_time", "out_time"])
+    #rotation = pot_df.merge(out_times, on="time", how="left")
+    pot_df.loc["TOTALS"] = pot_df.sum(numeric_only=True)
 
     # format pdf page
     pdf_date = TODAY.strftime("%A, %B-%d")
@@ -1023,7 +1028,7 @@ def potato(store_id):
     pdf.cell(col_width, th, str("OUT TIME"), border=1)
     pdf.cell(notes_width, th, str("NOTES"), border=1)
     pdf.ln(th)
-    for k, v in rotation.iterrows():
+    for k, v in pot_df.iterrows():
         if v["time"] == "15:00":
             pdf.ln(th)
             pdf.cell(col_width, th, str("DINNER"), border=1)
@@ -1077,7 +1082,7 @@ def lobster(store_id):
     store = restaurants.query.filter_by(id=store_id).first()
 
     live_lobster_avg_cost = get_item_avg_cost(
-        "SEAFOOD Lobster Live*",
+        "SEAFOOD Lobster Live Maine",
         fiscal_dates["last_seven"],
         fiscal_dates["start_day"],
         store_id,
@@ -1139,10 +1144,10 @@ def stone(store_id):
     TODAY = datetime.date(datetime.now())
     fiscal_dates = set_dates(session["date_selected"])
 
-    store = Restaurants.query.filter_by(id=store_id).first()
+    store = restaurants.query.filter_by(id=store_id).first()
 
     stone_claw_avg_cost = get_item_avg_cost(
-        "^(SEAFOOD Crab Stone Claw)",
+        "SEAFOOD Crab Stone Claws",
         fiscal_dates["last_seven"],
         fiscal_dates["start_day"],
         store_id,

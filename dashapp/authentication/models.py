@@ -271,6 +271,7 @@ class potato_sales(db.Model):
 
     date = db.Column(db.Date, primary_key=True)
     time = db.Column(db.Time(), primary_key=True)
+    dow = db.Column(db.Integer)
     name = db.Column(db.String(64))
     quantity = db.Column(db.Integer)
 

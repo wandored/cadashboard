@@ -132,7 +132,7 @@ def refresh_data(start, end):
     # refresh categories and menuitems
     # TODO add sales_payments
     sales_detail(start, end)
-    potato_sales(start)
+#    potato_sales(start)
     return 0
 
 
@@ -367,14 +367,13 @@ def get_item_avg_cost(regex, start, end, id):
     # Return average cost for purchase item
 
     query = db.session.query(
-        func.sum(Transactions.debit).label("cost"),
-        func.sum(Transactions.quantity).label("count"),
+        func.sum(purchases.debit).label("cost"),
+        func.sum(purchases.quantity).label("count"),
     ).filter(
-        Transactions.item.regexp_match(regex),
-        Transactions.date.between(start, end),
-        Transactions.store_id == id,
-        Transactions.type == "AP Invoice",
-    )
+        purchases.item.regexp_match(regex),
+        purchases.date.between(start, end),
+        purchases.id == id,
+    ).all()
     for q in query:
         try:
             avg_cost = q["cost"] / q["count"]
@@ -398,79 +397,79 @@ def get_category_labor(start, end, store, cat):
     return df
 
 
-def potato_sales(start):
-    df_pot = pd.DataFrame()
-    with open("/usr/local/share/potatochart.csv") as f:
-        times = csv.reader(f)
-        next(times)
-        for i in times:
-            url_filter = "$filter=date ge {}T{}Z and date le {}T{}Z".format(start, i[2], start, i[3])
-            query = "$select=menuitem,date,quantity,location&{}".format(url_filter)
-            url = "{}/SalesDetail?{}".format(Config.SRVC_ROOT, query)
-            rqst = make_HTTP_request(url)
-            df = make_dataframe(rqst)
-            if df.empty:
-                print("empty dataframe")
-                continue
-
-            data = db.session.query(Restaurants).all()
-            df_loc = pd.DataFrame([(x.name, x.location) for x in data], columns=["name", "location"])
-            df_merge = df_loc.merge(df, on="location")
-            if df_merge.empty:
-                print(f"no sales at {i[0]}")
-                if df_pot.empty:
-                    continue
-                df_pot.loc[i[0]] = [0]
-                continue
-            df_merge = df_merge.drop(columns=["location"])
-            df_menu = df_merge
-            df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(
-                r"CHOPHOUSE - NOLA", "CHOPHOUSE-NOLA", regex=True
-            )
-            df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(r"CAFÉ", "CAFE", regex=True)
-            df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(r"^(?:.*?( -)){2}", "-", regex=True)
-            df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.strip()
-            dafilter = df_menu["menuitem"].str.contains("VOID")
-            df_clean = df_menu[~dafilter]
-            df_temp = df_clean.copy()
-            df_temp[["x", "menuitem"]] = df_clean["menuitem"].str.split(" - ", expand=True)
-            pot_list = [
-                "BAKED POTATO",
-                "BAKED POTATO N/C",
-                "POTATO",
-                "POT",
-                "BAKED POTATO A SIDE",
-                "BAKED POTATO SIDE",
-                "KID SUB POT",
-                "POT-A",
-                "S-BAKED POTATO",
-                "SUB BAKED POTATO IN KIDS",
-                "SUB KID POT",
-                "Baked Potato",
-                "Baked Potato (After 4:00 PM)",
-                "Kid Baked Potato",
-                "Kid Baked Potato (After 4:00 PM)",
-                "Loaded Baked Potato",
-            ]
-            df = df_temp[df_temp["menuitem"].isin(pot_list)]
-            if df.empty:
-                continue
-            df.loc[:, "time"] = i[0]
-            df.loc[:, "in_time"] = i[1]
-            df.loc[:, "out_time"] = i[4]
-            df_pot = pd.concat([df_pot, df], ignore_index=True)
-            # df_pot = df_pot.append(df)
-
-        # Write the daily menu items to Menuitems table
-        menu_pivot = df_pot.pivot_table(
-            index=["time", "name", "in_time", "out_time"],
-            values=["quantity"],
-            aggfunc=np.sum,
-        )
-    menu_pivot.loc[:, "date"] = start
-    menu_pivot.to_sql("Potatoes", con=db.engine, if_exists="append")
-
-    return 0
+#def potato_sales(start):
+#    df_pot = pd.DataFrame()
+#    with open("/usr/local/share/potatochart.csv") as f:
+#        times = csv.reader(f)
+#        next(times)
+#        for i in times:
+#            url_filter = "$filter=date ge {}T{}Z and date le {}T{}Z".format(start, i[2], start, i[3])
+#            query = "$select=menuitem,date,quantity,location&{}".format(url_filter)
+#            url = "{}/SalesDetail?{}".format(Config.SRVC_ROOT, query)
+#            rqst = make_HTTP_request(url)
+#            df = make_dataframe(rqst)
+#            if df.empty:
+#                print("empty dataframe")
+#                continue
+#
+#            data = db.session.query(Restaurants).all()
+#            df_loc = pd.DataFrame([(x.name, x.location) for x in data], columns=["name", "location"])
+#            df_merge = df_loc.merge(df, on="location")
+#            if df_merge.empty:
+#                print(f"no sales at {i[0]}")
+#                if df_pot.empty:
+#                    continue
+#                df_pot.loc[i[0]] = [0]
+#                continue
+#            df_merge = df_merge.drop(columns=["location"])
+#            df_menu = df_merge
+#            df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(
+#                r"CHOPHOUSE - NOLA", "CHOPHOUSE-NOLA", regex=True
+#            )
+#            df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(r"CAFÉ", "CAFE", regex=True)
+#            df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(r"^(?:.*?( -)){2}", "-", regex=True)
+#            df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.strip()
+#            dafilter = df_menu["menuitem"].str.contains("VOID")
+#            df_clean = df_menu[~dafilter]
+#            df_temp = df_clean.copy()
+#            df_temp[["x", "menuitem"]] = df_clean["menuitem"].str.split(" - ", expand=True)
+#            pot_list = [
+#                "BAKED POTATO",
+#                "BAKED POTATO N/C",
+#                "POTATO",
+#                "POT",
+#                "BAKED POTATO A SIDE",
+#                "BAKED POTATO SIDE",
+#                "KID SUB POT",
+#                "POT-A",
+#                "S-BAKED POTATO",
+#                "SUB BAKED POTATO IN KIDS",
+#                "SUB KID POT",
+#                "Baked Potato",
+#                "Baked Potato (After 4:00 PM)",
+#                "Kid Baked Potato",
+#                "Kid Baked Potato (After 4:00 PM)",
+#                "Loaded Baked Potato",
+#            ]
+#            df = df_temp[df_temp["menuitem"].isin(pot_list)]
+#            if df.empty:
+#                continue
+#            df.loc[:, "time"] = i[0]
+#            df.loc[:, "in_time"] = i[1]
+#            df.loc[:, "out_time"] = i[4]
+#            df_pot = pd.concat([df_pot, df], ignore_index=True)
+#            # df_pot = df_pot.append(df)
+#
+#        # Write the daily menu items to Menuitems table
+#        menu_pivot = df_pot.pivot_table(
+#            index=["time", "name", "in_time", "out_time"],
+#            values=["quantity"],
+#            aggfunc=np.sum,
+#        )
+#    menu_pivot.loc[:, "date"] = start
+#    menu_pivot.to_sql("Potatoes", con=db.engine, if_exists="append")
+#
+#    return 0
 
 
 def convert_uofm(unit):
@@ -747,6 +746,7 @@ def set_dates(startdate):
         thirty = i.date - timedelta(days=30)
         threesixtyfive = i.date - timedelta(days=365)
 
+        d["dow"] = i.dow
         d["day"] = i.day
         d["week"] = i.week
         d["period"] = i.period
