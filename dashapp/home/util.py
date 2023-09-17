@@ -333,39 +333,10 @@ def get_glaccount_costs(start, end, acct, store, epoch):
     return results
 
 
-# def get_category_costs(start, end, sales, cat):
-#    # List of costs per category per period
-#    query = (
-#        db.session.query(
-#            func.sum(Transactions.credit).label("credits"),
-#            func.sum(Transactions.debit).label("costs"),
-#        )
-#        .select_from(Transactions)
-#        .join(calendar, calendar.date == Transactions.date)
-#        .group_by(calendar.period)
-#        .order_by(calendar.period)
-#        .filter(
-#            Transactions.date.between(start, end),
-#            Transactions.category2.in_(cat),
-#            Transactions.name == store.name,
-#        )
-#    )
-#    dol_lst = []
-#    pct_lst = []
-#    for v in query:
-#        amount = v.costs - v.credits
-#        dol_lst.append(amount)
-#    add_items = len(sales) - len(dol_lst)
-#    for i in range(0, add_items):
-#        dol_lst.append(0)
-#    for i in range(0, len(sales)):
-#        pct_lst.append(dol_lst[i] / sales[i])
-#    return dol_lst, pct_lst
-
-
 def get_item_avg_cost(regex, start, end, id):
     # Return average cost for purchase item
 
+    avg_cost = 0
     query = db.session.query(
         func.sum(purchases.debit).label("cost"),
         func.sum(purchases.quantity).label("count"),
