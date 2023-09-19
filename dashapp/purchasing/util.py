@@ -271,6 +271,7 @@ def get_cost_per_store(regex, start, end, stores):
             index=["store", "report_unit"],
             aggfunc={"unit_cost": np.mean, "unit_qty": np.sum},
         )
+        print(table)
         if not table.empty:
             table.sort_values(by=["unit_cost"], inplace=True)
             return table

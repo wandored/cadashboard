@@ -108,7 +108,7 @@ def purchasing():
 
 @blueprint.route("/purchasing/<product>", methods=["GET", "POST"])
 @login_required
-def beef(product):
+def purchase(product):
 
     fiscal_dates = set_dates(session["date_selected"])
 
@@ -125,13 +125,13 @@ def beef(product):
 
     if form1.submit1.data and form1.validate():
         session["date_selected"] = form1.selectdate.data
-        return redirect(url_for("purchasing_blueprint.beef", product=product))
+        return redirect(url_for("purchasing_blueprint.purchase", product=product))
 
     if form3.submit3.data and form3.validate():
         session["date_selected"] = fiscal_dates["start_day"]
         data = form3.stores.data
         session["store_list"] = tuple([x.id for x in data])
-        return redirect(url_for("purchasing_blueprint.beef", product=product))
+        return redirect(url_for("purchasing_blueprint.purchase", product=product))
 
     if form4.submit4.data and form4.validate():
         store_id = form4.store.data.id
@@ -246,7 +246,7 @@ def beef(product):
     store_names = ", ".join(store_names)
 
     return render_template(
-        "purchasing/beef.html",
+        "purchasing/purchase.html",
         title=product,
         company_name=Config.COMPANY_NAME,
         segment="purchasing",
