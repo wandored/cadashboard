@@ -481,7 +481,7 @@ class sales_records_day(db.Model):
     __tablename__ = 'sales_records_day'
 
     store = db.Column(db.String, primary_key=True)
-    date = db.Column(db.Date)
+    date = db.Column(db.Date, primary_key=True)
     dow = db.Column(db.Integer)
     week = db.Column(db.Integer)
     period = db.Column(db.Integer)
@@ -493,9 +493,9 @@ class sales_records_week(db.Model):
     __tablename__ = 'sales_records_week'
 
     store = db.Column(db.String, primary_key=True)
-    week = db.Column(db.Integer)
-    period = db.Column(db.Integer)
-    year = db.Column(db.Integer)
+    week = db.Column(db.Integer, primary_key=True)
+    period = db.Column(db.Integer, primary_key=True)
+    year = db.Column(db.Integer, primary_key=True)
     net_sales = db.Column(db.Float)
 
 
@@ -503,8 +503,8 @@ class sales_records_period(db.Model):
     __tablename__ = 'sales_records_period'
 
     store = db.Column(db.String, primary_key=True)
-    period = db.Column(db.Integer)
-    year = db.Column(db.Integer)
+    period = db.Column(db.Integer, primary_key=True)
+    year = db.Column(db.Integer, primary_key=True)
     net_sales = db.Column(db.Float)
 
 
@@ -512,7 +512,20 @@ class sales_records_year(db.Model):
     __tablename__ = 'sales_records_year'
 
     store = db.Column(db.String, primary_key=True)
-    year = db.Column(db.Integer)
+    year = db.Column(db.Integer, primary_key=True)
     net_sales = db.Column(db.Float)
 
 
+class table_turns(db.Model):
+    __tablename__ = 'table_turns'
+    store = db.Column(db.String, primary_key=True)
+    date = db.Column(db.Date, primary_key=True)
+    dow = db.Column(db.Integer)
+    week = db.Column(db.Integer)
+    period = db.Column(db.Integer)
+    year = db.Column(db.Integer)
+    bar = db.Column(db.Time)
+    dining_room = db.Column(db.Time)
+    handheld = db.Column(db.Time)
+    patio = db.Column(db.Time)
+    online_ordering = db.Column(db.Time)

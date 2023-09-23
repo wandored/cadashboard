@@ -272,27 +272,18 @@
         </div>
       </div>
     </div>
-    <!-- scorecard -->
+    <!-- table turns -->
     <div class="col-lg-4 col-md-6">
       <div class="card h-100">
         <div class="card-header pb-0">
-          <h6>Scorecard</h6>
+          <h6>Table Turns</h6>
         </div>
           <p class="text-sm">
-            <span class="font-weight-bold">Top 5 Sales Over Last Year</span>
           </p>
         <div class="alert alert-primary" role="alert">
-          <table class="table-responsive table-sm text-light">
-            <thead>
-              <tr>
-                <th scope="col">DAILY</th>
-                <th scope="col">% Over LY</th>
-                <th scope="col">$ Over LY</th>
-              </tr>
-            </thead>
-            <tbody>
-            </tbody>
-          </table>
+          <div class="chart">
+            <canvas id="chart-handheld" class="chart-canvas" height="170"></canvas>
+          </div>
         </div>
         <div class="alert alert-success" role="alert">
           <table class="table-responsive table-sm text-light text-bold">
@@ -333,9 +324,9 @@
 
   <script src="/static/assets/js/plugins/chartjs.min.js"></script>
   <script>
-    var ctx = document.getElementById("chart-bars").getContext("2d");
+    var ctx1 = document.getElementById("chart-bars").getContext("2d");
 
-    new Chart(ctx, {
+    new Chart(ctx1, {
       type: "bar",
       data: {
         labels: ["W", "T", "F", "S", "S", "M", "T"],
@@ -631,6 +622,105 @@
         },
       },
     });
+
+    var ctx4 = document.getElementById("chart-handheld").getContext("2d");
+
+    new Chart(ctx4, {
+      type: "bar",
+      data: {
+        labels: ["W", "T", "F", "S", "S", "M", "T"],
+        datasets: [{
+          label: "Table Turns",
+          tension: 0.4,
+          borderWidth: 0,
+          borderRadius: 4,
+          borderSkipped: false,
+          backgroundColor: "rgba(255, 255, 255, .8)",
+          data: {{ handleld_list | safe }},
+          maxBarThickness: 6
+        }, {
+          label: "Last Year",
+          tension: 0,
+          borderWidth: 0,
+          pointRadius: 5,
+          pointBackgroundColor: "rgba(200, 200, 200, 1)",
+          pointBorderColor: "transparent",
+          borderColor: "rgba(200, 200, 200, 1)",
+          borderWidth: 4,
+          type: "line",
+          backgroundColor: "transparent",
+          fill: true,
+          data: {{ handleld_list_ly | safe }},
+          maxBarThickness: 6
+        }, ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          }
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
+        scales: {
+          y: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              suggestedMin: 0,
+              suggestedMax: 500,
+              beginAtZero: true,
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+              color: "#fff",
+              // Abbreviate the millions
+              callback: function(value, index, values) {
+                return value / 1e3 + ' T';
+              },
+            },
+          },
+          x: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              color: '#f8f9fa',
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+            }
+          },
+        },
+      },
+    });
+
   </script>
 
 {% endblock javascripts %}

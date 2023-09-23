@@ -13,6 +13,7 @@ from flask_security import current_user, login_required
 from flask_security.decorators import roles_accepted
 from fpdf import FPDF
 import pandas as pd
+from pandas._libs.tslibs import dtypes
 from pandas.core.algorithms import isin
 from sqlalchemy import and_, func, or_
 
@@ -635,6 +636,43 @@ def store(store_id):
     #budgets3 = []
     #for v in budget_chart:
     #    budgets3.append(v.total_sales)
+
+    # service duration Charts
+    results = db.session.query(table_turns).filter(table_turns.date.between(
+                fiscal_dates["start_week"],
+                fiscal_dates["start_day"]),
+                table_turns.store == store.name).all()
+    #convert results to list of dictionaries
+    data = [
+            {
+                'store': row.store,
+                'date': row.date,
+                'dow': row.dow,
+                'week': row.week,
+                'period': row.period,
+                'year': row.year,
+                'bar': row.bar,
+                'dining_room': row.dining_room,
+                'handheld': row.handheld,
+                'patio': row.patio,
+                'online_ordering': row.online_ordering,
+                } for row in results
+            ]
+
+    table_turn_df = pd.DataFrame(data)
+    columns_to_convert = ['bar', 'dining_room', 'handheld', 'patio', 'online_ordering']
+    for column in columns_to_convert:
+        table_turn_df[column] = pd.to_timedelta(table_turn_df[column].astype(str)).dt.total_seconds()
+
+    print(table_turn_df)
+    bar_list = table_turn_df['bar'].tolist()
+    dining_room_list = table_turn_df['dining_room'].tolist()
+    handheld_list = table_turn_df['handheld'].tolist()
+    patio_list = table_turn_df['patio'].tolist()
+    online_ordering_list = table_turn_df['online_ordering'].tolist()
+
+    handheld_list_ly = handheld_list
+
 
     return render_template(
         "home/store.html",
