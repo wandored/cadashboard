@@ -636,10 +636,10 @@
           borderRadius: 4,
           borderSkipped: false,
           backgroundColor: "rgba(255, 255, 255, .8)",
-          data: {{ handleld_list | safe }},
+          data: {{ handheld_list | safe }},
           maxBarThickness: 6
         }, {
-          label: "Last Year",
+          label: "Avg Turn",
           tension: 0,
           borderWidth: 0,
           pointRadius: 5,
@@ -650,7 +650,7 @@
           type: "line",
           backgroundColor: "transparent",
           fill: true,
-          data: {{ handleld_list_ly | safe }},
+          data: {{ handheld_list_avg | safe }},
           maxBarThickness: 6
         }, ],
       },
@@ -660,7 +660,11 @@
         plugins: {
           legend: {
             display: false,
-          }
+          },
+          title: {
+            display: true,
+            text: 'Handhelds',
+          },
         },
         interaction: {
           intersect: false,
@@ -677,9 +681,7 @@
               color: 'rgba(255, 255, 255, .2)'
             },
             ticks: {
-              suggestedMin: 0,
-              suggestedMax: 500,
-              beginAtZero: true,
+              display: true,
               padding: 10,
               font: {
                 size: 14,
@@ -691,7 +693,8 @@
               color: "#fff",
               // Abbreviate the millions
               callback: function(value, index, values) {
-                return value / 1e3 + ' T';
+                var minutes = value / 60;
+                return minutes.toFixed(0) + ' Min';
               },
             },
           },

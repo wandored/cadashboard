@@ -638,32 +638,34 @@ def store(store_id):
     #    budgets3.append(v.total_sales)
 
     # service duration Charts
-    results = db.session.query(table_turns).filter(table_turns.date.between(
-                fiscal_dates["start_week"],
-                fiscal_dates["start_day"]),
-                table_turns.store == store.name).all()
-    #convert results to list of dictionaries
-    data = [
-            {
-                'store': row.store,
-                'date': row.date,
-                'dow': row.dow,
-                'week': row.week,
-                'period': row.period,
-                'year': row.year,
-                'bar': row.bar,
-                'dining_room': row.dining_room,
-                'handheld': row.handheld,
-                'patio': row.patio,
-                'online_ordering': row.online_ordering,
-                } for row in results
-            ]
+    def get_timeing_data(start, end):
+        results = db.session.query(table_turns).filter(table_turns.date.between(
+                    start, end), 
+                    table_turns.store == store.name).all()
+        #convert results to list of dictionaries
+        data = [
+                {
+                    'store': row.store,
+                    'date': row.date,
+                    'dow': row.dow,
+                    'week': row.week,
+                    'period': row.period,
+                    'year': row.year,
+                    'bar': row.bar,
+                    'dining_room': row.dining_room,
+                    'handheld': row.handheld,
+                    'patio': row.patio,
+                    'online_ordering': row.online_ordering,
+                    } for row in results
+                ]
 
-    table_turn_df = pd.DataFrame(data)
-    columns_to_convert = ['bar', 'dining_room', 'handheld', 'patio', 'online_ordering']
-    for column in columns_to_convert:
-        table_turn_df[column] = pd.to_timedelta(table_turn_df[column].astype(str)).dt.total_seconds()
+        df = pd.DataFrame(data)
+        columns_to_convert = ['bar', 'dining_room', 'handheld', 'patio', 'online_ordering']
+        for column in columns_to_convert:
+            df[column] = pd.to_timedelta(df[column].astype(str)).dt.total_seconds().astype(int)
+        return df
 
+    table_turn_df = get_timeing_data(fiscal_dates["start_week"], fiscal_dates["start_day"])
     print(table_turn_df)
     bar_list = table_turn_df['bar'].tolist()
     dining_room_list = table_turn_df['dining_room'].tolist()
@@ -671,7 +673,16 @@ def store(store_id):
     patio_list = table_turn_df['patio'].tolist()
     online_ordering_list = table_turn_df['online_ordering'].tolist()
 
-    handheld_list_ly = handheld_list
+    table_turn_df_avg = get_timeing_data(fiscal_dates["start_period"], fiscal_dates["start_day"])
+    # pivot table on dow to get average time
+    table_turn_df_avg = table_turn_df_avg.pivot_table(values=['bar', 'dining_room', 'handheld', 'patio', 'online_ordering'], index=['dow'], aggfunc='mean')
+    bar_list_avg = table_turn_df_avg['bar'].tolist()
+    dining_room_list_avg = table_turn_df_avg['dining_room'].tolist()
+    handheld_list_avg = table_turn_df_avg['handheld'].tolist()
+    patio_list_avg = table_turn_df_avg['patio'].tolist()
+    online_ordering_list_avg = table_turn_df_avg['online_ordering'].tolist()
+    print(table_turn_df_avg)
+
 
 
     return render_template(
