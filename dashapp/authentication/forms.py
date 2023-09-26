@@ -15,7 +15,7 @@ from dashapp.authentication.models import *
 
 
 def store_query():
-    return restaurants.query.filter(restaurants.active==True).order_by(restaurants.name).all()
+    return Restaurants.query.filter(Restaurants.active==True).order_by(Restaurants.name).all()
 
 
 class LoginForm(FlaskForm):

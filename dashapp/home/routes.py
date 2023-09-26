@@ -40,8 +40,8 @@ def index():
         session["store_list"] = tuple(
             [
                 store.id
-                for store in restaurants.query.filter(restaurants.active==True)
-                .order_by(restaurants.name)
+                for store in Restaurants.query.filter(Restaurants.active==True)
+                .order_by(Restaurants.name)
                 .all()
             ]
         )
@@ -50,7 +50,7 @@ def index():
     fiscal_dates = set_dates(session["date_selected"])
 
     # Check for no sales
-    if not sales_totals.query.filter_by(date=fiscal_dates["start_day"]).all():
+    if not SalesTotals.query.filter_by(date=fiscal_dates["start_day"]).all():
         session["date_selected"] = find_day_with_sales(day=fiscal_dates["start_day"])
         return redirect(url_for("home_blueprint.index"))
 
@@ -90,9 +90,9 @@ def index():
     # Sales Chart
     def get_chart_values(start, end, time_frame):
         query = (
-            db.session.query(func.sum(sales_totals.net_sales).label("total_sales"))
-            .select_from(sales_totals)
-            .filter(sales_totals.date.between(start, end))
+            db.session.query(func.sum(SalesTotals.net_sales).label("total_sales"))
+            .select_from(SalesTotals)
+            .filter(SalesTotals.date.between(start, end))
             .group_by(time_frame)
         )
         value = [v.total_sales for v in query]
@@ -101,81 +101,93 @@ def index():
     daily_sales_list = get_chart_values(
             fiscal_dates["start_week"],
             fiscal_dates["start_day"],
-            sales_totals.date)
+            SalesTotals.date)
     weekly_sales = sum(daily_sales_list)
 
     daily_sales_list_ly = get_chart_values(
             fiscal_dates["start_week_ly"],
             fiscal_dates["end_week_ly"],
-            sales_totals.date)
+            SalesTotals.date)
     weekly_sales_ly = sum(daily_sales_list_ly)
 
     week_to_date_sales_ly = get_chart_values(
             fiscal_dates["start_week_ly"],
             fiscal_dates["start_day_ly"],
-            sales_totals.date)
+            SalesTotals.date)
     wtd_sales_ly = sum(week_to_date_sales_ly)
 
     weekly_sales_list = get_chart_values(
             fiscal_dates["start_period"],
             fiscal_dates["start_day"],
-            sales_totals.week)
+            SalesTotals.week)
     period_sales = sum(weekly_sales_list)
 
     weekly_sales_list_ly = get_chart_values(
             fiscal_dates["start_period_ly"],
             fiscal_dates["end_period_ly"],
-            sales_totals.week)
+            SalesTotals.week)
     period_sales_ly = sum(weekly_sales_list_ly)
 
     period_to_date_sales_ly = get_chart_values(
             fiscal_dates["start_period_ly"],
             fiscal_dates["start_day_ly"],
-            sales_totals.week)
+            SalesTotals.week)
     ptd_sales_ly = sum(period_to_date_sales_ly)
 
     period_sales_list = get_chart_values(
             fiscal_dates["start_year"],
             fiscal_dates["start_day"],
-            sales_totals.period)
+            SalesTotals.period)
     yearly_sales = sum(period_sales_list)
 
     period_sales_list_ly = get_chart_values(
             fiscal_dates["start_year_ly"],
             fiscal_dates["end_year_ly"],
-            sales_totals.period)
+            SalesTotals.period)
     yearly_sales_ly = sum(period_sales_list_ly)
 
     year_to_date_sales_ly = get_chart_values(
             fiscal_dates["start_year_ly"],
             fiscal_dates["start_day_ly"],
-            sales_totals.period)
+            SalesTotals.period)
     ytd_sales_ly = sum(year_to_date_sales_ly)
 
     def build_sales_table(start, end, start_ly, end_ly, time_frame):
+        #sales_view = (
+        #    db.session.query(
+        #        SalesTotals.store,
+        #        func.sum(SalesTotals.net_sales).label("total_sales"),
+        #        func.sum(SalesTotals.guest_count).label("total_guests"),
+        #    )
+        #    .filter(SalesTotals.date.between(start, end))
+        #    .group_by(SalesTotals.store)
+        #    .all()
+        #)
         sales = (
-            db.session.query(
-                sales_totals.store,
-                func.sum(sales_totals.net_sales).label("total_sales"),
-                func.sum(sales_totals.guest_count).label("total_guests"),
-            )
-            .filter(sales_totals.date.between(start, end))
-            .group_by(sales_totals.store)
-            .all()
+                db.session.query(
+                    Restaurants.name.label("store"),
+                    func.sum(SalesEmployee.netsales).label('total_sales'),
+                    func.sum(SalesEmployee.numberofguests).label('total_guests')
+                )
+                .join(SalesEmployee, Restaurants.locationid == SalesEmployee.location)
+                .filter(SalesEmployee.date.between(start, end))
+                .group_by(Restaurants.name)
+                .all()
         )
 
         sales_ly = (
             db.session.query(
-                sales_totals.store,
-                func.sum(sales_totals.net_sales).label("total_sales_ly"),
-                func.sum(sales_totals.guest_count).label("total_guests_ly"),
+                Restaurants.name.label("store"),
+                func.sum(SalesEmployee.netsales).label("total_sales_ly"),
+                func.sum(SalesEmployee.numberofguests).label("total_guests_ly"),
             )
-            .filter(sales_totals.date.between(start_ly, end_ly))
-            .group_by(sales_totals.store)
+            .join(SalesEmployee, Restaurants.locationid == SalesEmployee.location)
+            .filter(SalesEmployee.date.between(start_ly, end_ly))
+            .group_by(Restaurants.name)
             .all()
         )
         # Get the top sales for each store and merge with sales_table
-        table_class = globals()[f'sales_records_{time_frame}'] # how you use a variable in query
+        table_class = globals()[f'SalesRecords{time_frame}'] # how you use a variable in query
         sales_query = table_class.query.with_entities(table_class.store, table_class.net_sales).all()
 
         top_sales = pd.DataFrame.from_records(sales_query, columns=['store', 'top_sales'])
@@ -185,25 +197,28 @@ def index():
         sales_table = sales_table.merge(sales_table_ly, how="outer", sort=True)
         sales_table = sales_table.merge(top_sales, how="left", left_on='store', right_on='store')
 
+        # TODO datetime needs to be change to datetime in the database to work like this
         labor = (
             db.session.query(
-                labor_totals.store,
-                func.sum(labor_totals.total_hours).label("total_hours"),
-                func.sum(labor_totals.total_dollars).label("total_dollars"),
+                Restaurants.name.label("store"),
+                func.sum(LaborDetail.hours).label("total_hours"),
+                func.sum(LaborDetail.total).label("total_dollars"),
             )
-            .filter(labor_totals.date.between(start, end))
-            .group_by(labor_totals.store)
+            .join(LaborDetail, Restaurants.locationid == LaborDetail.location_id)
+            .filter(LaborDetail.dateworked.between(start, end))
+            .group_by(Restaurants.name)
             .all()
         )
 
         labor_ly = (
             db.session.query(
-                labor_totals.store,
-                func.sum(labor_totals.total_hours).label("total_hours_ly"),
-                func.sum(labor_totals.total_dollars).label("total_dollars_ly"),
+                Restaurants.name.label("store"),
+                func.sum(LaborDetail.hours).label("total_hours_ly"),
+                func.sum(LaborDetail.total).label("total_dollars_ly"),
             )
-            .filter(labor_totals.date.between(start_ly, end_ly))
-            .group_by(labor_totals.store)
+            .join(LaborDetail, Restaurants.locationid == LaborDetail.location_id)
+            .filter(LaborDetail.dateworked.between(start_ly, end_ly))
+            .group_by(Restaurants.name)
             .all()
         )
 
@@ -213,7 +228,7 @@ def index():
         table = sales_table.merge(labor_table, how="outer", sort=True)
 
         # List of stores to add ID so i can pass to other templates
-        data = restaurants.query.with_entities(restaurants.name, restaurants.id).all()
+        data = Restaurants.query.with_entities(Restaurants.name, Restaurants.id).all()
         location_list = pd.DataFrame.from_records(data, columns=['store', 'id'])
         table = table.merge(location_list, on='store')
         table = table.set_index("store")
@@ -234,10 +249,10 @@ def index():
 
     daily_totals, daily_table, daily_top = build_sales_table(
         fiscal_dates["start_day"],
-        fiscal_dates["start_day"],
+        fiscal_dates["end_day"],
         fiscal_dates["start_day_ly"],
-        fiscal_dates["start_day_ly"],
-        "day",
+        fiscal_dates["end_day_ly"],
+        "Day",
     )
 
     weekly_totals, weekly_table, weekly_top = build_sales_table(
@@ -245,7 +260,7 @@ def index():
         fiscal_dates["week_to_date"],
         fiscal_dates["start_week_ly"],
         fiscal_dates["week_to_date_ly"],
-        "week",
+        "Week",
     )
 
     period_totals, period_table, period_top = build_sales_table(
@@ -253,7 +268,7 @@ def index():
         fiscal_dates["period_to_date"],
         fiscal_dates["start_period_ly"],
         fiscal_dates["period_to_date_ly"],
-        "period",
+        "Period",
     )
 
     yearly_totals, yearly_table, yearly_top = build_sales_table(
@@ -261,7 +276,7 @@ def index():
         fiscal_dates["year_to_date"],
         fiscal_dates["start_year_ly"],
         fiscal_dates["year_to_date_ly"],
-        "year",
+        "Year",
     )
 
     return render_template(
@@ -280,7 +295,7 @@ def store(store_id):
     TODAY = datetime.date(datetime.now())
 
     #store = Restaurants.query.filter_by(id=store_id).first()
-    store = restaurants.query.filter_by(id=store_id).first()
+    store = Restaurants.query.filter_by(id=store_id).first()
 
     if not "date_selected" in session:
         session["date_selected"] = TODAY
@@ -291,7 +306,7 @@ def store(store_id):
     #data = Restaurants.query.all()
     #store_df = pd.DataFrame([x.as_dict() for x in data])
 
-    if not sales_totals.query.filter_by(date=fiscal_dates["start_day"], store=store.name).first():
+    if not SalesTotals.query.filter_by(date=fiscal_dates["start_day"], store=store.name).first():
         session["date_selected"] = find_day_with_sales(day=fiscal_dates["start_day"], store=store.name)
         return redirect(url_for("home_blueprint.store", store_id=store.id))
 
@@ -331,11 +346,11 @@ def store(store_id):
     # Sales Charts
     def get_chart_values(start, end, time):
         chart = (
-            db.session.query(func.sum(sales_totals.net_sales).label("total_sales"))
-            .select_from(sales_totals)
+            db.session.query(func.sum(SalesTotals.net_sales).label("total_sales"))
+            .select_from(SalesTotals)
             .group_by(time)
             .order_by(time)
-            .filter(sales_totals.date.between(start, end), sales_totals.store == store.name)
+            .filter(SalesTotals.date.between(start, end), SalesTotals.store == store.name)
         )
         value = []
         for v in chart:
@@ -346,55 +361,55 @@ def store(store_id):
     daily_sales_list = get_chart_values(
             fiscal_dates["start_week"],
             fiscal_dates["start_day"],
-            sales_totals.date)
+            SalesTotals.date)
     weekly_sales = sum(daily_sales_list)
 
     daily_sales_list_ly = get_chart_values(
             fiscal_dates["start_week_ly"],
             fiscal_dates["end_week_ly"],
-            sales_totals.date)
+            SalesTotals.date)
     weekly_sales_ly = sum(daily_sales_list_ly)
 
     week_to_date_sales_ly = get_chart_values(
             fiscal_dates["start_week_ly"],
             fiscal_dates["start_day_ly"],
-            sales_totals.date)
+            SalesTotals.date)
     wtd_sales_ly = sum(week_to_date_sales_ly)
 
     weekly_sales_list = get_chart_values(
             fiscal_dates["start_period"],
             fiscal_dates["start_day"],
-            sales_totals.week)
+            SalesTotals.week)
     period_sales = sum(weekly_sales_list)
 
     weekly_sales_list_ly = get_chart_values(
         fiscal_dates["start_period_ly"],
         fiscal_dates["end_period_ly"],
-        sales_totals.week)
+        SalesTotals.week)
     period_sales_ly = sum(weekly_sales_list_ly)
 
     period_to_date_sales_ly = get_chart_values(
         fiscal_dates["start_period_ly"],
         fiscal_dates["start_day_ly"],
-        sales_totals.week)
+        SalesTotals.week)
     ptd_sales_ly = sum(period_to_date_sales_ly)
 
     period_sales_list = get_chart_values(
             fiscal_dates["start_year"],
             fiscal_dates["start_day"],
-            sales_totals.period)
+            SalesTotals.period)
     yearly_sales = sum(period_sales_list)
 
     period_sales_list_ly = get_chart_values(
             fiscal_dates["start_year_ly"],
             fiscal_dates["end_year_ly"],
-            sales_totals.period)
+            SalesTotals.period)
     yearly_sales_ly = sum(period_sales_list_ly)
 
     year_to_date_sales_ly = get_chart_values(
         fiscal_dates["start_year_ly"],
         fiscal_dates["start_day_ly"],
-        sales_totals.period)
+        SalesTotals.period)
     ytd_sales_ly = sum(year_to_date_sales_ly)
 
     #  TODO need to use Menuitems to get category sales
@@ -435,9 +450,9 @@ def store(store_id):
 
         #menu_items = (
         #    db.session.query(
-        #        menuitems.date,
-        #        menuitems.category,
-        #        func.sum(menuitems.total_sales).label("sales"),
+        #        Menuitems.date,
+        #        Menuitems.category,
+        #        func.sum(Menuitems.total_sales).label("sales"),
         #    )
         #    .filter(Menuitems.date.between(start, end), Menuitems.name == store.name)
         #    .group_by(Menuitems.date, Menuitems.category)
@@ -462,12 +477,12 @@ def store(store_id):
 
         labor = (
             db.session.query(
-                labor_totals.date,
-                labor_totals.category,
-                func.sum(labor_totals.total_dollars).label("total_dollars"),
+                LaborTotals.date,
+                LaborTotals.category,
+                func.sum(LaborTotals.total_dollars).label("total_dollars"),
             )
-            .filter(labor_totals.date.between(start, end), labor_totals.store == store.name)
-            .group_by(labor_totals.date, labor_totals.category)
+            .filter(LaborTotals.date.between(start, end), LaborTotals.store == store.name)
+            .group_by(LaborTotals.date, LaborTotals.category)
             .all()
         )
 
@@ -639,9 +654,9 @@ def store(store_id):
 
     # service duration Charts
     def get_timeing_data(start, end):
-        results = db.session.query(table_turns).filter(table_turns.date.between(
+        results = db.session.query(TableTurns).filter(TableTurns.date.between(
                     start, end), 
-                    table_turns.store == store.name).all()
+                    TableTurns.store == store.name).all()
         #convert results to list of dictionaries
         data = [
                 {
@@ -952,12 +967,12 @@ def support():
 #    unassigned_sales.sort_values(by=["amount"], ascending=False, inplace=True)
 
 #    query = (
-#        db.session.query(purchases.name, purchases.item)
+#        db.session.query(Purchases.name, Purchases.item)
 #        .filter(
-#            purchases.date >= fiscal_dates["start_week"],
-#            purchases.item.regexp_match("^DO NOT USE*"),
+#            Purchases.date >= fiscal_dates["start_week"],
+#            Purchases.item.regexp_match("^DO NOT USE*"),
 #        )
-#        .group_by(purchases.name, purchases.item)
+#        .group_by(Purchases.name, Purchases.item)
 #    ).all()
 #    do_not_use = pd.DataFrame.from_records(query, columns=["store", "menuitem"])
 #    do_not_use.sort_values(by=["store"], inplace=True)
@@ -1021,7 +1036,7 @@ def potato(store_id):
     TODAY = datetime.date(datetime.now())
     fiscal_dates = set_dates(datetime.date(datetime.now()))
 
-    store = restaurants.query.filter_by(id=store_id).first()
+    store = Restaurants.query.filter_by(id=store_id).first()
 
     load_times = pd.read_sql_table('potato_load_times', con=db.engine)
     pot_df = pd.DataFrame(columns=['time', 'in_time', 'out_time'])
@@ -1128,7 +1143,7 @@ def lobster(store_id):
     TODAY = datetime.date(datetime.now())
     fiscal_dates = set_dates(session["date_selected"])
 
-    store = restaurants.query.filter_by(id=store_id).first()
+    store = Restaurants.query.filter_by(id=store_id).first()
 
     live_lobster_avg_cost = get_item_avg_cost(
         "SEAFOOD Lobster Live Maine",
@@ -1193,7 +1208,7 @@ def stone(store_id):
     TODAY = datetime.date(datetime.now())
     fiscal_dates = set_dates(session["date_selected"])
 
-    store = restaurants.query.filter_by(id=store_id).first()
+    store = Restaurants.query.filter_by(id=store_id).first()
 
     stone_claw_avg_cost = get_item_avg_cost(
         "SEAFOOD Crab Stone Claws",

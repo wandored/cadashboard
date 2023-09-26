@@ -27,7 +27,7 @@ def purchasing():
     fiscal_dates = set_dates(session["date_selected"])
 
     # Get list of Restaurants
-    #data = restaurants.query.all()
+    #data = Restaurants.query.all()
     #store_df = pd.DataFrame([x.as_dict() for x in data])
 
     form1 = DateForm()
@@ -93,7 +93,7 @@ def purchasing():
     top_ten_vendor["percent"] = top_ten_vendor["Cost"] / category_costs_total
 
     # get name from Restaurants table based on session["store_list"]
-    store_names = db.session.query(restaurants.name).filter(restaurants.id.in_(session["store_list"]))
+    store_names = db.session.query(Restaurants.name).filter(Restaurants.id.in_(session["store_list"]))
     store_names = [x[0] for x in store_names]
     store_names = ", ".join(store_names)
 
@@ -241,7 +241,7 @@ def purchase(product):
 
     color = color_assigner(product)
 
-    store_names = db.session.query(restaurants.name).filter(restaurants.id.in_(session["store_list"]))
+    store_names = db.session.query(Restaurants.name).filter(Restaurants.id.in_(session["store_list"]))
     store_names = [x[0] for x in store_names]
     store_names = ", ".join(store_names)
 

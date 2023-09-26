@@ -18,18 +18,18 @@ from sqlalchemy import func
 def get_daypart_sales(start, end, store, day_part):
     query = (
         db.session.query(
-            sales_daypart.date,
-            sales_daypart.dow,
-            sales_daypart.week,
-            sales_daypart.period,
-            sales_daypart.year,
-            sales_daypart.daypart,
-            sales_daypart.net_sales,
-            sales_daypart.guest_count,
+            SalesDaypart.date,
+            SalesDaypart.dow,
+            SalesDaypart.week,
+            SalesDaypart.period,
+            SalesDaypart.year,
+            SalesDaypart.daypart,
+            SalesDaypart.net_sales,
+            SalesDaypart.guest_count,
         )
-        .filter(sales_daypart.date.between(start, end),
-                sales_daypart.daypart == (day_part),
-                sales_daypart.store == store)
+        .filter(SalesDaypart.date.between(start, end),
+                SalesDaypart.daypart == (day_part),
+                SalesDaypart.store == store)
         .all()
     )
     return query
@@ -141,102 +141,102 @@ def get_period(startdate):
     return target
 
 
-def removeSpecial(df):
-    """Removes specialty items from the menuitems dataframe"""
-    file = open("../../specialty.txt")
-    specialty_list = file.read().split("\n")
-    file.close
-    for item in specialty_list:
-        df = df.drop(df[df.menuitem == item].index)
-    return df
-
-
-def sales_employee(start, end):
-    url_filter = "$filter=date ge {}T00:00:00Z and date le {}T00:00:00Z".format(start, end)
-    query = "$select=dayPart,netSales,numberofGuests,location&{}".format(url_filter)
-    url = "{}/SalesEmployee?{}".format(Config.SRVC_ROOT, query)
-    rqst = make_HTTP_request(url)
-    df = make_dataframe(rqst)
-    if df.empty:
-        return 1
-
-    data = db.session.query(Restaurants).all()
-    df_loc = pd.DataFrame([(x.name, x.location) for x in data], columns=["name", "location"])
-    df_merge = df_loc.merge(df, on="location")
-    df_merge = df_merge.rename(columns={"netSales": "sales", "numberofGuests": "guests", "dayPart": "daypart"})
-
-    # pivot data and write to database
-    df_pivot = df_merge.pivot_table(index=["name", "daypart"], values=["sales", "guests"], aggfunc=np.sum)
-    df_pivot.loc[:, "date"] = start
-    df_pivot.to_sql("Sales", con=db.engine, if_exists="append")
-    return 0
-
-
-def labor_detail(start):
-    url_filter = "$filter=dateWorked eq {}T00:00:00Z".format(start)
-    query = "$select=jobTitle,hours,total,location_ID&{}".format(url_filter)
-    url = "{}/LaborDetail?{}".format(Config.SRVC_ROOT, query)
-    rqst = make_HTTP_request(url)
-    df = make_dataframe(rqst)
-    if df.empty:
-        return 1
-
-    with open("/usr/local/share/labor_categories.json") as labor_file:
-        labor_cats = json.load(labor_file)
-    df_cats = pd.DataFrame(list(labor_cats.items()), columns=["job", "category"])
-
-    data = db.session.query(Restaurants).all()
-    df_loc = pd.DataFrame([(x.name, x.location) for x in data], columns=["name", "location"])
-    df_merge = df_loc.merge(df, left_on="location", right_on="location_ID")
-    df_merge = df_merge.rename(columns={"jobTitle": "job", "total": "dollars"})
-    df_merge = df_merge.merge(df_cats, on="job")
-    df_pivot = df_merge.pivot_table(index=["name", "category", "job"], values=["hours", "dollars"], aggfunc=np.sum)
-    df_pivot.loc[:, "date"] = start
-    df_pivot.to_sql("Labor", con=db.engine, if_exists="append")
-    return 0
-
-
-def sales_detail(start, end):
-    url_filter = "$filter=date ge {}T00:00:00Z and date le {}T00:00:00Z".format(start, end)
-    query = "$select=menuitem,amount,date,quantity,category,location&{}".format(url_filter)
-    url = "{}/SalesDetail?{}".format(Config.SRVC_ROOT, query)
-    rqst = make_HTTP_request(url)
-    df = make_dataframe(rqst)
-    if df.empty:
-        return 1
-
-    with open("/usr/local/share/major_categories.json") as file:
-        major_cats = json.load(file)
-    df_cats = pd.DataFrame(list(major_cats.items()), columns=["menu_category", "category"])
-
-    data = db.session.query(Restaurants).all()
-    df_loc = pd.DataFrame([(x.name, x.location) for x in data], columns=["name", "location"])
-    df_merge = df_loc.merge(df, on="location")
-    df_merge = df_merge.drop(columns=["location"])
-
-    df_menu = df_merge.merge(df_cats, left_on="category", right_on="menu_category")
-
-    df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(r"CHOPHOUSE - NOLA", "CHOPHOUSE-NOLA", regex=True)
-    df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(r"CAFÉ", "CAFE", regex=True)
-    df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(r"^(?:.*?( -)){2}", "-", regex=True)
-    df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.strip()
-    dafilter = df_menu["menuitem"].str.contains("VOID")
-    df_clean = df_menu[~dafilter]
-    df_temp = df_clean.copy()
-    df_temp[["x", "menuitem"]] = df_clean["menuitem"].str.split(" - ", expand=True)
-    df_clean = df_temp.drop(columns=["category_x", "x"])
-    df_clean = df_clean.rename(columns={"category_y": "category"})
-    #    menuitems = removeSpecial(df_clean)  ### fix the file location before making this active
-    # Write the daily menu items to Menuitems table
-    menu_pivot = df_clean.pivot_table(
-        index=["name", "menuitem", "category", "menu_category"],
-        values=["amount", "quantity"],
-        aggfunc=np.sum,
-    )
-    menu_pivot.loc[:, "date"] = start
-    menu_pivot.to_sql("Menuitems", con=db.engine, if_exists="append")
-
-    return 0
+#def removeSpecial(df):
+#    """Removes specialty items from the menuitems dataframe"""
+#    file = open("../../specialty.txt")
+#    specialty_list = file.read().split("\n")
+#    file.close
+#    for item in specialty_list:
+#        df = df.drop(df[df.menuitem == item].index)
+#    return df
+#
+#
+#def sales_employee(start, end):
+#    url_filter = "$filter=date ge {}T00:00:00Z and date le {}T00:00:00Z".format(start, end)
+#    query = "$select=dayPart,netSales,numberofGuests,location&{}".format(url_filter)
+#    url = "{}/SalesEmployee?{}".format(Config.SRVC_ROOT, query)
+#    rqst = make_HTTP_request(url)
+#    df = make_dataframe(rqst)
+#    if df.empty:
+#        return 1
+#
+#    data = db.session.query(Restaurants).all()
+#    df_loc = pd.DataFrame([(x.name, x.location) for x in data], columns=["name", "location"])
+#    df_merge = df_loc.merge(df, on="location")
+#    df_merge = df_merge.rename(columns={"netSales": "sales", "numberofGuests": "guests", "dayPart": "daypart"})
+#
+#    # pivot data and write to database
+#    df_pivot = df_merge.pivot_table(index=["name", "daypart"], values=["sales", "guests"], aggfunc=np.sum)
+#    df_pivot.loc[:, "date"] = start
+#    df_pivot.to_sql("Sales", con=db.engine, if_exists="append")
+#    return 0
+#
+#
+#def labor_detail(start):
+#    url_filter = "$filter=dateWorked eq {}T00:00:00Z".format(start)
+#    query = "$select=jobTitle,hours,total,location_ID&{}".format(url_filter)
+#    url = "{}/LaborDetail?{}".format(Config.SRVC_ROOT, query)
+#    rqst = make_HTTP_request(url)
+#    df = make_dataframe(rqst)
+#    if df.empty:
+#        return 1
+#
+#    with open("/usr/local/share/labor_categories.json") as labor_file:
+#        labor_cats = json.load(labor_file)
+#    df_cats = pd.DataFrame(list(labor_cats.items()), columns=["job", "category"])
+#
+#    data = db.session.query(Restaurants).all()
+#    df_loc = pd.DataFrame([(x.name, x.location) for x in data], columns=["name", "location"])
+#    df_merge = df_loc.merge(df, left_on="location", right_on="location_ID")
+#    df_merge = df_merge.rename(columns={"jobTitle": "job", "total": "dollars"})
+#    df_merge = df_merge.merge(df_cats, on="job")
+#    df_pivot = df_merge.pivot_table(index=["name", "category", "job"], values=["hours", "dollars"], aggfunc=np.sum)
+#    df_pivot.loc[:, "date"] = start
+#    df_pivot.to_sql("Labor", con=db.engine, if_exists="append")
+#    return 0
+#
+#
+#def sales_detail(start, end):
+#    url_filter = "$filter=date ge {}T00:00:00Z and date le {}T00:00:00Z".format(start, end)
+#    query = "$select=menuitem,amount,date,quantity,category,location&{}".format(url_filter)
+#    url = "{}/SalesDetail?{}".format(Config.SRVC_ROOT, query)
+#    rqst = make_HTTP_request(url)
+#    df = make_dataframe(rqst)
+#    if df.empty:
+#        return 1
+#
+#    with open("/usr/local/share/major_categories.json") as file:
+#        major_cats = json.load(file)
+#    df_cats = pd.DataFrame(list(major_cats.items()), columns=["menu_category", "category"])
+#
+#    data = db.session.query(Restaurants).all()
+#    df_loc = pd.DataFrame([(x.name, x.location) for x in data], columns=["name", "location"])
+#    df_merge = df_loc.merge(df, on="location")
+#    df_merge = df_merge.drop(columns=["location"])
+#
+#    df_menu = df_merge.merge(df_cats, left_on="category", right_on="menu_category")
+#
+#    df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(r"CHOPHOUSE - NOLA", "CHOPHOUSE-NOLA", regex=True)
+#    df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(r"CAFÉ", "CAFE", regex=True)
+#    df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.replace(r"^(?:.*?( -)){2}", "-", regex=True)
+#    df_menu.loc[:, "menuitem"] = df_menu["menuitem"].str.strip()
+#    dafilter = df_menu["menuitem"].str.contains("VOID")
+#    df_clean = df_menu[~dafilter]
+#    df_temp = df_clean.copy()
+#    df_temp[["x", "menuitem"]] = df_clean["menuitem"].str.split(" - ", expand=True)
+#    df_clean = df_temp.drop(columns=["category_x", "x"])
+#    df_clean = df_clean.rename(columns={"category_y": "category"})
+#    #    menuitems = removeSpecial(df_clean)  ### fix the file location before making this active
+#    # Write the daily menu items to Menuitems table
+#    menu_pivot = df_clean.pivot_table(
+#        index=["name", "menuitem", "category", "menu_category"],
+#        values=["amount", "quantity"],
+#        aggfunc=np.sum,
+#    )
+#    menu_pivot.loc[:, "date"] = start
+#    menu_pivot.to_sql("Menuitems", con=db.engine, if_exists="append")
+#
+#    return 0
 
 
 def get_category_sales(start, end, store, cat):
@@ -297,12 +297,12 @@ def get_item_avg_cost(regex, start, end, id):
 
     avg_cost = 0
     query = db.session.query(
-        func.sum(purchases.debit).label("cost"),
-        func.sum(purchases.quantity).label("count"),
+        func.sum(Purchases.debit).label("cost"),
+        func.sum(Purchases.quantity).label("count"),
     ).filter(
-        purchases.item.regexp_match(regex),
-        purchases.date.between(start, end),
-        purchases.id == id,
+        Purchases.item.regexp_match(regex),
+        Purchases.date.between(start, end),
+        Purchases.id == id,
     ).all()
     for q in query:
         try:
