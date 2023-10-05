@@ -4,7 +4,7 @@ Dashboard by wandored
 from functools import cache
 import numpy as np
 import pandas as pd
-from datetime import datetime, timedelta
+from datetime import timedelta
 from dashapp.authentication.models import *
 from sqlalchemy import func
 
@@ -90,13 +90,13 @@ def convert_uofm(unit):
 
 def get_vendors(regex, days):
     query = (
-        purchases.query.with_entities(purchases.company)
+        Purchases.query.with_entities(Purchases.company)
         .filter(
-            purchases.item.regexp_match(regex),
-            purchases.company != "None",
-            purchases.date >= days,
+            Purchases.item.regexp_match(regex),
+            Purchases.company != "None",
+            Purchases.date >= days,
         )
-        .group_by(purchases.company)
+        .group_by(Purchases.company)
     ).all()
     return query
 
@@ -106,19 +106,19 @@ def get_cost_per_vendor(regex, start, end, stores):
 
     query = (
         db.session.query(
-            purchases.company,
-            purchases.uofm,
-            func.sum(purchases.quantity).label("count"),
-            func.sum(purchases.amount).label("cost"),
+            Purchases.company,
+            Purchases.uofm,
+            func.sum(Purchases.quantity).label("count"),
+            func.sum(Purchases.amount).label("cost"),
         )
         .filter(
-            purchases.item.regexp_match(regex),
-            purchases.date.between(start, end),
-            purchases.id.in_(stores),
+            Purchases.item.regexp_match(regex),
+            Purchases.date.between(start, end),
+            Purchases.id.in_(stores),
         )
         .group_by(
-            purchases.company,
-            purchases.uofm,
+            Purchases.company,
+            Purchases.uofm,
         )
     ).all()
     item_list = []
@@ -168,19 +168,19 @@ def get_cost_per_store(regex, start, end, stores):
 
     query = (
         db.session.query(
-            purchases.store,
-            purchases.uofm,
-            func.sum(purchases.quantity).label("count"),
-            func.sum(purchases.amount).label("cost"),
+            Purchases.store,
+            Purchases.uofm,
+            func.sum(Purchases.quantity).label("count"),
+            func.sum(Purchases.amount).label("cost"),
         )
         .filter(
-            purchases.item.regexp_match(regex),
-            purchases.date.between(start, end),
-            purchases.id.in_(stores),
+            Purchases.item.regexp_match(regex),
+            Purchases.date.between(start, end),
+            Purchases.id.in_(stores),
         )
         .group_by(
-            purchases.store,
-            purchases.uofm,
+            Purchases.store,
+            Purchases.uofm,
         )
     ).all()
     item_list = []
@@ -234,23 +234,23 @@ def period_purchases(regex, start, end, stores):
 
     query = (
         db.session.query(
-            purchases.date,
-            purchases.company,
-            purchases.store,
-            purchases.uofm,
-            func.sum(purchases.quantity).label("count"),
-            func.sum(purchases.amount).label("cost"),
+            Purchases.date,
+            Purchases.company,
+            Purchases.store,
+            Purchases.uofm,
+            func.sum(Purchases.quantity).label("count"),
+            func.sum(Purchases.amount).label("cost"),
         )
         .filter(
-            purchases.item.regexp_match(regex),
-            purchases.date.between(start, end),
-            purchases.id.in_(stores),
+            Purchases.item.regexp_match(regex),
+            Purchases.date.between(start, end),
+            Purchases.id.in_(stores),
         )
         .group_by(
-            purchases.date,
-            purchases.company,
-            purchases.store,
-            purchases.uofm,
+            Purchases.date,
+            Purchases.company,
+            Purchases.store,
+            Purchases.uofm,
         )
     ).all()
 
@@ -299,17 +299,17 @@ def get_category_costs(regex, start, end, stores):
     # Return list of sales
     query = (
         db.session.query(
-            purchases.account,
-            func.sum(purchases.credit).label("credits"),
-            func.sum(purchases.debit).label("costs"),
+            Purchases.account,
+            func.sum(Purchases.credit).label("credits"),
+            func.sum(Purchases.debit).label("costs"),
         )
         .filter(
-            purchases.account.in_(regex),
-            purchases.date.between(start, end),
-            purchases.id.in_(stores),
+            Purchases.account.in_(regex),
+            Purchases.date.between(start, end),
+            Purchases.id.in_(stores),
         )
-        .group_by(purchases.account)
-        .order_by(func.sum(purchases.debit).desc())
+        .group_by(Purchases.account)
+        .order_by(func.sum(Purchases.debit).desc())
     ).all()
     results = pd.DataFrame(query, columns=["Account", "Credits", "Costs"])
     results["Totals"] = results["Costs"] - results["Credits"]
@@ -320,16 +320,16 @@ def get_category_topten(regex, start, end, stores):
 
     query = (
         db.session.query(
-            purchases.item,
-            func.sum(purchases.debit).label("cost"),
+            Purchases.item,
+            func.sum(Purchases.debit).label("cost"),
         )
         .filter(
-            purchases.account.in_(regex),
-            purchases.date.between(start, end),
-            purchases.id.in_(stores),
+            Purchases.account.in_(regex),
+            Purchases.date.between(start, end),
+            Purchases.id.in_(stores),
         )
-        .group_by(purchases.item)
-        .order_by(func.sum(purchases.debit).desc())
+        .group_by(Purchases.item)
+        .order_by(func.sum(Purchases.debit).desc())
     ).limit(10)
     df = pd.DataFrame(query, columns=["Item", "Cost"])
 
@@ -340,16 +340,16 @@ def get_restaurant_topten(regex, start, end, stores):
 
     query = (
         db.session.query(
-            purchases.store,
-            func.sum(purchases.debit).label("cost"),
+            Purchases.store,
+            func.sum(Purchases.debit).label("cost"),
         )
         .filter(
-            purchases.account.in_(regex),
-            purchases.date.between(start, end),
-            purchases.id.in_(stores),
+            Purchases.account.in_(regex),
+            Purchases.date.between(start, end),
+            Purchases.id.in_(stores),
         )
-        .group_by(purchases.store)
-        .order_by(func.sum(purchases.debit).desc())
+        .group_by(Purchases.store)
+        .order_by(func.sum(Purchases.debit).desc())
     ).all()
     dframe = pd.DataFrame(query, columns=["Restaurant", "Cost"])
 
@@ -360,16 +360,16 @@ def get_vendor_topten(regex, start, end, stores):
 
     query = (
         db.session.query(
-            purchases.company,
-            func.sum(purchases.debit).label("cost"),
+            Purchases.company,
+            func.sum(Purchases.debit).label("cost"),
         )
         .filter(
-            purchases.account.in_(regex),
-            purchases.date.between(start, end),
-            purchases.id.in_(stores),
+            Purchases.account.in_(regex),
+            Purchases.date.between(start, end),
+            Purchases.id.in_(stores),
         )
-        .group_by(purchases.company)
-        .order_by(func.sum(purchases.debit).desc())
+        .group_by(Purchases.company)
+        .order_by(func.sum(Purchases.debit).desc())
     ).limit(10)
     dframe = pd.DataFrame(query, columns=["Vendor", "Cost"])
 
@@ -380,16 +380,16 @@ def get_item_topten(regex, start, end, stores):
 
     query = (
         db.session.query(
-            purchases.item,
-            func.sum(purchases.debit).label("cost"),
+            Purchases.item,
+            func.sum(Purchases.debit).label("cost"),
         )
         .filter(
-            purchases.item.regexp_match(regex),
-            purchases.date.between(start, end),
-            purchases.id.in_(stores),
+            Purchases.item.regexp_match(regex),
+            Purchases.date.between(start, end),
+            Purchases.id.in_(stores),
         )
-        .group_by(purchases.item)
-        .order_by(func.sum(purchases.debit).desc())
+        .group_by(Purchases.item)
+        .order_by(func.sum(Purchases.debit).desc())
     ).limit(10)
     dframe = pd.DataFrame(query, columns=["Item", "Cost"])
 

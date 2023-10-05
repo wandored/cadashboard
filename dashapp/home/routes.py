@@ -257,25 +257,25 @@ def index():
 
     weekly_totals, weekly_table, weekly_top = build_sales_table(
         fiscal_dates["start_week"],
-        fiscal_dates["week_to_date"],
+        fiscal_dates["week_to_date"] + timedelta(days=1),
         fiscal_dates["start_week_ly"],
-        fiscal_dates["week_to_date_ly"],
+        fiscal_dates["week_to_date_ly"] + timedelta(days=1),
         "Week",
     )
 
     period_totals, period_table, period_top = build_sales_table(
         fiscal_dates["start_period"],
-        fiscal_dates["period_to_date"],
+        fiscal_dates["period_to_date"] + timedelta(days=1),
         fiscal_dates["start_period_ly"],
-        fiscal_dates["period_to_date_ly"],
+        fiscal_dates["period_to_date_ly"] + timedelta(days=1),
         "Period",
     )
 
     yearly_totals, yearly_table, yearly_top = build_sales_table(
         fiscal_dates["start_year"],
-        fiscal_dates["year_to_date"],
+        fiscal_dates["year_to_date"] + timedelta(days=1),
         fiscal_dates["start_year_ly"],
-        fiscal_dates["year_to_date_ly"],
+        fiscal_dates["year_to_date_ly"] + timedelta(days=1),
         "Year",
     )
 
@@ -294,7 +294,6 @@ def index():
 def store(store_id):
     TODAY = datetime.date(datetime.now())
 
-    #store = Restaurants.query.filter_by(id=store_id).first()
     store = Restaurants.query.filter_by(id=store_id).first()
 
     if not "date_selected" in session:
@@ -302,9 +301,6 @@ def store(store_id):
         return redirect(url_for("home_blueprint.store", store_id=store.id))
 
     fiscal_dates = set_dates(session["date_selected"])
-
-    #data = Restaurants.query.all()
-    #store_df = pd.DataFrame([x.as_dict() for x in data])
 
     if not SalesTotals.query.filter_by(date=fiscal_dates["start_day"], store=store.name).first():
         session["date_selected"] = find_day_with_sales(day=fiscal_dates["start_day"], store=store.name)
@@ -748,32 +744,42 @@ def marketing():
 
     def get_giftcard_sales(start, end, epoch):
         chart = (
-            db.session.query(func.sum(Menuitems.amount).label("sales"), calendar.period)
+            db.session.query(
+                func.sum(Menuitems.total_sales).label("sales"), calendar.period,
+                func.sum(Menuitems.total_count).label("count"), calendar.period)
             .select_from(Menuitems)
             .group_by(epoch)
             .order_by(epoch)
             .filter(
                 Menuitems.date.between(start, end),
-                Menuitems.menuitem.regexp_match("(?i)GIFT CARD*"),
+                or_(
+                    Menuitems.menuitem.regexp_match("(?i)Gift Card*"),
+                    Menuitems.menuitem.regexp_match("(?i)ToastCard*")
+                )
             )
         )
         value = []
+        number = []
         for p in period_order:
             for v in chart:
                 if v.period == p:
                     value.append(int(v.sales))
+                    number.append(int(v.count))
 
-        return value
+        return value, number
 
     def get_giftcard_payments(start, end, epoch):
         chart = (
-            db.session.query(func.sum(Payments.amount).label("sales"), calendar.period)
+            db.session.query(func.sum(SalesPayment.amount).label("sales"), calendar.period)
             .select_from(Payments)
             .group_by(epoch)
             .order_by(epoch)
             .filter(
                 Payments.date.between(start, end),
-                Payments.paymenttype.regexp_match("(?i)GIFT CARD*"),
+                or_(
+                    Payments.paymenttype.regexp_match("(?i)GIFT CARD*"),
+                    Payments.paymenttype.regexp_match("(?i)GIFTCARD*")
+                    )
             )
         )
         value = []
@@ -790,9 +796,15 @@ def marketing():
     slice2 = period_list[: fiscal_dates["period"]]
     period_order = slice1 + slice2
 
-    giftcard_sales = get_giftcard_sales(fiscal_dates["last_threesixtyfive"], fiscal_dates["start_day"], calendar.period)
+    giftcard_sales, giftcard_count = get_giftcard_sales(
+       fiscal_dates["last_threesixtyfive"],
+       fiscal_dates["start_day"],
+       calendar.period
+   )
     giftcard_payments = get_giftcard_payments(
-        fiscal_dates["last_threesixtyfive"], fiscal_dates["start_day"], calendar.period
+        fiscal_dates["last_threesixtyfive"],
+        fiscal_dates["start_day"],
+        calendar.period
     )
 
     # TODO set to trailing year beginning in 2023

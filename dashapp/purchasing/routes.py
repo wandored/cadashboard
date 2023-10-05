@@ -3,16 +3,9 @@
 routes for purchasing pages
 """
 
-import pandas as pd
-from pandas.core.algorithms import isin
-from datetime import datetime, timedelta
-from fpdf import FPDF
-from sqlalchemy import and_, or_, func
-from flask import flash, render_template, session, redirect, url_for
+from flask import render_template, session, redirect, url_for
 from flask.helpers import url_for
-from flask_security.decorators import roles_accepted
-from flask.wrappers import Response
-from flask_security import login_required, current_user
+from flask_security import login_required
 from dashapp.purchasing import blueprint
 from dashapp.purchasing.util import *
 from dashapp.config import Config
@@ -25,10 +18,6 @@ from dashapp.authentication.models import *
 def purchasing():
 
     fiscal_dates = set_dates(session["date_selected"])
-
-    # Get list of Restaurants
-    #data = Restaurants.query.all()
-    #store_df = pd.DataFrame([x.as_dict() for x in data])
 
     form1 = DateForm()
     form3 = StoreForm()
@@ -61,7 +50,6 @@ def purchasing():
         print(store_id)
         return redirect(url_for("home_blueprint.stone", store_id=store_id))
 
-    print(session['store_list'])
     food_list = ["Beef", "Food Other", "Dairy", "Pork", "Poultry", "Produce", "Fish"]
     top_ten = get_category_topten(
         food_list,
@@ -112,16 +100,11 @@ def purchase(product):
 
     fiscal_dates = set_dates(session["date_selected"])
 
-    # Get list of Restaurants
-    #data = Restaurants.query.all()
-    #store_df = pd.DataFrame([x.as_dict() for x in data])
-
     form1 = DateForm()
     form3 = StoreForm()
     form4 = PotatoForm()
     form5 = LobsterForm()
     form6 = StoneForm()
-
 
     if form1.submit1.data and form1.validate():
         session["date_selected"] = form1.selectdate.data

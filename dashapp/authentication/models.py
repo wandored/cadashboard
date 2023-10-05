@@ -535,6 +535,7 @@ class SalesEmployee(db.Model):
 
 class LaborDetail(db.Model):
     __tablename__ = 'labor_detail'
+
     laborid = db.Column(db.String, primary_key=True)
     dateworked = db.Column(db.DateTime())
     jobtitle_id = db.Column(db.String)
@@ -543,3 +544,15 @@ class LaborDetail(db.Model):
     total = db.Column(db.Float)
     location_id = db.Column(db.String)
     dailylaborsummaryid = db.Column(db.String)
+
+
+class SalesPayment(db.Model):
+    __tablename__ = 'sales_payment'
+
+    salespaymentid = db.Column(db.String, primary_key=True)
+    name = db.Column(db.String)
+    amount = db.Column(db.Float)
+    date = db.Column(db.DateTime())
+    location = db.Column(db.String)
+    paymenttype = db.Column(db.String)
+    dailysalessummaryid = db.Column(db.String)

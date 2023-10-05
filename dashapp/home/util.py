@@ -3,14 +3,13 @@ home/util.py
 Dashboard by wandored
 """
 import json
-import csv
 import requests
 from flask import send_file
 import pandas as pd
 import numpy as np
 from io import StringIO, BytesIO
 from dashapp.config import Config
-from datetime import datetime, timedelta
+from datetime import timedelta
 from dashapp.authentication.models import *
 from sqlalchemy import func
 
@@ -54,13 +53,13 @@ def find_day_with_sales(**kwargs):
     has sales, if not it goes back one and checks until if finds a day with sales
     """
     if "store" in kwargs:
-        while not sales_totals.query.filter_by(date=kwargs["day"], name=kwargs["store"]).first():
+        while not SalesTotals.query.filter_by(date=kwargs["day"], name=kwargs["store"]).first():
             #date = datetime.strptime(kwargs["day"], "%Y-%m-%d")
             next_day = kwargs['day'] - timedelta(days=1)
             print(next_day)
             kwargs["day"] = next_day
     else:
-        while not sales_totals.query.filter_by(date=kwargs["day"]).first():
+        while not SalesTotals.query.filter_by(date=kwargs["day"]).first():
             #date = datetime.date(kwargs["day"])
             next_day = kwargs['day'] - timedelta(days=1)
             print(next_day)
