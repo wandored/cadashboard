@@ -150,6 +150,7 @@ def get_cost_per_vendor(regex, start, end, stores):
         df["report_unit"] = report.uofm
 
         df.drop(columns=["count", "cost", "base_qty"], inplace=True)
+        df = df[df.unit_cost.notna()]
         table = pd.pivot_table(
             df,
             values=["unit_cost", "unit_qty"],
@@ -213,6 +214,7 @@ def get_cost_per_store(regex, start, end, stores):
 
         df.drop(columns=["count", "cost", "base_qty"], inplace=True)
         print(df)
+        df = df[df.unit_cost.notna()]
         table = pd.pivot_table(
             df,
             values=["unit_cost", "unit_qty"],
