@@ -81,15 +81,3 @@ class StoneForm(FlaskForm):
         blank_text="Select Store",
     )
     submit6 = SubmitField("Submit")
-
-
-class UofMForm(FlaskForm):
-    submit_uofm = SubmitField("Submit")
-
-
-class RecipeForm(FlaskForm):
-    submit9 = SubmitField("Submit")
-
-
-class UserForm(FlaskForm):
-    submit_user = SubmitField("Submit")

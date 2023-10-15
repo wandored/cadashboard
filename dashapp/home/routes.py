@@ -900,28 +900,25 @@ def support():
     form4 = PotatoForm()
     form5 = LobsterForm()
     form6 = StoneForm()
-    uofm_form = UofMForm()
-    form9 = RecipeForm()
-    user_form = UserForm()
 
     if form1.submit1.data and form1.validate():
         """ """
         session["date_selected"] = form1.selectdate.data
         return redirect(url_for("home_blueprint.support"))
 
-    if form2.submit2.data and form2.validate():
-        """ """
-        new_start_day = form2.selectdate.data
-        new_end_day = form2.selectdate.data + timedelta(days=1)
-
-        baddates = refresh_data(new_start_day, new_end_day)
-        if baddates == 1:
-            flash(
-                f"I cannot find sales for the day you selected.  Please select another date!",
-                "warning",
-            )
-        session["date_selected"] = new_start_day
-        return redirect(url_for("home_blueprint.support"))
+#    if form2.submit2.data and form2.validate():
+#        """ """
+#        new_start_day = form2.selectdate.data
+#        new_end_day = form2.selectdate.data + timedelta(days=1)
+#
+#        baddates = refresh_data(new_start_day, new_end_day)
+#        if baddates == 1:
+#            flash(
+#                f"I cannot find sales for the day you selected.  Please select another date!",
+#                "warning",
+#            )
+#        session["date_selected"] = new_start_day
+#        return redirect(url_for("home_blueprint.support"))
 
     if form3.submit3.data and form3.validate():
         session["date_selected"] = fiscal_dates["start_day"]
@@ -942,52 +939,46 @@ def support():
         store_id = form6.store.data.id
         return redirect(url_for("home_blueprint.stone", store_id=store_id))
 
-    if uofm_form.submit_uofm.data and uofm_form.validate():
-        file = request.files["file"]
-        uofm_update(file)
-        session["date_selected"] = fiscal_dates["start_day"]
-        return redirect(url_for("home_blueprint.support"))
 
-    if form9.submit9.data and form9.validate():
-        file = request.files["file"]
-        receiving_by_purchased_item(file)
-        session["date_selected"] = fiscal_dates["start_day"]
-        return redirect(url_for("home_blueprint.support"))
+    query = (db.session.query(
+                Users.id,
+                Users.email,
+                Users.active,
+                Users.confirmed_at,
+                Users.last_login_at,
+                Users.login_count,
+                )
+            .order_by(Users.last_login_at.desc()
+            ).all()
+    )
+    user_table = pd.DataFrame.from_records(
+            query,
+            columns=
+                  [
+                      "id",
+                      "email",
+                      "active",
+                      "confirmed_at",
+                      "last_login_at",
+                      "login_count"
+                      ]
+                  )
+    no_login = user_table[user_table["last_login_at"].isnull()]
+    lapsed_users = user_table[user_table["last_login_at"] < TODAY - timedelta(days=30)].sort_values(by=["last_login_at"], ascending=False)
+    user_table = user_table[user_table["last_login_at"].notnull()].sort_values(by=["login_count"], ascending=False)
+    top_users = user_table
 
-    if user_form.submit_user.data and user_form.validate():
-        session["date_selected"] = fiscal_dates["start_day"]
-        return redirect(url_for("home_blueprint.users"))
 
-#    query = (
-#        db.session.query(
-#            menuitems.store,
-#            menuitems.menuitem,
-#            Menuitems.category,
-#            func.sum(Menuitems.amount).label("sales"),
-#            func.sum(Menuitems.quantity).label("count"),
-#        )
-#        .filter(
-#            Menuitems.date == fiscal_dates["start_day"],
-#            or_(
-#                Menuitems.menuitem == "Unassigned",
-#                Menuitems.category == "Unassigned",
-#            ),
-#        )
-#        .group_by(Menuitems.name, Menuitems.menuitem, Menuitems.category)
-#    ).all()
-#    unassigned_sales = pd.DataFrame.from_records(query, columns=["store", "menuitem", "category", "amount", "quantity"])
-#    unassigned_sales.sort_values(by=["amount"], ascending=False, inplace=True)
-
-#    query = (
-#        db.session.query(Purchases.name, Purchases.item)
-#        .filter(
-#            Purchases.date >= fiscal_dates["start_week"],
-#            Purchases.item.regexp_match("^DO NOT USE*"),
-#        )
-#        .group_by(Purchases.name, Purchases.item)
-#    ).all()
-#    do_not_use = pd.DataFrame.from_records(query, columns=["store", "menuitem"])
-#    do_not_use.sort_values(by=["store"], inplace=True)
+    query = (
+        db.session.query(stock_count.store, stock_count.item)
+        .filter(
+            stock_count.date >= fiscal_dates["start_week"],
+            stock_count.item.regexp_match("^DO NOT USE*"),
+        )
+        .group_by(stock_count.store, stock_count.item)
+    ).all()
+    do_not_use = pd.DataFrame.from_records(query, columns=["store", "menuitem"])
+    do_not_use.sort_values(by=["store"], inplace=True)
 
     return render_template(
         "home/support.html",

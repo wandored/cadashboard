@@ -556,3 +556,21 @@ class SalesPayment(db.Model):
     location = db.Column(db.String)
     paymenttype = db.Column(db.String)
     dailysalessummaryid = db.Column(db.String)
+
+
+class stock_count(db.Model):
+    __tablename__ = 'stock_count'
+
+    transactionid = db.Column(db.String, primary_key=True)
+    date = db.Column(db.DateTime())
+    id = db.Column(db.String)
+    store = db.Column(db.String)
+    item = db.Column(db.String)
+    category1 = db.Column(db.String)
+    category2 = db.Column(db.String)
+    category3 = db.Column(db.String)
+    quantity = db.Column(db.Float)
+    uofm = db.Column(db.String)
+    previous_amount = db.Column(db.Float)
+    adjustment = db.Column(db.Float)
+    amount = db.Column(db.Float)

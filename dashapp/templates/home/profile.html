@@ -24,9 +24,10 @@
               <h5 class="mb-1">
                 {{ current_user.email }}
               </h5>
-                <p class="mb-0 font-weight-bold text-sm">
-                   Last Login: {{ current_user.last_login_at }}
-                </p>
+              <p class="mb-0 font-weight-bold text-sm">Confirmed: {{ current_user.confirmed_at }}</p>
+              <p class="mb-0 font-weight-bold text-sm">Last Login: {{ current_user.last_login_at }}</p>
+              <p class="mb-0 font-weight-bold text-sm">Login IP: {{ current_user.last_login_ip }}</p>
+              <p class="mb-0 font-weight-bold text-sm">Login Count: {{ current_user.login_count }}</p>
               <p class="mb-0 font-weight-normal text-sm">
                 <a class="btn btn-info" href="/change" role="button">Change Password</a>
               </p>

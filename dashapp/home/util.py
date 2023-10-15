@@ -67,31 +67,31 @@ def find_day_with_sales(**kwargs):
     return next_day
 
 
-def refresh_data(start, end):
-    """
-    When new date submitted, the data for that date will be replaced with new data from R365
-    We check if there are infact sales for that day, if not, it resets to yesterday, if
-    there are sales, then labor is polled
-    """
-    # delete current days data from database and replace with fresh data
-    Sales.query.filter_by(date=start).delete()
-    Labor.query.filter_by(date=start).delete()
-    Menuitems.query.filter_by(date=start).delete()
-    Potatoes.query.filter_by(date=start).delete()
-    db.session.commit()
-
-    # refres the sales data and check to make sure there are sales for that day
-    baddates = sales_employee(start, end)
-    if baddates == 1:
-        return 1
-
-    # refresh labor
-    labor_detail(start)
-    # refresh categories and menuitems
-    # TODO add sales_payments
-    sales_detail(start, end)
-#    potato_sales(start)
-    return 0
+#def refresh_data(start, end):
+#    """
+#    When new date submitted, the data for that date will be replaced with new data from R365
+#    We check if there are infact sales for that day, if not, it resets to yesterday, if
+#    there are sales, then labor is polled
+#    """
+#    # delete current days data from database and replace with fresh data
+#    Sales.query.filter_by(date=start).delete()
+#    Labor.query.filter_by(date=start).delete()
+#    Menuitems.query.filter_by(date=start).delete()
+#    Potatoes.query.filter_by(date=start).delete()
+#    db.session.commit()
+#
+#    # refres the sales data and check to make sure there are sales for that day
+#    baddates = sales_employee(start, end)
+#    if baddates == 1:
+#        return 1
+#
+#    # refresh labor
+#    labor_detail(start)
+#    # refresh categories and menuitems
+#    # TODO add sales_payments
+#    sales_detail(start, end)
+##    potato_sales(start)
+#    return 0
 
 
 def make_HTTP_request(url):
@@ -642,30 +642,3 @@ def set_dates(startdate):
         d["end_previous_week"] = i.week_end - timedelta(days=7)
 
     return d
-
-def get_user_list():
-    query = (
-            db.session.query(
-                Users.id,
-                Users.email,
-                Users.active,
-                Users.confirmed_at,
-                Users.last_login_at,
-                Users.login_count,
-                )
-            .order_by(Users.last_login_at.desc()
-            ).all()
-    )
-    #user_table = pd.DataFrame.from_records(
-    #        query,
-    #        columns=
-    #              [
-    #                  "id",
-    #                  "email",
-    #                  "active",
-    #                  "confirmed_at",
-    #                  "last_login_at",
-    #                  "login_count"
-    #                  ]
-    #              )
-    return query
