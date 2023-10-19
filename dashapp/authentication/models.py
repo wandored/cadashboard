@@ -432,8 +432,8 @@ class SalesCategory(db.Model):
     week = db.Column(db.Integer)
     period = db.Column(db.Integer)
     year = db.Column(db.Integer)
-    item = db.Column(db.String)
-    quantity = db.Column(db.Float)
+    category = db.Column(db.String)
+    total_amount = db.Column(db.Float)
 
 
 class SalesDaypart(db.Model):

@@ -35,7 +35,6 @@ def index():
         session["date_selected"] = TODAY
         return redirect(url_for("home_blueprint.index"))
 
-    # TODO fix restaurant list selection
     if not "store_list" in session:
         session["store_list"] = tuple(
             [
@@ -197,7 +196,6 @@ def index():
         sales_table = sales_table.merge(sales_table_ly, how="outer", sort=True)
         sales_table = sales_table.merge(top_sales, how="left", left_on='store', right_on='store')
 
-        # TODO datetime needs to be change to datetime in the database to work like this
         labor = (
             db.session.query(
                 Restaurants.name.label("store"),
@@ -445,57 +443,188 @@ def store(store_id):
             fiscal_dates["start_day"],
             fiscal_dates["end_day"],
             "Host")
-    day_labor_dollar_ty = day_host_labor['dollars'].sum()
-    day_labor_pct_ty = day_labor_dollar_ty / daily_sales * 100
     day_host_labor_ly = get_period_labor(
             fiscal_dates["start_day_ly"],
             fiscal_dates["start_day_ly"],
             "Host")
-    day_labor_dollar_ly = day_host_labor_ly['dollars'].sum()
-    day_labor_pct_ly = day_labor_dollar_ly / daily_sales_ly * 100
 
     week_host_labor = get_period_labor(
             fiscal_dates["start_week"],
             fiscal_dates["week_to_date"],
             "Host")
-    week_labor_dollar_ty = week_host_labor['dollars'].sum()
-    week_labor_pct_ty = week_labor_dollar_ty / weekly_sales * 100
     week_host_labor_ly = get_period_labor(
             fiscal_dates["start_week_ly"],
             fiscal_dates["start_day_ly"],
             "Host")
-    week_labor_dollar_ly = week_host_labor_ly['dollars'].sum()
-    week_labor_pct_ly = week_labor_dollar_ly / weekly_sales_ly * 100
             
     period_host_labor = get_period_labor(
             fiscal_dates["start_period"],
             fiscal_dates["period_to_date"],
             "Host")
-    period_labor_dollar_ty = period_host_labor['dollars'].sum()
-    period_labor_pct_ty = period_labor_dollar_ty / period_sales * 100
     period_host_labor_ly = get_period_labor(
             fiscal_dates["start_period_ly"],
             fiscal_dates["start_day_ly"],
             "Host")
-    period_labor_dollar_ly = period_host_labor_ly['dollars'].sum()
-    period_labor_pct_ly = period_labor_dollar_ly / period_sales_ly * 100
             
     year_host_labor = get_period_labor(
             fiscal_dates["start_year"],
             fiscal_dates["year_to_date"],
             "Host")
-    year_labor_dollar_ty = year_host_labor['dollars'].sum()
-    year_labor_pct_ty = year_labor_dollar_ty / yearly_sales * 100
     year_host_labor_ly = get_period_labor(
             fiscal_dates["start_year_ly"],
             fiscal_dates["start_day_ly"],
             "Host")
-    year_labor_dollar_ly = year_host_labor_ly['dollars'].sum()
-    year_labor_pct_ly = year_labor_dollar_ly / yearly_sales_ly * 100
 
-# TODO complet labor tables
+    day_host_dollar_ty = day_host_labor['dollars'].sum()
+    day_host_pct_ty = day_host_dollar_ty / daily_sales * 100
+    day_host_dollar_ly = day_host_labor_ly['dollars'].sum()
+    day_host_pct_ly = day_host_dollar_ly / daily_sales_ly * 100
+    day_host_dollar_var = day_host_dollar_ty - day_host_dollar_ly
+    day_host_percent_var = day_host_pct_ty - day_host_pct_ly
+    week_host_dollar_ty = week_host_labor['dollars'].sum()
+    week_host_pct_ty = week_host_dollar_ty / weekly_sales * 100
+    week_host_dollar_ly = week_host_labor_ly['dollars'].sum()
+    week_host_pct_ly = week_host_dollar_ly / weekly_sales_ly * 100
+    week_host_dollar_var = week_host_dollar_ty - week_host_dollar_ly
+    week_host_percent_var = week_host_pct_ty - week_host_pct_ly
+    period_host_dollar_ty = period_host_labor['dollars'].sum()
+    period_host_pct_ty = period_host_dollar_ty / period_sales * 100
+    period_host_dollar_ly = period_host_labor_ly['dollars'].sum()
+    period_host_pct_ly = period_host_dollar_ly / period_sales_ly * 100
+    period_host_dollar_var = period_host_dollar_ty - period_host_dollar_ly
+    period_host_percent_var = period_host_pct_ty - period_host_pct_ly
+    year_host_dollar_ty = year_host_labor['dollars'].sum()
+    year_host_pct_ty = year_host_dollar_ty / yearly_sales * 100
+    year_host_dollar_ly = year_host_labor_ly['dollars'].sum()
+    year_host_pct_ly = year_host_dollar_ly / yearly_sales_ly * 100
+    year_host_dollar_var = year_host_dollar_ty - year_host_dollar_ly
+    year_host_percent_var = year_host_pct_ty - year_host_pct_ly
 
 
+
+    # get food sales to calculate BOH labor
+    def get_category_sales(start, end, categories):
+        query = (
+            db.session.query(func.sum(SalesCategory.total_amount).label("sales"))
+            .select_from(SalesCategory)
+            .filter(
+                SalesCategory.date.between(start, end),
+                SalesCategory.category.in_(categories),
+                SalesCategory.store == store.name)
+        ).all()
+        return query[0][0]
+
+
+    category_list = [
+            'ADD ON',
+            'APPETIZER',
+            'Appetizer',
+            'Salad',
+            'SALAD',
+            'Side',
+            'SIDE',
+            'ENTREE',
+            'Entree',
+            'Dessert',
+            'DESSERT',
+            'BEVERAGE'
+            ]
+    daily_food_sales = get_category_sales(
+            fiscal_dates["start_day"],
+            fiscal_dates["end_day"],
+            category_list)
+    daily_food_sales_ly = get_category_sales(
+            fiscal_dates["start_day_ly"],
+            fiscal_dates["end_day_ly"],
+            category_list)
+    weekly_food_sales = get_category_sales(
+            fiscal_dates["start_week"],
+            fiscal_dates["week_to_date"],
+            category_list)
+    weekly_food_sales_ly = get_category_sales(
+            fiscal_dates["start_week_ly"],
+            fiscal_dates["start_day_ly"],
+            category_list)
+    period_food_sales = get_category_sales(
+            fiscal_dates["start_period"],
+            fiscal_dates["period_to_date"],
+            category_list)
+    period_food_sales_ly = get_category_sales(
+            fiscal_dates["start_period_ly"],
+            fiscal_dates["start_day_ly"],
+            category_list)
+    year_food_sales = get_category_sales(
+            fiscal_dates["start_year"],
+            fiscal_dates["year_to_date"],
+            category_list)
+    year_food_sales_ly = get_category_sales(
+            fiscal_dates["start_year_ly"],
+            fiscal_dates["start_day_ly"],
+            category_list)
+
+
+    day_BOH_labor = get_period_labor(
+            fiscal_dates["start_day"],
+            fiscal_dates["end_day"],
+            "Kitchen")
+    day_BOH_labor_ly = get_period_labor(
+            fiscal_dates["start_day_ly"],
+            fiscal_dates["start_day_ly"],
+            "Kitchen")
+
+    week_BOH_labor = get_period_labor(
+            fiscal_dates["start_week"],
+            fiscal_dates["week_to_date"],
+            "Kitchen")
+    week_BOH_labor_ly = get_period_labor(
+            fiscal_dates["start_week_ly"],
+            fiscal_dates["start_day_ly"],
+            "Kitchen")
+            
+    period_BOH_labor = get_period_labor(
+            fiscal_dates["start_period"],
+            fiscal_dates["period_to_date"],
+            "Kitchen")
+    period_BOH_labor_ly = get_period_labor(
+            fiscal_dates["start_period_ly"],
+            fiscal_dates["start_day_ly"],
+            "Kitchen")
+            
+    year_BOH_labor = get_period_labor(
+            fiscal_dates["start_year"],
+            fiscal_dates["year_to_date"],
+            "Kitchen")
+    year_BOH_labor_ly = get_period_labor(
+            fiscal_dates["start_year_ly"],
+            fiscal_dates["start_day_ly"],
+            "Kitchen")
+
+    day_BOH_dollar_ty = day_BOH_labor['dollars'].sum()
+    day_BOH_pct_ty = day_BOH_dollar_ty / daily_food_sales * 100
+    day_BOH_dollar_ly = day_BOH_labor_ly['dollars'].sum()
+    day_BOH_pct_ly = day_BOH_dollar_ly / daily_sales_ly * 100
+    day_BOH_dollar_var = day_BOH_dollar_ty - day_BOH_dollar_ly
+    day_BOH_percent_var = day_BOH_pct_ty - day_BOH_pct_ly
+    week_BOH_dollar_ty = week_BOH_labor['dollars'].sum()
+    week_BOH_pct_ty = week_BOH_dollar_ty / weekly_sales * 100
+    week_BOH_dollar_ly = week_BOH_labor_ly['dollars'].sum()
+    week_BOH_pct_ly = week_BOH_dollar_ly / weekly_sales_ly * 100
+    week_BOH_dollar_var = week_BOH_dollar_ty - week_BOH_dollar_ly
+    week_BOH_percent_var = week_BOH_pct_ty - week_BOH_pct_ly
+    period_BOH_dollar_ty = period_BOH_labor['dollars'].sum()
+    period_BOH_pct_ty = period_BOH_dollar_ty / period_sales * 100
+    period_BOH_dollar_ly = period_BOH_labor_ly['dollars'].sum()
+    period_BOH_pct_ly = period_BOH_dollar_ly / period_sales_ly * 100
+    period_BOH_dollar_var = period_BOH_dollar_ty - period_BOH_dollar_ly
+    period_BOH_percent_var = period_BOH_pct_ty - period_BOH_pct_ly
+    year_BOH_dollar_ty = year_BOH_labor['dollars'].sum()
+    year_BOH_pct_ty = year_BOH_dollar_ty / yearly_sales * 100
+    year_BOH_dollar_ly = year_BOH_labor_ly['dollars'].sum()
+    year_BOH_pct_ly = year_BOH_dollar_ly / yearly_sales_ly * 100
+    year_BOH_dollar_var = year_BOH_dollar_ty - year_BOH_dollar_ly
+    year_BOH_percent_var = year_BOH_pct_ty - year_BOH_pct_ly
+
+    print(daily_food_sales)
     #budget_chart = (
     #    db.session.query(func.sum(Budgets.total_sales).label("total_sales"))
     #    .select_from(Budgets)
@@ -896,7 +1025,7 @@ def profile():
 @blueprint.route("/<int:store_id>/potato/", methods=["GET", "POST"])
 @login_required
 def potato(store_id):
-    # TODO need to fix store ID
+
     TODAY = datetime.date(datetime.now())
     fiscal_dates = set_dates(datetime.date(datetime.now()))
 
