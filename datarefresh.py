@@ -195,7 +195,6 @@ if __name__ == "__main__":
         today = current_date.strftime("%Y-%m-%d")
         tonight = TMRDAY.strftime("%Y-%m-%d")
         yesterday = YSTDAY.strftime("%Y-%m-%d")
-        print(f"Date is {today}")
 
         start_time = time.time()
         sales_payments(today, tonight)

@@ -154,6 +154,28 @@ admin.add_view(UserAdmin(Users, db.session))
 admin.add_view(RoleAdmin(Roles, db.session))
 
 
+class potato_load_times(db.Model):
+    __tablename__ = 'potato_load_times'
+
+    time = db.Column(db.Time(), primary_key=True)
+    in_time = db.Column(db.Time())
+    start_time = db.Column(db.Time())
+    stop_time = db.Column(db.Time())
+    out_time = db.Column(db.Time())
+
+
+class unitsofmeasure(db.Model):
+    __tablename__ = "unitsofmeasure"
+
+    uofm_id = db.Column(db.String(64), primary_key=True, unique=True)
+    name = db.Column(db.String(64))
+    equivalent_qty = db.Column(db.Float)
+    equivalent_uofm = db.Column(db.String(64))
+    measure_type = db.Column(db.String(64))
+    base_qty = db.Column(db.Float)
+    base_uofm = db.Column(db.String(64))
+
+
 class Restaurants(db.Model):
     __tablename__ = "restaurants"
 
@@ -163,7 +185,7 @@ class Restaurants(db.Model):
     toast_id = db.Column(db.Integer)
     active = db.Column(db.Boolean())
 
-class calendar(db.Model):
+class Calendar(db.Model):
     __tablename__ = "calendar"
 
     date = db.Column(db.String(64), primary_key=True, unique=True)
@@ -194,150 +216,24 @@ class calendar(db.Model):
         }
 
 
-class Sales(db.Model):
-    __tablename__ = "Sales"
 
-    id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.String(64))
-    daypart = db.Column(db.String(64))
-    name = db.Column(db.String(64))
-    sales = db.Column(db.Float)
-    guests = db.Column(db.Integer)
-
-
-class Labor(db.Model):
-    __tablename__ = "Labor"
-
-    id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.String(64))
-    category = db.Column(db.String(64))
-    job = db.Column(db.String(64))
-    name = db.Column(db.String(64))
-    hours = db.Column(db.Float)
-    dollars = db.Column(db.Float)
-
-
-class Transactions(db.Model):
-    __tablename__ = "Transactions"
-
-    id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.String(64))
-    trans_id = db.Column(db.String(64))
-    store_id = db.Column(db.Integer)
-    name = db.Column(db.String(64))
-    item = db.Column(db.String(256))
-    category1 = db.Column(db.String(64))
-    category2 = db.Column(db.String(64))
-    category3 = db.Column(db.String(64))
-    quantity = db.Column(db.Float)
-    UofM = db.Column(db.String(64))
-    credit = db.Column(db.Float)
-    debit = db.Column(db.Float)
-    amount = db.Column(db.Float)
-    type = db.Column(db.String(64))
-    modified = db.Column(db.String(64))
-    companyid = db.Column(db.String(64))
-    company = db.Column(db.String(64))
-    account = db.Column(db.String(64))
-
-
-class Potatoes(db.Model):
-    __tablename__ = "potatoes"
-
-    id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.String(64))
-    time = db.Column(db.String(64))
-    name = db.Column(db.String(64))
-    in_time = db.Column(db.String(64))
-    out_time = db.Column(db.String(64))
-    quantity = db.Column(db.Integer)
-
-
-class potato_sales(db.Model):
-    __tablename__ = "potato_sales"
-
-    date = db.Column(db.Date, primary_key=True)
-    time = db.Column(db.Time(), primary_key=True)
-    dow = db.Column(db.Integer)
-    name = db.Column(db.String(64))
-    quantity = db.Column(db.Integer)
-
-class potato_load_times(db.Model):
-    __tablename__ = 'potato_load_times'
-
-    time = db.Column(db.Time(), primary_key=True)
-    in_time = db.Column(db.Time())
-    start_time = db.Column(db.Time())
-    stop_time = db.Column(db.Time())
-    out_time = db.Column(db.Time())
-
-
-class unitsofmeasure(db.Model):
-    __tablename__ = "unitsofmeasure"
-
-    uofm_id = db.Column(db.String(64), primary_key=True, unique=True)
-    name = db.Column(db.String(64))
-    equivalent_qty = db.Column(db.Float)
-    equivalent_uofm = db.Column(db.String(64))
-    measure_type = db.Column(db.String(64))
-    base_qty = db.Column(db.Float)
-    base_uofm = db.Column(db.String(64))
-
-
-class Ingredients(db.Model):
-    __tablename__ = "Ingredients"
-
-    id = db.Column(db.Integer, primary_key=True)
-    item = db.Column(db.String(256))
-    recipe = db.Column(db.String(256))
-    qty = db.Column(db.Float)
-    uofm = db.Column(db.String(64))
-
-
-class Recipes(db.Model):
-    __tablename__ = "Recipes"
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(256))
-    menuitem = db.Column(db.String(256))
-    cost = db.Column(db.Float)
-    recipe = db.Column(db.String(256))
-    category1 = db.Column(db.String(64))
-    category2 = db.Column(db.String(64))
-    posid = db.Column(db.Integer)
-    recipeid = db.Column(db.String(64))
-    menuitemid = db.Column(db.String(64))
-
-
-class Payments(db.Model):
-    __tablename__ = "Payments"
-
-    id = db.Column(db.Integer, primary_key=True)
-    amount = db.Column(db.Float)
-    date = db.Column(db.String(64))
-    location = db.Column(db.String(64))
-    paymenttype = db.Column(db.String(64))
-    restaurant_id = db.Column(db.Integer, db.ForeignKey("Restaurants.id"))
-
-"""
-new database tables -------------------------------------------------
-"""
-
-class company(db.Model):
+class Company(db.Model):
     __tablename__ = 'company'
 
     companyid = db.Column(db.String, primary_key=True)
     name = db.Column(db.String)
 
-class glaccount(db.Model):
+
+class GlAccount(db.Model):
     __tablename__ = 'glaccount'
 
     glaccountid = db.Column(db.String, primary_key=True)
     name = db.Column(db.String)
     glaccountnumber = db.Column(db.String)
     gltyp = db.Column(db.String)
+    
 
-class item(db.Model):
+class Item(db.Model):
     __tablename__ = 'item'
 
     itemid = db.Column(db.String, primary_key=True)
@@ -346,7 +242,8 @@ class item(db.Model):
     category2 = db.Column(db.String)
     category3 = db.Column(db.String)
 
-class job_title(db.Model):
+
+class JobTitle(db.Model):
     __tablename__ = 'job_title'
 
     jobtitleid = db.Column(db.String, primary_key=True)
@@ -355,12 +252,68 @@ class job_title(db.Model):
     glaccount_id = db.Column(db.String, db.ForeignKey("glaccount.glaccountid"))
     location_id = db.Column(db.String, db.ForeignKey("location.locationid"))
 
+
 class Location(db.Model):
     __tablename__ = 'location'
 
     locationid = db.Column(db.String, primary_key=True)
     name = db.Column(db.String)
     locationnumber = db.Column(db.String)
+
+
+class SalesDetail(db.Model):
+    __tablename__ = "sales_detail"
+
+    salesdetailid = db.Column(db.Integer, primary_key=True)
+    menuitem = db.Column(db.String(256))
+    amount = db.Column(db.Float)
+    date = db.Column(db.String(64))
+    quantity = db.Column(db.Float)
+    location = db.Column(db.String(64))
+    salesaccount = db.Column(db.String(64))
+    category = db.Column(db.String(64))
+    dailysalessummaryid = db.Column(db.String(64))
+
+
+class SalesEmployee(db.Model):
+    __tablename__ = 'sales_employee'
+
+    salesid = db.Column(db.String, primary_key=True)
+    date = db.Column(db.DateTime())
+    daypart = db.Column(db.String)
+    netsales = db.Column(db.Float)
+    numberofguests = db.Column(db.Integer)
+    orderhour = db.Column(db.Integer)
+    salesamount = db.Column(db.Float)
+    location = db.Column(db.String)
+    grosssales = db.Column(db.Float)
+    dailysalessummaryid = db.Column(db.String)
+
+
+class LaborDetail(db.Model):
+    __tablename__ = 'labor_detail'
+
+    laborid = db.Column(db.String, primary_key=True)
+    dateworked = db.Column(db.DateTime())
+    jobtitle_id = db.Column(db.String)
+    jobtitle = db.Column(db.String)
+    hours = db.Column(db.Float)
+    total = db.Column(db.Float)
+    location_id = db.Column(db.String)
+    dailylaborsummaryid = db.Column(db.String)
+
+
+class SalesPayment(db.Model):
+    __tablename__ = 'sales_payment'
+
+    salespaymentid = db.Column(db.String, primary_key=True)
+    name = db.Column(db.String)
+    amount = db.Column(db.Float)
+    date = db.Column(db.DateTime())
+    location = db.Column(db.String)
+    paymenttype = db.Column(db.String)
+    dailysalessummaryid = db.Column(db.String)
+
 
 ## Table Views
 
@@ -518,47 +471,7 @@ class TableTurns(db.Model):
     online_ordering = db.Column(db.Time)
 
 
-class SalesEmployee(db.Model):
-    __tablename__ = 'sales_employee'
-
-    salesid = db.Column(db.String, primary_key=True)
-    date = db.Column(db.DateTime())
-    daypart = db.Column(db.String)
-    netsales = db.Column(db.Float)
-    numberofguests = db.Column(db.Integer)
-    orderhour = db.Column(db.Integer)
-    salesamount = db.Column(db.Float)
-    location = db.Column(db.String)
-    grosssales = db.Column(db.Float)
-    dailysalessummaryid = db.Column(db.String)
-
-
-class LaborDetail(db.Model):
-    __tablename__ = 'labor_detail'
-
-    laborid = db.Column(db.String, primary_key=True)
-    dateworked = db.Column(db.DateTime())
-    jobtitle_id = db.Column(db.String)
-    jobtitle = db.Column(db.String)
-    hours = db.Column(db.Float)
-    total = db.Column(db.Float)
-    location_id = db.Column(db.String)
-    dailylaborsummaryid = db.Column(db.String)
-
-
-class SalesPayment(db.Model):
-    __tablename__ = 'sales_payment'
-
-    salespaymentid = db.Column(db.String, primary_key=True)
-    name = db.Column(db.String)
-    amount = db.Column(db.Float)
-    date = db.Column(db.DateTime())
-    location = db.Column(db.String)
-    paymenttype = db.Column(db.String)
-    dailysalessummaryid = db.Column(db.String)
-
-
-class stock_count(db.Model):
+class StockCount(db.Model):
     __tablename__ = 'stock_count'
 
     transactionid = db.Column(db.String, primary_key=True)

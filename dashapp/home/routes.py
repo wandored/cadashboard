@@ -22,7 +22,9 @@ from dashapp.authentication.models import *
 from dashapp.config import Config
 from dashapp.home import blueprint
 from dashapp.home.util import *
+
 import time
+from icecream import ic
 
 
 @blueprint.route("/", methods=["GET", "POST"])
@@ -624,7 +626,6 @@ def store(store_id):
     year_BOH_dollar_var = year_BOH_dollar_ty - year_BOH_dollar_ly
     year_BOH_percent_var = year_BOH_pct_ty - year_BOH_pct_ly
 
-    print(daily_food_sales)
     #budget_chart = (
     #    db.session.query(func.sum(Budgets.total_sales).label("total_sales"))
     #    .select_from(Budgets)
@@ -685,6 +686,7 @@ def store(store_id):
 #     print(table_turn_df_avg)
 
 
+    ic(locals())
 
     return render_template(
         "home/store.html",
@@ -731,20 +733,19 @@ def marketing():
         return redirect(url_for("home_blueprint.stone", store_id=store_id))
 
     # Gift Card Sales
+    gift_card_list = ["GIFTCARD", "Gift Certificate (Paper)"]
 
     def get_giftcard_sales(start, end, epoch):
         chart = (
             db.session.query(
-                func.sum(Menuitems.total_sales).label("sales"), calendar.period,
-                func.sum(Menuitems.total_count).label("count"), calendar.period)
-            .select_from(Menuitems)
-            .group_by(epoch)
-            .order_by(epoch)
+                func.sum(SalesDetail.amount).label("sales"),
+                func.sum(SalesDetail.quantity).label("count"))
+            .select_from(SalesDetail)
             .filter(
-                Menuitems.date.between(start, end),
+                SalesDetail.date.between(start, end),
                 or_(
-                    Menuitems.menuitem.regexp_match("(?i)Gift Card*"),
-                    Menuitems.menuitem.regexp_match("(?i)ToastCard*")
+                    SalesDetail.category.regexp_match("(?i)GIFT CARD*"),
+                    SalesDetail.menuitem.regexp_match("(?i)ToastCard*")
                 )
             )
         )
@@ -760,16 +761,11 @@ def marketing():
 
     def get_giftcard_payments(start, end, epoch):
         chart = (
-            db.session.query(func.sum(SalesPayment.amount).label("sales"), calendar.period)
-            .select_from(Payments)
-            .group_by(epoch)
-            .order_by(epoch)
+            db.session.query(func.sum(SalesPayment.amount).label("sales"))
+            .select_from(SalesPayment)
             .filter(
-                Payments.date.between(start, end),
-                or_(
-                    Payments.paymenttype.regexp_match("(?i)GIFT CARD*"),
-                    Payments.paymenttype.regexp_match("(?i)GIFTCARD*")
-                    )
+                SalesPayment.date.between(start, end),
+                SalesPayment.paymenttype.in_(gift_card_list)
             )
         )
         value = []
@@ -789,12 +785,12 @@ def marketing():
     giftcard_sales, giftcard_count = get_giftcard_sales(
        fiscal_dates["last_threesixtyfive"],
        fiscal_dates["start_day"],
-       calendar.period
+       Calendar.period
    )
     giftcard_payments = get_giftcard_payments(
         fiscal_dates["last_threesixtyfive"],
         fiscal_dates["start_day"],
-        calendar.period
+        Calendar.period
     )
 
     # TODO set to trailing year beginning in 2023
@@ -808,15 +804,15 @@ def marketing():
     def get_giftcard_sales_per_store(start, end):
         query = (
             db.session.query(
-                Menuitems.name,
-                func.sum(Menuitems.amount).label("sales"),
-                func.sum(Menuitems.quantity).label("count"),
+                SalesDetail.location,
+                func.sum(SalesDetail.amount).label("sales"),
+                func.sum(SalesDetail.quantity).label("count"),
             )
             .filter(
-                Menuitems.date.between(start, end),
-                Menuitems.menuitem.regexp_match("(?i)GIFT CARD*"),
+                SalesDetail.date.between(start, end),
+                SalesDetail.menuitem.in_(gift_card_list)
             )
-            .group_by(Menuitems.name)
+            .group_by(SalesDetail.location)
         ).all()
         sales = pd.DataFrame.from_records(query, columns=["store", "amount", "quantity"])
         sales.sort_values(by=["amount"], ascending=False, inplace=True)
@@ -835,14 +831,14 @@ def marketing():
 
         query = (
             db.session.query(
-                Payments.restaurant_id,
-                func.sum(Payments.amount).label("payment"),
+                SalesPayment.location,
+                func.sum(SalesPayment.amount).label("payment"),
             )
             .filter(
-                Payments.date.between(start, end),
-                Payments.paymenttype.regexp_match("GIFT CARD"),
+                SalesPayment.date.between(start, end),
+                SalesPayment.paymenttype.in_(gift_card_list)
             )
-            .group_by(Payments.restaurant_id)
+            .group_by(SalesPayment.location)
         ).all()
 
         payments = pd.DataFrame.from_records(query, columns=["restaurant_id", "payment"])
@@ -857,6 +853,8 @@ def marketing():
     gift_card_sales = gift_card_sales.merge(gift_card_payments, left_on="store", right_on="name")
     gift_card_sales["diff"] = gift_card_sales["amount"] - gift_card_sales["payment"]
     gift_card_sales.sort_values(by=["diff"], ascending=False, inplace=True)
+
+    ic(locals())
 
     return render_template(
         "home/marketing.html",

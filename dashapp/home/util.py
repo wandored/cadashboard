@@ -117,7 +117,7 @@ def make_dataframe(sales):
 
 
 def get_lastyear(date):
-    target = calendar.query.filter_by(date=date)
+    target = Calendar.query.filter_by(date=date)
     dt_date = date
 
     for i in target:
@@ -125,7 +125,7 @@ def get_lastyear(date):
         period = i.period
         week = i.week
         day = i.day
-        ly_target = calendar.query.filter_by(year=lst_year, period=period, week=week, day=day)
+        ly_target = Calendar.query.filter_by(year=lst_year, period=period, week=week, day=day)
         for x in ly_target:
             dt_date = x.date
     return dt_date
@@ -135,7 +135,7 @@ def get_period(startdate):
     """
     returns the period integer for the current startdate
     """
-    target = calendar.query.filter_by(date=startdate)
+    target = Calendar.query.filter_by(date=startdate)
 
     return target
 
@@ -267,28 +267,28 @@ def get_category_sales(start, end, store, cat):
     return df
 
 
-def get_glaccount_costs(start, end, acct, store, epoch):
-    # Return list of sales
-    query = (
-        db.session.query(
-            func.sum(Transactions.credit).label("credits"),
-            func.sum(Transactions.debit).label("costs"),
-        )
-        .select_from(Transactions)
-        .join(calendar, calendar.date == Transactions.date)
-        .group_by(epoch)
-        .order_by(epoch)
-        .filter(
-            Transactions.date.between(start, end),
-            Transactions.account == acct,
-            Transactions.name == store,
-        )
-    )
-    results = []
-    for q in query:
-        amount = q.costs - q.credits
-        results.append(amount)
-    return results
+#def get_glaccount_costs(start, end, acct, store, epoch):
+#    # Return list of sales
+#    query = (
+#        db.session.query(
+#            func.sum(Transactions.credit).label("credits"),
+#            func.sum(Transactions.debit).label("costs"),
+#        )
+#        .select_from(Transactions)
+#        .join(Calendar, Calendar.date == Transactions.date)
+#        .group_by(epoch)
+#        .order_by(epoch)
+#        .filter(
+#            Transactions.date.between(start, end),
+#            Transactions.account == acct,
+#            Transactions.name == store,
+#        )
+#    )
+#    results = []
+#    for q in query:
+#        amount = q.costs - q.credits
+#        results.append(amount)
+#    return results
 
 
 def get_item_avg_cost(regex, start, end, id):
@@ -590,7 +590,7 @@ def update_recipe_costs():
 
 
 def set_dates(startdate):
-    target = calendar.query.filter_by(date=startdate)
+    target = Calendar.query.filter_by(date=startdate)
     d = {}
 
     for i in target:
