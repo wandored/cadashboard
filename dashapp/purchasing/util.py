@@ -10,7 +10,7 @@ from sqlalchemy import func
 
 
 def get_lastyear(date):
-    target = calendar.query.filter_by(date=date)
+    target = Calendar.query.filter_by(date=date)
     dt_date = date
 
     for i in target:
@@ -18,7 +18,7 @@ def get_lastyear(date):
         period = i.period
         week = i.week
         day = i.day
-        ly_target = calendar.query.filter_by(year=lst_year, period=period, week=week, day=day)
+        ly_target = Calendar.query.filter_by(year=lst_year, period=period, week=week, day=day)
         for x in ly_target:
             dt_date = x.date
     return dt_date
@@ -26,7 +26,7 @@ def get_lastyear(date):
 
 def set_dates(startdate):
 
-    target = calendar.query.filter_by(date=startdate)
+    target = Calendar.query.filter_by(date=startdate)
     d = {}
 
     for i in target:
@@ -231,7 +231,7 @@ def get_cost_per_store(regex, start, end, stores):
 @cache
 def period_purchases(regex, start, end, stores):
     # generate list of purchase costs per period for charts
-    cal_query = calendar.query.with_entities(calendar.date, calendar.week, calendar.period, calendar.year).all()
+    cal_query = Calendar.query.with_entities(Calendar.date, Calendar.week, Calendar.period, Calendar.year).all()
     cal_df = pd.DataFrame(cal_query, columns=["date", "week", "period", "year"])
 
     query = (
