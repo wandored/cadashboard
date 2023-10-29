@@ -335,258 +335,258 @@ def convert_uofm(unit):
         return 0, 0
 
 
-def download_file(filename):
-    output = BytesIO()
-    writer = pd.ExcelWriter(output, engine="xlsxwriter")
-    df.to_excel(writer, sheet_name="Sheet1")
-    writer.save()
-    output.seek(0)
-
-    # Send the Excel file as a response
-    response = make_response(output.read())
-    response.headres.set("Content-Disposition", "attachment", filename=filename)
-    response.headres.set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-
-    return response
-
-
-def receiving_by_purchased_item(file):
-    def make_pivot(table):
-        vendor = pd.pivot_table(
-            table,
-            values=["totalQuantity", "ExtCost"],
-            index=["ItemName", "VendorName", "unit"],
-            aggfunc=np.sum,
-        )
-        vendor = vendor.reset_index().sort_values(["ItemName", "VendorName"]).set_index("VendorName")
-        vendor.loc["Totals"] = vendor.sum(numeric_only=True)
-        vendor["CostPerUnit"] = vendor["ExtCost"] / vendor["totalQuantity"]
-
-        restaurant = pd.pivot_table(
-            table,
-            values=["totalQuantity", "ExtCost"],
-            index=["ItemName", "LocationName", "unit"],
-            aggfunc=np.sum,
-        )
-        restaurant = restaurant.reset_index().sort_values(["ItemName", "LocationName"]).set_index("LocationName")
-        restaurant.loc["Totals"] = restaurant.sum(numeric_only=True)
-        restaurant["CostPerUnit"] = restaurant["ExtCost"] / restaurant["totalQuantity"]
-        restaurant.style.format(
-            {
-                "ExtCost": "${:,.2f}",
-                "totalQuantity": "{:,.0f}",
-                "CostPerUnit": "${:,.2f}",
-            }
-        )
-        return [vendor, restaurant]
-
-    try:
-        file_contents = file.stream.read().decode("utf-8")  # read the file's contents into memory
-        df = pd.read_csv(
-            StringIO(file_contents),
-            skiprows=3,
-            usecols=[
-                "ItemName",
-                "LocationName",
-                "TransactionNumber",
-                "VendorName",
-                "Textbox11",
-                "TransactionDate",
-                "PurchaseUnit",
-                "Quantity",
-                "AmountEach",
-                "ExtPrice2",
-            ],
-        )
-    except:
-        print("No file selected or file error")
-        return 1
-
-    try:
-        filter = df.Quantity.str.match(r"\((.+)\)")
-        df = df[~filter]
-    except:
-        pass
-
-    item_list = [df.ItemName.unique()]
-    item_list = [item for sublist in item_list for item in sublist]
-    item_list.sort()
-
-    # TODO merge the UofM table with the df
-    with open("/usr/local/share/UofM.json") as file:
-        uofm = json.load(file)
-    units = pd.DataFrame(uofm)
-    df = df.merge(units, left_on="PurchaseUnit", right_on="Name", how="left")
-    df.rename(columns={"Textbox11": "VendorNumber"}, inplace=True)
-    try:
-        df["BaseQty"] = df["BaseQty"].str.replace(",", "").astype(float)
-    except:
-        df["BaseQty"] = df["BaseQty"].astype(float)
-    df["Quantity"] = df["Quantity"].astype(float)
-    try:
-        df["AmountEach"] = df["AmountEach"].str.replace(",", "").astype(float)
-    except:
-        df["AmountEach"] = df["AmountEach"].astype(float)
-    try:
-        df["ExtPrice2"] = df["ExtPrice2"].astype(str).str.replace(",", "").astype(float)
-    except:
-        df["ExtPrice2"] = df["ExtPrice2"].astype(float)
-    # rename df["ExtPrice2"] to df["ExtPrice"] to match other reports
-    df.rename(columns={"ExtPrice2": "ExtCost"}, inplace=True)
-    # df.loc["Totals"] = df.sum(numeric_only=True)
-    sorted_units = (
-        df.groupby(["Name"]).mean(numeric_only=True).sort_values(by=["Quantity"], ascending=False).reset_index()
-    )
-    df_sorted = pd.DataFrame()
-    for item in item_list:
-        df_temp = df[df.ItemName == item]
-        sorted_units = (
-            df_temp.groupby(["Name"])
-            .mean(numeric_only=True)
-            .sort_values(by=["Quantity"], ascending=False)
-            .reset_index()
-        )
-        report_unit = df_temp.iloc[0]["Name"]
-        base_factor = df_temp.iloc[0]["BaseQty"]
-        df_temp["reportUnit"] = report_unit
-        df_temp["base_factor"] = base_factor
-        df_temp["totalQuantity"] = df["Quantity"] * df["BaseQty"] / base_factor
-        df_temp["unit"] = report_unit
-        df_sorted = pd.concat([df_sorted, df_temp], ignore_index=True)
-
-    vendor, restaurant = make_pivot(df_sorted)
-
-    output = BytesIO()
-    with pd.ExcelWriter(output) as writer:
-        vendor.to_excel(writer, sheet_name="Vendor")
-        restaurant.to_excel(writer, sheet_name="Restaurant")
-        df_sorted.to_excel(writer, sheet_name="Detail", index=False)
-
-    output.seek(0)
-
-    # Send the Excel file as a response
-    return send_file(
-        output,
-        as_attachment=True,
-        download_name="receiving_by_purchased_item.xlsx",
-    )
+#def download_file(filename):
+#    output = BytesIO()
+#    writer = pd.ExcelWriter(output, engine="xlsxwriter")
+#    df.to_excel(writer, sheet_name="Sheet1")
+#    writer.save()
+#    output.seek(0)
+#
+#    # Send the Excel file as a response
+#    response = make_response(output.read())
+#    response.headres.set("Content-Disposition", "attachment", filename=filename)
+#    response.headres.set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+#
+#    return response
 
 
-def uofm_update(file):
-    try:
-        file_contents = file.stream.read().decode("utf-8")  # read the file's contents into memory
-        df = pd.read_csv(
-            StringIO(file_contents),
-            usecols=[
-                "Name",
-                "EquivalentQty",
-                "EquivalentUofM",
-                "MeasureType",
-                "BaseQty",
-                "BaseUofM",
-                "UnitOfMeasureId",
-            ],
-        )
-    except Exception as e:
-        print("Error reading file:", e)
-        return 1
+#def receiving_by_purchased_item(file):
+#    def make_pivot(table):
+#        vendor = pd.pivot_table(
+#            table,
+#            values=["totalQuantity", "ExtCost"],
+#            index=["ItemName", "VendorName", "unit"],
+#            aggfunc=np.sum,
+#        )
+#        vendor = vendor.reset_index().sort_values(["ItemName", "VendorName"]).set_index("VendorName")
+#        vendor.loc["Totals"] = vendor.sum(numeric_only=True)
+#        vendor["CostPerUnit"] = vendor["ExtCost"] / vendor["totalQuantity"]
+#
+#        restaurant = pd.pivot_table(
+#            table,
+#            values=["totalQuantity", "ExtCost"],
+#            index=["ItemName", "LocationName", "unit"],
+#            aggfunc=np.sum,
+#        )
+#        restaurant = restaurant.reset_index().sort_values(["ItemName", "LocationName"]).set_index("LocationName")
+#        restaurant.loc["Totals"] = restaurant.sum(numeric_only=True)
+#        restaurant["CostPerUnit"] = restaurant["ExtCost"] / restaurant["totalQuantity"]
+#        restaurant.style.format(
+#            {
+#                "ExtCost": "${:,.2f}",
+#                "totalQuantity": "{:,.0f}",
+#                "CostPerUnit": "${:,.2f}",
+#            }
+#        )
+#        return [vendor, restaurant]
+#
+#    try:
+#        file_contents = file.stream.read().decode("utf-8")  # read the file's contents into memory
+#        df = pd.read_csv(
+#            StringIO(file_contents),
+#            skiprows=3,
+#            usecols=[
+#                "ItemName",
+#                "LocationName",
+#                "TransactionNumber",
+#                "VendorName",
+#                "Textbox11",
+#                "TransactionDate",
+#                "PurchaseUnit",
+#                "Quantity",
+#                "AmountEach",
+#                "ExtPrice2",
+#            ],
+#        )
+#    except:
+#        print("No file selected or file error")
+#        return 1
+#
+#    try:
+#        filter = df.Quantity.str.match(r"\((.+)\)")
+#        df = df[~filter]
+#    except:
+#        pass
+#
+#    item_list = [df.ItemName.unique()]
+#    item_list = [item for sublist in item_list for item in sublist]
+#    item_list.sort()
+#
+#    # TODO merge the UofM table with the df
+#    with open("/usr/local/share/UofM.json") as file:
+#        uofm = json.load(file)
+#    units = pd.DataFrame(uofm)
+#    df = df.merge(units, left_on="PurchaseUnit", right_on="Name", how="left")
+#    df.rename(columns={"Textbox11": "VendorNumber"}, inplace=True)
+#    try:
+#        df["BaseQty"] = df["BaseQty"].str.replace(",", "").astype(float)
+#    except:
+#        df["BaseQty"] = df["BaseQty"].astype(float)
+#    df["Quantity"] = df["Quantity"].astype(float)
+#    try:
+#        df["AmountEach"] = df["AmountEach"].str.replace(",", "").astype(float)
+#    except:
+#        df["AmountEach"] = df["AmountEach"].astype(float)
+#    try:
+#        df["ExtPrice2"] = df["ExtPrice2"].astype(str).str.replace(",", "").astype(float)
+#    except:
+#        df["ExtPrice2"] = df["ExtPrice2"].astype(float)
+#    # rename df["ExtPrice2"] to df["ExtPrice"] to match other reports
+#    df.rename(columns={"ExtPrice2": "ExtCost"}, inplace=True)
+#    # df.loc["Totals"] = df.sum(numeric_only=True)
+#    sorted_units = (
+#        df.groupby(["Name"]).mean(numeric_only=True).sort_values(by=["Quantity"], ascending=False).reset_index()
+#    )
+#    df_sorted = pd.DataFrame()
+#    for item in item_list:
+#        df_temp = df[df.ItemName == item]
+#        sorted_units = (
+#            df_temp.groupby(["Name"])
+#            .mean(numeric_only=True)
+#            .sort_values(by=["Quantity"], ascending=False)
+#            .reset_index()
+#        )
+#        report_unit = df_temp.iloc[0]["Name"]
+#        base_factor = df_temp.iloc[0]["BaseQty"]
+#        df_temp["reportUnit"] = report_unit
+#        df_temp["base_factor"] = base_factor
+#        df_temp["totalQuantity"] = df["Quantity"] * df["BaseQty"] / base_factor
+#        df_temp["unit"] = report_unit
+#        df_sorted = pd.concat([df_sorted, df_temp], ignore_index=True)
+#
+#    vendor, restaurant = make_pivot(df_sorted)
+#
+#    output = BytesIO()
+#    with pd.ExcelWriter(output) as writer:
+#        vendor.to_excel(writer, sheet_name="Vendor")
+#        restaurant.to_excel(writer, sheet_name="Restaurant")
+#        df_sorted.to_excel(writer, sheet_name="Detail", index=False)
+#
+#    output.seek(0)
+#
+#    # Send the Excel file as a response
+#    return send_file(
+#        output,
+#        as_attachment=True,
+#        download_name="receiving_by_purchased_item.xlsx",
+#    )
 
-    df.rename(
-        columns={
-            "Name": "name",
-            "EquivalentQty": "equivalent_qty",
-            "EquivalentUofM": "equivalent_uofm",
-            "MeasureType": "measure_type",
-            "BaseQty": "base_qty",
-            "BaseUofM": "base_uofm",
-            "UnitOfMeasureId": "uofm_id",
-        },
-        inplace=True,
-    )
-    # upsert data to Unitsofmeasure table
-    try:
-        df.to_sql("unitsofmeasure", db.engine, if_exists="replace", index=False)
-    except Exception as e:
-        print("Error writing to database:", e)
-        return 1
 
-    return 0
+#def uofm_update(file):
+#    try:
+#        file_contents = file.stream.read().decode("utf-8")  # read the file's contents into memory
+#        df = pd.read_csv(
+#            StringIO(file_contents),
+#            usecols=[
+#                "Name",
+#                "EquivalentQty",
+#                "EquivalentUofM",
+#                "MeasureType",
+#                "BaseQty",
+#                "BaseUofM",
+#                "UnitOfMeasureId",
+#            ],
+#        )
+#    except Exception as e:
+#        print("Error reading file:", e)
+#        return 1
+#
+#    df.rename(
+#        columns={
+#            "Name": "name",
+#            "EquivalentQty": "equivalent_qty",
+#            "EquivalentUofM": "equivalent_uofm",
+#            "MeasureType": "measure_type",
+#            "BaseQty": "base_qty",
+#            "BaseUofM": "base_uofm",
+#            "UnitOfMeasureId": "uofm_id",
+#        },
+#        inplace=True,
+#    )
+#    # upsert data to Unitsofmeasure table
+#    try:
+#        df.to_sql("unitsofmeasure", db.engine, if_exists="replace", index=False)
+#    except Exception as e:
+#        print("Error writing to database:", e)
+#        return 1
+#
+#    return 0
 
 
-def update_recipe_costs():
-    """
-    write current recipe costs to database
-    imported from downloaded report
-    """
-
-    df = pd.read_csv("/usr/local/share/export.csv", sep=",")
-    df.loc[:, "Name"] = df["Name"].str.replace(r"CHOPHOUSE - NOLA", "CHOPHOUSE-NOLA", regex=True)
-    df.loc[:, "Name"] = df["Name"].str.replace(r"CAFÉ", "CAFE", regex=True)
-    df.loc[:, "Name"] = df["Name"].str.replace(r"^(?:.*?( -)){2}", "-", regex=True)
-    df[["name", "menuitem"]] = df["Name"].str.split(" - ", expand=True)
-    df = df.drop(columns=["Name", "__count", "Barcode"])
-    df = df.rename(
-        columns={
-            "RecipeId": "recipeid",
-            "Recipe": "recipe",
-            "Category1": "category1",
-            "Category2": "category2",
-            "POSID": "posid",
-            "MenuItemId": "menuitemid",
-        }
-    )
-    df = df[
-        [
-            "name",
-            "menuitem",
-            "recipe",
-            "category1",
-            "category2",
-            "posid",
-            "recipeid",
-            "menuitemid",
-        ]
-    ]
-
-    df_cost = pd.read_csv("/usr/local/share/Menu Price Analysis.csv", skiprows=3, sep=",", thousands=",")
-    df_cost.loc[:, "MenuItemName"] = df_cost["MenuItemName"].str.replace(
-        r"CHOPHOUSE - NOLA", "CHOPHOUSE-NOLA", regex=True
-    )
-    df_cost.loc[:, "MenuItemName"] = df_cost["MenuItemName"].str.replace(r"CAFÉ", "CAFE", regex=True)
-    df_cost.loc[:, "MenuItemName"] = df_cost["MenuItemName"].str.replace(r"^(?:.*?( -)){2}", "-", regex=True)
-    df_cost[["name", "menuitem"]] = df_cost["MenuItemName"].str.split(" - ", expand=True)
-    df_cost = df_cost.drop(
-        columns=[
-            "AvgPrice1",
-            "Profit1",
-            "Textbox35",
-            "TargetMargin1",
-            "Textbox43",
-            "PriceNeeded1",
-            "Location",
-            "Cost1",
-            "AvgPrice",
-            "Profit",
-            "ProfitPercent",
-            "TargetMargin",
-            "Variance",
-            "PriceNeeded",
-            "MenuItemName",
-        ]
-    )
-    df_cost = df_cost.rename(columns={"Cost": "cost"})
-    df_cost = df_cost[["name", "menuitem", "cost"]]
-
-    recipes = pd.merge(df_cost, df, on=["name", "menuitem"], how="left")
-    # Need to fix names to match the database
-    recipes.loc[:, "name"] = recipes["name"].str.replace(r"'47", "47", regex=True)
-    recipes.loc[:, "name"] = recipes["name"].str.replace(r"NEW YORK PRIME-BOCA", "NYP-BOCA", regex=True)
-    recipes.loc[:, "name"] = recipes["name"].str.replace(r"NEW YORK PRIME-MYRTLE BEACH", "NYP-MYRTLE BEACH", regex=True)
-    recipes.loc[:, "name"] = recipes["name"].str.replace(r"NEW YORK PRIME-ATLANTA", "NYP-ATLANTA", regex=True)
-
-    # TODO may need to delete by recipID if duplicates show up
-    recipes.to_sql("Recipes", con=db.engine, if_exists="replace", index_label="id")
-    return 0
+#def update_recipe_costs():
+#    """
+#    write current recipe costs to database
+#    imported from downloaded report
+#    """
+#
+#    df = pd.read_csv("/usr/local/share/export.csv", sep=",")
+#    df.loc[:, "Name"] = df["Name"].str.replace(r"CHOPHOUSE - NOLA", "CHOPHOUSE-NOLA", regex=True)
+#    df.loc[:, "Name"] = df["Name"].str.replace(r"CAFÉ", "CAFE", regex=True)
+#    df.loc[:, "Name"] = df["Name"].str.replace(r"^(?:.*?( -)){2}", "-", regex=True)
+#    df[["name", "menuitem"]] = df["Name"].str.split(" - ", expand=True)
+#    df = df.drop(columns=["Name", "__count", "Barcode"])
+#    df = df.rename(
+#        columns={
+#            "RecipeId": "recipeid",
+#            "Recipe": "recipe",
+#            "Category1": "category1",
+#            "Category2": "category2",
+#            "POSID": "posid",
+#            "MenuItemId": "menuitemid",
+#        }
+#    )
+#    df = df[
+#        [
+#            "name",
+#            "menuitem",
+#            "recipe",
+#            "category1",
+#            "category2",
+#            "posid",
+#            "recipeid",
+#            "menuitemid",
+#        ]
+#    ]
+#
+#    df_cost = pd.read_csv("/usr/local/share/Menu Price Analysis.csv", skiprows=3, sep=",", thousands=",")
+#    df_cost.loc[:, "MenuItemName"] = df_cost["MenuItemName"].str.replace(
+#        r"CHOPHOUSE - NOLA", "CHOPHOUSE-NOLA", regex=True
+#    )
+#    df_cost.loc[:, "MenuItemName"] = df_cost["MenuItemName"].str.replace(r"CAFÉ", "CAFE", regex=True)
+#    df_cost.loc[:, "MenuItemName"] = df_cost["MenuItemName"].str.replace(r"^(?:.*?( -)){2}", "-", regex=True)
+#    df_cost[["name", "menuitem"]] = df_cost["MenuItemName"].str.split(" - ", expand=True)
+#    df_cost = df_cost.drop(
+#        columns=[
+#            "AvgPrice1",
+#            "Profit1",
+#            "Textbox35",
+#            "TargetMargin1",
+#            "Textbox43",
+#            "PriceNeeded1",
+#            "Location",
+#            "Cost1",
+#            "AvgPrice",
+#            "Profit",
+#            "ProfitPercent",
+#            "TargetMargin",
+#            "Variance",
+#            "PriceNeeded",
+#            "MenuItemName",
+#        ]
+#    )
+#    df_cost = df_cost.rename(columns={"Cost": "cost"})
+#    df_cost = df_cost[["name", "menuitem", "cost"]]
+#
+#    recipes = pd.merge(df_cost, df, on=["name", "menuitem"], how="left")
+#    # Need to fix names to match the database
+#    recipes.loc[:, "name"] = recipes["name"].str.replace(r"'47", "47", regex=True)
+#    recipes.loc[:, "name"] = recipes["name"].str.replace(r"NEW YORK PRIME-BOCA", "NYP-BOCA", regex=True)
+#    recipes.loc[:, "name"] = recipes["name"].str.replace(r"NEW YORK PRIME-MYRTLE BEACH", "NYP-MYRTLE BEACH", regex=True)
+#    recipes.loc[:, "name"] = recipes["name"].str.replace(r"NEW YORK PRIME-ATLANTA", "NYP-ATLANTA", regex=True)
+#
+#    # TODO may need to delete by recipID if duplicates show up
+#    recipes.to_sql("Recipes", con=db.engine, if_exists="replace", index_label="id")
+#    return 0
 
 
 def set_dates(startdate):
