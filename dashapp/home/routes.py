@@ -1029,7 +1029,7 @@ def potato(store_id):
 
     store = Restaurants.query.filter_by(id=store_id).first()
 
-    load_times = pd.read_sql_table('potato_load_times', con=db.engine)
+    load_times = pd.read_sql_table('PotatoLoadTimes', con=db.engine)
     pot_df = pd.DataFrame(columns=['time', 'in_time', 'out_time'])
     for num in [7, 14, 21, 28]:
         day_pot_sales = pd.DataFrame(columns=['time', 'in_time', 'out_time', 'quantity'])
@@ -1051,7 +1051,7 @@ def potato(store_id):
     pot_df.loc[:, "MAX"] = pot_df.max(numeric_only=True, axis=1)
 
     #out_times = pd.read_csv("/usr/local/share/potatochart.csv", usecols=["time", "in_time", "out_time"])
-    #out_times = pd.read_sql_table('potato_load_times', con=db.engine, columns=["time", "in_time", "out_time"])
+    #out_times = pd.read_sql_table('PotatoLoadTimes', con=db.engine, columns=["time", "in_time", "out_time"])
     #rotation = pot_df.merge(out_times, on="time", how="left")
     pot_df.loc["TOTALS"] = pot_df.sum(numeric_only=True)
 

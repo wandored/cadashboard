@@ -328,7 +328,7 @@ def get_category_labor(start, end, store, cat):
 
 def convert_uofm(unit):
     # convert the unit uofm to base quantity
-    pack_size = db.session.query(unitsofmeasure).filter(unitsofmeasure.name == unit.UofM).first()
+    pack_size = db.session.query(UnitsOfMeasure).filter(UnitsOfMeasure.name == unit.UofM).first()
     if pack_size:
         return pack_size.base_qty, pack_size.base_uofm
     else:
@@ -505,7 +505,7 @@ def convert_uofm(unit):
 #    )
 #    # upsert data to Unitsofmeasure table
 #    try:
-#        df.to_sql("unitsofmeasure", db.engine, if_exists="replace", index=False)
+#        df.to_sql("UnitsOfMeasure", db.engine, if_exists="replace", index=False)
 #    except Exception as e:
 #        print("Error writing to database:", e)
 #        return 1

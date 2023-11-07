@@ -30,14 +30,14 @@ admin = Admin()
 # Create a table to support a many-to-many relationship between Users and Roles
 roles_users = db.Table(
     "roles_users",
-    db.Column("users_id", db.Integer, db.ForeignKey("Users.id")),
-    db.Column("roles_id", db.Integer, db.ForeignKey("Roles.id")),
+    db.Column("users_id", db.Integer, db.ForeignKey("users.id")),
+    db.Column("roles_id", db.Integer, db.ForeignKey("roles.id")),
 )
 
 
 # Role class
 class Roles(db.Model, RoleMixin):
-    __tablename__ = "Roles"
+    __tablename__ = "roles"
 
     # Our Role has three fields, ID, name and description
     id = db.Column(db.Integer(), primary_key=True)
@@ -55,7 +55,7 @@ class Roles(db.Model, RoleMixin):
 
 
 class Users(db.Model, UserMixin):
-    __tablename__ = "Users"
+    __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(255), unique=True)
@@ -69,24 +69,6 @@ class Users(db.Model, UserMixin):
     last_login_ip = db.Column(db.String(100))
     current_login_ip = db.Column(db.String(100))
     login_count = db.Column(db.Integer)
-
-
-#    def __init__(self, **kwargs):
-#        for property, value in kwargs.items():
-#            # depending on whether value is an iterable or not, we must
-#            # unpack it's value (when **kwargs is request.form, some values
-#            # will be a 1-element list)
-#            if hasattr(value, "__iter__") and not isinstance(value, str):
-#                # the ,= unpack of a singleton fails PEP8 (travis flake8 test)
-#                value = value[0]
-#
-#            if property == "password":
-#                value = hash_pass(value)  # we need bytes here (not plain str)
-#
-#            setattr(self, property, value)
-#
-#    def __repr__(self):
-#        return str(self.username)
 
 
 user_datastore = SQLAlchemySessionUserDatastore(db.session, Users, Roles)
@@ -154,7 +136,7 @@ admin.add_view(UserAdmin(Users, db.session))
 admin.add_view(RoleAdmin(Roles, db.session))
 
 
-class potato_load_times(db.Model):
+class PotatoLoadTimes(db.Model):
     __tablename__ = 'potato_load_times'
 
     time = db.Column(db.Time(), primary_key=True)
@@ -164,7 +146,7 @@ class potato_load_times(db.Model):
     out_time = db.Column(db.Time())
 
 
-class unitsofmeasure(db.Model):
+class UnitsOfMeasure(db.Model):
     __tablename__ = "unitsofmeasure"
 
     uofm_id = db.Column(db.String(64), primary_key=True, unique=True)

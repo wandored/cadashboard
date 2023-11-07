@@ -81,7 +81,7 @@ def set_dates(startdate):
 
 def convert_uofm(unit):
     # convert the unit uofm to base quantity
-    pack_size = db.session.query(unitsofmeasure).filter(unitsofmeasure.name == unit.uofm).first()
+    pack_size = db.session.query(UnitsOfMeasure).filter(UnitsOfMeasure.name == unit.uofm).first()
     if pack_size:
         return pack_size.base_qty, pack_size.base_uofm
     else:
