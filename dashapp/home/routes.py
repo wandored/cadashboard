@@ -95,6 +95,7 @@ def index():
             .select_from(SalesTotals)
             .filter(SalesTotals.date.between(start, end))
             .group_by(time_frame)
+            .order_by(time_frame)
         )
         value = [v.total_sales for v in query]
         return value
@@ -166,25 +167,23 @@ def index():
         #)
         sales = (
                 db.session.query(
-                    Restaurants.name.label("store"),
-                    func.sum(SalesEmployee.netsales).label('total_sales'),
-                    func.sum(SalesEmployee.numberofguests).label('total_guests')
+                    SalesTotals.store,
+                    func.sum(SalesTotals.net_sales).label('total_sales'),
+                    func.sum(SalesTotals.guest_count).label('total_guests')
                 )
-                .join(SalesEmployee, Restaurants.locationid == SalesEmployee.location)
-                .filter(SalesEmployee.date.between(start, end))
-                .group_by(Restaurants.name)
+                .filter(SalesTotals.date.between(start, end))
+                .group_by(SalesTotals.store)
                 .all()
         )
 
         sales_ly = (
             db.session.query(
-                Restaurants.name.label("store"),
-                func.sum(SalesEmployee.netsales).label("total_sales_ly"),
-                func.sum(SalesEmployee.numberofguests).label("total_guests_ly"),
+                SalesTotals.store,
+                func.sum(SalesTotals.net_sales).label("total_sales_ly"),
+                func.sum(SalesTotals.guest_count).label("total_guests_ly"),
             )
-            .join(SalesEmployee, Restaurants.locationid == SalesEmployee.location)
-            .filter(SalesEmployee.date.between(start_ly, end_ly))
-            .group_by(Restaurants.name)
+            .filter(SalesTotals.date.between(start_ly, end_ly))
+            .group_by(SalesTotals.store)
             .all()
         )
         # Get the top sales for each store and merge with sales_table
@@ -200,25 +199,23 @@ def index():
 
         labor = (
             db.session.query(
-                Restaurants.name.label("store"),
-                func.sum(LaborDetail.hours).label("total_hours"),
-                func.sum(LaborDetail.total).label("total_dollars"),
+                LaborTotals.store,
+                func.sum(LaborTotals.total_hours),
+                func.sum(LaborTotals.total_dollars),
             )
-            .join(LaborDetail, Restaurants.locationid == LaborDetail.location_id)
-            .filter(LaborDetail.dateworked.between(start, end))
-            .group_by(Restaurants.name)
+            .filter(LaborTotals.date.between(start, end))
+            .group_by(LaborTotals.store)
             .all()
         )
 
         labor_ly = (
             db.session.query(
-                Restaurants.name.label("store"),
-                func.sum(LaborDetail.hours).label("total_hours_ly"),
-                func.sum(LaborDetail.total).label("total_dollars_ly"),
+                LaborTotals.store,
+                func.sum(LaborTotals.total_hours).label("total_hours_ly"),
+                func.sum(LaborTotals.total_dollars).label("total_dollars_ly"),
             )
-            .join(LaborDetail, Restaurants.locationid == LaborDetail.location_id)
-            .filter(LaborDetail.dateworked.between(start_ly, end_ly))
-            .group_by(Restaurants.name)
+            .filter(LaborTotals.date.between(start_ly, end_ly))
+            .group_by(LaborTotals.store)
             .all()
         )
 
@@ -249,9 +246,9 @@ def index():
 
     daily_totals, daily_table, daily_top = build_sales_table(
         fiscal_dates["start_day"],
-        fiscal_dates["end_day"],
+        fiscal_dates["start_day"],
         fiscal_dates["start_day_ly"],
-        fiscal_dates["end_day_ly"],
+        fiscal_dates["start_day_ly"],
         "Day",
     )
 
@@ -507,7 +504,7 @@ def store(store_id):
     # get food sales to calculate BOH labor
     def get_category_sales(start, end, categories):
         query = (
-            db.session.query(func.sum(SalesCategory.total_amount).label("sales"))
+            db.session.query(func.sum(SalesCategory.amount).label("sales"))
             .select_from(SalesCategory)
             .filter(
                 SalesCategory.date.between(start, end),
@@ -668,7 +665,6 @@ def store(store_id):
         return df
 
     table_turn_df = get_timeing_data(fiscal_dates["start_week"], fiscal_dates["start_day"])
-#     print(table_turn_df)
     bar_list = table_turn_df['bar'].tolist()
     dining_room_list = table_turn_df['dining_room'].tolist()
     handheld_list = table_turn_df['handheld'].tolist()
@@ -683,7 +679,6 @@ def store(store_id):
     handheld_list_avg = table_turn_df_avg['handheld'].tolist()
     patio_list_avg = table_turn_df_avg['patio'].tolist()
     online_ordering_list_avg = table_turn_df_avg['online_ordering'].tolist()
-#     print(table_turn_df_avg)
 
 
     ic(locals())

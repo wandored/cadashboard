@@ -368,7 +368,8 @@ class SalesCategory(db.Model):
     period = db.Column(db.Integer)
     year = db.Column(db.Integer)
     category = db.Column(db.String)
-    total_amount = db.Column(db.Float)
+    quantity = db.Column(db.Float)
+    amount = db.Column(db.Float)
 
 
 class SalesDaypart(db.Model):
