@@ -17,13 +17,14 @@ def hash_pass(password):
     h = bcrypt.hash(password)
     return h  # return bytes
 
+
 #    salt = hashlib.sha256(os.urandom(60)).hexdigest().encode("ascii")
 #    pwdhash = hashlib.pbkdf2_hmac("sha512", password.encode("utf-8"), salt, 100000)
 #    pwdhash = binascii.hexlify(pwdhash)
 #    return salt + pwdhash  # return bytes
 
 
-#def verify_pass(provided_password, stored_password):
+# def verify_pass(provided_password, stored_password):
 #    """Verify a stored password against one provided by user"""
 #
 #    stored_password = stored_password.decode("ascii")

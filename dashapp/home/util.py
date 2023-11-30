@@ -26,9 +26,11 @@ def get_daypart_sales(start, end, store, day_part):
             SalesDaypart.net_sales,
             SalesDaypart.guest_count,
         )
-        .filter(SalesDaypart.date.between(start, end),
-                SalesDaypart.daypart == (day_part),
-                SalesDaypart.store == store)
+        .filter(
+            SalesDaypart.date.between(start, end),
+            SalesDaypart.daypart == (day_part),
+            SalesDaypart.store == store,
+        )
         .all()
     )
     return query
@@ -41,7 +43,11 @@ def get_daypart_guest(start, end, store, day_part):
             Sales.daypart,
             Sales.guests,
         )
-        .filter(Sales.date.between(start, end), Sales.daypart == (day_part), Sales.name == store)
+        .filter(
+            Sales.date.between(start, end),
+            Sales.daypart == (day_part),
+            Sales.name == store,
+        )
         .all()
     )
     return query
@@ -53,21 +59,23 @@ def find_day_with_sales(**kwargs):
     has sales, if not it goes back one and checks until if finds a day with sales
     """
     if "store" in kwargs:
-        while not SalesTotals.query.filter_by(date=kwargs["day"], name=kwargs["store"]).first():
-            #date = datetime.strptime(kwargs["day"], "%Y-%m-%d")
-            next_day = kwargs['day'] - timedelta(days=1)
+        while not SalesTotals.query.filter_by(
+            date=kwargs["day"], name=kwargs["store"]
+        ).first():
+            # date = datetime.strptime(kwargs["day"], "%Y-%m-%d")
+            next_day = kwargs["day"] - timedelta(days=1)
             print(next_day)
             kwargs["day"] = next_day
     else:
         while not SalesTotals.query.filter_by(date=kwargs["day"]).first():
-            #date = datetime.date(kwargs["day"])
-            next_day = kwargs['day'] - timedelta(days=1)
+            # date = datetime.date(kwargs["day"])
+            next_day = kwargs["day"] - timedelta(days=1)
             print(next_day)
             kwargs["day"] = next_day
     return next_day
 
 
-#def refresh_data(start, end):
+# def refresh_data(start, end):
 #    """
 #    When new date submitted, the data for that date will be replaced with new data from R365
 #    We check if there are infact sales for that day, if not, it resets to yesterday, if
@@ -125,7 +133,9 @@ def get_lastyear(date):
         period = i.period
         week = i.week
         day = i.day
-        ly_target = Calendar.query.filter_by(year=lst_year, period=period, week=week, day=day)
+        ly_target = Calendar.query.filter_by(
+            year=lst_year, period=period, week=week, day=day
+        )
         for x in ly_target:
             dt_date = x.date
     return dt_date
@@ -140,7 +150,7 @@ def get_period(startdate):
     return target
 
 
-#def removeSpecial(df):
+# def removeSpecial(df):
 #    """Removes specialty items from the menuitems dataframe"""
 #    file = open("../../specialty.txt")
 #    specialty_list = file.read().split("\n")
@@ -150,7 +160,7 @@ def get_period(startdate):
 #    return df
 #
 #
-#def sales_employee(start, end):
+# def sales_employee(start, end):
 #    url_filter = "$filter=date ge {}T00:00:00Z and date le {}T00:00:00Z".format(start, end)
 #    query = "$select=dayPart,netSales,numberofGuests,location&{}".format(url_filter)
 #    url = "{}/SalesEmployee?{}".format(Config.SRVC_ROOT, query)
@@ -171,7 +181,7 @@ def get_period(startdate):
 #    return 0
 #
 #
-#def labor_detail(start):
+# def labor_detail(start):
 #    url_filter = "$filter=dateWorked eq {}T00:00:00Z".format(start)
 #    query = "$select=jobTitle,hours,total,location_ID&{}".format(url_filter)
 #    url = "{}/LaborDetail?{}".format(Config.SRVC_ROOT, query)
@@ -195,7 +205,7 @@ def get_period(startdate):
 #    return 0
 #
 #
-#def sales_detail(start, end):
+# def sales_detail(start, end):
 #    url_filter = "$filter=date ge {}T00:00:00Z and date le {}T00:00:00Z".format(start, end)
 #    query = "$select=menuitem,amount,date,quantity,category,location&{}".format(url_filter)
 #    url = "{}/SalesDetail?{}".format(Config.SRVC_ROOT, query)
@@ -243,7 +253,9 @@ def get_category_sales(start, end, store, cat):
 
     if cat == "GIFT CARDS":
         data = (
-            db.session.query(Menuitems.date, func.sum(Menuitems.amount).label("total_sales"))
+            db.session.query(
+                Menuitems.date, func.sum(Menuitems.amount).label("total_sales")
+            )
             .filter(
                 Menuitems.date.between(start, end),
                 Menuitems.name == store,
@@ -254,7 +266,9 @@ def get_category_sales(start, end, store, cat):
         )
     else:
         data = (
-            db.session.query(Menuitems.date, func.sum(Menuitems.amount).label("total_sales"))
+            db.session.query(
+                Menuitems.date, func.sum(Menuitems.amount).label("total_sales")
+            )
             .filter(
                 Menuitems.date.between(start, end),
                 Menuitems.name == store,
@@ -267,7 +281,7 @@ def get_category_sales(start, end, store, cat):
     return df
 
 
-#def get_glaccount_costs(start, end, acct, store, epoch):
+# def get_glaccount_costs(start, end, acct, store, epoch):
 #    # Return list of sales
 #    query = (
 #        db.session.query(
@@ -295,14 +309,18 @@ def get_item_avg_cost(regex, start, end, id):
     # Return average cost for purchase item
 
     avg_cost = 0
-    query = db.session.query(
-        func.sum(Purchases.debit).label("cost"),
-        func.sum(Purchases.quantity).label("count"),
-    ).filter(
-        Purchases.item.regexp_match(regex),
-        Purchases.date.between(start, end),
-        Purchases.id == id,
-    ).all()
+    query = (
+        db.session.query(
+            func.sum(Purchases.debit).label("cost"),
+            func.sum(Purchases.quantity).label("count"),
+        )
+        .filter(
+            Purchases.item.regexp_match(regex),
+            Purchases.date.between(start, end),
+            Purchases.id == id,
+        )
+        .all()
+    )
     for q in query:
         try:
             avg_cost = q["cost"] / q["count"]
@@ -318,7 +336,9 @@ def get_category_labor(start, end, store, cat):
             Labor.date,
             func.sum(Labor.dollars).label("total_dollars"),
         )
-        .filter(Labor.date.between(start, end), Labor.name == store, Labor.category == cat)
+        .filter(
+            Labor.date.between(start, end), Labor.name == store, Labor.category == cat
+        )
         .group_by(Labor.date)
         .all()
     )
@@ -328,14 +348,18 @@ def get_category_labor(start, end, store, cat):
 
 def convert_uofm(unit):
     # convert the unit uofm to base quantity
-    pack_size = db.session.query(UnitsOfMeasure).filter(UnitsOfMeasure.name == unit.UofM).first()
+    pack_size = (
+        db.session.query(UnitsOfMeasure)
+        .filter(UnitsOfMeasure.name == unit.UofM)
+        .first()
+    )
     if pack_size:
         return pack_size.base_qty, pack_size.base_uofm
     else:
         return 0, 0
 
 
-#def download_file(filename):
+# def download_file(filename):
 #    output = BytesIO()
 #    writer = pd.ExcelWriter(output, engine="xlsxwriter")
 #    df.to_excel(writer, sheet_name="Sheet1")
@@ -350,7 +374,7 @@ def convert_uofm(unit):
 #    return response
 
 
-#def receiving_by_purchased_item(file):
+# def receiving_by_purchased_item(file):
 #    def make_pivot(table):
 #        vendor = pd.pivot_table(
 #            table,
@@ -472,7 +496,7 @@ def convert_uofm(unit):
 #    )
 
 
-#def uofm_update(file):
+# def uofm_update(file):
 #    try:
 #        file_contents = file.stream.read().decode("utf-8")  # read the file's contents into memory
 #        df = pd.read_csv(
@@ -513,7 +537,7 @@ def convert_uofm(unit):
 #    return 0
 
 
-#def update_recipe_costs():
+# def update_recipe_costs():
 #    """
 #    write current recipe costs to database
 #    imported from downloaded report
@@ -594,7 +618,6 @@ def set_dates(startdate):
     d = {}
 
     for i in target:
-
         day_end = i.date + timedelta(days=1)
         seven = i.date - timedelta(days=7)
         thirty = i.date - timedelta(days=30)
@@ -609,7 +632,7 @@ def set_dates(startdate):
         d["date"] = i.date.strftime("%A, %B %d %Y")
         d["start_day"] = i.date
         d["end_day"] = i.date + timedelta(days=1)
-        d['start_week'] = i.week_start
+        d["start_week"] = i.week_start
         d["end_week"] = i.week_end
         d["week_to_date"] = i.date
         d["last_seven"] = i.date - timedelta(days=7)
@@ -623,7 +646,7 @@ def set_dates(startdate):
         d["start_year"] = i.year_start
         d["end_year"] = i.year_end
         d["year_to_date"] = i.date
-        d["last_threesixtyfive"] = i.date - timedelta(days=365) 
+        d["last_threesixtyfive"] = i.date - timedelta(days=365)
         d["start_day_ly"] = get_lastyear(i.date)
         d["end_day_ly"] = get_lastyear(d["end_day"])
         d["start_week_ly"] = get_lastyear(i.week_start)

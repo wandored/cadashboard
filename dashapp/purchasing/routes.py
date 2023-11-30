@@ -16,7 +16,6 @@ from dashapp.authentication.models import *
 @blueprint.route("/purchasing/", methods=["GET", "POST"])
 @login_required
 def purchasing():
-
     fiscal_dates = set_dates(session["date_selected"])
 
     form1 = DateForm()
@@ -24,7 +23,6 @@ def purchasing():
     form4 = PotatoForm()
     form5 = LobsterForm()
     form6 = StoneForm()
-
 
     if form1.submit1.data and form1.validate():
         session["date_selected"] = form1.selectdate.data
@@ -81,7 +79,9 @@ def purchasing():
     top_ten_vendor["percent"] = top_ten_vendor["Cost"] / category_costs_total
 
     # get name from Restaurants table based on session["store_list"]
-    store_names = db.session.query(Restaurants.name).filter(Restaurants.id.in_(session["store_list"]))
+    store_names = db.session.query(Restaurants.name).filter(
+        Restaurants.id.in_(session["store_list"])
+    )
     store_names = [x[0] for x in store_names]
     store_names = ", ".join(store_names)
 
@@ -97,7 +97,6 @@ def purchasing():
 @blueprint.route("/purchasing/<product>", methods=["GET", "POST"])
 @login_required
 def purchase(product):
-
     fiscal_dates = set_dates(session["date_selected"])
 
     form1 = DateForm()
@@ -224,7 +223,9 @@ def purchase(product):
 
     color = color_assigner(product)
 
-    store_names = db.session.query(Restaurants.name).filter(Restaurants.id.in_(session["store_list"]))
+    store_names = db.session.query(Restaurants.name).filter(
+        Restaurants.id.in_(session["store_list"])
+    )
     store_names = [x[0] for x in store_names]
     store_names = ", ".join(store_names)
 

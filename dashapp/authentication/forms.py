@@ -15,17 +15,27 @@ from dashapp.authentication.models import *
 
 
 def store_query():
-    return Restaurants.query.filter(Restaurants.active==True).order_by(Restaurants.name).all()
+    return (
+        Restaurants.query.filter(Restaurants.active == True)
+        .order_by(Restaurants.name)
+        .all()
+    )
 
 
 class LoginForm(FlaskForm):
-    email = StringField("Email Address", id="email_login", validators=[DataRequired(), Email()])
+    email = StringField(
+        "Email Address", id="email_login", validators=[DataRequired(), Email()]
+    )
     password = PasswordField("Password", id="pwd_login", validators=[DataRequired()])
 
 
 class CreateAccountForm(FlaskForm):
-    username = StringField("Username", id="username_create", validators=[DataRequired()])
-    email = StringField("Email", id="email_create", validators=[DataRequired(), Email()])
+    username = StringField(
+        "Username", id="username_create", validators=[DataRequired()]
+    )
+    email = StringField(
+        "Email", id="email_create", validators=[DataRequired(), Email()]
+    )
     password = PasswordField("Password", id="pwd_create", validators=[DataRequired()])
 
 

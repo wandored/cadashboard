@@ -8,6 +8,9 @@ from datetime import timedelta
 from dashapp.authentication.models import *
 from sqlalchemy import func
 
+from icecream import ic
+
+pd.set_option("display.max_rows", 20, "display.max_columns", None)
 
 def get_lastyear(date):
     target = Calendar.query.filter_by(date=date)
@@ -18,19 +21,19 @@ def get_lastyear(date):
         period = i.period
         week = i.week
         day = i.day
-        ly_target = Calendar.query.filter_by(year=lst_year, period=period, week=week, day=day)
+        ly_target = Calendar.query.filter_by(
+            year=lst_year, period=period, week=week, day=day
+        )
         for x in ly_target:
             dt_date = x.date
     return dt_date
 
 
 def set_dates(startdate):
-
     target = Calendar.query.filter_by(date=startdate)
     d = {}
 
     for i in target:
-
         day_end = i.date + timedelta(days=1)
         seven = i.date - timedelta(days=7)
         thirty = i.date - timedelta(days=30)
@@ -44,7 +47,7 @@ def set_dates(startdate):
         d["date"] = i.date.strftime("%A, %B %d %Y")
         d["start_day"] = i.date
         d["end_day"] = i.date + timedelta(days=1)
-        d['start_week'] = i.week_start
+        d["start_week"] = i.week_start
         d["end_week"] = i.week_end
         d["week_to_date"] = i.date
         d["last_seven"] = i.date - timedelta(days=7)
@@ -58,7 +61,7 @@ def set_dates(startdate):
         d["start_year"] = i.year_start
         d["end_year"] = i.year_end
         d["year_to_date"] = i.date
-        d["last_threesixtyfive"] = i.date - timedelta(days=365) 
+        d["last_threesixtyfive"] = i.date - timedelta(days=365)
         d["start_day_ly"] = get_lastyear(i.date)
         d["end_day_ly"] = get_lastyear(d["end_day"])
         d["start_week_ly"] = get_lastyear(i.week_start)
@@ -81,7 +84,11 @@ def set_dates(startdate):
 
 def convert_uofm(unit):
     # convert the unit uofm to base quantity
-    pack_size = db.session.query(UnitsOfMeasure).filter(UnitsOfMeasure.name == unit.uofm).first()
+    pack_size = (
+        db.session.query(UnitsOfMeasure)
+        .filter(UnitsOfMeasure.name == unit.uofm)
+        .first()
+    )
     if pack_size:
         return pack_size.base_qty, pack_size.base_uofm
     else:
@@ -103,7 +110,6 @@ def get_vendors(regex, days):
 
 @cache
 def get_cost_per_vendor(regex, start, end, stores):
-
     query = (
         db.session.query(
             Purchases.company,
@@ -130,35 +136,34 @@ def get_cost_per_vendor(regex, start, end, stores):
             "count": q[2],
             "cost": q[3],
             "base_qty": qty,
-            "base_uofm": uofm
+            "base_uofm": uofm,
         }
         item_list.append(row_dict)
     df = pd.DataFrame(item_list)
     sorted_units = (
-        df.groupby(["uofm"]).mean(["count", "cost"]).sort_values(by=["count"], ascending=False).reset_index()
+        df.groupby(["uofm"])
+        .mean(["count", "cost"])
+        .sort_values(by=["count"], ascending=False)
+        .reset_index()
     )
     report = sorted_units.iloc[0]
     df = df.groupby(["company", "uofm"]).sum(["count", "cost"]).reset_index()
-    mask = df['uofm'] != report.uofm
-    df.loc[mask, 'uofm'] = report.uofm
-    df.loc[mask, 'count'] = (df.loc[mask, 'base_qty'] / report['base_qty']) * df.loc[mask, 'count']
-    df.loc[mask, 'base_qty'] = report.base_qty
 
     if not df.empty:
-        df["unit_cost"] = ((df["cost"] / df["count"]) / df["base_qty"]) * report["base_qty"]
-        df["unit_qty"] = (df["count"] * df["base_qty"]) / report["base_qty"]
-        df["report_unit"] = report.uofm
-
-        df.drop(columns=["count", "cost", "base_qty"], inplace=True)
+        # get common unit to compare costs and sort
+        df["base_cost"] = ((df["cost"] / df["count"]) / df["base_qty"]) * report[
+            "base_qty"
+        ]
+        df["unit_cost"] = df["cost"] / df["count"]
         df = df[df.unit_cost.notna()]
         table = pd.pivot_table(
             df,
-            values=["unit_cost", "unit_qty"],
-            index=["company", "report_unit"],
-            aggfunc={"unit_cost": np.mean, "unit_qty": np.sum},
+            values=["unit_cost", "count", "base_cost"],
+            index=["company", "uofm"],
+            aggfunc={"unit_cost": np.mean, "count": np.sum, "base_cost": np.mean},
         )
         if not table.empty:
-            table.sort_values(by=["unit_cost"], inplace=True)
+            table.sort_values(by=["base_cost"], inplace=True)
             return table
     df = pd.DataFrame()
     return df
@@ -166,7 +171,6 @@ def get_cost_per_vendor(regex, start, end, stores):
 
 @cache
 def get_cost_per_store(regex, start, end, stores):
-
     query = (
         db.session.query(
             Purchases.store,
@@ -193,27 +197,33 @@ def get_cost_per_store(regex, start, end, stores):
             "count": q[2],
             "cost": q[3],
             "base_qty": qty,
-            "base_uofm": uofm
+            "base_uofm": uofm,
         }
         item_list.append(row_dict)
     df = pd.DataFrame(item_list)
     sorted_units = (
-        df.groupby(["uofm"]).mean(["count", "cost"]).sort_values(by=["count"], ascending=False).reset_index()
+        df.groupby(["uofm"])
+        .mean(["count", "cost"])
+        .sort_values(by=["count"], ascending=False)
+        .reset_index()
     )
     report = sorted_units.iloc[0]
     df = df.groupby(["store", "uofm"]).sum(["count", "cost"]).reset_index()
-    mask = df['uofm'] != report.uofm
-    df.loc[mask, 'uofm'] = report.uofm
-    df.loc[mask, 'count'] = (df.loc[mask, 'base_qty'] / report['base_qty']) * df.loc[mask, 'count']
-    df.loc[mask, 'base_qty'] = report.base_qty
+    mask = df["uofm"] != report.uofm
+    df.loc[mask, "uofm"] = report.uofm
+    df.loc[mask, "count"] = (df.loc[mask, "base_qty"] / report["base_qty"]) * df.loc[
+        mask, "count"
+    ]
+    df.loc[mask, "base_qty"] = report.base_qty
 
     if not df.empty:
-        df["unit_cost"] = ((df["cost"] / df["count"]) / df["base_qty"]) * report["base_qty"]
+        df["unit_cost"] = ((df["cost"] / df["count"]) / df["base_qty"]) * report[
+            "base_qty"
+        ]
         df["unit_qty"] = (df["count"] * df["base_qty"]) / report["base_qty"]
         df["report_unit"] = report.uofm
 
         df.drop(columns=["count", "cost", "base_qty"], inplace=True)
-        print(df)
         df = df[df.unit_cost.notna()]
         table = pd.pivot_table(
             df,
@@ -231,7 +241,9 @@ def get_cost_per_store(regex, start, end, stores):
 @cache
 def period_purchases(regex, start, end, stores):
     # generate list of purchase costs per period for charts
-    cal_query = Calendar.query.with_entities(Calendar.date, Calendar.week, Calendar.period, Calendar.year).all()
+    cal_query = Calendar.query.with_entities(
+        Calendar.date, Calendar.week, Calendar.period, Calendar.year
+    ).all()
     cal_df = pd.DataFrame(cal_query, columns=["date", "week", "period", "year"])
 
     query = (
@@ -269,7 +281,7 @@ def period_purchases(regex, start, end, stores):
             "count": q[4],
             "cost": q[5],
             "base_qty": qty,
-            "base_uofm": uofm
+            "base_uofm": uofm,
         }
         row_dict["unit_qty"] = np.where(
             row_dict["base_uofm"] == "OZ-wt",
@@ -319,7 +331,6 @@ def get_category_costs(regex, start, end, stores):
 
 
 def get_category_topten(regex, start, end, stores):
-
     query = (
         db.session.query(
             Purchases.item,
@@ -339,7 +350,6 @@ def get_category_topten(regex, start, end, stores):
 
 
 def get_restaurant_topten(regex, start, end, stores):
-
     query = (
         db.session.query(
             Purchases.store,
@@ -359,7 +369,6 @@ def get_restaurant_topten(regex, start, end, stores):
 
 
 def get_vendor_topten(regex, start, end, stores):
-
     query = (
         db.session.query(
             Purchases.company,
@@ -379,7 +388,6 @@ def get_vendor_topten(regex, start, end, stores):
 
 
 def get_item_topten(regex, start, end, stores):
-
     query = (
         db.session.query(
             Purchases.item,

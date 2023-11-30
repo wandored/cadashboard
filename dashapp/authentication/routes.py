@@ -7,7 +7,6 @@ from flask import render_template
 from dashapp.authentication import blueprint
 
 
-
 @blueprint.errorhandler(403)
 def access_forbidden(error):
     return render_template("home/page-403.html"), 403

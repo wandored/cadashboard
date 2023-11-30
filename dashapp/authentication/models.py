@@ -81,13 +81,15 @@ class UserAdmin(sqla.ModelView):
     column_exclude_list = ("password", "fs_uniquifier")
 
     # Don't include the standard password field when creating or editing a User (but see below)
-    form_excluded_columns = ("password",
-                             "fs_uniquifier",
-                             "last_login_at",
-                             "current_login_at",
-                             "last_login_ip",
-                             "current_login_ip",
-                             "login_count")
+    form_excluded_columns = (
+        "password",
+        "fs_uniquifier",
+        "last_login_at",
+        "current_login_at",
+        "last_login_ip",
+        "current_login_ip",
+        "login_count",
+    )
 
     # Automatically display human-readable names for the current and available Roles when creating or editing a User
     column_auto_select_related = True
@@ -137,7 +139,7 @@ admin.add_view(RoleAdmin(Roles, db.session))
 
 
 class PotatoLoadTimes(db.Model):
-    __tablename__ = 'potato_load_times'
+    __tablename__ = "potato_load_times"
 
     time = db.Column(db.Time(), primary_key=True)
     in_time = db.Column(db.Time())
@@ -166,6 +168,7 @@ class Restaurants(db.Model):
     name = db.Column(db.String(64), unique=True)
     toast_id = db.Column(db.Integer)
     active = db.Column(db.Boolean())
+
 
 class Calendar(db.Model):
     __tablename__ = "calendar"
@@ -198,25 +201,24 @@ class Calendar(db.Model):
         }
 
 
-
 class Company(db.Model):
-    __tablename__ = 'company'
+    __tablename__ = "company"
 
     companyid = db.Column(db.String, primary_key=True)
     name = db.Column(db.String)
 
 
 class GlAccount(db.Model):
-    __tablename__ = 'glaccount'
+    __tablename__ = "glaccount"
 
     glaccountid = db.Column(db.String, primary_key=True)
     name = db.Column(db.String)
     glaccountnumber = db.Column(db.String)
     gltyp = db.Column(db.String)
-    
+
 
 class Item(db.Model):
-    __tablename__ = 'item'
+    __tablename__ = "item"
 
     itemid = db.Column(db.String, primary_key=True)
     name = db.Column(db.String)
@@ -226,7 +228,7 @@ class Item(db.Model):
 
 
 class JobTitle(db.Model):
-    __tablename__ = 'job_title'
+    __tablename__ = "job_title"
 
     jobtitleid = db.Column(db.String, primary_key=True)
     name = db.Column(db.String)
@@ -236,7 +238,7 @@ class JobTitle(db.Model):
 
 
 class Location(db.Model):
-    __tablename__ = 'location'
+    __tablename__ = "location"
 
     locationid = db.Column(db.String, primary_key=True)
     name = db.Column(db.String)
@@ -258,7 +260,7 @@ class SalesDetail(db.Model):
 
 
 class SalesEmployee(db.Model):
-    __tablename__ = 'sales_employee'
+    __tablename__ = "sales_employee"
 
     salesid = db.Column(db.String, primary_key=True)
     date = db.Column(db.DateTime())
@@ -273,7 +275,7 @@ class SalesEmployee(db.Model):
 
 
 class LaborDetail(db.Model):
-    __tablename__ = 'labor_detail'
+    __tablename__ = "labor_detail"
 
     laborid = db.Column(db.String, primary_key=True)
     dateworked = db.Column(db.DateTime())
@@ -286,7 +288,7 @@ class LaborDetail(db.Model):
 
 
 class SalesPayment(db.Model):
-    __tablename__ = 'sales_payment'
+    __tablename__ = "sales_payment"
 
     salespaymentid = db.Column(db.String, primary_key=True)
     name = db.Column(db.String)
@@ -299,8 +301,9 @@ class SalesPayment(db.Model):
 
 ## Table Views
 
+
 class SalesTotals(db.Model):
-    __tablename__ = 'sales_totals'
+    __tablename__ = "sales_totals"
 
     store = db.Column(db.String, primary_key=True)
     date = db.Column(db.Date, primary_key=True)
@@ -313,7 +316,7 @@ class SalesTotals(db.Model):
 
 
 class LaborTotals(db.Model):
-    __tablename__ = 'labor_totals'
+    __tablename__ = "labor_totals"
 
     store = db.Column(db.String, primary_key=True)
     job = db.Column(db.String, primary_key=True)
@@ -328,7 +331,7 @@ class LaborTotals(db.Model):
 
 
 class Menuitems(db.Model):
-    __tablename__ = 'menuitems'
+    __tablename__ = "menuitems"
 
     store = db.Column(db.String, primary_key=True)
     menuitem = db.Column(db.String, primary_key=True)
@@ -338,7 +341,7 @@ class Menuitems(db.Model):
 
 
 class Purchases(db.Model):
-    __tablename__ = 'purchases'
+    __tablename__ = "purchases"
 
     transactionid = db.Column(db.String, primary_key=True)
     date = db.Column(db.Date, primary_key=True)
@@ -359,7 +362,7 @@ class Purchases(db.Model):
 
 
 class SalesCategory(db.Model):
-    __tablename__ = 'sales_category'
+    __tablename__ = "sales_category"
 
     store = db.Column(db.String, primary_key=True)
     date = db.Column(db.Date, primary_key=True)
@@ -373,7 +376,7 @@ class SalesCategory(db.Model):
 
 
 class SalesDaypart(db.Model):
-    __tablename__ = 'sales_daypart'
+    __tablename__ = "sales_daypart"
 
     store = db.Column(db.String, primary_key=True)
     daypart = db.Column(db.String, primary_key=True)
@@ -387,7 +390,7 @@ class SalesDaypart(db.Model):
 
 
 class SalesHourly(db.Model):
-    __tablename__ = 'sales_hourly'
+    __tablename__ = "sales_hourly"
 
     store = db.Column(db.String, primary_key=True)
     order_hour = db.Column(db.Integer, primary_key=True)
@@ -401,7 +404,7 @@ class SalesHourly(db.Model):
 
 
 class SalesRecordsDay(db.Model):
-    __tablename__ = 'sales_records_day'
+    __tablename__ = "sales_records_day"
 
     store = db.Column(db.String, primary_key=True)
     date = db.Column(db.Date, primary_key=True)
@@ -413,7 +416,7 @@ class SalesRecordsDay(db.Model):
 
 
 class SalesRecordsWeek(db.Model):
-    __tablename__ = 'sales_records_week'
+    __tablename__ = "sales_records_week"
 
     store = db.Column(db.String, primary_key=True)
     week = db.Column(db.Integer, primary_key=True)
@@ -423,7 +426,7 @@ class SalesRecordsWeek(db.Model):
 
 
 class SalesRecordsPeriod(db.Model):
-    __tablename__ = 'sales_records_period'
+    __tablename__ = "sales_records_period"
 
     store = db.Column(db.String, primary_key=True)
     period = db.Column(db.Integer, primary_key=True)
@@ -432,7 +435,7 @@ class SalesRecordsPeriod(db.Model):
 
 
 class SalesRecordsYear(db.Model):
-    __tablename__ = 'sales_records_year'
+    __tablename__ = "sales_records_year"
 
     store = db.Column(db.String, primary_key=True)
     year = db.Column(db.Integer, primary_key=True)
@@ -440,7 +443,7 @@ class SalesRecordsYear(db.Model):
 
 
 class TableTurns(db.Model):
-    __tablename__ = 'table_turns'
+    __tablename__ = "table_turns"
     store = db.Column(db.String, primary_key=True)
     date = db.Column(db.Date, primary_key=True)
     dow = db.Column(db.Integer)
@@ -455,7 +458,7 @@ class TableTurns(db.Model):
 
 
 class StockCount(db.Model):
-    __tablename__ = 'stock_count'
+    __tablename__ = "stock_count"
 
     transactionid = db.Column(db.String, primary_key=True)
     date = db.Column(db.DateTime())

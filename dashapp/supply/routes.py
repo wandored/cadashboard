@@ -23,7 +23,6 @@ from sqlalchemy import and_, or_, func
 @blueprint.route("/supplies/", methods=["GET", "POST"])
 @login_required
 def supplies():
-
     TODAY = datetime.date(datetime.now())
     CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
     YSTDAY = TODAY - timedelta(days=1)
@@ -106,7 +105,6 @@ def supplies():
 @blueprint.route("/smallwares/", methods=["GET", "POST"])
 @login_required
 def smallwares():
-
     TODAY = datetime.date(datetime.now())
     CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
     YSTDAY = TODAY - timedelta(days=1)
@@ -170,7 +168,6 @@ def smallwares():
 @blueprint.route("/linen/", methods=["GET", "POST"])
 @login_required
 def linen():
-
     TODAY = datetime.date(datetime.now())
     CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
     YSTDAY = TODAY - timedelta(days=1)
