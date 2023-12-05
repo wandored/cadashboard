@@ -176,6 +176,8 @@ def index():
         top_sales = pd.DataFrame.from_records(
             sales_query, columns=["store", "top_sales"]
         )
+        # round to 2 decimal places
+        top_sales["top_sales"] = top_sales["top_sales"].round(2)
         top_sales.set_index("store", inplace=True)
         sales_table = pd.DataFrame.from_records(
             sales, columns=["store", "sales", "guests"]
@@ -187,6 +189,7 @@ def index():
         sales_table = sales_table.merge(
             top_sales, how="left", left_on="store", right_on="store"
         )
+        ic(sales_table)
 
         labor = (
             db.session.query(
