@@ -674,7 +674,7 @@
           <table class="table-responsive table-sm text-light">
             <thead>
               <tr>
-                <th scope="col">DAILY</th>
+                <th scope="col">DAY</th>
                 <th scope="col">% Over LY</th>
                 <th scope="col">$ Over LY</th>
               </tr>
@@ -698,7 +698,7 @@
           <table class="table-responsive table-sm text-light text-bold">
             <thead>
               <tr>
-                <th scope="col">WEEKLY</th>
+                <th scope="col">WEEK TO DATE</th>
                 <th scope="col">% Over LY</th>
                 <th scope="col">$ Over LY</th>
               </tr>
@@ -722,13 +722,37 @@
           <table class="table-responsive table-sm text-light">
             <thead>
               <tr>
-                <th scope="col">PERIOD</th>
+                <th scope="col">PERIOD TO DATE</th>
                 <th scope="col">% Over LY</th>
                 <th scope="col">$ Over LY</th>
               </tr>
             </thead>
             <tbody>
                 {% for i, v in period_top.iterrows() %}
+              <tr>
+                  <th scope="row">{{ i }}</th>
+                  <td>
+                    <p class="mb-0 ms-1 text-end">{{ "{:,.0f}%".format(v.poly) }}</p>
+                  </td>
+                  <td>
+                    <p class="mb-0 ms-1 text-end">{{ "${:,.0f}".format(v.doly) }}</p>
+                  </td>
+              </tr>
+                {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div class="alert alert-warning" role="alert">
+          <table class="table-responsive table-sm text-light">
+            <thead>
+              <tr>
+                <th scope="col">YEAR TO DATE</th>
+                <th scope="col">% Over LY</th>
+                <th scope="col">$ Over LY</th>
+              </tr>
+            </thead>
+            <tbody>
+                {% for i, v in yearly_top.iterrows() %}
               <tr>
                   <th scope="row">{{ i }}</th>
                   <td>

@@ -3,28 +3,47 @@
 Copyright (c) 2019 - present AppSeed.us
 """
 
-from datetime import datetime, timedelta
 import json
-import re
-from flask import flash, redirect, render_template, request, session, url_for
+from datetime import datetime, timedelta
+
+import pandas as pd
+from flask import flash, redirect, render_template, request, session
 from flask.helpers import url_for
 from flask.wrappers import Response
 from flask_security import current_user, login_required
 from flask_security.decorators import roles_accepted
 from fpdf import FPDF
-import pandas as pd
+from icecream import ic
 from pandas._libs.tslibs import dtypes
 from pandas.core.algorithms import isin
 from sqlalchemy import and_, func, or_
 
-from dashapp.authentication.forms import *
-from dashapp.authentication.models import *
+from dashapp.authentication.forms import (
+    DateForm,
+    LobsterForm,
+    PotatoForm,
+    StoneForm,
+    StoreForm,
+    UpdateForm,
+)
+from dashapp.authentication.models import (
+        db,
+        Restaurants,
+        SalesTotals,
+        LaborTotals,
+        SalesCategory,
+        SalesRecordsDay,  # noqa: F401
+        SalesRecordsWeek,  # noqa: F401
+        SalesRecordsPeriod,  # noqa: F401
+        SalesRecordsYear,  # noqa: F401
+        TableTurns,
+        )
 from dashapp.config import Config
 from dashapp.home import blueprint
-from dashapp.home.util import *
-
-import time
-from icecream import ic
+from dashapp.home.util import (
+        find_day_with_sales,
+        set_dates,
+        )
 
 
 @blueprint.route("/", methods=["GET", "POST"])
@@ -32,15 +51,15 @@ from icecream import ic
 @login_required
 def index():
     TODAY = datetime.date(datetime.now())
-    if not "date_selected" in session:
+    if "date_selected" not in session:
         session["date_selected"] = TODAY
         return redirect(url_for("home_blueprint.index"))
 
-    if not "store_list" in session:
+    if "store_list" not in session:
         session["store_list"] = tuple(
             [
                 store.id
-                for store in Restaurants.query.filter(Restaurants.active == True)
+                for store in Restaurants.query.filter(Restaurants.active == True)  # noqa: E712
                 .order_by(Restaurants.name)
                 .all()
             ]
@@ -256,7 +275,7 @@ def index():
         fiscal_dates["start_week"],
         fiscal_dates["week_to_date"] + timedelta(days=1),
         fiscal_dates["start_week_ly"],
-        fiscal_dates["week_to_date_ly"] + timedelta(days=1),
+        fiscal_dates["week_to_date_ly"],
         "Week",
     )
 
@@ -264,7 +283,7 @@ def index():
         fiscal_dates["start_period"],
         fiscal_dates["period_to_date"] + timedelta(days=1),
         fiscal_dates["start_period_ly"],
-        fiscal_dates["period_to_date_ly"] + timedelta(days=1),
+        fiscal_dates["period_to_date_ly"],
         "Period",
     )
 
@@ -272,7 +291,7 @@ def index():
         fiscal_dates["start_year"],
         fiscal_dates["year_to_date"] + timedelta(days=1),
         fiscal_dates["start_year_ly"],
-        fiscal_dates["year_to_date_ly"] + timedelta(days=1),
+        fiscal_dates["year_to_date_ly"],
         "Year",
     )
 
@@ -293,7 +312,7 @@ def store(store_id):
 
     store = Restaurants.query.filter_by(id=store_id).first()
 
-    if not "date_selected" in session:
+    if "date_selected" not in session:
         session["date_selected"] = TODAY
         return redirect(url_for("home_blueprint.store", store_id=store.id))
 
