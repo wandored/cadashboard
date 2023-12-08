@@ -12,6 +12,8 @@ from dashapp.config import Config
 from dashapp.authentication.forms import *
 from dashapp.authentication.models import *
 
+from icecream import ic
+
 
 @blueprint.route("/purchasing/", methods=["GET", "POST"])
 @login_required

@@ -7,16 +7,14 @@ import json
 from datetime import datetime, timedelta
 
 import pandas as pd
-from flask import flash, redirect, render_template, request, session
+from flask import redirect, render_template, session
 from flask.helpers import url_for
 from flask.wrappers import Response
 from flask_security import current_user, login_required
 from flask_security.decorators import roles_accepted
 from fpdf import FPDF
 from icecream import ic
-from pandas._libs.tslibs import dtypes
-from pandas.core.algorithms import isin
-from sqlalchemy import and_, func, or_
+from sqlalchemy import func, or_
 
 from dashapp.authentication.forms import (
     DateForm,
@@ -27,23 +25,23 @@ from dashapp.authentication.forms import (
     UpdateForm,
 )
 from dashapp.authentication.models import (
-        db,
-        Restaurants,
-        SalesTotals,
-        LaborTotals,
-        SalesCategory,
-        SalesRecordsDay,  # noqa: F401
-        SalesRecordsWeek,  # noqa: F401
-        SalesRecordsPeriod,  # noqa: F401
-        SalesRecordsYear,  # noqa: F401
-        TableTurns,
-        )
+    db,
+    Restaurants,
+    SalesTotals,
+    LaborTotals,
+    SalesCategory,
+    SalesRecordsDay,  # noqa: F401
+    SalesRecordsWeek,  # noqa: F401
+    SalesRecordsPeriod,  # noqa: F401
+    SalesRecordsYear,  # noqa: F401
+    TableTurns,
+    PotatoLoadTimes,
+    PotatoSales,
+    PotatoChart,
+)
 from dashapp.config import Config
 from dashapp.home import blueprint
-from dashapp.home.util import (
-        find_day_with_sales,
-        set_dates,
-        )
+from dashapp.home.util import find_day_with_sales, set_dates, get_item_avg_cost
 
 
 @blueprint.route("/", methods=["GET", "POST"])
@@ -208,7 +206,6 @@ def index():
         sales_table = sales_table.merge(
             top_sales, how="left", left_on="store", right_on="store"
         )
-        ic(sales_table)
 
         labor = (
             db.session.query(
@@ -689,8 +686,6 @@ def store(store_id):
     patio_list_avg = table_turn_df_avg["patio"].tolist()
     online_ordering_list_avg = table_turn_df_avg["online_ordering"].tolist()
 
-    ic(locals())
-
     return render_template(
         "home/store.html",
         title=store.name,
@@ -864,8 +859,6 @@ def marketing():
     gift_card_sales["diff"] = gift_card_sales["amount"] - gift_card_sales["payment"]
     gift_card_sales.sort_values(by=["diff"], ascending=False, inplace=True)
 
-    ic(locals())
-
     return render_template(
         "home/marketing.html",
         title="Marketing",
@@ -903,20 +896,6 @@ def support():
         """ """
         session["date_selected"] = form1.selectdate.data
         return redirect(url_for("home_blueprint.support"))
-
-    #    if form2.submit2.data and form2.validate():
-    #        """ """
-    #        new_start_day = form2.selectdate.data
-    #        new_end_day = form2.selectdate.data + timedelta(days=1)
-    #
-    #        baddates = refresh_data(new_start_day, new_end_day)
-    #        if baddates == 1:
-    #            flash(
-    #                f"I cannot find sales for the day you selected.  Please select another date!",
-    #                "warning",
-    #            )
-    #        session["date_selected"] = new_start_day
-    #        return redirect(url_for("home_blueprint.support"))
 
     if form3.submit3.data and form3.validate():
         session["date_selected"] = fiscal_dates["start_day"]
@@ -1040,7 +1019,7 @@ def potato(store_id):
 
     store = Restaurants.query.filter_by(id=store_id).first()
 
-    load_times = pd.read_sql_table("PotatoLoadTimes", con=db.engine)
+    load_times = pd.read_sql_table("potato_load_times", con=db.engine)
     pot_df = pd.DataFrame(columns=["time", "in_time", "out_time"])
     for num in [7, 14, 21, 28]:
         day_pot_sales = pd.DataFrame(
@@ -1049,12 +1028,12 @@ def potato(store_id):
         for index, row in load_times.iterrows():
             query = (
                 db.session.query(
-                    func.sum(potato_sales.quantity).label("quantity")
+                    func.sum(PotatoSales.quantity).label("quantity")
                 ).filter(
-                    potato_sales.time.between(row["start_time"], row["stop_time"]),
-                    potato_sales.dow == fiscal_dates["dow"],
-                    potato_sales.name == store.name,
-                    potato_sales.date == TODAY - timedelta(days=num),
+                    PotatoSales.time.between(row["start_time"], row["stop_time"]),
+                    PotatoSales.dow == fiscal_dates["dow"],
+                    PotatoSales.name == store.name,
+                    PotatoSales.date == TODAY - timedelta(days=num),
                 )
             ).all()
             day_pot_sales = pd.concat(
@@ -1177,6 +1156,7 @@ def lobster(store_id):
         fiscal_dates["start_day"],
         store_id,
     )
+
     with open("./lobster_items.json") as file:
         lobster_items = json.load(file)
 

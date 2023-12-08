@@ -13,6 +13,8 @@ from datetime import timedelta
 from dashapp.authentication.models import *
 from sqlalchemy import func
 
+from icecream import ic
+
 
 def get_daypart_sales(start, end, store, day_part):
     query = (
@@ -64,13 +66,11 @@ def find_day_with_sales(**kwargs):
         ).first():
             # date = datetime.strptime(kwargs["day"], "%Y-%m-%d")
             next_day = kwargs["day"] - timedelta(days=1)
-            print(next_day)
             kwargs["day"] = next_day
     else:
         while not SalesTotals.query.filter_by(date=kwargs["day"]).first():
             # date = datetime.date(kwargs["day"])
             next_day = kwargs["day"] - timedelta(days=1)
-            print(next_day)
             kwargs["day"] = next_day
     return next_day
 
@@ -311,7 +311,7 @@ def get_item_avg_cost(regex, start, end, id):
     avg_cost = 0
     query = (
         db.session.query(
-            func.sum(Purchases.debit).label("cost"),
+            func.sum(Purchases.amount).label("cost"),
             func.sum(Purchases.quantity).label("count"),
         )
         .filter(
@@ -323,7 +323,7 @@ def get_item_avg_cost(regex, start, end, id):
     )
     for q in query:
         try:
-            avg_cost = q["cost"] / q["count"]
+            avg_cost = q[0] / q[1]
         except:
             avg_cost = 0
 

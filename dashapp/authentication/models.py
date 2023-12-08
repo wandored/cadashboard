@@ -302,6 +302,27 @@ class SalesPayment(db.Model):
 ## Table Views
 
 
+class PotatoSales(db.Model):
+    __tablename__ = "potato_sales"
+
+    date = db.Column(db.Date, primary_key=True)
+    time = db.Column(db.Time, primary_key=True)
+    dow = db.Column(db.Integer)
+    name = db.Column(db.String)
+    quantity = db.Column(db.Float)
+
+
+class PotatoChart(db.Model):
+    __tablename__ = "potato_chart"
+
+    date = db.Column(db.Date, primary_key=True)
+    store = db.Column(db.String, primary_key=True)
+    time = db.Column(db.Time, primary_key=True)
+    in_time = db.Column(db.Time)
+    out_time = db.Column(db.Time)
+    quantity = db.Column(db.Float)
+
+
 class SalesTotals(db.Model):
     __tablename__ = "sales_totals"
 
