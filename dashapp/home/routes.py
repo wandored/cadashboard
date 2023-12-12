@@ -13,7 +13,7 @@ from flask.wrappers import Response
 from flask_security import current_user, login_required
 from flask_security.decorators import roles_accepted
 from fpdf import FPDF
-from icecream import ic
+from icecream import ic  # noqa: F401
 from sqlalchemy import func, or_
 
 from dashapp.authentication.forms import (
@@ -25,23 +25,28 @@ from dashapp.authentication.forms import (
     UpdateForm,
 )
 from dashapp.authentication.models import (
-    db,
-    Restaurants,
-    SalesTotals,
     LaborTotals,
+    PotatoChart,  # noqa: F401
+    PotatoLoadTimes,  # noqa: F401
+    PotatoSales,
+    Restaurants,
     SalesCategory,
     SalesRecordsDay,  # noqa: F401
-    SalesRecordsWeek,  # noqa: F401
     SalesRecordsPeriod,  # noqa: F401
+    SalesRecordsWeek,  # noqa: F401
     SalesRecordsYear,  # noqa: F401
+    SalesTotals,
+    StockCount,
     TableTurns,
-    PotatoLoadTimes,
-    PotatoSales,
-    PotatoChart,
+    Users,
+    db,
+    Calendar,
+    GiftCardSales,
+    GiftCardRedeem,
 )
 from dashapp.config import Config
 from dashapp.home import blueprint
-from dashapp.home.util import find_day_with_sales, set_dates, get_item_avg_cost
+from dashapp.home.util import find_day_with_sales, get_item_avg_cost, set_dates
 
 
 @blueprint.route("/", methods=["GET", "POST"])
@@ -251,9 +256,7 @@ def index():
         top = table[["doly", "poly"]]
         top = top.nlargest(5, "poly", keep="all")
         table["guest_check_avg"] = table["sales"] / table["guests"].astype(float)
-        table["guest_check_avg_ly"] = table["sales_ly"] / table["guests_ly"].astype(
-            float
-        )
+        table["guest_check_avg_ly"] = table["sales_ly"] / table["guests_ly"].astype(float)
         table["labor_pct"] = table.dollars / table.sales
         table["labor_pct_ly"] = table.dollars_ly / table.sales_ly
         totals = table.sum()
@@ -306,7 +309,6 @@ def index():
 @login_required
 def store(store_id):
     TODAY = datetime.date(datetime.now())
-
     store = Restaurants.query.filter_by(id=store_id).first()
 
     if "date_selected" not in session:
@@ -699,7 +701,6 @@ def store(store_id):
 @blueprint.route("/marketing/", methods=["GET", "POST"])
 @login_required
 def marketing():
-    TODAY = datetime.date(datetime.now())
 
     fiscal_dates = set_dates(session["date_selected"])
     form1 = DateForm()
@@ -731,22 +732,17 @@ def marketing():
         return redirect(url_for("home_blueprint.stone", store_id=store_id))
 
     # Gift Card Sales
-    gift_card_list = ["GIFTCARD", "Gift Certificate (Paper)"]
 
-    def get_giftcard_sales(start, end, epoch):
+    def get_giftcard_sales(start, end):
         chart = (
             db.session.query(
-                func.sum(SalesDetail.amount).label("sales"),
-                func.sum(SalesDetail.quantity).label("count"),
+                GiftCardSales.period,
+                func.sum(GiftCardSales.amount).label("sales"),
+                func.sum(GiftCardSales.quantity).label("count"),
             )
-            .select_from(SalesDetail)
-            .filter(
-                SalesDetail.date.between(start, end),
-                or_(
-                    SalesDetail.category.regexp_match("(?i)GIFT CARD*"),
-                    SalesDetail.menuitem.regexp_match("(?i)ToastCard*"),
-                ),
-            )
+            .select_from(GiftCardSales)
+            .filter(GiftCardSales.date.between(start, end))
+            .group_by(GiftCardSales.period)
         )
         value = []
         number = []
@@ -758,14 +754,14 @@ def marketing():
 
         return value, number
 
-    def get_giftcard_payments(start, end, epoch):
+    def get_giftcard_payments(start, end):
         chart = (
-            db.session.query(func.sum(SalesPayment.amount).label("sales"))
-            .select_from(SalesPayment)
-            .filter(
-                SalesPayment.date.between(start, end),
-                SalesPayment.paymenttype.in_(gift_card_list),
-            )
+            db.session.query(
+                GiftCardRedeem.period,
+                func.sum(GiftCardRedeem.amount).label("sales"))
+            .select_from(GiftCardRedeem)
+            .filter(GiftCardRedeem.date.between(start, end))
+            .group_by(GiftCardRedeem.period)
         )
         value = []
         for p in period_order:
@@ -782,10 +778,10 @@ def marketing():
     period_order = slice1 + slice2
 
     giftcard_sales, giftcard_count = get_giftcard_sales(
-        fiscal_dates["last_threesixtyfive"], fiscal_dates["start_day"], Calendar.period
+        fiscal_dates["last_threesixtyfive"], fiscal_dates["start_day"]
     )
     giftcard_payments = get_giftcard_payments(
-        fiscal_dates["last_threesixtyfive"], fiscal_dates["start_day"], Calendar.period
+        fiscal_dates["last_threesixtyfive"], fiscal_dates["start_day"]
     )
 
     # TODO set to trailing year beginning in 2023
@@ -799,15 +795,14 @@ def marketing():
     def get_giftcard_sales_per_store(start, end):
         query = (
             db.session.query(
-                SalesDetail.location,
-                func.sum(SalesDetail.amount).label("sales"),
-                func.sum(SalesDetail.quantity).label("count"),
+                GiftCardSales.name,
+                func.sum(GiftCardSales.amount).label("sales"),
+                func.sum(GiftCardSales.quantity).label("count"),
             )
             .filter(
-                SalesDetail.date.between(start, end),
-                SalesDetail.menuitem.in_(gift_card_list),
+                GiftCardSales.date.between(start, end),
             )
-            .group_by(SalesDetail.location)
+            .group_by(GiftCardSales.name)
         ).all()
         sales = pd.DataFrame.from_records(
             query, columns=["store", "amount", "quantity"]
@@ -817,34 +812,34 @@ def marketing():
         return sales
 
     def get_giftcard_payments_per_store(start, end):
-        data = Restaurants.query.all()
-        df_loc = pd.DataFrame([x.as_dict() for x in data])
-        df_loc.rename(
-            columns={
-                "id": "restaurant_id",
-            },
-            inplace=True,
-        )
+        #data = Restaurants.query.with_entities(Restaurants.name, Restaurants.id).all()
+        #df_loc = pd.DataFrame([x.as_dict() for x in data])
+        #df_loc.rename(
+        #    columns={
+        #        "id": "name",
+        #    },
+        #    inplace=True,
+        #)
 
         query = (
             db.session.query(
-                SalesPayment.location,
-                func.sum(SalesPayment.amount).label("payment"),
+                GiftCardRedeem.name,
+                GiftCardRedeem.period,
+                func.sum(GiftCardRedeem.amount).label("payment"),
             )
             .filter(
-                SalesPayment.date.between(start, end),
-                SalesPayment.paymenttype.in_(gift_card_list),
+                GiftCardRedeem.date.between(start, end),
             )
-            .group_by(SalesPayment.location)
+            .group_by(GiftCardRedeem.name, GiftCardRedeem.period)
         ).all()
 
         payments = pd.DataFrame.from_records(
-            query, columns=["restaurant_id", "payment"]
+            query, columns=["name", "payment", "period"]
         )
         payments.sort_values(by=["payment"], ascending=False, inplace=True)
-        payments = df_loc.merge(payments, on="restaurant_id")
 
         payments.loc["TOTALS"] = payments.sum(numeric_only=True)
+        ic(payments)
         return payments
 
     gift_card_sales = get_giftcard_sales_per_store(
@@ -864,16 +859,8 @@ def marketing():
         title="Marketing",
         company_name=Config.COMPANY_NAME,
         segment="marketing",
-        fiscal_dates=fiscal_dates,
-        form1=form1,
-        form3=form3,
-        current_user=current_user,
         roles=current_user.roles,
-        gift_card_sales=gift_card_sales,
-        giftcard_sales=giftcard_sales,
-        giftcard_payments=giftcard_payments,
-        giftcard_diff=giftcard_diff,
-        period_order=period_order,
+        **locals(),
     )
 
 
@@ -939,6 +926,7 @@ def support():
             "login_count",
         ],
     )
+    top_users = user_table[user_table["login_count"] > 0].sort_values("login_count")
     no_login = user_table[user_table["last_login_at"].isnull()]
     lapsed_users = user_table[
         user_table["last_login_at"] < TODAY - timedelta(days=30)
@@ -949,12 +937,12 @@ def support():
     top_users = user_table
 
     query = (
-        db.session.query(stock_count.store, stock_count.item)
+        db.session.query(StockCount.store, StockCount.item)
         .filter(
-            stock_count.date >= fiscal_dates["start_week"],
-            stock_count.item.regexp_match("^DO NOT USE*"),
+            StockCount.date >= fiscal_dates["start_week"],
+            StockCount.item.regexp_match("^DO NOT USE*"),
         )
-        .group_by(stock_count.store, stock_count.item)
+        .group_by(StockCount.store, StockCount.item)
     ).all()
     do_not_use = pd.DataFrame.from_records(query, columns=["store", "menuitem"])
     do_not_use.sort_values(by=["store"], inplace=True)

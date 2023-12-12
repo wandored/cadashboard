@@ -13,8 +13,37 @@
     <div class="col-lg-4 col-md-6 mt-4 mb-4">
       <div class="card h-100">
         <div class="card-header bg-primary pb-0">
-          <h4>USER LIST</h4>
-          <h6>Top Users last 30 days</h6>
+          <h4>TOP USER LIST</h4>
+          <h6>Top 10 Users</h6>
+        </div>
+        <div class="card">
+          <table class="table-responsive table-md">
+            <thead>
+              <tr>
+                <th scope="col">USER</th>
+                <th scope="col">ALL-TIME LOGINS</th>
+              </tr>
+            </thead>
+            <tbody>
+                {% for k, v in top_users.iterrows() %}
+                    <tr>
+                      <th scope="row">{{ v.email }}</th>
+                        <td>
+                          <p class="mb-0 ms-1 text-begin">{{ v.login_count }}</p>
+                        </td>
+                    </tr>
+                  {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <!-- missing user table -->
+    <div class="col-lg-4 col-md-6 mt-4 mb-4">
+      <div class="card h-100">
+        <div class="card-header bg-primary pb-0">
+          <h4>NO LOGIN USER LIST</h4>
+          <h6>User has never Logged in</h6>
         </div>
         <div class="card">
           <table class="table-responsive table-md">

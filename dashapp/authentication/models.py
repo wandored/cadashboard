@@ -494,3 +494,26 @@ class StockCount(db.Model):
     previous_amount = db.Column(db.Float)
     adjustment = db.Column(db.Float)
     amount = db.Column(db.Float)
+
+
+class GiftCardSales(db.Model):
+    __tablename__ = "gift_card_sales"
+
+    name = db.Column(db.String, primary_key=True)
+    date = db.Column(db.Date, primary_key=True)
+    week = db.Column(db.Integer)
+    period = db.Column(db.Integer)
+    year = db.Column(db.Integer)
+    quantity = db.Column(db.Float)
+    amount = db.Column(db.Float)
+
+
+class GiftCardRedeem(db.Model):
+    __tablename__ = "gift_card_redeem"
+
+    name = db.Column(db.String, primary_key=True)
+    date = db.Column(db.Date, primary_key=True)
+    week = db.Column(db.Integer)
+    period = db.Column(db.Integer)
+    year = db.Column(db.Integer)
+    amount = db.Column(db.Float)
