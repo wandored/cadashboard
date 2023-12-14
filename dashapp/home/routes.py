@@ -14,7 +14,7 @@ from flask_security import current_user, login_required
 from flask_security.decorators import roles_accepted
 from fpdf import FPDF
 from icecream import ic  # noqa: F401
-from sqlalchemy import func, or_
+from sqlalchemy import func
 
 from dashapp.authentication.forms import (
     DateForm,
@@ -36,11 +36,12 @@ from dashapp.authentication.models import (
     SalesRecordsWeek,  # noqa: F401
     SalesRecordsYear,  # noqa: F401
     SalesTotals,
+    SalesDaypart,
     StockCount,
     TableTurns,
     Users,
     db,
-    Calendar,
+    Calendar,  # noqa: F401
     GiftCardSales,
     GiftCardRedeem,
 )
@@ -256,7 +257,9 @@ def index():
         top = table[["doly", "poly"]]
         top = top.nlargest(5, "poly", keep="all")
         table["guest_check_avg"] = table["sales"] / table["guests"].astype(float)
-        table["guest_check_avg_ly"] = table["sales_ly"] / table["guests_ly"].astype(float)
+        table["guest_check_avg_ly"] = table["sales_ly"] / table["guests_ly"].astype(
+            float
+        )
         table["labor_pct"] = table.dollars / table.sales
         table["labor_pct_ly"] = table.dollars_ly / table.sales_ly
         totals = table.sum()
@@ -422,6 +425,251 @@ def store(store_id):
 
     daily_sales = daily_sales_list[-1]
     daily_sales_ly = daily_sales_list_ly[-1]
+
+    # daypart sales
+    def get_daypart_sales(start, end):
+        query = (
+            db.session.query(
+                SalesDaypart.date,
+                SalesDaypart.daypart,
+                SalesDaypart.dow,
+                SalesDaypart.week,
+                SalesDaypart.period,
+                SalesDaypart.year,
+                func.sum(SalesDaypart.net_sales).label("sales"),
+                func.sum(SalesDaypart.guest_count).label("guests"),
+            )
+            .filter(
+                SalesDaypart.date.between(start, end),
+                SalesDaypart.store == store.name,
+            )
+            .group_by(
+                SalesDaypart.date,
+                SalesDaypart.daypart,
+                SalesDaypart.dow,
+                SalesDaypart.week,
+                SalesDaypart.period,
+                SalesDaypart.year,
+            )
+            .order_by(SalesDaypart.date)
+            .all()
+        )
+        return pd.DataFrame.from_records(
+            query,
+            columns=[
+                "date",
+                "daypart",
+                "dow",
+                "week",
+                "period",
+                "year",
+                "sales",
+                "guests",
+            ],
+        )
+
+    week_daypart_sales = get_daypart_sales(
+        fiscal_dates["start_week"], fiscal_dates["week_to_date"]
+    )
+    week_lunch_sales_list = week_daypart_sales[week_daypart_sales.daypart == "Lunch"][
+        "sales"
+    ].tolist()
+    week_lunch_sales_total = sum(week_lunch_sales_list)
+    week_dinner_sales_list = week_daypart_sales[week_daypart_sales.daypart == "Dinner"][
+        "sales"
+    ].tolist()
+    week_dinner_sales_total = sum(week_dinner_sales_list)
+
+    week_daypart_sales_ly = get_daypart_sales(
+        fiscal_dates["start_week_ly"], fiscal_dates["start_day_ly"]
+    )
+    week_lunch_sales_list_ly = week_daypart_sales_ly[
+        week_daypart_sales_ly.daypart == "Lunch"
+    ]["sales"].tolist()
+    week_lunch_sales_total_ly = sum(week_lunch_sales_list_ly)
+    week_dinner_sales_list_ly = week_daypart_sales_ly[
+        week_daypart_sales_ly.daypart == "Dinner"
+    ]["sales"].tolist()
+    week_dinner_sales_total_ly = sum(week_dinner_sales_list_ly)
+
+    period_daypart_sales = get_daypart_sales(
+        fiscal_dates["start_period"], fiscal_dates["period_to_date"]
+    )
+    period_lunch_sales_list = period_daypart_sales[
+        period_daypart_sales.daypart == "Lunch"
+    ]["sales"].tolist()
+    period_lunch_sales_total = sum(period_lunch_sales_list)
+    period_dinner_sales_list = period_daypart_sales[
+        period_daypart_sales.daypart == "Dinner"
+    ]["sales"].tolist()
+    period_dinner_sales_total = sum(period_dinner_sales_list)
+
+    period_daypart_sales_ly = get_daypart_sales(
+        fiscal_dates["start_period_ly"], fiscal_dates["start_day_ly"]
+    )
+    period_lunch_sales_list_ly = period_daypart_sales_ly[
+        period_daypart_sales_ly.daypart == "Lunch"
+    ]["sales"].tolist()
+    period_lunch_sales_total_ly = sum(period_lunch_sales_list_ly)
+    period_dinner_sales_list_ly = period_daypart_sales_ly[
+        period_daypart_sales_ly.daypart == "Dinner"
+    ]["sales"].tolist()
+    period_dinner_sales_total_ly = sum(period_dinner_sales_list_ly)
+
+    year_daypart_sales = get_daypart_sales(
+        fiscal_dates["start_year"], fiscal_dates["year_to_date"]
+    )
+    year_lunch_sales_list = year_daypart_sales[year_daypart_sales.daypart == "Lunch"][
+        "sales"
+    ].tolist()
+    year_lunch_sales_total = sum(year_lunch_sales_list)
+    year_dinner_sales_list = year_daypart_sales[year_daypart_sales.daypart == "Dinner"][
+        "sales"
+    ].tolist()
+    year_dinner_sales_total = sum(year_dinner_sales_list)
+
+    year_daypart_sales_ly = get_daypart_sales(
+        fiscal_dates["start_year_ly"], fiscal_dates["start_day_ly"]
+    )
+    year_lunch_sales_list_ly = year_daypart_sales_ly[
+        year_daypart_sales_ly.daypart == "Lunch"
+    ]["sales"].tolist()
+    year_lunch_sales_total_ly = sum(year_lunch_sales_list_ly)
+    year_dinner_sales_list_ly = year_daypart_sales_ly[
+        year_daypart_sales_ly.daypart == "Dinner"
+    ]["sales"].tolist()
+    year_dinner_sales_total_ly = sum(year_dinner_sales_list_ly)
+
+    def get_giftcard_sales(start, end):
+        # TODO add dow to account for days with 0 sales
+        query = (
+            db.session.query(
+                GiftCardSales.date,
+                GiftCardSales.week,
+                GiftCardSales.period,
+                GiftCardSales.year,
+                func.sum(GiftCardSales.amount).label("sales"),
+                func.sum(GiftCardSales.quantity).label("count"),
+            )
+            .select_from(GiftCardSales)
+            .filter(
+                GiftCardSales.date.between(start, end), GiftCardSales.name == store.name
+            )
+            .group_by(
+                GiftCardSales.date,
+                GiftCardSales.week,
+                GiftCardSales.period,
+                GiftCardSales.year,
+            )
+            .order_by(GiftCardSales.date)
+            .all()
+        )
+        return pd.DataFrame.from_records(
+            query, columns=["date", "week", "period", "year", "sales", "count"]
+        )
+
+    def get_giftcard_redeem(start, end):
+        # TODO add dow to account for days with 0 sales
+        query = (
+            db.session.query(
+                GiftCardRedeem.date,
+                GiftCardRedeem.week,
+                GiftCardRedeem.period,
+                GiftCardRedeem.year,
+                func.sum(GiftCardRedeem.amount).label("sales"),
+            )
+            .select_from(GiftCardRedeem)
+            .filter(
+                GiftCardRedeem.date.between(start, end),
+                GiftCardRedeem.name == store.name,
+            )
+            .group_by(
+                GiftCardRedeem.date,
+                GiftCardRedeem.week,
+                GiftCardRedeem.period,
+                GiftCardRedeem.year,
+            )
+            .order_by(GiftCardRedeem.date)
+            .all()
+        )
+        return pd.DataFrame.from_records(
+            query, columns=["date", "week", "period", "year", "sales"]
+        )
+
+    # giftcard sales
+    week_giftcard_sales = get_giftcard_sales(
+        fiscal_dates["start_week"], fiscal_dates["week_to_date"]
+    )
+    week_giftcard_sales_list = week_giftcard_sales["sales"].tolist()
+    week_giftcard_sales_total = sum(week_giftcard_sales_list)
+    period_giftcard_sales = get_giftcard_sales(
+        fiscal_dates["start_period"], fiscal_dates["period_to_date"]
+    )
+    period_giftcard_sales_list = period_giftcard_sales["sales"].tolist()
+    period_giftcard_sales_total = sum(period_giftcard_sales_list)
+    year_giftcard_sales = get_giftcard_sales(
+        fiscal_dates["start_year"], fiscal_dates["year_to_date"]
+    )
+    year_giftcard_sales_list = year_giftcard_sales["sales"].tolist()
+    year_giftcard_sales_total = sum(year_giftcard_sales_list)
+
+    # giftcard sales last year
+    week_giftcard_sales_ly = get_giftcard_sales(
+        fiscal_dates["start_week_ly"], fiscal_dates["start_day_ly"]
+    )
+    week_giftcard_sales_list_ly = week_giftcard_sales_ly["sales"].tolist()
+    week_giftcard_sales_total_ly = sum(week_giftcard_sales_list_ly)
+    period_giftcard_sales_ly = get_giftcard_sales(
+        fiscal_dates["start_period_ly"], fiscal_dates["start_day_ly"]
+    )
+    period_giftcard_sales_list_ly = period_giftcard_sales_ly["sales"].tolist()
+    period_giftcard_sales_total_ly = sum(period_giftcard_sales_list_ly)
+    year_giftcard_sales_ly = get_giftcard_sales(
+        fiscal_dates["start_year_ly"], fiscal_dates["start_day_ly"]
+    )
+    year_giftcard_sales_list_ly = year_giftcard_sales_ly["sales"].tolist()
+    year_giftcard_sales_total_ly = sum(year_giftcard_sales_list_ly)
+
+    # giftcard redeem
+    week_giftcard_redeem = get_giftcard_redeem(
+        fiscal_dates["start_week"], fiscal_dates["week_to_date"]
+    )
+    week_giftcard_redeem_list = week_giftcard_redeem["sales"].tolist()
+    week_giftcard_redeem_total = sum(week_giftcard_redeem_list)
+    week_giftcard_redeem_list[:] = [-abs(x) for x in week_giftcard_redeem_list]
+    period_giftcard_redeem = get_giftcard_redeem(
+        fiscal_dates["start_period"], fiscal_dates["period_to_date"]
+    )
+    period_giftcard_redeem_list = period_giftcard_redeem["sales"].tolist()
+    period_giftcard_redeem_total = sum(period_giftcard_redeem_list)
+    period_giftcard_redeem_list[:] = [-abs(x) for x in period_giftcard_redeem_list]
+    year_giftcard_redeem = get_giftcard_redeem(
+        fiscal_dates["start_year"], fiscal_dates["year_to_date"]
+    )
+    year_giftcard_redeem_list = year_giftcard_redeem["sales"].tolist()
+    year_giftcard_redeem_total = sum(year_giftcard_redeem_list)
+    year_giftcard_redeem_list[:] = [-abs(x) for x in year_giftcard_redeem_list]
+
+    ic(period_giftcard_redeem)
+    ic(period_giftcard_sales_list)
+    # giftcard balance
+    week_giftcard_balance = []
+    diff = 0
+    for i in range(len(week_giftcard_sales_list)):
+        diff += week_giftcard_sales_list[i] - week_giftcard_redeem_list[i]
+        week_giftcard_balance.append(diff)
+
+    period_giftcard_balance = []
+    diff = 0
+    for i in range(len(period_giftcard_sales_list)):
+        diff += period_giftcard_sales_list[i] - period_giftcard_redeem_list[i]
+        period_giftcard_balance.append(diff)
+
+    year_giftcard_balance = []
+    diff = 0
+    for i in range(len(year_giftcard_sales_list)):
+        diff += year_giftcard_sales_list[i] - year_giftcard_redeem_list[i]
+        year_giftcard_balance.append(diff)
 
     # labor tables
 
@@ -701,7 +949,6 @@ def store(store_id):
 @blueprint.route("/marketing/", methods=["GET", "POST"])
 @login_required
 def marketing():
-
     fiscal_dates = set_dates(session["date_selected"])
     form1 = DateForm()
     form4 = PotatoForm()
@@ -757,8 +1004,8 @@ def marketing():
     def get_giftcard_payments(start, end):
         chart = (
             db.session.query(
-                GiftCardRedeem.period,
-                func.sum(GiftCardRedeem.amount).label("sales"))
+                GiftCardRedeem.period, func.sum(GiftCardRedeem.amount).label("sales")
+            )
             .select_from(GiftCardRedeem)
             .filter(GiftCardRedeem.date.between(start, end))
             .group_by(GiftCardRedeem.period)
@@ -812,14 +1059,14 @@ def marketing():
         return sales
 
     def get_giftcard_payments_per_store(start, end):
-        #data = Restaurants.query.with_entities(Restaurants.name, Restaurants.id).all()
-        #df_loc = pd.DataFrame([x.as_dict() for x in data])
-        #df_loc.rename(
+        # data = Restaurants.query.with_entities(Restaurants.name, Restaurants.id).all()
+        # df_loc = pd.DataFrame([x.as_dict() for x in data])
+        # df_loc.rename(
         #    columns={
         #        "id": "name",
         #    },
         #    inplace=True,
-        #)
+        # )
 
         query = (
             db.session.query(
