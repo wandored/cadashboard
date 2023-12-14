@@ -15,20 +15,27 @@ from dashapp.authentication.models import *
 
 
 def store_query():
-    closed_stores = [
-            "91", "21B", "12B", "2B", "17B", "7B", "18", "10", "3B", "28", "8B", "1B", "85B", "15B", "15", "4B", "19", "25B", "14B", "11B", "95", "99", "5B", "10B", "18B" 
-            ]
-    return location.query.filter(location.locationnumber.notin_(closed_stores)).order_by(location.name).all()
+    return (
+        Restaurants.query.filter(Restaurants.active == True)
+        .order_by(Restaurants.name)
+        .all()
+    )
 
 
 class LoginForm(FlaskForm):
-    email = StringField("Email Address", id="email_login", validators=[DataRequired(), Email()])
+    email = StringField(
+        "Email Address", id="email_login", validators=[DataRequired(), Email()]
+    )
     password = PasswordField("Password", id="pwd_login", validators=[DataRequired()])
 
 
 class CreateAccountForm(FlaskForm):
-    username = StringField("Username", id="username_create", validators=[DataRequired()])
-    email = StringField("Email", id="email_create", validators=[DataRequired(), Email()])
+    username = StringField(
+        "Username", id="username_create", validators=[DataRequired()]
+    )
+    email = StringField(
+        "Email", id="email_create", validators=[DataRequired(), Email()]
+    )
     password = PasswordField("Password", id="pwd_create", validators=[DataRequired()])
 
 
@@ -84,15 +91,3 @@ class StoneForm(FlaskForm):
         blank_text="Select Store",
     )
     submit6 = SubmitField("Submit")
-
-
-class UofMForm(FlaskForm):
-    submit_uofm = SubmitField("Submit")
-
-
-class RecipeForm(FlaskForm):
-    submit9 = SubmitField("Submit")
-
-
-class UserForm(FlaskForm):
-    submit_user = SubmitField("Submit")

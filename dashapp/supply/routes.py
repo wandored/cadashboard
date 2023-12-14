@@ -23,7 +23,6 @@ from sqlalchemy import and_, or_, func
 @blueprint.route("/supplies/", methods=["GET", "POST"])
 @login_required
 def supplies():
-
     TODAY = datetime.date(datetime.now())
     CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
     YSTDAY = TODAY - timedelta(days=1)
@@ -38,8 +37,7 @@ def supplies():
     form3 = StoreForm()
 
     if form1.submit1.data and form1.validate():
-        new_day = form1.selectdate.data.strftime("%Y-%m-%d")
-        session["token"] = new_day
+        session["date_selected"] = form1.selectdate.data
         return redirect(url_for("supply_blueprint.supplies"))
 
     if form3.submit3.data and form3.validate():
@@ -107,7 +105,6 @@ def supplies():
 @blueprint.route("/smallwares/", methods=["GET", "POST"])
 @login_required
 def smallwares():
-
     TODAY = datetime.date(datetime.now())
     CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
     YSTDAY = TODAY - timedelta(days=1)
@@ -122,8 +119,7 @@ def smallwares():
     form3 = StoreForm()
 
     if form1.submit1.data and form1.validate():
-        new_day = form1.selectdate.data.strftime("%Y-%m-%d")
-        session["token"] = new_day
+        session["date_selected"] = form1.selectdate.data
         return redirect(url_for("supply_blueprint.smallwares"))
 
     if form3.submit3.data and form3.validate():
@@ -172,7 +168,6 @@ def smallwares():
 @blueprint.route("/linen/", methods=["GET", "POST"])
 @login_required
 def linen():
-
     TODAY = datetime.date(datetime.now())
     CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
     YSTDAY = TODAY - timedelta(days=1)
@@ -187,8 +182,7 @@ def linen():
     form3 = StoreForm()
 
     if form1.submit1.data and form1.validate():
-        new_day = form1.selectdate.data.strftime("%Y-%m-%d")
-        session["token"] = new_day
+        session["date_selected"] = form1.selectdate.data
         return redirect(url_for("supply_blueprint.linen"))
 
     if form3.submit3.data and form3.validate():
@@ -233,375 +227,3 @@ def linen():
         segment="supplies",
         **locals(),
     )
-
-
-# @blueprint.route("/restaurant/", methods=["GET", "POST"])
-# @login_required
-# def restaurant():
-#
-#    TODAY = datetime.date(datetime.now())
-#    CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
-#    YSTDAY = TODAY - timedelta(days=1)
-#
-#    fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
-#
-#    # Get list of Restaurants
-#    data = Restaurants.query.all()
-#    store_df = pd.DataFrame([x.as_dict() for x in data])
-#
-#    form1 = DateForm()
-#    form3 = StoreForm()
-#
-#    if form1.submit1.data and form1.validate():
-#        new_day = form1.selectdate.data.strftime("%Y-%m-%d")
-#        session["token"] = new_day
-#        return redirect(url_for("supply_blueprint.restaurant"))
-#
-#    if form3.submit3.data and form3.validate():
-#        session["token"] = fiscal_dates["start_day"]
-#        store_id = form3.store.data.id
-#        return redirect(url_for("home_blueprint.store", store_id=store_id))
-#
-#    top_ten = get_category_topten(
-#        ["Restaurant Supplies"],
-#        fiscal_dates["last_thirty"],
-#        fiscal_dates["start_day"],
-#    )
-#    top_ten_restaurant = get_restaurant_topten(
-#        ["Restaurant Supplies"],
-#        fiscal_dates["last_thirty"],
-#        fiscal_dates["start_day"],
-#    )
-#    top_ten_vendor = get_vendor_topten(
-#        ["Restaurant Supplies"],
-#        fiscal_dates["last_thirty"],
-#        fiscal_dates["start_day"],
-#    )
-#
-#    category_costs = get_category_costs(
-#        ["Restaurant Supplies"],
-#        fiscal_dates["last_thirty"],
-#        fiscal_dates["start_day"],
-#    )
-#    category_costs_total = category_costs["Totals"].sum()
-#    top_ten["percent"] = top_ten["Cost"] / category_costs_total
-#    top_ten_vendor["percent"] = top_ten_vendor["Cost"] / category_costs_total
-#
-#
-#    return render_template(
-#        "supply/restaurant.html",
-#        title="Restaurant Supplies",
-#        company_name=Config.COMPANY_NAME,
-#        segment="supplies",
-#        **locals(),
-#    )
-#
-#
-# @blueprint.route("/kitchen/", methods=["GET", "POST"])
-# @login_required
-# def kitchen():
-#
-#    TODAY = datetime.date(datetime.now())
-#    CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
-#    YSTDAY = TODAY - timedelta(days=1)
-#
-#    fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
-#
-#    # Get list of Restaurants
-#    data = Restaurants.query.all()
-#    store_df = pd.DataFrame([x.as_dict() for x in data])
-#
-#    form1 = DateForm()
-#    form3 = StoreForm()
-#
-#    if form1.submit1.data and form1.validate():
-#        new_day = form1.selectdate.data.strftime("%Y-%m-%d")
-#        session["token"] = new_day
-#        return redirect(url_for("supply_blueprint.kitchen"))
-#
-#    if form3.submit3.data and form3.validate():
-#        session["token"] = fiscal_dates["start_day"]
-#        store_id = form3.store.data.id
-#        return redirect(url_for("home_blueprint.store", store_id=store_id))
-#
-#    top_ten = get_category_topten(
-#        ["Kitchen Supplies"],
-#        fiscal_dates["last_thirty"],
-#        fiscal_dates["start_day"],
-#    )
-#    top_ten_restaurant = get_restaurant_topten(
-#        ["Kitchen Supplies"],
-#        fiscal_dates["last_thirty"],
-#        fiscal_dates["start_day"],
-#    )
-#    top_ten_vendor = get_vendor_topten(
-#        ["Kitchen Supplies"],
-#        fiscal_dates["last_thirty"],
-#        fiscal_dates["start_day"],
-#    )
-#
-#    category_costs = get_category_costs(
-#        ["Kitchen Supplies"],
-#        fiscal_dates["last_thirty"],
-#        fiscal_dates["start_day"],
-#    )
-#    category_costs_total = category_costs["Totals"].sum()
-#    top_ten["percent"] = top_ten["Cost"] / category_costs_total
-#    top_ten_vendor["percent"] = top_ten_vendor["Cost"] / category_costs_total
-#
-#
-#    return render_template(
-#        "supply/kitchen.html",
-#        title="Kitchen Supplies",
-#        company_name=Config.COMPANY_NAME,
-#        segment="supplies",
-#        **locals(),
-#    )
-#
-#
-# @blueprint.route("/cleaning/", methods=["GET", "POST"])
-# @login_required
-# def cleaning():
-#
-#    TODAY = datetime.date(datetime.now())
-#    CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
-#    YSTDAY = TODAY - timedelta(days=1)
-#
-#    fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
-#
-#    # Get list of Restaurants
-#    data = Restaurants.query.all()
-#    store_df = pd.DataFrame([x.as_dict() for x in data])
-#
-#    form1 = DateForm()
-#    form3 = StoreForm()
-#
-#    if form1.submit1.data and form1.validate():
-#        new_day = form1.selectdate.data.strftime("%Y-%m-%d")
-#        session["token"] = new_day
-#        return redirect(url_for("supply_blueprint.cleaning"))
-#
-#    if form3.submit3.data and form3.validate():
-#        session["token"] = fiscal_dates["start_day"]
-#        store_id = form3.store.data.id
-#        return redirect(url_for("home_blueprint.store", store_id=store_id))
-#
-#    top_ten = get_category_topten(
-#        ["Cleaning Supplies"],
-#        fiscal_dates["last_thirty"],
-#        fiscal_dates["start_day"],
-#    )
-#    top_ten_restaurant = get_restaurant_topten(
-#        ["Cleaning Supplies"],
-#        fiscal_dates["last_thirty"],
-#        fiscal_dates["start_day"],
-#    )
-#    top_ten_vendor = get_vendor_topten(
-#        ["Cleaning Supplies"],
-#        fiscal_dates["last_thirty"],
-#        fiscal_dates["start_day"],
-#    )
-#
-#    category_costs = get_category_costs(
-#        ["Cleaning Supplies"],
-#        fiscal_dates["last_thirty"],
-#        fiscal_dates["start_day"],
-#    )
-#    category_costs_total = category_costs["Totals"].sum()
-#    top_ten["percent"] = top_ten["Cost"] / category_costs_total
-#    top_ten_vendor["percent"] = top_ten_vendor["Cost"] / category_costs_total
-#
-#
-#    return render_template(
-#        "supply/cleaning.html",
-#        title="Cleaning Supplies",
-#        company_name=Config.COMPANY_NAME,
-#        segment="supplies",
-#        **locals(),
-#    )
-#
-#
-# @blueprint.route("/catering/", methods=["GET", "POST"])
-# @login_required
-# def catering():
-#
-#    TODAY = datetime.date(datetime.now())
-#    CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
-#    YSTDAY = TODAY - timedelta(days=1)
-#
-#    fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
-#
-#    # Get list of Restaurants
-#    data = Restaurants.query.all()
-#    store_df = pd.DataFrame([x.as_dict() for x in data])
-#
-#    form1 = DateForm()
-#    form3 = StoreForm()
-#
-#    if form1.submit1.data and form1.validate():
-#        new_day = form1.selectdate.data.strftime("%Y-%m-%d")
-#        session["token"] = new_day
-#        return redirect(url_for("supply_blueprint.catering"))
-#
-#    if form3.submit3.data and form3.validate():
-#        session["token"] = fiscal_dates["start_day"]
-#        store_id = form3.store.data.id
-#        return redirect(url_for("home_blueprint.store", store_id=store_id))
-#
-#    top_ten = get_category_topten(
-#        ["Catering Supplies/Expense"],
-#        fiscal_dates["last_thirty"],
-#        fiscal_dates["start_day"],
-#    )
-#    top_ten_restaurant = get_restaurant_topten(
-#        ["Catering Supplies/Expense"],
-#        fiscal_dates["last_thirty"],
-#        fiscal_dates["start_day"],
-#    )
-#    top_ten_vendor = get_vendor_topten(
-#        ["Catering Supplies/Expense"],
-#        fiscal_dates["last_thirty"],
-#        fiscal_dates["start_day"],
-#    )
-#
-#    category_costs = get_category_costs(
-#        ["Catering Supplies/Expense"],
-#        fiscal_dates["last_thirty"],
-#        fiscal_dates["start_day"],
-#    )
-#    category_costs_total = category_costs["Totals"].sum()
-#    top_ten["percent"] = top_ten["Cost"] / category_costs_total
-#    top_ten_vendor["percent"] = top_ten_vendor["Cost"] / category_costs_total
-#
-#
-#    return render_template(
-#        "supply/catering.html",
-#        title="Catering Supplies",
-#        company_name=Config.COMPANY_NAME,
-#        segment="supplies",
-#        **locals(),
-#    )
-#
-#
-# @blueprint.route("/bar/", methods=["GET", "POST"])
-# @login_required
-# def bar():
-#
-#    TODAY = datetime.date(datetime.now())
-#    CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
-#    YSTDAY = TODAY - timedelta(days=1)
-#
-#    fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
-#
-#    # Get list of Restaurants
-#    data = Restaurants.query.all()
-#    store_df = pd.DataFrame([x.as_dict() for x in data])
-#
-#    form1 = DateForm()
-#    form3 = StoreForm()
-#
-#    if form1.submit1.data and form1.validate():
-#        new_day = form1.selectdate.data.strftime("%Y-%m-%d")
-#        session["token"] = new_day
-#        return redirect(url_for("supply_blueprint.bar"))
-#
-#    if form3.submit3.data and form3.validate():
-#        session["token"] = fiscal_dates["start_day"]
-#        store_id = form3.store.data.id
-#        return redirect(url_for("home_blueprint.store", store_id=store_id))
-#
-#    top_ten = get_category_topten(
-#        ["Bar Supplies"],
-#        fiscal_dates["last_thirty"],
-#        fiscal_dates["start_day"],
-#    )
-#    top_ten_restaurant = get_restaurant_topten(
-#        ["Bar Supplies"],
-#        fiscal_dates["last_thirty"],
-#        fiscal_dates["start_day"],
-#    )
-#    top_ten_vendor = get_vendor_topten(
-#        ["Bar Supplies"],
-#        fiscal_dates["last_thirty"],
-#        fiscal_dates["start_day"],
-#    )
-#
-#    category_costs = get_category_costs(
-#        ["Bar Supplies"],
-#        fiscal_dates["last_thirty"],
-#        fiscal_dates["start_day"],
-#    )
-#    category_costs_total = category_costs["Totals"].sum()
-#    top_ten["percent"] = top_ten["Cost"] / category_costs_total
-#    top_ten_vendor["percent"] = top_ten_vendor["Cost"] / category_costs_total
-#
-#
-#    return render_template(
-#        "supply/bar.html",
-#        title="Bar Supplies",
-#        company_name=Config.COMPANY_NAME,
-#        segment="supplies",
-#        **locals(),
-#    )
-#
-#
-# @blueprint.route("/smallware/", methods=["GET", "POST"])
-# @login_required
-# def smallware():
-#
-#    TODAY = datetime.date(datetime.now())
-#    CURRENT_DATE = TODAY.strftime("%Y-%m-%d")
-#    YSTDAY = TODAY - timedelta(days=1)
-#
-#    fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
-#
-#    # Get list of Restaurants
-#    data = Restaurants.query.all()
-#    store_df = pd.DataFrame([x.as_dict() for x in data])
-#
-#    form1 = DateForm()
-#    form3 = StoreForm()
-#
-#    if form1.submit1.data and form1.validate():
-#        new_day = form1.selectdate.data.strftime("%Y-%m-%d")
-#        session["token"] = new_day
-#        return redirect(url_for("supply_blueprint.smallware"))
-#
-#    if form3.submit3.data and form3.validate():
-#        session["token"] = fiscal_dates["start_day"]
-#        store_id = form3.store.data.id
-#        return redirect(url_for("home_blueprint.store", store_id=store_id))
-#
-#    top_ten = get_category_topten(
-#        ["Smallware", "Silverware", "China", "Glassware"],
-#        fiscal_dates["last_thirty"],
-#        fiscal_dates["start_day"],
-#    )
-#    top_ten_restaurant = get_restaurant_topten(
-#        ["Smallware", "Silverware", "China", "Glassware"],
-#        fiscal_dates["last_thirty"],
-#        fiscal_dates["start_day"],
-#    )
-#    top_ten_vendor = get_vendor_topten(
-#        ["Smallware", "Silverware", "China", "Glassware"],
-#        fiscal_dates["last_thirty"],
-#        fiscal_dates["start_day"],
-#    )
-#
-#    category_costs = get_category_costs(
-#        ["Smallware", "Silverware", "China", "Glassware"],
-#        fiscal_dates["last_thirty"],
-#        fiscal_dates["start_day"],
-#    )
-#    category_costs_total = category_costs["Totals"].sum()
-#    top_ten["percent"] = top_ten["Cost"] / category_costs_total
-#    top_ten_vendor["percent"] = top_ten_vendor["Cost"] / category_costs_total
-#
-#
-#    return render_template(
-#        "supply/smallware.html",
-#        title="Smallware Supplies",
-#        company_name=Config.COMPANY_NAME,
-#        segment="supplies",
-#        **locals(),
-#    )

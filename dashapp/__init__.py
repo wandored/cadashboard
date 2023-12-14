@@ -37,5 +37,5 @@ def create_app(config_class=Config):
     register_extensions(app)
     register_blueprints(app)
     configure_database(app)
-#    asgi_app = WsgiToAsgi(app) # added for uvicorn
+    #    asgi_app = WsgiToAsgi(app) # added for uvicorn
     return app

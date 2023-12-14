@@ -1,4 +1,3 @@
-
 import json
 import csv
 from sqlalchemy.engine.create import create_engine
@@ -32,5 +31,3 @@ def make_dataframe(sales):
     jStr = json.dumps(sales)
     df = pd.read_json(jStr)
     return df
-
-

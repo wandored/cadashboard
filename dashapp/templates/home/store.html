@@ -162,19 +162,19 @@
       </div>
     </div>
   </div>
-  <!-- Daily Sales Table -->
+  <!-- Daily Table -->
   <div class="row mb-4">
     <div class="col-lg-8 col-md-6 mb-md-0 mb-4">
       <div class="card">
           <ul class="nav nav-tabs mb-0" id="nav-tab" role="tablist">
           <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="nav-day-tab" data-bs-toggle="pill" data-bs-target="#nav-day" type="button" role="tab" aria-controls="nav-day" aria-selected="true">Week</button>
+            <button class="nav-link active" id="nav-day-tab" data-bs-toggle="pill" data-bs-target="#nav-day" type="button" role="tab" aria-controls="nav-day" aria-selected="true">Day</button>
           </li>
           <li class="nav-item" role="presentation">
-            <button class="nav-link" id="nav-week-tab" data-bs-toggle="pill" data-bs-target="#nav-week" type="button" role="tab" aria-controls="nav-week" aria-selected="false">Period</button>
+            <button class="nav-link" id="nav-week-tab" data-bs-toggle="pill" data-bs-target="#nav-week" type="button" role="tab" aria-controls="nav-week" aria-selected="false">Week</button>
           </li>
           <li class="nav-item" role="presentation">
-            <button class="nav-link" id="nav-period-tab" data-bs-toggle="pill" data-bs-target="#nav-period" type="button" role="tab" aria-controls="nav-period" aria-selected="false">Quarter</button>
+            <button class="nav-link" id="nav-period-tab" data-bs-toggle="pill" data-bs-target="#nav-period" type="button" role="tab" aria-controls="nav-period" aria-selected="false">Period</button>
           </li>
           <li class="nav-item" role="presentation">
             <button class="nav-link" id="nav-year-tab" data-bs-toggle="pill" data-bs-target="#nav-year" type="button" role="tab" aria-controls="nav-year" aria-selected="false">Year</button>
@@ -182,6 +182,181 @@
         </ul>
         <div class="tab-content" id="nav-tabContent">
           <div class="tab-pane fade show active" id="nav-day" role="tabpanel" aria-labelledby="nav-day-tab">
+            <div class="card-header pb-0">
+              <div class="row">
+                <div class="col-lg-6 col-7">
+                  <h4>{{ fiscal_dates["date"] }}</h4>
+                </div>
+              </div>
+            </div>
+            <div class="card-body px-0 pb-2">
+              <div class="table-responsive table-hover">
+                <table class="table align-items-center mb-0">
+                  <thead>
+                    <tr>
+                      <th class="text-uppercase text-secondary text-sm font-weight-bolder opacity-3">Host Labor</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor $ LY</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor % LY</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor $ TY</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor % TY</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor % Var</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor $ Var</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                      <tr>
+                          <td>
+                              <div class="d-flex flex-column">
+                              </div>
+                          </td>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm">{{ "${:,.2f}".format(day_host_dollar_ly) }}</h6></a>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm">{{ "%{:,.2f}".format(day_host_pct_ly) }}</h6></a>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm">{{ "${:,.2f}".format(day_host_dollar_ty) }}</h6></a>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm">{{ "%{:,.2f}".format(day_host_pct_ty) }}</h6></a>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            {% if day_host_pct_ty >= day_host_pct_ly  %}
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm"><i class="fa fa-arrow-up text-danger" aria-hidden="true"></i> {{ "%{:,.2f}".format(day_host_percent_var) }}</h6></a>
+                              </div>
+                            </div>
+                            {% else %}
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm"><i class="fa fa-arrow-down text-success" aria-hidden="true"></i> {{ "%{:,.2f}".format(day_host_percent_var) }}</h6></a>
+                              </div>
+                            </div>
+                            {% endif %}
+                          </td>
+                          <td>
+                            {% if day_host_dollar_ty >= day_host_dollar_ly  %}
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm"><i class="fa fa-arrow-up text-danger" aria-hidden="true"></i> {{ "${:,.2f}".format(day_host_dollar_var) }}</h6></a>
+                              </div>
+                            </div>
+                            {% else %}
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm"><i class="fa fa-arrow-down text-success" aria-hidden="true"></i> {{ "${:,.2f}".format(day_host_dollar_var) }}</h6></a>
+                              </div>
+                            </div>
+                            {% endif %}
+                          </td>
+                      </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="card-body px-0 pb-2">
+              <div class="table-responsive table-hover">
+                <table class="table align-items-center mb-0">
+                  <thead>
+                    <tr>
+                      <th class="text-uppercase text-secondary text-sm font-weight-bolder opacity-3">BOH Labor</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor $ LY</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor % LY</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor $ TY</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor % TY</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor % Var</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor $ Var</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                      <tr>
+                          <td>
+                              <div class="d-flex flex-column">
+                              </div>
+                          </td>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm">{{ "${:,.2f}".format(day_BOH_dollar_ly) }}</h6></a>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm">{{ "%{:,.2f}".format(day_BOH_pct_ly) }}</h6></a>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm">{{ "${:,.2f}".format(day_BOH_dollar_ty) }}</h6></a>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm">{{ "%{:,.2f}".format(day_BOH_pct_ty) }}</h6></a>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            {% if day_BOH_pct_ty >= day_BOH_pct_ly  %}
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm"><i class="fa fa-arrow-up text-danger" aria-hidden="true"></i> {{ "%{:,.2f}".format(day_BOH_percent_var) }}</h6></a>
+                              </div>
+                            </div>
+                            {% else %}
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm"><i class="fa fa-arrow-down text-success" aria-hidden="true"></i> {{ "%{:,.2f}".format(day_BOH_percent_var) }}</h6></a>
+                              </div>
+                            </div>
+                            {% endif %}
+                          </td>
+                          <td>
+                            {% if day_BOH_dollar_ty >= day_BOH_dollar_ly  %}
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm"><i class="fa fa-arrow-up text-danger" aria-hidden="true"></i> {{ "${:,.2f}".format(day_BOH_dollar_var) }}</h6></a>
+                              </div>
+                            </div>
+                            {% else %}
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm"><i class="fa fa-arrow-down text-success" aria-hidden="true"></i> {{ "${:,.2f}".format(day_BOH_dollar_var) }}</h6></a>
+                              </div>
+                            </div>
+                            {% endif %}
+                          </td>
+                      </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="tab-pane fade" id="nav-week" role="tabpanel" aria-labelledby="nav-week-tab">
             <div class="card-header pb-0">
               <div class="row">
                 <div class="col-lg-6 col-7">
@@ -194,43 +369,169 @@
                 <table class="table align-items-center mb-0">
                   <thead>
                     <tr>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Days</th>
-                    {% for cat in weekly_table.columns %}
-                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">{{ cat }}</th>
-                    {% endfor %}
+                      <th class="text-uppercase text-secondary text-sm font-weight-bolder opacity-3">Host Labor</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor $ LY</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor % LY</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor $ TY</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor % TY</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor % Var</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor $ Var</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {% for cat, row in weekly_table.iterrows() %}
-                    <tr> 
-                      <td>
-                        {{ row["name"] }}
-                      </td>
-                        {% for _, value in row.items() %}
-                      <td>
-                            {{ "{:,.0f}".format(value) }}
-                      </td>
-                        {% endfor %}
+                      <tr>
+                          <td>
+                              <div class="d-flex flex-column">
+                              </div>
+                          </td>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm">{{ "${:,.2f}".format(week_host_dollar_ly) }}</h6></a>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm">{{ "%{:,.2f}".format(week_host_pct_ly) }}</h6></a>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm">{{ "${:,.2f}".format(week_host_dollar_ty) }}</h6></a>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm">{{ "%{:,.2f}".format(week_host_pct_ty) }}</h6></a>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            {% if week_host_pct_ty >= week_host_pct_ly  %}
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm"><i class="fa fa-arrow-up text-danger" aria-hidden="true"></i> {{ "%{:,.2f}".format(week_host_percent_var) }}</h6></a>
+                              </div>
+                            </div>
+                            {% else %}
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm"><i class="fa fa-arrow-down text-success" aria-hidden="true"></i> {{ "%{:,.2f}".format(week_host_percent_var) }}</h6></a>
+                              </div>
+                            </div>
+                            {% endif %}
+                          </td>
+                          <td>
+                            {% if week_host_dollar_ty >= week_host_dollar_ly  %}
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm"><i class="fa fa-arrow-up text-danger" aria-hidden="true"></i> {{ "${:,.2f}".format(week_host_dollar_var) }}</h6></a>
+                              </div>
+                            </div>
+                            {% else %}
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm"><i class="fa fa-arrow-down text-success" aria-hidden="true"></i> {{ "${:,.2f}".format(week_host_dollar_var) }}</h6></a>
+                              </div>
+                            </div>
+                            {% endif %}
+                          </td>
+                      </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="card-body px-0 pb-2">
+              <div class="table-responsive table-hover">
+                <table class="table align-items-center mb-0">
+                  <thead>
+                    <tr>
+                      <th class="text-uppercase text-secondary text-sm font-weight-bolder opacity-3">BOH Labor</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor $ LY</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor % LY</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor $ TY</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor % TY</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor % Var</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor $ Var</th>
                     </tr>
-                    {% endfor %}
-                    {% for cat, row in weekly_labor.iterrows() %}
-                    <tr> 
-                      <td>
-                        {{ row["name"] }}
-                      </td>
-                        {% for _, value in row.items() %}
-                      <td>
-                            {{ "{:,.0f}".format(value) }}
-                      </td>
-                        {% endfor %}
-                    </tr>
-                    {% endfor %}
+                  </thead>
+                  <tbody>
+                      <tr>
+                          <td>
+                              <div class="d-flex flex-column">
+                              </div>
+                          </td>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm">{{ "${:,.2f}".format(week_BOH_dollar_ly) }}</h6></a>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm">{{ "%{:,.2f}".format(week_BOH_pct_ly) }}</h6></a>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm">{{ "${:,.2f}".format(week_BOH_dollar_ty) }}</h6></a>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm">{{ "%{:,.2f}".format(week_BOH_pct_ty) }}</h6></a>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            {% if week_BOH_pct_ty >= week_BOH_pct_ly  %}
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm"><i class="fa fa-arrow-up text-danger" aria-hidden="true"></i> {{ "%{:,.2f}".format(week_BOH_percent_var) }}</h6></a>
+                              </div>
+                            </div>
+                            {% else %}
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm"><i class="fa fa-arrow-down text-success" aria-hidden="true"></i> {{ "%{:,.2f}".format(week_BOH_percent_var) }}</h6></a>
+                              </div>
+                            </div>
+                            {% endif %}
+                          </td>
+                          <td>
+                            {% if week_BOH_dollar_ty >= week_BOH_dollar_ly  %}
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm"><i class="fa fa-arrow-up text-danger" aria-hidden="true"></i> {{ "${:,.2f}".format(week_BOH_dollar_var) }}</h6></a>
+                              </div>
+                            </div>
+                            {% else %}
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm"><i class="fa fa-arrow-down text-success" aria-hidden="true"></i> {{ "${:,.2f}".format(week_BOH_dollar_var) }}</h6></a>
+                              </div>
+                            </div>
+                            {% endif %}
+                          </td>
+                      </tr>
                   </tbody>
                 </table>
               </div>
             </div>
           </div>
-          <div class="tab-pane fade" id="nav-week" role="tabpanel" aria-labelledby="nav-week-tab">
+          <div class="tab-pane fade" id="nav-period" role="tabpanel" aria-labelledby="nav-period-tab">
             <div class="card-header pb-0">
               <div class="row">
                 <div class="col-lg-6 col-7">
@@ -243,48 +544,82 @@
                 <table class="table align-items-center mb-0">
                   <thead>
                     <tr>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Weeks</th>
-                    {% for cat in period_table.columns %}
-                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">{{ cat }}</th>
-                    {% endfor %}
+                      <th class="text-uppercase text-secondary text-sm font-weight-bolder opacity-3">Host Labor</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor $ LY</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor % LY</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor $ TY</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor % TY</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor % Var</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor $ Var</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {% for cat, row in period_table.iterrows() %}
-                    <tr> 
-                      <td>
-                        {{ row["name"] }}
-                      </td>
-                        {% for _, value in row.items() %}
-                      <td>
-                            {{ "{:,.0f}".format(value) }}
-                      </td>
-                        {% endfor %}
-                    </tr>
-                    {% endfor %}
-                    {% for cat, row in period_labor.iterrows() %}
-                    <tr> 
-                      <td>
-                        {{ row["name"] }}
-                      </td>
-                        {% for _, value in row.items() %}
-                      <td>
-                            {{ "{:,.0f}".format(value) }}
-                      </td>
-                        {% endfor %}
-                    </tr>
-                    {% endfor %}
+                      <tr>
+                          <td>
+                              <div class="d-flex flex-column">
+                              </div>
+                          </td>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm">{{ "${:,.2f}".format(period_host_dollar_ly) }}</h6></a>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm">{{ "%{:,.2f}".format(period_host_pct_ly) }}</h6></a>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm">{{ "${:,.2f}".format(period_host_dollar_ty) }}</h6></a>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm">{{ "%{:,.2f}".format(period_host_pct_ty) }}</h6></a>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            {% if period_host_pct_ty >= period_host_pct_ly  %}
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm"><i class="fa fa-arrow-up text-danger" aria-hidden="true"></i> {{ "%{:,.2f}".format(period_host_percent_var) }}</h6></a>
+                              </div>
+                            </div>
+                            {% else %}
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm"><i class="fa fa-arrow-down text-success" aria-hidden="true"></i> {{ "%{:,.2f}".format(period_host_percent_var) }}</h6></a>
+                              </div>
+                            </div>
+                            {% endif %}
+                          </td>
+                          <td>
+                            {% if period_host_dollar_ty >= period_host_dollar_ly  %}
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm"><i class="fa fa-arrow-up text-danger" aria-hidden="true"></i> {{ "${:,.2f}".format(period_host_dollar_var) }}</h6></a>
+                              </div>
+                            </div>
+                            {% else %}
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm"><i class="fa fa-arrow-down text-success" aria-hidden="true"></i> {{ "${:,.2f}".format(period_host_dollar_var) }}</h6></a>
+                              </div>
+                            </div>
+                            {% endif %}
+                          </td>
+                      </tr>
                   </tbody>
                 </table>
-              </div>
-            </div>
-          </div>
-          <div class="tab-pane fade" id="nav-period" role="tabpanel" aria-labelledby="nav-period-tab">
-            <div class="card-header pb-0">
-              <div class="row">
-                <div class="col-lg-6 col-7">
-                  <h4>Quarter-{{ fiscal_dates["quarter"] }}</h4>
-                </div>
               </div>
             </div>
             <div class="card-body px-0 pb-2">
@@ -292,37 +627,80 @@
                 <table class="table align-items-center mb-0">
                   <thead>
                     <tr>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Periods</th>
-                    {% for cat in quarterly_table.columns %}
-                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">{{ cat }}</th>
-                    {% endfor %}
+                      <th class="text-uppercase text-secondary text-sm font-weight-bolder opacity-3">BOH Labor</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor $ LY</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor % LY</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor $ TY</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor % TY</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor % Var</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor $ Var</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {% for cat, row in quarterly_table.iterrows() %}
-                    <tr> 
-                      <td>
-                        {{ row["name"] }}
-                      </td>
-                        {% for _, value in row.items() %}
-                      <td>
-                            {{ "{:,.0f}".format(value) }}
-                      </td>
-                        {% endfor %}
-                    </tr>
-                    {% endfor %}
-                    {% for cat, row in quarterly_labor.iterrows() %}
-                    <tr> 
-                      <td>
-                        {{ row["name"] }}
-                      </td>
-                        {% for _, value in row.items() %}
-                      <td>
-                            {{ "{:,.0f}".format(value) }}
-                      </td>
-                        {% endfor %}
-                    </tr>
-                    {% endfor %}
+                      <tr>
+                          <td>
+                              <div class="d-flex flex-column">
+                              </div>
+                          </td>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm">{{ "${:,.2f}".format(period_BOH_dollar_ly) }}</h6></a>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm">{{ "%{:,.2f}".format(period_BOH_pct_ly) }}</h6></a>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm">{{ "${:,.2f}".format(period_BOH_dollar_ty) }}</h6></a>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm">{{ "%{:,.2f}".format(period_BOH_pct_ty) }}</h6></a>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            {% if period_BOH_pct_ty >= period_BOH_pct_ly  %}
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm"><i class="fa fa-arrow-up text-danger" aria-hidden="true"></i> {{ "%{:,.2f}".format(period_BOH_percent_var) }}</h6></a>
+                              </div>
+                            </div>
+                            {% else %}
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm"><i class="fa fa-arrow-down text-success" aria-hidden="true"></i> {{ "%{:,.2f}".format(period_BOH_percent_var) }}</h6></a>
+                              </div>
+                            </div>
+                            {% endif %}
+                          </td>
+                          <td>
+                            {% if period_BOH_dollar_ty >= period_BOH_dollar_ly  %}
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm"><i class="fa fa-arrow-up text-danger" aria-hidden="true"></i> {{ "${:,.2f}".format(period_BOH_dollar_var) }}</h6></a>
+                              </div>
+                            </div>
+                            {% else %}
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm"><i class="fa fa-arrow-down text-success" aria-hidden="true"></i> {{ "${:,.2f}".format(period_BOH_dollar_var) }}</h6></a>
+                              </div>
+                            </div>
+                            {% endif %}
+                          </td>
+                      </tr>
                   </tbody>
                 </table>
               </div>
@@ -341,37 +719,163 @@
                 <table class="table align-items-center mb-0">
                   <thead>
                     <tr>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Quarters</th>
-                    {% for cat in yearly_table.columns %}
-                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">{{ cat }}</th>
-                    {% endfor %}
+                      <th class="text-uppercase text-secondary text-sm font-weight-bolder opacity-3">Host Labor</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor $ LY</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor % LY</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor $ TY</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor % TY</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor % Var</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor $ Var</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {% for cat, row in yearly_table.iterrows() %}
-                    <tr> 
-                      <td>
-                        {{ row["name"] }}
-                      </td>
-                        {% for _, value in row.items() %}
-                      <td>
-                            {{ "{:,.0f}".format(value) }}
-                      </td>
-                        {% endfor %}
+                      <tr>
+                          <td>
+                              <div class="d-flex flex-column">
+                              </div>
+                          </td>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm">{{ "${:,.2f}".format(year_host_dollar_ly) }}</h6></a>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm">{{ "%{:,.2f}".format(year_host_pct_ly) }}</h6></a>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm">{{ "${:,.2f}".format(year_host_dollar_ty) }}</h6></a>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm">{{ "%{:,.2f}".format(year_host_pct_ty) }}</h6></a>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            {% if year_host_pct_ty >= year_host_pct_ly  %}
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm"><i class="fa fa-arrow-up text-danger" aria-hidden="true"></i> {{ "%{:,.2f}".format(year_host_percent_var) }}</h6></a>
+                              </div>
+                            </div>
+                            {% else %}
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm"><i class="fa fa-arrow-down text-success" aria-hidden="true"></i> {{ "%{:,.2f}".format(year_host_percent_var) }}</h6></a>
+                              </div>
+                            </div>
+                            {% endif %}
+                          </td>
+                          <td>
+                            {% if year_host_dollar_ty >= year_host_dollar_ly  %}
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm"><i class="fa fa-arrow-up text-danger" aria-hidden="true"></i> {{ "${:,.2f}".format(year_host_dollar_var) }}</h6></a>
+                              </div>
+                            </div>
+                            {% else %}
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm"><i class="fa fa-arrow-down text-success" aria-hidden="true"></i> {{ "${:,.2f}".format(year_host_dollar_var) }}</h6></a>
+                              </div>
+                            </div>
+                            {% endif %}
+                          </td>
+                      </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="card-body px-0 pb-2">
+              <div class="table-responsive table-hover">
+                <table class="table align-items-center mb-0">
+                  <thead>
+                    <tr>
+                      <th class="text-uppercase text-secondary text-sm font-weight-bolder opacity-3">BOH Labor</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor $ LY</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor % LY</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor $ TY</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor % TY</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor % Var</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Labor $ Var</th>
                     </tr>
-                    {% endfor %}
-                    {% for cat, row in yearly_labor.iterrows() %}
-                    <tr> 
-                      <td>
-                        {{ row["name"] }}
-                      </td>
-                        {% for _, value in row.items() %}
-                      <td>
-                            {{ "{:,.0f}".format(value) }}
-                      </td>
-                        {% endfor %}
-                    </tr>
-                    {% endfor %}
+                  </thead>
+                  <tbody>
+                      <tr>
+                          <td>
+                              <div class="d-flex flex-column">
+                              </div>
+                          </td>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm">{{ "${:,.2f}".format(year_BOH_dollar_ly) }}</h6></a>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm">{{ "%{:,.2f}".format(year_BOH_pct_ly) }}</h6></a>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm">{{ "${:,.2f}".format(year_BOH_dollar_ty) }}</h6></a>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm">{{ "%{:,.2f}".format(year_BOH_pct_ty) }}</h6></a>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            {% if year_BOH_pct_ty >= year_BOH_pct_ly  %}
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm"><i class="fa fa-arrow-up text-danger" aria-hidden="true"></i> {{ "%{:,.2f}".format(year_BOH_percent_var) }}</h6></a>
+                              </div>
+                            </div>
+                            {% else %}
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm"><i class="fa fa-arrow-down text-success" aria-hidden="true"></i> {{ "%{:,.2f}".format(year_BOH_percent_var) }}</h6></a>
+                              </div>
+                            </div>
+                            {% endif %}
+                          </td>
+                          <td>
+                            {% if year_BOH_dollar_ty >= year_BOH_dollar_ly  %}
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm"><i class="fa fa-arrow-up text-danger" aria-hidden="true"></i> {{ "${:,.2f}".format(year_BOH_dollar_var) }}</h6></a>
+                              </div>
+                            </div>
+                            {% else %}
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column">
+                                <a class="me-2"><h6 class="mb-0 text-sm"><i class="fa fa-arrow-down text-success" aria-hidden="true"></i> {{ "${:,.2f}".format(year_BOH_dollar_var) }}</h6></a>
+                              </div>
+                            </div>
+                            {% endif %}
+                          </td>
+                      </tr>
                   </tbody>
                 </table>
               </div>
@@ -380,27 +884,18 @@
         </div>
       </div>
     </div>
-    <!-- scorecard -->
+    <!-- table turns -->
     <div class="col-lg-4 col-md-6">
       <div class="card h-100">
         <div class="card-header pb-0">
-          <h6>Scorecard</h6>
+          <h6>Table Turns</h6>
         </div>
           <p class="text-sm">
-            <span class="font-weight-bold">Top 5 Sales Over Last Year</span>
           </p>
         <div class="alert alert-primary" role="alert">
-          <table class="table-responsive table-sm text-light">
-            <thead>
-              <tr>
-                <th scope="col">DAILY</th>
-                <th scope="col">% Over LY</th>
-                <th scope="col">$ Over LY</th>
-              </tr>
-            </thead>
-            <tbody>
-            </tbody>
-          </table>
+          <div class="chart">
+            <canvas id="chart-handheld" class="chart-canvas" height="170"></canvas>
+          </div>
         </div>
         <div class="alert alert-success" role="alert">
           <table class="table-responsive table-sm text-light text-bold">
@@ -441,9 +936,9 @@
 
   <script src="/static/assets/js/plugins/chartjs.min.js"></script>
   <script>
-    var ctx = document.getElementById("chart-bars").getContext("2d");
+    var ctx1 = document.getElementById("chart-bars").getContext("2d");
 
-    new Chart(ctx, {
+    new Chart(ctx1, {
       type: "bar",
       data: {
         labels: ["W", "T", "F", "S", "S", "M", "T"],
@@ -739,6 +1234,108 @@
         },
       },
     });
+
+    var ctx4 = document.getElementById("chart-handheld").getContext("2d");
+
+    new Chart(ctx4, {
+      type: "bar",
+      data: {
+        labels: ["W", "T", "F", "S", "S", "M", "T"],
+        datasets: [{
+          label: "Table Turns",
+          tension: 0.4,
+          borderWidth: 0,
+          borderRadius: 4,
+          borderSkipped: false,
+          backgroundColor: "rgba(255, 255, 255, .8)",
+          data: {{ handheld_list | safe }},
+          maxBarThickness: 6
+        }, {
+          label: "Avg Turn",
+          tension: 0,
+          borderWidth: 0,
+          pointRadius: 5,
+          pointBackgroundColor: "rgba(200, 200, 200, 1)",
+          pointBorderColor: "transparent",
+          borderColor: "rgba(200, 200, 200, 1)",
+          borderWidth: 4,
+          type: "line",
+          backgroundColor: "transparent",
+          fill: true,
+          data: {{ handheld_list_avg | safe }},
+          maxBarThickness: 6
+        }, ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          title: {
+            display: true,
+            text: 'Handhelds',
+          },
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
+        scales: {
+          y: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+              color: "#fff",
+              // Abbreviate the millions
+              callback: function(value, index, values) {
+                var minutes = value / 60;
+                return minutes.toFixed(0) + ' Min';
+              },
+            },
+          },
+          x: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              color: '#f8f9fa',
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+            }
+          },
+        },
+      },
+    });
+
   </script>
 
 {% endblock javascripts %}

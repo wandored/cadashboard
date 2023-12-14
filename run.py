@@ -4,9 +4,10 @@ Dashboard app
 
 from dashapp import create_app
 from asgiref.wsgi import WsgiToAsgi
+import uvicorn
 
 app = create_app()
-asgi_app = WsgiToAsgi(app) # added for uvicorn
+asgi_app = WsgiToAsgi(app)  # added for uvicorn
 
-#if __name__ == "__main__":
-#    app.run(host="127.0.0.1", port=5000, debug=True)
+if __name__ == "__main__":
+    uvicorn.run(asgi_app, host="0.0.0.0", port=5000)

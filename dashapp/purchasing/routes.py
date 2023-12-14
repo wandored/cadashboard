@@ -3,32 +3,22 @@
 routes for purchasing pages
 """
 
-import pandas as pd
-from pandas.core.algorithms import isin
-from datetime import datetime, timedelta
-from fpdf import FPDF
-from sqlalchemy import and_, or_, func
-from flask import flash, render_template, session, redirect, url_for
+from flask import render_template, session, redirect, url_for
 from flask.helpers import url_for
-from flask_security.decorators import roles_accepted
-from flask.wrappers import Response
-from flask_security import login_required, current_user
+from flask_security import login_required
 from dashapp.purchasing import blueprint
 from dashapp.purchasing.util import *
 from dashapp.config import Config
 from dashapp.authentication.forms import *
 from dashapp.authentication.models import *
 
+from icecream import ic
+
 
 @blueprint.route("/purchasing/", methods=["GET", "POST"])
 @login_required
 def purchasing():
-
-    fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
-
-    # Get list of Restaurants
-    data = Restaurants.query.all()
-    store_df = pd.DataFrame([x.as_dict() for x in data])
+    fiscal_dates = set_dates(session["date_selected"])
 
     form1 = DateForm()
     form3 = StoreForm()
@@ -36,14 +26,12 @@ def purchasing():
     form5 = LobsterForm()
     form6 = StoneForm()
 
-
     if form1.submit1.data and form1.validate():
-        new_day = form1.selectdate.data.strftime("%Y-%m-%d")
-        session["token"] = new_day
+        session["date_selected"] = form1.selectdate.data
         return redirect(url_for("purchasing_blueprint.purchasing"))
 
     if form3.submit3.data and form3.validate():
-        session["token"] = fiscal_dates["start_day"]
+        session["date_selected"] = fiscal_dates["start_day"]
         data = form3.stores.data
         session["store_list"] = tuple([x.id for x in data])
         return redirect(url_for("purchasing_blueprint.purchasing"))
@@ -93,7 +81,9 @@ def purchasing():
     top_ten_vendor["percent"] = top_ten_vendor["Cost"] / category_costs_total
 
     # get name from Restaurants table based on session["store_list"]
-    store_names = db.session.query(Restaurants.name).filter(Restaurants.id.in_(session["store_list"]))
+    store_names = db.session.query(Restaurants.name).filter(
+        Restaurants.id.in_(session["store_list"])
+    )
     store_names = [x[0] for x in store_names]
     store_names = ", ".join(store_names)
 
@@ -108,13 +98,8 @@ def purchasing():
 
 @blueprint.route("/purchasing/<product>", methods=["GET", "POST"])
 @login_required
-def beef(product):
-
-    fiscal_dates = set_dates(datetime.strptime(session["token"], "%Y-%m-%d"))
-
-    # Get list of Restaurants
-    data = Restaurants.query.all()
-    store_df = pd.DataFrame([x.as_dict() for x in data])
+def purchase(product):
+    fiscal_dates = set_dates(session["date_selected"])
 
     form1 = DateForm()
     form3 = StoreForm()
@@ -122,17 +107,15 @@ def beef(product):
     form5 = LobsterForm()
     form6 = StoneForm()
 
-
     if form1.submit1.data and form1.validate():
-        new_day = form1.selectdate.data.strftime("%Y-%m-%d")
-        session["token"] = new_day
-        return redirect(url_for("purchasing_blueprint.beef", product=product))
+        session["date_selected"] = form1.selectdate.data
+        return redirect(url_for("purchasing_blueprint.purchase", product=product))
 
     if form3.submit3.data and form3.validate():
-        session["token"] = fiscal_dates["start_day"]
+        session["date_selected"] = fiscal_dates["start_day"]
         data = form3.stores.data
         session["store_list"] = tuple([x.id for x in data])
-        return redirect(url_for("purchasing_blueprint.beef", product=product))
+        return redirect(url_for("purchasing_blueprint.purchase", product=product))
 
     if form4.submit4.data and form4.validate():
         store_id = form4.store.data.id
@@ -242,12 +225,14 @@ def beef(product):
 
     color = color_assigner(product)
 
-    store_names = db.session.query(Restaurants.name).filter(Restaurants.id.in_(session["store_list"]))
+    store_names = db.session.query(Restaurants.name).filter(
+        Restaurants.id.in_(session["store_list"])
+    )
     store_names = [x[0] for x in store_names]
     store_names = ", ".join(store_names)
 
     return render_template(
-        "purchasing/beef.html",
+        "purchasing/purchase.html",
         title=product,
         company_name=Config.COMPANY_NAME,
         segment="purchasing",

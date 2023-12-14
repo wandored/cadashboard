@@ -45,9 +45,9 @@
                   <label class="form-label">Password</label>
                   {{ login_user_form.password(class="form-control", type="password") }}
                 </div>
-                <div class="form-check form-switch d-flex align-items-center mb-3">
-                  <input class="form-check-input" type="checkbox" id="rememberMe">
-                  <label class="form-check-label mb-0 ms-2" for="rememberMe">Remember me</label>
+                <div class="form-check d-flex mb-3">
+                  {{ login_user_form.remember() }}
+                  <label class="form-check-label mb-0 ms-2" for="rememberMe">Remember Me </label>
                 </div>
                 <div class="text-center">
                   {{ render_field(login_user_form.next) }}

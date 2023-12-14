@@ -1,5 +1,6 @@
 dashapp/*.db
 *.sql
+*.csv
 /output
 /scripts
 datarecovery.py

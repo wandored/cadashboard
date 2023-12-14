@@ -48,37 +48,37 @@
                 <a class="dropdown-item font-weight-bold text-primary" href="/purchasing/">Food</a>
             </li>
             <li>
-                <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.beef', product='Beef') }}">Beef</a>
+                <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.purchase', product='Beef') }}">Beef</a>
             </li>
             <li>
-                <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.beef', product='Dairy') }}">Dairy</a>
+                <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.purchase', product='Dairy') }}">Dairy</a>
             </li>
             <li>
-                <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.beef', product='Food Other') }}">Food
+                <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.purchase', product='Food Other') }}">Food
                     Other</a>
             </li>
             <li>
-                <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.beef', product='Pork') }}">Pork</a>
+                <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.purchase', product='Pork') }}">Pork</a>
             </li>
             <li>
                 <a class="dropdown-item"
-                    href="{{ url_for('purchasing_blueprint.beef', product='Poultry') }}">Poultry</a>
+                    href="{{ url_for('purchasing_blueprint.purchase', product='Poultry') }}">Poultry</a>
             </li>
             <li>
                 <a class="dropdown-item"
-                    href="{{ url_for('purchasing_blueprint.beef', product='Produce') }}">Produce</a>
+                    href="{{ url_for('purchasing_blueprint.purchase', product='Produce') }}">Produce</a>
             </li>
             <li>
-                <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.beef', product='Fish') }}">Seafood</a>
+                <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.purchase', product='Fish') }}">Seafood</a>
             </li>
             <li>
-                <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.beef', product='Beer') }}">Beer</a>
+                <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.purchase', product='Beer') }}">Beer</a>
             </li>
             <li>
-                <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.beef', product='Wine') }}">Wine</a>
+                <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.purchase', product='Wine') }}">Wine</a>
             </li>
             <li>
-                <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.beef', product='Liquor') }}">Liquor</a>
+                <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.purchase', product='Liquor') }}">Liquor</a>
             </li>
             <li><a class="dropdown-item" href="#">Supplies</a></li>
         </ul>
@@ -109,16 +109,17 @@
                         {{ form4.hidden_tag() }}
                         <fieldset id="" class="form-group mb-0">
                             <div class="form-group mb-1">
-                                {{ form4.store.label(class="form=control-label") }} {% if
-                                form4.store.errors %} {{ form4.store(class="form=control
-                                form-control-md is-invalid") }}
+                                {{ form4.store.label(class="form=control-label") }}
+                                {% if form4.store.errors %}
+                                {{ form4.store(class="form=control form-control-md is-invalid") }}
                                 <div class="invalid-feedback">
                                     {% for error in form4.store.errors %}
                                     <span>{{ error }}</span>
                                     {% endfor %}
                                 </div>
-                                {% else %} {{ form4.store(class="form=control form-control-md")
-                                }} {% endif %}
+                                {% else %}
+                                {{ form4.store(class="form=control form-control-md") }}
+                                {% endif %}
                             </div>
                         </fieldset>
                         <div class="form-group">

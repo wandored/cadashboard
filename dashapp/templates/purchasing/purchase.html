@@ -165,8 +165,7 @@
                                     <tr>
                                         <th scope="col">VENDOR</th>
                                         <th scope="col">UNIT</th>
-                                        <th scope="col">COUNT</th>
-                                        <th scope="col">COST</th>
+                                        <th scope="col">AVG COST</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -177,9 +176,6 @@
                                         </td>
                                         <td>
                                             <p class="mb-0 ms-1 text-begin">{{ v.name[1] }}</p>
-                                        </td>
-                                        <td>
-                                            <p class="mb-0 ms-1 text-end">{{ "{:,.0f}".format(v.unit_qty) }}</p>
                                         </td>
                                         <td>
                                             <p class="mb-0 ms-1 text-end">{{  "${:,.2f}".format(v.unit_cost) }}</p>
