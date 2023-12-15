@@ -541,10 +541,14 @@ def store(store_id):
     year_dinner_sales_total_ly = sum(year_dinner_sales_list_ly)
 
     def get_giftcard_sales(start, end):
-        # TODO add dow to account for days with 0 sales
+        cal_query = Calendar.query.with_entities(
+            Calendar.date, Calendar.dow, Calendar.week, Calendar.period, Calendar.year
+        ).filter(Calendar.date.between(start, end))
+        cal_df = pd.DataFrame(cal_query, columns=["date", "dow", "week", "period", "year"])
         query = (
             db.session.query(
                 GiftCardSales.date,
+                GiftCardSales.dow,
                 GiftCardSales.week,
                 GiftCardSales.period,
                 GiftCardSales.year,
@@ -557,6 +561,7 @@ def store(store_id):
             )
             .group_by(
                 GiftCardSales.date,
+                GiftCardSales.dow,
                 GiftCardSales.week,
                 GiftCardSales.period,
                 GiftCardSales.year,
@@ -564,15 +569,23 @@ def store(store_id):
             .order_by(GiftCardSales.date)
             .all()
         )
-        return pd.DataFrame.from_records(
-            query, columns=["date", "week", "period", "year", "sales", "count"]
+        df = pd.DataFrame.from_records(
+                query, columns=["date", "dow", "week", "period", "year", "sales", "count"]
         )
+        df = df.merge(cal_df, how="outer", on=["date", "dow", "week", "period", "year"])
+        df = df.fillna(0)
+        df = df.sort_values(by=["date"])
+        return df
 
     def get_giftcard_redeem(start, end):
-        # TODO add dow to account for days with 0 sales
+        cal_query = Calendar.query.with_entities(
+            Calendar.date, Calendar.dow, Calendar.week, Calendar.period, Calendar.year
+        ).filter(Calendar.date.between(start, end))
+        cal_df = pd.DataFrame(cal_query, columns=["date", "dow", "week", "period", "year"])
         query = (
             db.session.query(
                 GiftCardRedeem.date,
+                GiftCardRedeem.dow,
                 GiftCardRedeem.week,
                 GiftCardRedeem.period,
                 GiftCardRedeem.year,
@@ -585,6 +598,7 @@ def store(store_id):
             )
             .group_by(
                 GiftCardRedeem.date,
+                GiftCardRedeem.dow,
                 GiftCardRedeem.week,
                 GiftCardRedeem.period,
                 GiftCardRedeem.year,
@@ -592,9 +606,13 @@ def store(store_id):
             .order_by(GiftCardRedeem.date)
             .all()
         )
-        return pd.DataFrame.from_records(
-            query, columns=["date", "week", "period", "year", "sales"]
+        df = pd.DataFrame.from_records(
+                query, columns=["date", "dow", "week", "period", "year", "sales"]
         )
+        df = df.merge(cal_df, how="outer", on=["date", "dow", "week", "period", "year"])
+        df = df.fillna(0)
+        df = df.sort_values(by=["date"])
+        return df
 
     # giftcard sales
     week_giftcard_sales = get_giftcard_sales(
@@ -650,8 +668,6 @@ def store(store_id):
     year_giftcard_redeem_total = sum(year_giftcard_redeem_list)
     year_giftcard_redeem_list[:] = [-abs(x) for x in year_giftcard_redeem_list]
 
-    ic(period_giftcard_redeem)
-    ic(period_giftcard_sales_list)
     # giftcard balance
     week_giftcard_balance = []
     diff = 0
@@ -670,6 +686,46 @@ def store(store_id):
     for i in range(len(year_giftcard_sales_list)):
         diff += year_giftcard_sales_list[i] - year_giftcard_redeem_list[i]
         year_giftcard_balance.append(diff)
+
+    # calculate percent of sales difference from previous year correcting for division by zero
+    if week_lunch_sales_total_ly != 0:
+        wtd_lunch_sales_pct = ((week_lunch_sales_total - week_lunch_sales_total_ly) / week_lunch_sales_total_ly * 100)
+    else:
+        wtd_lunch_sales_pct = 0
+    if week_dinner_sales_total_ly != 0:
+        wtd_dinner_sales_pct = ((week_dinner_sales_total - week_dinner_sales_total_ly) / week_dinner_sales_total_ly * 100)
+    else:
+        wtd_dinner_sales_pct = 0
+    if period_lunch_sales_total_ly != 0:
+        ptd_lunch_sales_pct = ((period_lunch_sales_total - period_lunch_sales_total_ly) / period_lunch_sales_total_ly * 100)
+    else:
+        ptd_lunch_sales_pct = 0
+    if period_dinner_sales_total_ly != 0:
+        ptd_dinner_sales_pct = ((period_dinner_sales_total - period_dinner_sales_total_ly) / period_dinner_sales_total_ly * 100)
+    else:
+        ptd_dinner_sales_pct = 0
+    if year_lunch_sales_total_ly != 0:
+        ytd_lunch_sales_pct = ((year_lunch_sales_total - year_lunch_sales_total_ly) / year_lunch_sales_total_ly * 100)
+    else:
+        ytd_lunch_sales_pct = 0
+    if year_dinner_sales_total_ly != 0:
+        ytd_dinner_sales_pct = ((year_dinner_sales_total - year_dinner_sales_total_ly) / year_dinner_sales_total_ly * 100)
+    else:
+        ytd_dinner_sales_pct = 0
+    if week_giftcard_sales_total_ly != 0:
+        wtd_giftcard_sales_pct = ((week_giftcard_sales_total - week_giftcard_sales_total_ly) / week_giftcard_sales_total_ly * 100)
+    else:
+        wtd_giftcard_sales_pct = 0
+    if period_giftcard_sales_total_ly != 0:
+        ptd_giftcard_sales_pct = ((period_giftcard_sales_total - period_giftcard_sales_total_ly) / period_giftcard_sales_total_ly * 100)
+    else:
+        ptd_giftcard_sales_pct = 0
+    if year_giftcard_sales_total_ly != 0:
+        ytd_giftcard_sales_pct = ((year_giftcard_sales_total - year_giftcard_sales_total_ly) / year_giftcard_sales_total_ly * 100)
+    else:
+        ytd_giftcard_sales_pct = 0
+
+
 
     # labor tables
 
@@ -897,6 +953,7 @@ def store(store_id):
         ]
 
         df = pd.DataFrame(data)
+        ic(df)
         columns_to_convert = [
             "bar",
             "dining_room",
@@ -904,13 +961,29 @@ def store(store_id):
             "patio",
             "online_ordering",
         ]
-        for column in columns_to_convert:
-            # if df[column] == 'nan' change to 0
-            df[column] = df[column].fillna(0)
-            df[column] = (
-                pd.to_timedelta(df[column].astype(str)).dt.total_seconds().astype(int)
-            )
-        return df
+        if not df.empty:
+            for column in columns_to_convert:
+                # if df[column] == 'nan' change to 0
+                df[column] = df[column].fillna(0)
+                df[column] = (
+                    pd.to_timedelta(df[column].astype(str)).dt.total_seconds().astype(int)
+                )
+            return df
+        else:
+            # return empty dataframe
+            cal_query = Calendar.query.with_entities(
+                Calendar.date, Calendar.dow, Calendar.week, Calendar.period, Calendar.year
+            ).filter(Calendar.date.between(start, end))
+            df = pd.DataFrame(cal_query, columns=["date", "dow", "week", "period", "year"])
+            df["store"] = store.name
+            df["bar"] = 0
+            df["dining_room"] = 0
+            df["handheld"] = 0
+            df["patio"] = 0
+            df["online_ordering"] = 0
+            return df
+
+
 
     table_turn_df = get_timeing_data(
         fiscal_dates["start_week"], fiscal_dates["start_day"]

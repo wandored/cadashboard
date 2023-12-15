@@ -62,7 +62,7 @@ def find_day_with_sales(**kwargs):
     """
     if "store" in kwargs:
         while not SalesTotals.query.filter_by(
-            date=kwargs["day"], name=kwargs["store"]
+            date=kwargs["day"], store=kwargs["store"]
         ).first():
             # date = datetime.strptime(kwargs["day"], "%Y-%m-%d")
             next_day = kwargs["day"] - timedelta(days=1)

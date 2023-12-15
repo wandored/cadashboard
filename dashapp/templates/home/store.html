@@ -199,9 +199,9 @@
                     <div class="card-body">
                       <h6 class="mb-0 ">Week to Date Lunch Sales</h6>
                       {% if week_lunch_sales_total > week_lunch_sales_total_ly %}
-                      <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format((week_lunch_sales_total - week_lunch_sales_total_ly) / week_lunch_sales_total_ly * 100) }} over last year</p>
+                      <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_lunch_sales_pct) }} over last year</p>
                       {% else %}
-                      <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format((week_lunch_sales_total - week_lunch_sales_total_ly) / week_lunch_sales_total_ly * 100) }} below last year</p>
+                      <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_lunch_sales_pct) }} below last year</p>
                       {% endif %}
                     </div>
                   </div>
@@ -218,9 +218,9 @@
                     <div class="card-body">
                       <h6 class="mb-0 ">Week to Date Dinner Sales</h6>
                       {% if week_dinner_sales_total > week_dinner_sales_total_ly %}
-                      <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format((week_dinner_sales_total - week_dinner_sales_total_ly) / week_dinner_sales_total_ly * 100) }} over last year</p>
+                      <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_dinner_sales_pct) }} over last year</p>
                       {% else %}
-                      <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format((week_dinner_sales_total - week_dinner_sales_total_ly) / week_dinner_sales_total_ly * 100) }} below last year</p>
+                      <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_dinner_sales_pct) }} below last year</p>
                       {% endif %}
                     </div>
                   </div>
@@ -237,9 +237,9 @@
                     <div class="card-body">
                       <h6 class="mb-0 ">Week to Date Gift Card Sales</h6>
                       {% if week_giftcard_sales_total > week_giftcard_sales_total_ly %}
-                      <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format((week_giftcard_sales_total - week_giftcard_sales_total_ly) / week_giftcard_sales_total_ly * 100) }} over last year</p>
+                      <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_giftcard_sales_pct) }} over last year</p>
                       {% else %}
-                      <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format((week_giftcard_sales_total - week_giftcard_sales_total_ly) / week_giftcard_sales_total_ly * 100) }} below last year</p>
+                      <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_giftcard_sales_pct) }} below last year</p>
                       {% endif %}
                     </div>
                   </div>
@@ -812,7 +812,7 @@
           borderWidth: 0,
           borderRadius: 4,
           borderSkipped: false,
-          BackgroundColor: "rgba(100, 100, 100, 1)",
+          BackgroundColor: "rgba(255, 255, 255, 1)",
           data: {{ week_giftcard_redeem_list | safe }},
           stack: 'Stack 0'
         }, ],
@@ -844,7 +844,6 @@
               color: 'rgba(255, 255, 255, .2)'
             },
             ticks: {
-              display: true,
               padding: 10,
               font: {
                 size: 14,
@@ -854,10 +853,6 @@
                 lineHeight: 2
               },
               color: "#fff",
-              // Abbreviate the thousands
-              callback: function(value, index, values) {
-                return value / 1e3 + ' T';
-              },
             },
           },
           x: {

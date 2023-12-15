@@ -501,6 +501,7 @@ class GiftCardSales(db.Model):
 
     name = db.Column(db.String, primary_key=True)
     date = db.Column(db.Date, primary_key=True)
+    dow = db.Column(db.Integer)
     week = db.Column(db.Integer)
     period = db.Column(db.Integer)
     year = db.Column(db.Integer)
@@ -513,6 +514,7 @@ class GiftCardRedeem(db.Model):
 
     name = db.Column(db.String, primary_key=True)
     date = db.Column(db.Date, primary_key=True)
+    dow = db.Column(db.Integer)
     week = db.Column(db.Integer)
     period = db.Column(db.Integer)
     year = db.Column(db.Integer)
