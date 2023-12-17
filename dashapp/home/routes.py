@@ -13,7 +13,8 @@ from flask.wrappers import Response
 from flask_security import current_user, login_required
 from flask_security.decorators import roles_accepted
 from fpdf import FPDF
-from icecream import ic  # noqa: F401
+from icecream import ic
+from pandas._libs.tslibs import period  # noqa: F401
 from sqlalchemy import func
 
 from dashapp.authentication.forms import (
@@ -481,64 +482,65 @@ def store(store_id):
     week_dinner_sales_total = sum(week_dinner_sales_list)
 
     week_daypart_sales_ly = get_daypart_sales(
-        fiscal_dates["start_week_ly"], fiscal_dates["start_day_ly"]
+        fiscal_dates["start_week_ly"], fiscal_dates["end_week_ly"]
     )
     week_lunch_sales_list_ly = week_daypart_sales_ly[
         week_daypart_sales_ly.daypart == "Lunch"
     ]["sales"].tolist()
-    week_lunch_sales_total_ly = sum(week_lunch_sales_list_ly)
+    week_lunch_sales_total_ly = sum(week_lunch_sales_list_ly[:fiscal_dates["dow"]])
     week_dinner_sales_list_ly = week_daypart_sales_ly[
         week_daypart_sales_ly.daypart == "Dinner"
     ]["sales"].tolist()
-    week_dinner_sales_total_ly = sum(week_dinner_sales_list_ly)
+    week_dinner_sales_total_ly = sum(week_dinner_sales_list_ly[:fiscal_dates["dow"]])
 
     period_daypart_sales = get_daypart_sales(
         fiscal_dates["start_period"], fiscal_dates["period_to_date"]
     )
-    period_lunch_sales_list = period_daypart_sales[
-        period_daypart_sales.daypart == "Lunch"
-    ]["sales"].tolist()
+    # drop date column and group by week
+    period_daypart_sales = period_daypart_sales.drop(columns=["date"])
+    period_daypart_sales = period_daypart_sales.groupby(["week", "daypart"]).sum().reset_index()
+    period_lunch_sales = period_daypart_sales[period_daypart_sales['daypart'] == 'Lunch']
+    period_lunch_sales_list = period_lunch_sales['sales'].tolist()
     period_lunch_sales_total = sum(period_lunch_sales_list)
-    period_dinner_sales_list = period_daypart_sales[
-        period_daypart_sales.daypart == "Dinner"
-    ]["sales"].tolist()
+    period_dinner_sales = period_daypart_sales[period_daypart_sales['daypart'] == 'Dinner']
+    period_dinner_sales_list = period_dinner_sales['sales'].tolist()
     period_dinner_sales_total = sum(period_dinner_sales_list)
 
     period_daypart_sales_ly = get_daypart_sales(
-        fiscal_dates["start_period_ly"], fiscal_dates["start_day_ly"]
+        fiscal_dates["start_period_ly"], fiscal_dates["end_period_ly"]
     )
-    period_lunch_sales_list_ly = period_daypart_sales_ly[
-        period_daypart_sales_ly.daypart == "Lunch"
-    ]["sales"].tolist()
-    period_lunch_sales_total_ly = sum(period_lunch_sales_list_ly)
-    period_dinner_sales_list_ly = period_daypart_sales_ly[
-        period_daypart_sales_ly.daypart == "Dinner"
-    ]["sales"].tolist()
-    period_dinner_sales_total_ly = sum(period_dinner_sales_list_ly)
+    period_daypart_sales_ly = period_daypart_sales_ly.drop(columns=["date"])
+    period_daypart_sales_ly = period_daypart_sales_ly.groupby(["week", "daypart"]).sum().reset_index()
+    period_lunch_sales_ly = period_daypart_sales_ly[period_daypart_sales_ly['daypart'] == 'Lunch']
+    period_lunch_sales_list_ly = period_lunch_sales_ly['sales'].tolist()
+    period_lunch_sales_total_ly = sum(period_lunch_sales_list_ly[:fiscal_dates["week"]])
+    period_dinner_sales_ly = period_daypart_sales_ly[period_daypart_sales_ly['daypart'] == 'Dinner']
+    period_dinner_sales_list_ly = period_dinner_sales_ly['sales'].tolist()
+    period_dinner_sales_total_ly = sum(period_dinner_sales_list_ly[:fiscal_dates["week"]])
 
     year_daypart_sales = get_daypart_sales(
         fiscal_dates["start_year"], fiscal_dates["year_to_date"]
     )
-    year_lunch_sales_list = year_daypart_sales[year_daypart_sales.daypart == "Lunch"][
-        "sales"
-    ].tolist()
+    year_daypart_sales = year_daypart_sales.drop(columns=["date"])
+    year_daypart_sales = year_daypart_sales.groupby(["period", "daypart"]).sum().reset_index()
+    year_lunch_sales = year_daypart_sales[year_daypart_sales['daypart'] == 'Lunch']
+    year_lunch_sales_list = year_lunch_sales['sales'].tolist()
     year_lunch_sales_total = sum(year_lunch_sales_list)
-    year_dinner_sales_list = year_daypart_sales[year_daypart_sales.daypart == "Dinner"][
-        "sales"
-    ].tolist()
+    year_dinner_sales = year_daypart_sales[year_daypart_sales['daypart'] == 'Dinner']
+    year_dinner_sales_list = year_dinner_sales['sales'].tolist()
     year_dinner_sales_total = sum(year_dinner_sales_list)
 
     year_daypart_sales_ly = get_daypart_sales(
-        fiscal_dates["start_year_ly"], fiscal_dates["start_day_ly"]
+        fiscal_dates["start_year_ly"], fiscal_dates["end_year_ly"]
     )
-    year_lunch_sales_list_ly = year_daypart_sales_ly[
-        year_daypart_sales_ly.daypart == "Lunch"
-    ]["sales"].tolist()
-    year_lunch_sales_total_ly = sum(year_lunch_sales_list_ly)
-    year_dinner_sales_list_ly = year_daypart_sales_ly[
-        year_daypart_sales_ly.daypart == "Dinner"
-    ]["sales"].tolist()
-    year_dinner_sales_total_ly = sum(year_dinner_sales_list_ly)
+    year_daypart_sales_ly = year_daypart_sales_ly.drop(columns=["date"])
+    year_daypart_sales_ly = year_daypart_sales_ly.groupby(["period", "daypart"]).sum().reset_index()
+    year_lunch_sales_ly = year_daypart_sales_ly[year_daypart_sales_ly['daypart'] == 'Lunch']
+    year_lunch_sales_list_ly = year_lunch_sales_ly['sales'].tolist()
+    year_lunch_sales_total_ly = sum(year_lunch_sales_list_ly[:fiscal_dates["period"]])
+    year_dinner_sales_ly = year_daypart_sales_ly[year_daypart_sales_ly['daypart'] == 'Dinner']
+    year_dinner_sales_list_ly = year_dinner_sales_ly['sales'].tolist()
+    year_dinner_sales_total_ly = sum(year_dinner_sales_list_ly[:fiscal_dates["period"]])
 
     def get_giftcard_sales(start, end):
         cal_query = Calendar.query.with_entities(
@@ -623,30 +625,38 @@ def store(store_id):
     period_giftcard_sales = get_giftcard_sales(
         fiscal_dates["start_period"], fiscal_dates["period_to_date"]
     )
+    period_giftcard_sales = period_giftcard_sales.drop(columns=["date"])
+    period_giftcard_sales = period_giftcard_sales.groupby(["week"]).sum().reset_index()
     period_giftcard_sales_list = period_giftcard_sales["sales"].tolist()
     period_giftcard_sales_total = sum(period_giftcard_sales_list)
     year_giftcard_sales = get_giftcard_sales(
         fiscal_dates["start_year"], fiscal_dates["year_to_date"]
     )
+    year_giftcard_sales = year_giftcard_sales.drop(columns=["date"])
+    year_giftcard_sales = year_giftcard_sales.groupby(["period"]).sum().reset_index()
     year_giftcard_sales_list = year_giftcard_sales["sales"].tolist()
     year_giftcard_sales_total = sum(year_giftcard_sales_list)
 
     # giftcard sales last year
     week_giftcard_sales_ly = get_giftcard_sales(
-        fiscal_dates["start_week_ly"], fiscal_dates["start_day_ly"]
+        fiscal_dates["start_week_ly"], fiscal_dates["end_week_ly"]
     )
     week_giftcard_sales_list_ly = week_giftcard_sales_ly["sales"].tolist()
-    week_giftcard_sales_total_ly = sum(week_giftcard_sales_list_ly)
+    week_giftcard_sales_total_ly = sum(week_giftcard_sales_list_ly[:fiscal_dates['dow']])
     period_giftcard_sales_ly = get_giftcard_sales(
-        fiscal_dates["start_period_ly"], fiscal_dates["start_day_ly"]
+        fiscal_dates["start_period_ly"], fiscal_dates["end_period_ly"]
     )
+    period_giftcard_sales_ly = period_giftcard_sales_ly.drop(columns=["date"])
+    period_giftcard_sales_ly = period_giftcard_sales_ly.groupby(["week"]).sum().reset_index()
     period_giftcard_sales_list_ly = period_giftcard_sales_ly["sales"].tolist()
-    period_giftcard_sales_total_ly = sum(period_giftcard_sales_list_ly)
+    period_giftcard_sales_total_ly = sum(period_giftcard_sales_list_ly[:fiscal_dates['week']])
     year_giftcard_sales_ly = get_giftcard_sales(
-        fiscal_dates["start_year_ly"], fiscal_dates["start_day_ly"]
+        fiscal_dates["start_year_ly"], fiscal_dates["end_year_ly"]
     )
+    year_giftcard_sales_ly = year_giftcard_sales_ly.drop(columns=["date"])
+    year_giftcard_sales_ly = year_giftcard_sales_ly.groupby(["period"]).sum().reset_index()
     year_giftcard_sales_list_ly = year_giftcard_sales_ly["sales"].tolist()
-    year_giftcard_sales_total_ly = sum(year_giftcard_sales_list_ly)
+    year_giftcard_sales_total_ly = sum(year_giftcard_sales_list_ly[:fiscal_dates['period']])
 
     # giftcard redeem
     week_giftcard_redeem = get_giftcard_redeem(
@@ -953,7 +963,6 @@ def store(store_id):
         ]
 
         df = pd.DataFrame(data)
-        ic(df)
         columns_to_convert = [
             "bar",
             "dining_room",

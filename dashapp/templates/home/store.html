@@ -107,7 +107,7 @@
     <div class="col-lg-4 col-md-6 mt-4 mb-4">
       <div class="card z-index-2 ">
         <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-          <div class="bg-gradient-primary shadow-primary border-radius-lg py-3 pe-1">
+          <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
             <div class="chart">
               <canvas id="chart-bars" class="chart-canvas" height="170"></canvas>
             </div>
@@ -126,7 +126,7 @@
     <div class="col-lg-4 col-md-6 mt-4 mb-4">
       <div class="card z-index-2  ">
         <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-          <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
+          <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
             <div class="chart">
               <canvas id="chart-line" class="chart-canvas" height="170"></canvas>
             </div>
@@ -145,7 +145,7 @@
     <div class="col-lg-4 mt-4 mb-3">
       <div class="card z-index-2 ">
         <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-          <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
+          <div class="bg-gradient-warning shadow-warning border-radius-lg py-3 pe-1">
             <div class="chart">
               <canvas id="chart-line-tasks" class="chart-canvas" height="170"></canvas>
             </div>
@@ -190,9 +190,9 @@
                 <div class="col-lg-4 col-md-6 mt-4 mb-4">
                   <div class="card z-index-2">
                     <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                      <div class="bg-gradient-primary shadow-primary border-radius-lg py-3 pe-1">
+                      <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
                         <div class="chart">
-                          <canvas id="chart-lunch-sales" class="chart-canvas" height="170"></canvas>
+                          <canvas id="chart-week-lunch-sales" class="chart-canvas" height="170"></canvas>
                         </div>
                       </div>
                     </div>
@@ -209,9 +209,9 @@
                 <div class="col-lg-4 col-md-6 mt-4 mb-4">
                   <div class="card z-index-2">
                     <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                      <div class="bg-gradient-primary shadow-primary border-radius-lg py-3 pe-1">
+                      <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
                         <div class="chart">
-                          <canvas id="chart-dinner-sales" class="chart-canvas" height="170"></canvas>
+                          <canvas id="chart-week-dinner-sales" class="chart-canvas" height="170"></canvas>
                         </div>
                       </div>
                     </div>
@@ -228,9 +228,9 @@
                 <div class="col-lg-4 col-md-6 mt-4 mb-4">
                   <div class="card z-index-2">
                     <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                      <div class="bg-gradient-primary shadow-primary border-radius-lg py-3 pe-1">
+                      <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
                         <div class="chart">
-                          <canvas id="chart-giftcard-sales" class="chart-canvas" height="170"></canvas>
+                          <canvas id="chart-week-giftcard-sales" class="chart-canvas" height="170"></canvas>
                         </div>
                       </div>
                     </div>
@@ -254,6 +254,65 @@
                 </div>
               </div>
             </div>
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mt-4 mb-4">
+                  <div class="card z-index-2">
+                    <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                      <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
+                        <div class="chart">
+                          <canvas id="chart-period-lunch-sales" class="chart-canvas" height="170"></canvas>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-body">
+                      <h6 class="mb-0 ">Period to Date Lunch Sales</h6>
+                      {% if period_lunch_sales_total > period_lunch_sales_total_ly %}
+                      <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_lunch_sales_pct) }} over last year</p>
+                      {% else %}
+                      <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_lunch_sales_pct) }} below last year</p>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mt-4 mb-4">
+                  <div class="card z-index-2">
+                    <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                      <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
+                        <div class="chart">
+                          <canvas id="chart-period-dinner-sales" class="chart-canvas" height="170"></canvas>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-body">
+                      <h6 class="mb-0 ">Period to Date Dinner Sales</h6>
+                      {% if period_dinner_sales_total > period_dinner_sales_total_ly %}
+                      <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_dinner_sales_pct) }} over last year</p>
+                      {% else %}
+                      <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_dinner_sales_pct) }} below last year</p>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mt-4 mb-4">
+                  <div class="card z-index-2">
+                    <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                      <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
+                        <div class="chart">
+                          <canvas id="chart-period-giftcard-sales" class="chart-canvas" height="170"></canvas>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-body">
+                      <h6 class="mb-0 ">Period to Date Gift Card Sales</h6>
+                      {% if period_giftcard_sales_total > period_giftcard_sales_total_ly %}
+                      <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_giftcard_sales_pct) }} over last year</p>
+                      {% else %}
+                      <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_giftcard_sales_pct) }} below last year</p>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+            </div>
           </div>
           <div class="tab-pane fade" id="nav-year" role="tabpanel" aria-labelledby="nav-year-tab">
             <div class="card-header pb-0">
@@ -262,6 +321,65 @@
                   <h4>Year-{{ fiscal_dates["year"] }}</h4>
                 </div>
               </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mt-4 mb-4">
+                  <div class="card z-index-2">
+                    <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                      <div class="bg-gradient-warning shadow-warning border-radius-lg py-3 pe-1">
+                        <div class="chart">
+                          <canvas id="chart-year-lunch-sales" class="chart-canvas" height="170"></canvas>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-body">
+                      <h6 class="mb-0 ">Year to Date Lunch Sales</h6>
+                      {% if year_lunch_sales_total > year_lunch_sales_total_ly %}
+                      <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_lunch_sales_pct) }} over last year</p>
+                      {% else %}
+                      <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_lunch_sales_pct) }} below last year</p>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mt-4 mb-4">
+                  <div class="card z-index-2">
+                    <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                      <div class="bg-gradient-warning shadow-warning border-radius-lg py-3 pe-1">
+                        <div class="chart">
+                          <canvas id="chart-year-dinner-sales" class="chart-canvas" height="170"></canvas>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-body">
+                      <h6 class="mb-0 ">Year to Date Dinner Sales</h6>
+                      {% if year_dinner_sales_total > year_dinner_sales_total_ly %}
+                      <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_dinner_sales_pct) }} over last year</p>
+                      {% else %}
+                      <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_dinner_sales_pct) }} below last year</p>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mt-4 mb-4">
+                  <div class="card z-index-2">
+                    <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                      <div class="bg-gradient-warning shadow-warning border-radius-lg py-3 pe-1">
+                        <div class="chart">
+                          <canvas id="chart-year-giftcard-sales" class="chart-canvas" height="170"></canvas>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-body">
+                      <h6 class="mb-0 ">Year to Date Gift Card Sales</h6>
+                      {% if year_giftcard_sales_total > year_giftcard_sales_total_ly %}
+                      <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_giftcard_sales_pct) }} over last year</p>
+                      {% else %}
+                      <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_giftcard_sales_pct) }} below last year</p>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
             </div>
             <div class="card-body px-0 pb-2">
             </div>
@@ -579,7 +697,7 @@
       },
     });
 
-    var ctx4 = document.getElementById("chart-lunch-sales").getContext("2d");
+    var ctx4 = document.getElementById("chart-week-lunch-sales").getContext("2d");
 
     new Chart(ctx4, {
       type: "bar",
@@ -679,7 +797,7 @@
       },
     });
 
-    var ctx5 = document.getElementById("chart-dinner-sales").getContext("2d");
+    var ctx5 = document.getElementById("chart-week-dinner-sales").getContext("2d");
 
     new Chart(ctx5, {
       type: "bar",
@@ -779,7 +897,7 @@
       },
     });
 
-    var ctx6 = document.getElementById("chart-giftcard-sales").getContext("2d");
+    var ctx6 = document.getElementById("chart-week-giftcard-sales").getContext("2d");
 
     new Chart(ctx6, {
       type: "bar",
@@ -814,6 +932,610 @@
           borderSkipped: false,
           BackgroundColor: "rgba(255, 255, 255, 1)",
           data: {{ week_giftcard_redeem_list | safe }},
+          stack: 'Stack 0'
+        }, ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          title: {
+            display: true,
+            text: 'Gift Card Sales/Expense',
+          },
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
+        scales: {
+          y: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+              color: "#fff",
+            },
+          },
+          x: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              color: '#f8f9fa',
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+            }
+          },
+        },
+      },
+    });
+
+    var ctx7 = document.getElementById("chart-period-lunch-sales").getContext("2d");
+
+    new Chart(ctx7, {
+      type: "bar",
+      data: {
+        labels: ["W1", "W2", "W3", "W4"],
+        datasets: [{
+          label: "Lunch Sales",
+          tension: 0.4,
+          borderWidth: 0,
+          borderRadius: 4,
+          borderSkipped: false,
+          backgroundColor: "rgba(255, 255, 255, .8)",
+          data: {{ period_lunch_sales_list | safe }},
+          maxBarThickness: 6
+        }, {
+        label: "Same Week LY",
+          tension: 0,
+          borderWidth: 0,
+          pointRadius: 5,
+          pointBackgroundColor: "rgba(200, 200, 200, 1)",
+          pointBorderColor: "transparent",
+          borderColor: "rgba(200, 200, 200, 1)",
+          borderWidth: 4,
+          type: "line",
+          backgroundColor: "transparent",
+          fill: true,
+          data: {{ period_lunch_sales_list_ly | safe }},
+          maxBarThickness: 6
+        }, ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          title: {
+            display: true,
+            text: 'Lunch Sales',
+          },
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
+        scales: {
+          y: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+              color: "#fff",
+              // Abbreviate the thousands
+              callback: function(value, index, values) {
+                return value / 1e3 + ' T';
+              },
+            },
+          },
+          x: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              color: '#f8f9fa',
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+            }
+          },
+        },
+      },
+    });
+
+    var ctx8 = document.getElementById("chart-period-dinner-sales").getContext("2d");
+
+    new Chart(ctx8, {
+      type: "bar",
+      data: {
+        labels: ["W1", "W2", "W3", "W4"],
+        datasets: [{
+          label: "Dinner Sales",
+          tension: 0.4,
+          borderWidth: 0,
+          borderRadius: 4,
+          borderSkipped: false,
+          backgroundColor: "rgba(255, 255, 255, .8)",
+          data: {{ period_dinner_sales_list | safe }},
+          maxBarThickness: 6
+        }, {
+        label: "Same Week LY",
+          tension: 0,
+          borderWidth: 0,
+          pointRadius: 5,
+          pointBackgroundColor: "rgba(200, 200, 200, 1)",
+          pointBorderColor: "transparent",
+          borderColor: "rgba(200, 200, 200, 1)",
+          borderWidth: 4,
+          type: "line",
+          backgroundColor: "transparent",
+          fill: true,
+          data: {{ period_dinner_sales_list_ly | safe }},
+          maxBarThickness: 6
+        }, ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          title: {
+            display: true,
+            text: 'Dinner Sales',
+          },
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
+        scales: {
+          y: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+              color: "#fff",
+              // Abbreviate the thousands
+              callback: function(value, index, values) {
+                return value / 1e3 + ' T';
+              },
+            },
+          },
+          x: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              color: '#f8f9fa',
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+            }
+          },
+        },
+      },
+    });
+
+    var ctx9 = document.getElementById("chart-period-giftcard-sales").getContext("2d");
+
+    new Chart(ctx9, {
+      type: "bar",
+      data: {
+        labels: ["W1", "W2", "W3", "W4"],
+        datasets: [{
+          label: "SWLY",
+          tension: 0,
+          borderWidth: 5,
+          borderRadius: 5,
+          borderColor: "rgba(100, 100, 100, 1)",
+          pointBackgroundColor: "rgba(100, 100, 100, 1)",
+          pointBorderColor: "transparent",
+          backgroundColor: "rgba(100, 100, 100, 1)",
+          fill: false,
+          data: {{ period_giftcard_sales_list_ly | safe }},
+          type: "line"
+        },{
+          label: "Sales",
+          tension: 0.4,
+          borderWidth: 0,
+          borderRadius: 4,
+          borderSkipped: false,
+          backgroundColor: "rgba(255, 255, 255, .8)",
+          data: {{ period_giftcard_sales_list | safe }},
+          stack: 'Stack 0'
+        }, {
+        label: "Expense",
+          tension: 0.4,
+          borderWidth: 0,
+          borderRadius: 4,
+          borderSkipped: false,
+          BackgroundColor: "rgba(255, 255, 255, 1)",
+          data: {{ period_giftcard_redeem_list | safe }},
+          stack: 'Stack 0'
+        }, ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          title: {
+            display: true,
+            text: 'Gift Card Sales/Expense',
+          },
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
+        scales: {
+          y: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+              color: "#fff",
+            },
+          },
+          x: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              color: '#f8f9fa',
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+            }
+          },
+        },
+      },
+    });
+
+    var ctx10 = document.getElementById("chart-year-lunch-sales").getContext("2d");
+
+    new Chart(ctx10, {
+      type: "bar",
+      data: {
+        labels: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13"],
+        datasets: [{
+          label: "Lunch Sales",
+          tension: 0.4,
+          borderWidth: 0,
+          borderRadius: 4,
+          borderSkipped: false,
+          backgroundColor: "rgba(255, 255, 255, .8)",
+          data: {{ year_lunch_sales_list | safe }},
+          maxBarThickness: 6
+        }, {
+        label: "Same Period LY",
+          tension: 0,
+          borderWidth: 0,
+          pointRadius: 5,
+          pointBackgroundColor: "rgba(200, 200, 200, 1)",
+          pointBorderColor: "transparent",
+          borderColor: "rgba(200, 200, 200, 1)",
+          borderWidth: 4,
+          type: "line",
+          backgroundColor: "transparent",
+          fill: true,
+          data: {{ year_lunch_sales_list_ly | safe }},
+          maxBarThickness: 6
+        }, ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          title: {
+            display: true,
+            text: 'Lunch Sales',
+          },
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
+        scales: {
+          y: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+              color: "#fff",
+              // Abbreviate the thousands
+              callback: function(value, index, values) {
+                return value / 1e3 + ' T';
+              },
+            },
+          },
+          x: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              color: '#f8f9fa',
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+            }
+          },
+        },
+      },
+    });
+
+    var ctx11 = document.getElementById("chart-year-dinner-sales").getContext("2d");
+
+    new Chart(ctx11, {
+      type: "bar",
+      data: {
+        labels: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13"],
+        datasets: [{
+          label: "Dinner Sales",
+          tension: 0.4,
+          borderWidth: 0,
+          borderRadius: 4,
+          borderSkipped: false,
+          backgroundColor: "rgba(255, 255, 255, .8)",
+          data: {{ year_dinner_sales_list | safe }},
+          maxBarThickness: 6
+        }, {
+        label: "Same Period LY",
+          tension: 0,
+          borderWidth: 0,
+          pointRadius: 5,
+          pointBackgroundColor: "rgba(200, 200, 200, 1)",
+          pointBorderColor: "transparent",
+          borderColor: "rgba(200, 200, 200, 1)",
+          borderWidth: 4,
+          type: "line",
+          backgroundColor: "transparent",
+          fill: true,
+          data: {{ year_dinner_sales_list_ly | safe }},
+          maxBarThickness: 6
+        }, ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          title: {
+            display: true,
+            text: 'Dinner Sales',
+          },
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
+        scales: {
+          y: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+              color: "#fff",
+              // Abbreviate the thousands
+              callback: function(value, index, values) {
+                return value / 1e3 + ' T';
+              },
+            },
+          },
+          x: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              color: '#f8f9fa',
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+            }
+          },
+        },
+      },
+    });
+
+    var ctx12 = document.getElementById("chart-year-giftcard-sales").getContext("2d");
+
+    new Chart(ctx12, {
+      type: "bar",
+      data: {
+        labels: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13"],
+        datasets: [{
+          label: "SPLY",
+          tension: 0,
+          borderWidth: 5,
+          borderRadius: 5,
+          borderColor: "rgba(100, 100, 100, 1)",
+          pointBackgroundColor: "rgba(100, 100, 100, 1)",
+          pointBorderColor: "transparent",
+          backgroundColor: "rgba(100, 100, 100, 1)",
+          fill: false,
+          data: {{ year_giftcard_sales_list_ly | safe }},
+          type: "line"
+        },{
+          label: "Sales",
+          tension: 0.4,
+          borderWidth: 0,
+          borderRadius: 4,
+          borderSkipped: false,
+          backgroundColor: "rgba(255, 255, 255, .8)",
+          data: {{ year_giftcard_sales_list | safe }},
+          stack: 'Stack 0'
+        }, {
+        label: "Expense",
+          tension: 0.4,
+          borderWidth: 0,
+          borderRadius: 4,
+          borderSkipped: false,
+          BackgroundColor: "rgba(255, 255, 255, 1)",
+          data: {{ year_giftcard_redeem_list | safe }},
           stack: 'Stack 0'
         }, ],
       },
