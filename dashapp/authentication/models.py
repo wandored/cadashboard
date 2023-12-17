@@ -327,6 +327,7 @@ class SalesTotals(db.Model):
     __tablename__ = "sales_totals"
 
     store = db.Column(db.String, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.Date, primary_key=True)
     dow = db.Column(db.Integer)
     week = db.Column(db.Integer)
@@ -340,6 +341,7 @@ class LaborTotals(db.Model):
     __tablename__ = "labor_totals"
 
     store = db.Column(db.String, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     job = db.Column(db.String, primary_key=True)
     category = db.Column(db.String)
     date = db.Column(db.Date)
@@ -386,6 +388,7 @@ class SalesCategory(db.Model):
     __tablename__ = "sales_category"
 
     store = db.Column(db.String, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.Date, primary_key=True)
     dow = db.Column(db.Integer)
     week = db.Column(db.Integer)
@@ -400,6 +403,7 @@ class SalesDaypart(db.Model):
     __tablename__ = "sales_daypart"
 
     store = db.Column(db.String, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     daypart = db.Column(db.String, primary_key=True)
     date = db.Column(db.Date, primary_key=True)
     dow = db.Column(db.Integer)
@@ -414,6 +418,7 @@ class SalesHourly(db.Model):
     __tablename__ = "sales_hourly"
 
     store = db.Column(db.String, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     order_hour = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.Date, primary_key=True)
     dow = db.Column(db.Integer)
@@ -428,6 +433,7 @@ class SalesRecordsDay(db.Model):
     __tablename__ = "sales_records_day"
 
     store = db.Column(db.String, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.Date, primary_key=True)
     dow = db.Column(db.Integer)
     week = db.Column(db.Integer)
@@ -440,6 +446,7 @@ class SalesRecordsWeek(db.Model):
     __tablename__ = "sales_records_week"
 
     store = db.Column(db.String, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     week = db.Column(db.Integer, primary_key=True)
     period = db.Column(db.Integer, primary_key=True)
     year = db.Column(db.Integer, primary_key=True)
@@ -450,6 +457,7 @@ class SalesRecordsPeriod(db.Model):
     __tablename__ = "sales_records_period"
 
     store = db.Column(db.String, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     period = db.Column(db.Integer, primary_key=True)
     year = db.Column(db.Integer, primary_key=True)
     net_sales = db.Column(db.Float)
@@ -459,6 +467,7 @@ class SalesRecordsYear(db.Model):
     __tablename__ = "sales_records_year"
 
     store = db.Column(db.String, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     year = db.Column(db.Integer, primary_key=True)
     net_sales = db.Column(db.Float)
 
@@ -466,6 +475,7 @@ class SalesRecordsYear(db.Model):
 class TableTurns(db.Model):
     __tablename__ = "table_turns"
     store = db.Column(db.String, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.Date, primary_key=True)
     dow = db.Column(db.Integer)
     week = db.Column(db.Integer)
@@ -499,7 +509,8 @@ class StockCount(db.Model):
 class GiftCardSales(db.Model):
     __tablename__ = "gift_card_sales"
 
-    name = db.Column(db.String, primary_key=True)
+    store = db.Column(db.String, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.Date, primary_key=True)
     dow = db.Column(db.Integer)
     week = db.Column(db.Integer)
@@ -512,7 +523,8 @@ class GiftCardSales(db.Model):
 class GiftCardRedeem(db.Model):
     __tablename__ = "gift_card_redeem"
 
-    name = db.Column(db.String, primary_key=True)
+    store = db.Column(db.String, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.Date, primary_key=True)
     dow = db.Column(db.Integer)
     week = db.Column(db.Integer)
