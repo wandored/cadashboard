@@ -245,6 +245,65 @@
                   </div>
                 </div>
             </div>
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mt-4 mb-4">
+                  <div class="card z-index-2">
+                    <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                      <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
+                        <div class="chart">
+                          <canvas id="chart-week-beer-sales" class="chart-canvas" height="170"></canvas>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-body">
+                      <h6 class="mb-0 ">Week to Date Beer Sales</h6>
+                      {% if week_beer_sales_total > week_beer_sales_total_ly %}
+                      <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_beer_sales_pct) }} over last year</p>
+                      {% else %}
+                      <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_beer_sales_pct) }} below last year</p>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mt-4 mb-4">
+                  <div class="card z-index-2">
+                    <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                      <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
+                        <div class="chart">
+                          <canvas id="chart-week-wine-sales" class="chart-canvas" height="170"></canvas>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-body">
+                      <h6 class="mb-0 ">Week to Date Wine Sales</h6>
+                      {% if week_wine_sales_total > week_wine_sales_total_ly %}
+                      <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_wine_sales_pct) }} over last year</p>
+                      {% else %}
+                      <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_wine_sales_pct) }} below last year</p>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mt-4 mb-4">
+                  <div class="card z-index-2">
+                    <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                      <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
+                        <div class="chart">
+                          <canvas id="chart-week-liquor-sales" class="chart-canvas" height="170"></canvas>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-body">
+                      <h6 class="mb-0 ">Week to Date Liquor Sales</h6>
+                      {% if week_liquor_sales_total > week_liquor_sales_total_ly %}
+                      <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_liquor_sales_pct) }} over last year</p>
+                      {% else %}
+                      <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_liquor_sales_pct) }} below last year</p>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+            </div>
           </div>
           <div class="tab-pane fade" id="nav-period" role="tabpanel" aria-labelledby="nav-period-tab">
             <div class="card-header pb-0">
@@ -1602,6 +1661,307 @@
         },
       },
     });
+
+    var ctx13 = document.getElementById("chart-week-beer-sales").getContext("2d");
+
+    new Chart(ctx13, {
+      type: "bar",
+      data: {
+        labels: ["W", "T", "F", "S", "S", "M", "T"],
+        datasets: [{
+          label: "Beer Sales",
+          tension: 0.4,
+          borderWidth: 0,
+          borderRadius: 4,
+          borderSkipped: false,
+          backgroundColor: "rgba(255, 255, 255, .8)",
+          data: {{ week_beer_sales_list | safe }},
+          maxBarThickness: 6
+        }, {
+        label: "Same Day LY",
+          tension: 0,
+          borderWidth: 0,
+          pointRadius: 5,
+          pointBackgroundColor: "rgba(200, 200, 200, 1)",
+          pointBorderColor: "transparent",
+          borderColor: "rgba(200, 200, 200, 1)",
+          borderWidth: 4,
+          type: "line",
+          backgroundColor: "transparent",
+          fill: true,
+          data: {{ week_beer_sales_list_ly | safe }},
+          maxBarThickness: 6
+        }, ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          title: {
+            display: true,
+            text: 'Beer Sales',
+          },
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
+        scales: {
+          y: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+              color: "#fff",
+              // Abbreviate the thousands
+              callback: function(value, index, values) {
+                return value / 1e3 + ' T';
+              },
+            },
+          },
+          x: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              color: '#f8f9fa',
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+            }
+          },
+        },
+      },
+    });
+
+    var ctx14 = document.getElementById("chart-week-wine-sales").getContext("2d");
+
+    new Chart(ctx14, {
+      type: "bar",
+      data: {
+        labels: ["W", "T", "F", "S", "S", "M", "T"],
+        datasets: [{
+          label: "Wine Sales",
+          tension: 0.4,
+          borderWidth: 0,
+          borderRadius: 4,
+          borderSkipped: false,
+          backgroundColor: "rgba(255, 255, 255, .8)",
+          data: {{ week_wine_sales_list | safe }},
+          maxBarThickness: 6
+        }, {
+        label: "Same Day LY",
+          tension: 0,
+          borderWidth: 0,
+          pointRadius: 5,
+          pointBackgroundColor: "rgba(200, 200, 200, 1)",
+          pointBorderColor: "transparent",
+          borderColor: "rgba(200, 200, 200, 1)",
+          borderWidth: 4,
+          type: "line",
+          backgroundColor: "transparent",
+          fill: true,
+          data: {{ week_wine_sales_list_ly | safe }},
+          maxBarThickness: 6
+        }, ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          title: {
+            display: true,
+            text: 'Wine Sales',
+          },
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
+        scales: {
+          y: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+              color: "#fff",
+              // Abbreviate the thousands
+              callback: function(value, index, values) {
+                return value / 1e3 + ' T';
+              },
+            },
+          },
+          x: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              color: '#f8f9fa',
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+            }
+          },
+        },
+      },
+    });
+
+    var ctx15 = document.getElementById("chart-week-liquor-sales").getContext("2d");
+
+    new Chart(ctx15, {
+      type: "bar",
+      data: {
+        labels: ["W", "T", "F", "S", "S", "M", "T"],
+        datasets: [{
+          label: "Liquor Sales",
+          tension: 0.4,
+          borderWidth: 0,
+          borderRadius: 4,
+          borderSkipped: false,
+          backgroundColor: "rgba(255, 255, 255, .8)",
+          data: {{ week_liquor_sales_list | safe }},
+          maxBarThickness: 6
+        }, {
+        label: "Same Day LY",
+          tension: 0,
+          borderWidth: 0,
+          pointRadius: 5,
+          pointBackgroundColor: "rgba(200, 200, 200, 1)",
+          pointBorderColor: "transparent",
+          borderColor: "rgba(200, 200, 200, 1)",
+          borderWidth: 4,
+          type: "line",
+          backgroundColor: "transparent",
+          fill: true,
+          data: {{ week_liquor_sales_list_ly | safe }},
+          maxBarThickness: 6
+        }, ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          title: {
+            display: true,
+            text: 'Liquor Sales',
+          },
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
+        scales: {
+          y: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+              color: "#fff",
+              // Abbreviate the thousands
+              callback: function(value, index, values) {
+                return value / 1e3 + ' T';
+              },
+            },
+          },
+          x: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              color: '#f8f9fa',
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+            }
+          },
+        },
+      },
+    });
+
 
   </script>
 
