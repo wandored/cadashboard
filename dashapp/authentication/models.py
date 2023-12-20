@@ -531,3 +531,17 @@ class GiftCardRedeem(db.Model):
     period = db.Column(db.Integer)
     year = db.Column(db.Integer)
     amount = db.Column(db.Float)
+
+
+class SalesCarryout(db.Model):
+    __tablename__ = "sales_carryout"
+    store = db.Column(db.String, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.Date, primary_key=True)
+    dow = db.Column(db.Integer)
+    week = db.Column(db.Integer)
+    period = db.Column(db.Integer)
+    year = db.Column(db.Integer)
+    category = db.Column(db.String)
+    quantity = db.Column(db.Float)
+    amount = db.Column(db.Integer)
