@@ -53,6 +53,7 @@ from dashapp.home.util import (
     get_giftcard_sales,
     get_giftcard_redeem,
     get_category_sales,
+    get_togo_sales,
     get_sales_charts,
     find_day_with_sales,
     get_item_avg_cost,
@@ -490,6 +491,7 @@ def store(store_id):
     daily_sales = daily_sales_list[-1]
     daily_sales_ly = daily_sales_list_ly[-1]
 
+    # lunch and dinner sales
     week_daypart_sales = get_daypart_sales(
         fiscal_dates["start_week"], fiscal_dates["week_to_date"], session["store_list"]
     )
@@ -597,6 +599,80 @@ def store(store_id):
     year_dinner_sales_total_ly = sum(
         year_dinner_sales_list_ly[: fiscal_dates["period"]]
     )
+
+    # togo sales
+    week_togo_sales = get_togo_sales(
+        fiscal_dates["start_week"],
+        fiscal_dates["week_to_date"],
+        session["store_list"]
+    )
+    week_togo_sales_list = week_togo_sales["sales"].tolist()
+    week_togo_sales_total = sum(week_togo_sales_list)
+    period_togo_sales = get_togo_sales(
+        fiscal_dates["start_period"],
+        fiscal_dates["period_to_date"],
+        session["store_list"],
+    )
+    period_togo_sales_list = period_togo_sales["sales"].tolist()
+    period_togo_sales_total = sum(period_togo_sales_list)
+    year_togo_sales = get_togo_sales(
+        fiscal_dates["start_year"], fiscal_dates["year_to_date"], session["store_list"]
+    )
+    year_togo_sales_list = year_togo_sales["sales"].tolist()
+    year_togo_sales_total = sum(year_togo_sales_list)
+
+    # togo sales last year
+    week_togo_sales_ly = get_togo_sales(
+        fiscal_dates["start_week_ly"],
+        fiscal_dates["end_week_ly"],
+        session["store_list"],
+    )
+    week_togo_sales_list_ly = week_togo_sales_ly["sales"].tolist()
+    week_togo_sales_total_ly = sum(week_togo_sales_list_ly[: fiscal_dates["dow"]])
+    period_togo_sales_ly = get_togo_sales(
+        fiscal_dates["start_period_ly"],
+        fiscal_dates["end_period_ly"],
+        session["store_list"],
+    )
+    period_togo_sales_list_ly = period_togo_sales_ly["sales"].tolist()
+    period_togo_sales_total_ly = sum(
+        period_togo_sales_list_ly[: fiscal_dates["week"]]
+    )
+    year_togo_sales_ly = get_togo_sales(
+            fiscal_dates["start_year_ly"],
+            fiscal_dates["end_year_ly"],
+            session["store_list"],
+                )
+    year_togo_sales_list_ly = year_togo_sales_ly["sales"].tolist()
+    year_togo_sales_total_ly = sum(
+            year_togo_sales_list_ly[: fiscal_dates["period"]]
+                )
+    # calculate percent of togo sales difference from previous year correcting for division by zero
+    if week_togo_sales_total_ly != 0:
+        wtd_togo_sales_pct = (
+            (week_togo_sales_total - week_togo_sales_total_ly)
+            / week_togo_sales_total_ly
+            * 100
+        )
+    else:
+        wtd_togo_sales_pct = 0
+    if period_togo_sales_total_ly != 0:
+        ptd_togo_sales_pct = (
+            (period_togo_sales_total - period_togo_sales_total_ly)
+            / period_togo_sales_total_ly
+            * 100
+        )
+    else:
+        ptd_togo_sales_pct = 0
+    if year_togo_sales_total_ly != 0:
+        ytd_togo_sales_pct = (
+            (year_togo_sales_total - year_togo_sales_total_ly)
+            / year_togo_sales_total_ly
+            * 100
+        )
+    else:
+        ytd_togo_sales_pct = 0
+
 
     # giftcard sales
     week_giftcard_sales = get_giftcard_sales(
@@ -1235,8 +1311,9 @@ def store(store_id):
     patio_list_avg = table_turn_df_avg["patio"].tolist()
     online_ordering_list_avg = table_turn_df_avg["online_ordering"].tolist()
 
-    ic(locals())
 
+    ic(week_togo_sales_list)
+    ic(week_togo_sales_list_ly)
     return render_template(
         "home/store.html",
         title=store.name,

@@ -230,16 +230,16 @@
                     <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
                       <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
                         <div class="chart">
-                          <canvas id="chart-week-giftcard-sales" class="chart-canvas" height="170"></canvas>
+                          <canvas id="chart-week-togo-sales" class="chart-canvas" height="170"></canvas>
                         </div>
                       </div>
                     </div>
                     <div class="card-body">
-                      <h6 class="mb-0 ">Week to Date Gift Card Sales</h6>
-                      {% if week_giftcard_sales_total > week_giftcard_sales_total_ly %}
-                      <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_giftcard_sales_pct) }} over last year</p>
+                      <h6 class="mb-0 ">Week to Date To-Go Sales</h6>
+                      {% if week_togo_sales_total > week_togo_sales_total_ly %}
+                      <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_togo_sales_pct) }} over last year</p>
                       {% else %}
-                      <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_giftcard_sales_pct) }} below last year</p>
+                      <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_togo_sales_pct) }} below last year</p>
                       {% endif %}
                     </div>
                   </div>
@@ -357,16 +357,16 @@
                     <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
                       <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
                         <div class="chart">
-                          <canvas id="chart-period-giftcard-sales" class="chart-canvas" height="170"></canvas>
+                          <canvas id="chart-period-togo-sales" class="chart-canvas" height="170"></canvas>
                         </div>
                       </div>
                     </div>
                     <div class="card-body">
-                      <h6 class="mb-0 ">Period to Date Gift Card Sales</h6>
-                      {% if period_giftcard_sales_total > period_giftcard_sales_total_ly %}
-                      <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_giftcard_sales_pct) }} over last year</p>
+                      <h6 class="mb-0 ">Period to Date To-Go Sales</h6>
+                      {% if period_togo_sales_total > period_togo_sales_total_ly %}
+                      <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_togo_sales_pct) }} over last year</p>
                       {% else %}
-                      <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_giftcard_sales_pct) }} below last year</p>
+                      <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_togo_sales_pct) }} below last year</p>
                       {% endif %}
                     </div>
                   </div>
@@ -425,16 +425,16 @@
                     <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
                       <div class="bg-gradient-warning shadow-warning border-radius-lg py-3 pe-1">
                         <div class="chart">
-                          <canvas id="chart-year-giftcard-sales" class="chart-canvas" height="170"></canvas>
+                          <canvas id="chart-year-togo-sales" class="chart-canvas" height="170"></canvas>
                         </div>
                       </div>
                     </div>
                     <div class="card-body">
-                      <h6 class="mb-0 ">Year to Date Gift Card Sales</h6>
-                      {% if year_giftcard_sales_total > year_giftcard_sales_total_ly %}
-                      <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_giftcard_sales_pct) }} over last year</p>
+                      <h6 class="mb-0 ">Year to Date To-Go Sales</h6>
+                      {% if year_togo_sales_total > year_togo_sales_total_ly %}
+                      <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_togo_sales_pct) }} over last year</p>
                       {% else %}
-                      <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_giftcard_sales_pct) }} below last year</p>
+                      <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_togo_sales_pct) }} below last year</p>
                       {% endif %}
                     </div>
                   </div>
@@ -756,9 +756,9 @@
       },
     });
 
-    var ctx4 = document.getElementById("chart-week-lunch-sales").getContext("2d");
+    var ctw1 = document.getElementById("chart-week-lunch-sales").getContext("2d");
 
-    new Chart(ctx4, {
+    new Chart(ctw1, {
       type: "bar",
       data: {
         labels: ["W", "T", "F", "S", "S", "M", "T"],
@@ -856,9 +856,9 @@
       },
     });
 
-    var ctx5 = document.getElementById("chart-week-dinner-sales").getContext("2d");
+    var ctw2 = document.getElementById("chart-week-dinner-sales").getContext("2d");
 
-    new Chart(ctx5, {
+    new Chart(ctw2, {
       type: "bar",
       data: {
         labels: ["W", "T", "F", "S", "S", "M", "T"],
@@ -956,125 +956,23 @@
       },
     });
 
-    var ctx6 = document.getElementById("chart-week-giftcard-sales").getContext("2d");
+    var ctw3 = document.getElementById("chart-week-togo-sales").getContext("2d");
 
-    new Chart(ctx6, {
+    new Chart(ctw3, {
       type: "bar",
       data: {
         labels: ["W", "T", "F", "S", "S", "M", "T"],
         datasets: [{
-          label: "SDLY",
-          tension: 0,
-          borderWidth: 5,
-          borderRadius: 5,
-          borderColor: "rgba(100, 100, 100, 1)",
-          pointBackgroundColor: "rgba(100, 100, 100, 1)",
-          pointBorderColor: "transparent",
-          backgroundColor: "rgba(100, 100, 100, 1)",
-          fill: false,
-          data: {{ week_giftcard_sales_list_ly | safe }},
-          type: "line"
-        },{
-          label: "Sales",
+          label: "To-Go Sales",
           tension: 0.4,
           borderWidth: 0,
           borderRadius: 4,
           borderSkipped: false,
           backgroundColor: "rgba(255, 255, 255, .8)",
-          data: {{ week_giftcard_sales_list | safe }},
-          stack: 'Stack 0'
-        }, {
-        label: "Expense",
-          tension: 0.4,
-          borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false,
-          BackgroundColor: "rgba(255, 255, 255, 1)",
-          data: {{ week_giftcard_redeem_list | safe }},
-          stack: 'Stack 0'
-        }, ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          },
-          title: {
-            display: true,
-            text: 'Gift Card Sales/Expense',
-          },
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-              color: "#fff",
-            },
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              color: '#f8f9fa',
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-            }
-          },
-        },
-      },
-    });
-
-    var ctx7 = document.getElementById("chart-period-lunch-sales").getContext("2d");
-
-    new Chart(ctx7, {
-      type: "bar",
-      data: {
-        labels: ["W1", "W2", "W3", "W4"],
-        datasets: [{
-          label: "Lunch Sales",
-          tension: 0.4,
-          borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false,
-          backgroundColor: "rgba(255, 255, 255, .8)",
-          data: {{ period_lunch_sales_list | safe }},
+          data: {{ week_togo_sales_list | safe }},
           maxBarThickness: 6
         }, {
-        label: "Same Week LY",
+        label: "Same Day LY",
           tension: 0,
           borderWidth: 0,
           pointRadius: 5,
@@ -1085,7 +983,7 @@
           type: "line",
           backgroundColor: "transparent",
           fill: true,
-          data: {{ period_lunch_sales_list_ly | safe }},
+          data: {{ week_togo_sales_list_ly | safe }},
           maxBarThickness: 6
         }, ],
       },
@@ -1098,7 +996,7 @@
           },
           title: {
             display: true,
-            text: 'Lunch Sales',
+            text: 'To-Go Sales',
           },
         },
         interaction: {
@@ -1158,513 +1056,9 @@
       },
     });
 
-    var ctx8 = document.getElementById("chart-period-dinner-sales").getContext("2d");
+    var ctw4 = document.getElementById("chart-week-beer-sales").getContext("2d");
 
-    new Chart(ctx8, {
-      type: "bar",
-      data: {
-        labels: ["W1", "W2", "W3", "W4"],
-        datasets: [{
-          label: "Dinner Sales",
-          tension: 0.4,
-          borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false,
-          backgroundColor: "rgba(255, 255, 255, .8)",
-          data: {{ period_dinner_sales_list | safe }},
-          maxBarThickness: 6
-        }, {
-        label: "Same Week LY",
-          tension: 0,
-          borderWidth: 0,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(200, 200, 200, 1)",
-          pointBorderColor: "transparent",
-          borderColor: "rgba(200, 200, 200, 1)",
-          borderWidth: 4,
-          type: "line",
-          backgroundColor: "transparent",
-          fill: true,
-          data: {{ period_dinner_sales_list_ly | safe }},
-          maxBarThickness: 6
-        }, ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          },
-          title: {
-            display: true,
-            text: 'Dinner Sales',
-          },
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-              color: "#fff",
-              // Abbreviate the thousands
-              callback: function(value, index, values) {
-                return value / 1e3 + ' T';
-              },
-            },
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              color: '#f8f9fa',
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-            }
-          },
-        },
-      },
-    });
-
-    var ctx9 = document.getElementById("chart-period-giftcard-sales").getContext("2d");
-
-    new Chart(ctx9, {
-      type: "bar",
-      data: {
-        labels: ["W1", "W2", "W3", "W4"],
-        datasets: [{
-          label: "SWLY",
-          tension: 0,
-          borderWidth: 5,
-          borderRadius: 5,
-          borderColor: "rgba(100, 100, 100, 1)",
-          pointBackgroundColor: "rgba(100, 100, 100, 1)",
-          pointBorderColor: "transparent",
-          backgroundColor: "rgba(100, 100, 100, 1)",
-          fill: false,
-          data: {{ period_giftcard_sales_list_ly | safe }},
-          type: "line"
-        },{
-          label: "Sales",
-          tension: 0.4,
-          borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false,
-          backgroundColor: "rgba(255, 255, 255, .8)",
-          data: {{ period_giftcard_sales_list | safe }},
-          stack: 'Stack 0'
-        }, {
-        label: "Expense",
-          tension: 0.4,
-          borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false,
-          BackgroundColor: "rgba(255, 255, 255, 1)",
-          data: {{ period_giftcard_redeem_list | safe }},
-          stack: 'Stack 0'
-        }, ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          },
-          title: {
-            display: true,
-            text: 'Gift Card Sales/Expense',
-          },
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-              color: "#fff",
-            },
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              color: '#f8f9fa',
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-            }
-          },
-        },
-      },
-    });
-
-    var ctx10 = document.getElementById("chart-year-lunch-sales").getContext("2d");
-
-    new Chart(ctx10, {
-      type: "bar",
-      data: {
-        labels: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13"],
-        datasets: [{
-          label: "Lunch Sales",
-          tension: 0.4,
-          borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false,
-          backgroundColor: "rgba(255, 255, 255, .8)",
-          data: {{ year_lunch_sales_list | safe }},
-          maxBarThickness: 6
-        }, {
-        label: "Same Period LY",
-          tension: 0,
-          borderWidth: 0,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(200, 200, 200, 1)",
-          pointBorderColor: "transparent",
-          borderColor: "rgba(200, 200, 200, 1)",
-          borderWidth: 4,
-          type: "line",
-          backgroundColor: "transparent",
-          fill: true,
-          data: {{ year_lunch_sales_list_ly | safe }},
-          maxBarThickness: 6
-        }, ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          },
-          title: {
-            display: true,
-            text: 'Lunch Sales',
-          },
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-              color: "#fff",
-              // Abbreviate the thousands
-              callback: function(value, index, values) {
-                return value / 1e3 + ' T';
-              },
-            },
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              color: '#f8f9fa',
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-            }
-          },
-        },
-      },
-    });
-
-    var ctx11 = document.getElementById("chart-year-dinner-sales").getContext("2d");
-
-    new Chart(ctx11, {
-      type: "bar",
-      data: {
-        labels: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13"],
-        datasets: [{
-          label: "Dinner Sales",
-          tension: 0.4,
-          borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false,
-          backgroundColor: "rgba(255, 255, 255, .8)",
-          data: {{ year_dinner_sales_list | safe }},
-          maxBarThickness: 6
-        }, {
-        label: "Same Period LY",
-          tension: 0,
-          borderWidth: 0,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(200, 200, 200, 1)",
-          pointBorderColor: "transparent",
-          borderColor: "rgba(200, 200, 200, 1)",
-          borderWidth: 4,
-          type: "line",
-          backgroundColor: "transparent",
-          fill: true,
-          data: {{ year_dinner_sales_list_ly | safe }},
-          maxBarThickness: 6
-        }, ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          },
-          title: {
-            display: true,
-            text: 'Dinner Sales',
-          },
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-              color: "#fff",
-              // Abbreviate the thousands
-              callback: function(value, index, values) {
-                return value / 1e3 + ' T';
-              },
-            },
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              color: '#f8f9fa',
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-            }
-          },
-        },
-      },
-    });
-
-    var ctx12 = document.getElementById("chart-year-giftcard-sales").getContext("2d");
-
-    new Chart(ctx12, {
-      type: "bar",
-      data: {
-        labels: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13"],
-        datasets: [{
-          label: "SPLY",
-          tension: 0,
-          borderWidth: 5,
-          borderRadius: 5,
-          borderColor: "rgba(100, 100, 100, 1)",
-          pointBackgroundColor: "rgba(100, 100, 100, 1)",
-          pointBorderColor: "transparent",
-          backgroundColor: "rgba(100, 100, 100, 1)",
-          fill: false,
-          data: {{ year_giftcard_sales_list_ly | safe }},
-          type: "line"
-        },{
-          label: "Sales",
-          tension: 0.4,
-          borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false,
-          backgroundColor: "rgba(255, 255, 255, .8)",
-          data: {{ year_giftcard_sales_list | safe }},
-          stack: 'Stack 0'
-        }, {
-        label: "Expense",
-          tension: 0.4,
-          borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false,
-          BackgroundColor: "rgba(255, 255, 255, 1)",
-          data: {{ year_giftcard_redeem_list | safe }},
-          stack: 'Stack 0'
-        }, ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          },
-          title: {
-            display: true,
-            text: 'Gift Card Sales/Expense',
-          },
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-              color: "#fff",
-            },
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              color: '#f8f9fa',
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-            }
-          },
-        },
-      },
-    });
-
-    var ctx13 = document.getElementById("chart-week-beer-sales").getContext("2d");
-
-    new Chart(ctx13, {
+    new Chart(ctw4, {
       type: "bar",
       data: {
         labels: ["W", "T", "F", "S", "S", "M", "T"],
@@ -1762,9 +1156,9 @@
       },
     });
 
-    var ctx14 = document.getElementById("chart-week-wine-sales").getContext("2d");
+    var ctw5 = document.getElementById("chart-week-wine-sales").getContext("2d");
 
-    new Chart(ctx14, {
+    new Chart(ctw5, {
       type: "bar",
       data: {
         labels: ["W", "T", "F", "S", "S", "M", "T"],
@@ -1862,9 +1256,9 @@
       },
     });
 
-    var ctx15 = document.getElementById("chart-week-liquor-sales").getContext("2d");
+    var ctw6 = document.getElementById("chart-week-liquor-sales").getContext("2d");
 
-    new Chart(ctx15, {
+    new Chart(ctw6, {
       type: "bar",
       data: {
         labels: ["W", "T", "F", "S", "S", "M", "T"],
@@ -1934,6 +1328,1512 @@
               callback: function(value, index, values) {
                 return value / 1e3 + ' T';
               },
+            },
+          },
+          x: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              color: '#f8f9fa',
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+            }
+          },
+        },
+      },
+    });
+
+    var ctw7 = document.getElementById("chart-week-giftcard-sales").getContext("2d");
+
+    new Chart(ctw7, {
+      type: "bar",
+      data: {
+        labels: ["W", "T", "F", "S", "S", "M", "T"],
+        datasets: [{
+          label: "SDLY",
+          tension: 0,
+          borderWidth: 5,
+          borderRadius: 5,
+          borderColor: "rgba(100, 100, 100, 1)",
+          pointBackgroundColor: "rgba(100, 100, 100, 1)",
+          pointBorderColor: "transparent",
+          backgroundColor: "rgba(100, 100, 100, 1)",
+          fill: false,
+          data: {{ week_giftcard_sales_list_ly | safe }},
+          type: "line"
+        },{
+          label: "Sales",
+          tension: 0.4,
+          borderWidth: 0,
+          borderRadius: 4,
+          borderSkipped: false,
+          backgroundColor: "rgba(255, 255, 255, .8)",
+          data: {{ week_giftcard_sales_list | safe }},
+          stack: 'Stack 0'
+        }, {
+        label: "Expense",
+          tension: 0.4,
+          borderWidth: 0,
+          borderRadius: 4,
+          borderSkipped: false,
+          BackgroundColor: "rgba(255, 255, 255, 1)",
+          data: {{ week_giftcard_redeem_list | safe }},
+          stack: 'Stack 0'
+        }, ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          title: {
+            display: true,
+            text: 'To-Go Sales/Expense',
+          },
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
+        scales: {
+          y: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+              color: "#fff",
+            },
+          },
+          x: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              color: '#f8f9fa',
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+            }
+          },
+        },
+      },
+    });
+
+    var ctp1 = document.getElementById("chart-period-lunch-sales").getContext("2d");
+
+    new Chart(ctp1, {
+      type: "bar",
+      data: {
+        labels: ["W1", "W2", "W3", "W4"],
+        datasets: [{
+          label: "Lunch Sales",
+          tension: 0.4,
+          borderWidth: 0,
+          borderRadius: 4,
+          borderSkipped: false,
+          backgroundColor: "rgba(255, 255, 255, .8)",
+          data: {{ period_lunch_sales_list | safe }},
+          maxBarThickness: 6
+        }, {
+        label: "Same Week LY",
+          tension: 0,
+          borderWidth: 0,
+          pointRadius: 5,
+          pointBackgroundColor: "rgba(200, 200, 200, 1)",
+          pointBorderColor: "transparent",
+          borderColor: "rgba(200, 200, 200, 1)",
+          borderWidth: 4,
+          type: "line",
+          backgroundColor: "transparent",
+          fill: true,
+          data: {{ period_lunch_sales_list_ly | safe }},
+          maxBarThickness: 6
+        }, ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          title: {
+            display: true,
+            text: 'Lunch Sales',
+          },
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
+        scales: {
+          y: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+              color: "#fff",
+              // Abbreviate the thousands
+              callback: function(value, index, values) {
+                return value / 1e3 + ' T';
+              },
+            },
+          },
+          x: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              color: '#f8f9fa',
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+            }
+          },
+        },
+      },
+    });
+
+    var ctp2 = document.getElementById("chart-period-dinner-sales").getContext("2d");
+
+    new Chart(ctp2, {
+      type: "bar",
+      data: {
+        labels: ["W1", "W2", "W3", "W4"],
+        datasets: [{
+          label: "Dinner Sales",
+          tension: 0.4,
+          borderWidth: 0,
+          borderRadius: 4,
+          borderSkipped: false,
+          backgroundColor: "rgba(255, 255, 255, .8)",
+          data: {{ period_dinner_sales_list | safe }},
+          maxBarThickness: 6
+        }, {
+        label: "Same Week LY",
+          tension: 0,
+          borderWidth: 0,
+          pointRadius: 5,
+          pointBackgroundColor: "rgba(200, 200, 200, 1)",
+          pointBorderColor: "transparent",
+          borderColor: "rgba(200, 200, 200, 1)",
+          borderWidth: 4,
+          type: "line",
+          backgroundColor: "transparent",
+          fill: true,
+          data: {{ period_dinner_sales_list_ly | safe }},
+          maxBarThickness: 6
+        }, ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          title: {
+            display: true,
+            text: 'Dinner Sales',
+          },
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
+        scales: {
+          y: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+              color: "#fff",
+              // Abbreviate the thousands
+              callback: function(value, index, values) {
+                return value / 1e3 + ' T';
+              },
+            },
+          },
+          x: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              color: '#f8f9fa',
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+            }
+          },
+        },
+      },
+    });
+
+    var ctp3 = document.getElementById("chart-period-togo-sales").getContext("2d");
+
+    new Chart(ctp3, {
+      type: "bar",
+      data: {
+        labels: ["W1", "W2", "W3", "W4"],
+        datasets: [{
+          label: "To-Go Sales",
+          tension: 0.4,
+          borderWidth: 0,
+          borderRadius: 4,
+          borderSkipped: false,
+          backgroundColor: "rgba(255, 255, 255, .8)",
+          data: {{ period_togo_sales_list | safe }},
+          maxBarThickness: 6
+        }, {
+        label: "Same Week LY",
+          tension: 0,
+          borderWidth: 0,
+          pointRadius: 5,
+          pointBackgroundColor: "rgba(200, 200, 200, 1)",
+          pointBorderColor: "transparent",
+          borderColor: "rgba(200, 200, 200, 1)",
+          borderWidth: 4,
+          type: "line",
+          backgroundColor: "transparent",
+          fill: true,
+          data: {{ period_togo_sales_list_ly | safe }},
+          maxBarThickness: 6
+        }, ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          title: {
+            display: true,
+            text: 'To-Go Sales',
+          },
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
+        scales: {
+          y: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+              color: "#fff",
+              // Abbreviate the thousands
+              callback: function(value, index, values) {
+                return value / 1e3 + ' T';
+              },
+            },
+          },
+          x: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              color: '#f8f9fa',
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+            }
+          },
+        },
+      },
+    });
+
+    var ctp4 = document.getElementById("chart-period-beer-sales").getContext("2d");
+
+    new Chart(ctp4, {
+      type: "bar",
+      data: {
+        labels: ["W1", "W2", "W3", "W4"],
+        datasets: [{
+          label: "Beer Sales",
+          tension: 0.4,
+          borderWidth: 0,
+          borderRadius: 4,
+          borderSkipped: false,
+          backgroundColor: "rgba(255, 255, 255, .8)",
+          data: {{ period_beer_sales_list | safe }},
+          maxBarThickness: 6
+        }, {
+        label: "Same Week LY",
+          tension: 0,
+          borderWidth: 0,
+          pointRadius: 5,
+          pointBackgroundColor: "rgba(200, 200, 200, 1)",
+          pointBorderColor: "transparent",
+          borderColor: "rgba(200, 200, 200, 1)",
+          borderWidth: 4,
+          type: "line",
+          backgroundColor: "transparent",
+          fill: true,
+          data: {{ period_beer_sales_list_ly | safe }},
+          maxBarThickness: 6
+        }, ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          title: {
+            display: true,
+            text: 'Beer Sales',
+          },
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
+        scales: {
+          y: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+              color: "#fff",
+              // Abbreviate the thousands
+              callback: function(value, index, values) {
+                return value / 1e3 + ' T';
+              },
+            },
+          },
+          x: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              color: '#f8f9fa',
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+            }
+          },
+        },
+      },
+    });
+
+    var ctp5 = document.getElementById("chart-period-wine-sales").getContext("2d");
+
+    new Chart(ctp5, {
+      type: "bar",
+      data: {
+        labels: ["W1", "W2", "W3", "W4"],
+        datasets: [{
+          label: "Wine Sales",
+          tension: 0.4,
+          borderWidth: 0,
+          borderRadius: 4,
+          borderSkipped: false,
+          backgroundColor: "rgba(255, 255, 255, .8)",
+          data: {{ period_wine_sales_list | safe }},
+          maxBarThickness: 6
+        }, {
+        label: "Same Week LY",
+          tension: 0,
+          borderWidth: 0,
+          pointRadius: 5,
+          pointBackgroundColor: "rgba(200, 200, 200, 1)",
+          pointBorderColor: "transparent",
+          borderColor: "rgba(200, 200, 200, 1)",
+          borderWidth: 4,
+          type: "line",
+          backgroundColor: "transparent",
+          fill: true,
+          data: {{ period_wine_sales_list_ly | safe }},
+          maxBarThickness: 6
+        }, ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          title: {
+            display: true,
+            text: 'Wine Sales',
+          },
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
+        scales: {
+          y: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+              color: "#fff",
+              // Abbreviate the thousands
+              callback: function(value, index, values) {
+                return value / 1e3 + ' T';
+              },
+            },
+          },
+          x: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              color: '#f8f9fa',
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+            }
+          },
+        },
+      },
+    });
+
+    var ctp6 = document.getElementById("chart-period-liquor-sales").getContext("2d");
+
+    new Chart(ctp6, {
+      type: "bar",
+      data: {
+        labels: ["W1", "W2", "W3", "W4"],
+        datasets: [{
+          label: "Liquor Sales",
+          tension: 0.4,
+          borderWidth: 0,
+          borderRadius: 4,
+          borderSkipped: false,
+          backgroundColor: "rgba(255, 255, 255, .8)",
+          data: {{ period_liquor_sales_list | safe }},
+          maxBarThickness: 6
+        }, {
+        label: "Same Week LY",
+          tension: 0,
+          borderWidth: 0,
+          pointRadius: 5,
+          pointBackgroundColor: "rgba(200, 200, 200, 1)",
+          pointBorderColor: "transparent",
+          borderColor: "rgba(200, 200, 200, 1)",
+          borderWidth: 4,
+          type: "line",
+          backgroundColor: "transparent",
+          fill: true,
+          data: {{ period_liquor_sales_list_ly | safe }},
+          maxBarThickness: 6
+        }, ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          title: {
+            display: true,
+            text: 'Liquor Sales',
+          },
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
+        scales: {
+          y: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+              color: "#fff",
+              // Abbreviate the thousands
+              callback: function(value, index, values) {
+                return value / 1e3 + ' T';
+              },
+            },
+          },
+          x: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              color: '#f8f9fa',
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+            }
+          },
+        },
+      },
+    });
+
+    var ctp7 = document.getElementById("chart-period-giftcard-sales").getContext("2d");
+
+    new Chart(ctp7, {
+      type: "bar",
+      data: {
+        labels: ["W1", "W2", "W3", "W4"],
+        datasets: [{
+          label: "SWLY",
+          tension: 0,
+          borderWidth: 5,
+          borderRadius: 5,
+          borderColor: "rgba(100, 100, 100, 1)",
+          pointBackgroundColor: "rgba(100, 100, 100, 1)",
+          pointBorderColor: "transparent",
+          backgroundColor: "rgba(100, 100, 100, 1)",
+          fill: false,
+          data: {{ period_giftcard_sales_list_ly | safe }},
+          type: "line"
+        },{
+          label: "Sales",
+          tension: 0.4,
+          borderWidth: 0,
+          borderRadius: 4,
+          borderSkipped: false,
+          backgroundColor: "rgba(255, 255, 255, .8)",
+          data: {{ period_giftcard_sales_list | safe }},
+          stack: 'Stack 0'
+        }, {
+        label: "Expense",
+          tension: 0.4,
+          borderWidth: 0,
+          borderRadius: 4,
+          borderSkipped: false,
+          BackgroundColor: "rgba(255, 255, 255, 1)",
+          data: {{ period_giftcard_redeem_list | safe }},
+          stack: 'Stack 0'
+        }, ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          title: {
+            display: true,
+            text: 'To-Go Sales/Expense',
+          },
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
+        scales: {
+          y: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+              color: "#fff",
+            },
+          },
+          x: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              color: '#f8f9fa',
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+            }
+          },
+        },
+      },
+    });
+
+    var cty1 = document.getElementById("chart-year-lunch-sales").getContext("2d");
+
+    new Chart(cty1, {
+      type: "bar",
+      data: {
+        labels: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13"],
+        datasets: [{
+          label: "Lunch Sales",
+          tension: 0.4,
+          borderWidth: 0,
+          borderRadius: 4,
+          borderSkipped: false,
+          backgroundColor: "rgba(255, 255, 255, .8)",
+          data: {{ year_lunch_sales_list | safe }},
+          maxBarThickness: 6
+        }, {
+        label: "Same Period LY",
+          tension: 0,
+          borderWidth: 0,
+          pointRadius: 5,
+          pointBackgroundColor: "rgba(200, 200, 200, 1)",
+          pointBorderColor: "transparent",
+          borderColor: "rgba(200, 200, 200, 1)",
+          borderWidth: 4,
+          type: "line",
+          backgroundColor: "transparent",
+          fill: true,
+          data: {{ year_lunch_sales_list_ly | safe }},
+          maxBarThickness: 6
+        }, ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          title: {
+            display: true,
+            text: 'Lunch Sales',
+          },
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
+        scales: {
+          y: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+              color: "#fff",
+              // Abbreviate the thousands
+              callback: function(value, index, values) {
+                return value / 1e3 + ' T';
+              },
+            },
+          },
+          x: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              color: '#f8f9fa',
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+            }
+          },
+        },
+      },
+    });
+
+    var cty2 = document.getElementById("chart-year-dinner-sales").getContext("2d");
+
+    new Chart(cty2, {
+      type: "bar",
+      data: {
+        labels: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13"],
+        datasets: [{
+          label: "Dinner Sales",
+          tension: 0.4,
+          borderWidth: 0,
+          borderRadius: 4,
+          borderSkipped: false,
+          backgroundColor: "rgba(255, 255, 255, .8)",
+          data: {{ year_dinner_sales_list | safe }},
+          maxBarThickness: 6
+        }, {
+        label: "Same Period LY",
+          tension: 0,
+          borderWidth: 0,
+          pointRadius: 5,
+          pointBackgroundColor: "rgba(200, 200, 200, 1)",
+          pointBorderColor: "transparent",
+          borderColor: "rgba(200, 200, 200, 1)",
+          borderWidth: 4,
+          type: "line",
+          backgroundColor: "transparent",
+          fill: true,
+          data: {{ year_dinner_sales_list_ly | safe }},
+          maxBarThickness: 6
+        }, ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          title: {
+            display: true,
+            text: 'Dinner Sales',
+          },
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
+        scales: {
+          y: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+              color: "#fff",
+              // Abbreviate the thousands
+              callback: function(value, index, values) {
+                return value / 1e3 + ' T';
+              },
+            },
+          },
+          x: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              color: '#f8f9fa',
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+            }
+          },
+        },
+      },
+    });
+
+    var cty3 = document.getElementById("chart-year-togo-sales").getContext("2d");
+
+    new Chart(cty3, {
+      type: "bar",
+      data: {
+        labels: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13"],
+        datasets: [{
+          label: "To-Go Sales",
+          tension: 0.4,
+          borderWidth: 0,
+          borderRadius: 4,
+          borderSkipped: false,
+          backgroundColor: "rgba(255, 255, 255, .8)",
+          data: {{ year_togo_sales_list | safe }},
+          maxBarThickness: 6
+        }, {
+        label: "Same Period LY",
+          tension: 0,
+          borderWidth: 0,
+          pointRadius: 5,
+          pointBackgroundColor: "rgba(200, 200, 200, 1)",
+          pointBorderColor: "transparent",
+          borderColor: "rgba(200, 200, 200, 1)",
+          borderWidth: 4,
+          type: "line",
+          backgroundColor: "transparent",
+          fill: true,
+          data: {{ year_togo_sales_list_ly | safe }},
+          maxBarThickness: 6
+        }, ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          title: {
+            display: true,
+            text: 'To-Go Sales',
+          },
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
+        scales: {
+          y: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+              color: "#fff",
+              // Abbreviate the thousands
+              callback: function(value, index, values) {
+                return value / 1e3 + ' T';
+              },
+            },
+          },
+          x: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              color: '#f8f9fa',
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+            }
+          },
+        },
+      },
+    });
+
+    var cty4 = document.getElementById("chart-year-beer-sales").getContext("2d");
+
+    new Chart(cty4, {
+      type: "bar",
+      data: {
+        labels: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13"],
+        datasets: [{
+          label: "Beer Sales",
+          tension: 0.4,
+          borderWidth: 0,
+          borderRadius: 4,
+          borderSkipped: false,
+          backgroundColor: "rgba(255, 255, 255, .8)",
+          data: {{ year_beer_sales_list | safe }},
+          maxBarThickness: 6
+        }, {
+        label: "Same Period LY",
+          tension: 0,
+          borderWidth: 0,
+          pointRadius: 5,
+          pointBackgroundColor: "rgba(200, 200, 200, 1)",
+          pointBorderColor: "transparent",
+          borderColor: "rgba(200, 200, 200, 1)",
+          borderWidth: 4,
+          type: "line",
+          backgroundColor: "transparent",
+          fill: true,
+          data: {{ year_beer_sales_list_ly | safe }},
+          maxBarThickness: 6
+        }, ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          title: {
+            display: true,
+            text: 'Beer Sales',
+          },
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
+        scales: {
+          y: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+              color: "#fff",
+              // Abbreviate the thousands
+              callback: function(value, index, values) {
+                return value / 1e3 + ' T';
+              },
+            },
+          },
+          x: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              color: '#f8f9fa',
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+            }
+          },
+        },
+      },
+    });
+
+    var cty5 = document.getElementById("chart-year-wine-sales").getContext("2d");
+
+    new Chart(cty5, {
+      type: "bar",
+      data: {
+        labels: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13"],
+        datasets: [{
+          label: "Wine Sales",
+          tension: 0.4,
+          borderWidth: 0,
+          borderRadius: 4,
+          borderSkipped: false,
+          backgroundColor: "rgba(255, 255, 255, .8)",
+          data: {{ year_wine_sales_list | safe }},
+          maxBarThickness: 6
+        }, {
+        label: "Same Period LY",
+          tension: 0,
+          borderWidth: 0,
+          pointRadius: 5,
+          pointBackgroundColor: "rgba(200, 200, 200, 1)",
+          pointBorderColor: "transparent",
+          borderColor: "rgba(200, 200, 200, 1)",
+          borderWidth: 4,
+          type: "line",
+          backgroundColor: "transparent",
+          fill: true,
+          data: {{ year_wine_sales_list_ly | safe }},
+          maxBarThickness: 6
+        }, ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          title: {
+            display: true,
+            text: 'Wine Sales',
+          },
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
+        scales: {
+          y: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+              color: "#fff",
+              // Abbreviate the thousands
+              callback: function(value, index, values) {
+                return value / 1e3 + ' T';
+              },
+            },
+          },
+          x: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              color: '#f8f9fa',
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+            }
+          },
+        },
+      },
+    });
+
+    var cty6 = document.getElementById("chart-year-liquor-sales").getContext("2d");
+
+    new Chart(cty6, {
+      type: "bar",
+      data: {
+        labels: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13"],
+        datasets: [{
+          label: "Liquor Sales",
+          tension: 0.4,
+          borderWidth: 0,
+          borderRadius: 4,
+          borderSkipped: false,
+          backgroundColor: "rgba(255, 255, 255, .8)",
+          data: {{ year_liquor_sales_list | safe }},
+          maxBarThickness: 6
+        }, {
+        label: "Same Period LY",
+          tension: 0,
+          borderWidth: 0,
+          pointRadius: 5,
+          pointBackgroundColor: "rgba(200, 200, 200, 1)",
+          pointBorderColor: "transparent",
+          borderColor: "rgba(200, 200, 200, 1)",
+          borderWidth: 4,
+          type: "line",
+          backgroundColor: "transparent",
+          fill: true,
+          data: {{ year_liquor_sales_list_ly | safe }},
+          maxBarThickness: 6
+        }, ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          title: {
+            display: true,
+            text: 'Liquor Sales',
+          },
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
+        scales: {
+          y: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+              color: "#fff",
+              // Abbreviate the thousands
+              callback: function(value, index, values) {
+                return value / 1e3 + ' T';
+              },
+            },
+          },
+          x: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              color: '#f8f9fa',
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+            }
+          },
+        },
+      },
+    });
+
+    var cty7 = document.getElementById("chart-year-giftcard-sales").getContext("2d");
+
+    new Chart(cty7, {
+      type: "bar",
+      data: {
+        labels: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13"],
+        datasets: [{
+          label: "SPLY",
+          tension: 0,
+          borderWidth: 5,
+          borderRadius: 5,
+          borderColor: "rgba(100, 100, 100, 1)",
+          pointBackgroundColor: "rgba(100, 100, 100, 1)",
+          pointBorderColor: "transparent",
+          backgroundColor: "rgba(100, 100, 100, 1)",
+          fill: false,
+          data: {{ year_giftcard_sales_list_ly | safe }},
+          type: "line"
+        },{
+          label: "Sales",
+          tension: 0.4,
+          borderWidth: 0,
+          borderRadius: 4,
+          borderSkipped: false,
+          backgroundColor: "rgba(255, 255, 255, .8)",
+          data: {{ year_giftcard_sales_list | safe }},
+          stack: 'Stack 0'
+        }, {
+        label: "Expense",
+          tension: 0.4,
+          borderWidth: 0,
+          borderRadius: 4,
+          borderSkipped: false,
+          BackgroundColor: "rgba(255, 255, 255, 1)",
+          data: {{ year_giftcard_redeem_list | safe }},
+          stack: 'Stack 0'
+        }, ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          title: {
+            display: true,
+            text: 'To-Go Sales/Expense',
+          },
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
+        scales: {
+          y: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+              color: "#fff",
             },
           },
           x: {

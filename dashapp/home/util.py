@@ -17,6 +17,7 @@ from dashapp.authentication.models import (
     PotatoSales,
     Restaurants,
     SalesCategory,
+    SalesCarryout,
     SalesRecordsDay,  # noqa: F401
     SalesRecordsPeriod,  # noqa: F401
     SalesRecordsWeek,  # noqa: F401
@@ -195,6 +196,45 @@ def get_category_sales(start, end, categories, store_list):
             SalesCategory.year,
         )
         .order_by(SalesCategory.date)
+        .all()
+    )
+    df = pd.DataFrame.from_records(
+        query, columns=["date", "dow", "week", "period", "year", "sales", "count"]
+    )
+    df = df.merge(cal_df, how="outer", on=["date", "dow", "week", "period", "year"])
+    df = df.fillna(0)
+    df = df.sort_values(by=["date"])
+    return df
+
+
+def get_togo_sales(start, end, store_list):
+    cal_query = Calendar.query.with_entities(
+        Calendar.date, Calendar.dow, Calendar.week, Calendar.period, Calendar.year
+    ).filter(Calendar.date.between(start, end))
+    cal_df = pd.DataFrame(cal_query, columns=["date", "dow", "week", "period", "year"])
+    query = (
+        db.session.query(
+            SalesCarryout.date,
+            SalesCarryout.dow,
+            SalesCarryout.week,
+            SalesCarryout.period,
+            SalesCarryout.year,
+            func.sum(SalesCarryout.amount).label("sales"),
+            func.sum(SalesCarryout.quantity).label("count"),
+        )
+        .select_from(SalesCarryout)
+        .filter(
+            SalesCarryout.date.between(start, end),
+            SalesCarryout.id.in_(store_list),
+        )
+        .group_by(
+            SalesCarryout.date,
+            SalesCarryout.dow,
+            SalesCarryout.week,
+            SalesCarryout.period,
+            SalesCarryout.year,
+        )
+        .order_by(SalesCarryout.date)
         .all()
     )
     df = pd.DataFrame.from_records(
