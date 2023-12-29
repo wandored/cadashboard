@@ -51,6 +51,10 @@ def get_sales_charts(start, end, time, store_list):
 
 # daypart sales
 def get_daypart_sales(start, end, store_list):
+    cal_query = Calendar.query.with_entities(
+        Calendar.date, Calendar.dow, Calendar.week, Calendar.period, Calendar.year
+    ).filter(Calendar.date.between(start, end))
+    cal_df = pd.DataFrame(cal_query, columns=["date", "dow", "week", "period", "year"])
     query = (
         db.session.query(
             SalesDaypart.date,
@@ -77,7 +81,7 @@ def get_daypart_sales(start, end, store_list):
         .order_by(SalesDaypart.date)
         .all()
     )
-    return pd.DataFrame.from_records(
+    df = pd.DataFrame.from_records(
         query,
         columns=[
             "date",
@@ -90,6 +94,23 @@ def get_daypart_sales(start, end, store_list):
             "guests",
         ],
     )
+    df_lunch = df[df["daypart"] == "Lunch"]
+    df_lunch = df_lunch.merge(
+        cal_df, how="outer", on=["date", "dow", "week", "period", "year"]
+    )
+    df_lunch["daypart"] = df_lunch["daypart"].fillna("Lunch")
+    df_dinner = df[df["daypart"] == "Dinner"]
+    df_dinner = df_dinner.merge(
+        cal_df, how="outer", on=["date", "dow", "week", "period", "year"]
+    )
+    df_dinner["daypart"] = df_dinner["daypart"].fillna("Dinner")
+    df_lunch = df_lunch.sort_values(by=["date"])
+    df_dinner = df_dinner.sort_values(by=["date"])
+    df_lunch = df_lunch.fillna(0)
+    df_dinner = df_dinner.fillna(0)
+    print(df_lunch)
+    print(df_dinner)
+    return df_lunch, df_dinner
 
 
 def get_giftcard_sales(start, end, store_list):
