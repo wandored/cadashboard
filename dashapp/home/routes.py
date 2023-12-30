@@ -71,16 +71,15 @@ def index():
         session["date_selected"] = TODAY
         return redirect(url_for("home_blueprint.index"))
 
-    if "store_list" not in session:
-        session["store_list"] = tuple(
-            [
-                store.id
-                for store in Restaurants.query.filter(Restaurants.active == True)  # noqa: E712
-                .order_by(Restaurants.name)
-                .all()
-            ]
-        )
-        return redirect(url_for("home_blueprint.index"))
+    # set store list to all active stores
+    session["store_list"] = tuple(
+        [
+            store.id
+            for store in Restaurants.query.filter(Restaurants.active == True)  # noqa: E712
+            .order_by(Restaurants.name)
+            .all()
+        ]
+    )
 
     fiscal_dates = set_dates(session["date_selected"])
 
@@ -402,20 +401,6 @@ def store(store_id):
         return redirect(url_for("home_blueprint.stone", store_id=store_id))
 
     # Sales Charts
-    # TODO: need to account of for 0 sales days in charts
-    def get_chart_values(start, end, time):
-        chart = (
-            db.session.query(func.sum(SalesTotals.net_sales).label("total_sales"))
-            .select_from(SalesTotals)
-            .group_by(time)
-            .order_by(time)
-            .filter(
-                SalesTotals.date.between(start, end), SalesTotals.store == store.name
-            )
-        )
-        value = [v.total_sales for v in chart]
-        return value
-
     daily_sales_list = get_sales_charts(
         fiscal_dates["start_week"],
         fiscal_dates["start_day"],
@@ -618,63 +603,70 @@ def store(store_id):
         fiscal_dates["period_to_date"],
         session["store_list"],
     )
+    period_togo_sales = period_togo_sales.drop(columns=["date"])
+    period_togo_sales = period_togo_sales.groupby(["week"]).sum().reset_index()
     period_togo_sales_list = period_togo_sales["sales"].tolist()
     period_togo_sales_total = sum(period_togo_sales_list)
     year_togo_sales = get_togo_sales(
         fiscal_dates["start_year"], fiscal_dates["year_to_date"], session["store_list"]
     )
+    year_togo_sales = year_togo_sales.drop(columns=["date"])
+    year_togo_sales = year_togo_sales.groupby(["period"]).sum().reset_index()
     year_togo_sales_list = year_togo_sales["sales"].tolist()
     year_togo_sales_total = sum(year_togo_sales_list)
 
-    # togo sales last year
     week_togo_sales_ly = get_togo_sales(
         fiscal_dates["start_week_ly"],
         fiscal_dates["end_week_ly"],
         session["store_list"],
     )
     week_togo_sales_list_ly = week_togo_sales_ly["sales"].tolist()
-    week_togo_sales_total_ly = sum(week_togo_sales_list_ly[: fiscal_dates["dow"]])
+    wtd_togo_sales_total_ly = sum(week_togo_sales_list_ly[: fiscal_dates["dow"]])
     period_togo_sales_ly = get_togo_sales(
         fiscal_dates["start_period_ly"],
         fiscal_dates["end_period_ly"],
         session["store_list"],
     )
-    period_togo_sales_list_ly = period_togo_sales_ly["sales"].tolist()
     ptd_togo_sales_ly = period_togo_sales_ly[
         period_togo_sales_ly["date"] <= fiscal_dates["start_day_ly"]
     ]
-    period_togo_sales_total_ly = sum(ptd_togo_sales_ly["sales"])
+    ptd_togo_sales_total_ly = sum(ptd_togo_sales_ly["sales"])
+    period_togo_sales_ly = period_togo_sales_ly.drop(columns=["date"])
+    period_togo_sales_ly = period_togo_sales_ly.groupby(["week"]).sum().reset_index()
+    period_togo_sales_list_ly = period_togo_sales_ly["sales"].tolist()
     year_togo_sales_ly = get_togo_sales(
         fiscal_dates["start_year_ly"],
         fiscal_dates["end_year_ly"],
         session["store_list"],
     )
-    year_togo_sales_list_ly = year_togo_sales_ly["sales"].tolist()
     ytd_togo_sales_ly = year_togo_sales_ly[
         year_togo_sales_ly["date"] <= fiscal_dates["start_day_ly"]
     ]
-    year_togo_sales_total_ly = sum(ytd_togo_sales_ly["sales"])
+    ytd_togo_sales_total_ly = sum(ytd_togo_sales_ly["sales"])
+    year_togo_sales_ly = year_togo_sales_ly.drop(columns=["date"])
+    year_togo_sales_ly = year_togo_sales_ly.groupby(["period"]).sum().reset_index()
+    year_togo_sales_list_ly = year_togo_sales_ly["sales"].tolist()
     # calculate percent of togo sales difference from previous year correcting for division by zero
-    if week_togo_sales_total_ly != 0:
+    if wtd_togo_sales_total_ly != 0:
         wtd_togo_sales_pct = (
-            (week_togo_sales_total - week_togo_sales_total_ly)
-            / week_togo_sales_total_ly
+            (week_togo_sales_total - wtd_togo_sales_total_ly)
+            / wtd_togo_sales_total_ly
             * 100
         )
     else:
         wtd_togo_sales_pct = 0
-    if period_togo_sales_total_ly != 0:
+    if ptd_togo_sales_total_ly != 0:
         ptd_togo_sales_pct = (
-            (period_togo_sales_total - period_togo_sales_total_ly)
-            / period_togo_sales_total_ly
+            (period_togo_sales_total - ptd_togo_sales_total_ly)
+            / ptd_togo_sales_total_ly
             * 100
         )
     else:
         ptd_togo_sales_pct = 0
-    if year_togo_sales_total_ly != 0:
+    if ytd_togo_sales_total_ly != 0:
         ytd_togo_sales_pct = (
-            (year_togo_sales_total - year_togo_sales_total_ly)
-            / year_togo_sales_total_ly
+            (year_togo_sales_total - ytd_togo_sales_total_ly)
+            / ytd_togo_sales_total_ly
             * 100
         )
     else:
@@ -1175,8 +1167,8 @@ def store(store_id):
         ["WINE"],
         session["store_list"],
     )
-    ic(week_beer_sales_ly)
     # sales lists for charts
+    # TODO: period & year grouping is correct
     week_beer_sales_list = week_beer_sales["sales"].tolist()
     week_beer_sales_list_ly = week_beer_sales_ly["sales"].tolist()
     week_liquor_sales_list = week_liquor_sales["sales"].tolist()
@@ -1251,9 +1243,6 @@ def store(store_id):
         )
     else:
         wtd_liquor_sales_pct = 0
-    ic(week_liquor_sales_total)
-    ic(wtd_liquor_sales_total_ly)
-    ic(wtd_liquor_sales_pct)
     if wtd_wine_sales_total_ly != 0:
         wtd_wine_sales_pct = (
             (week_wine_sales_total - wtd_wine_sales_total_ly)

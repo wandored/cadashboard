@@ -38,15 +38,38 @@ from icecream import ic
 
 
 def get_sales_charts(start, end, time, store_list):
-    chart = (
-        db.session.query(func.sum(SalesTotals.net_sales).label("total_sales"))
+    cal_query = Calendar.query.with_entities(
+        Calendar.date, Calendar.dow, Calendar.week, Calendar.period, Calendar.year
+    ).filter(Calendar.date.between(start, end))
+    cal_df = pd.DataFrame(cal_query, columns=["date", "dow", "week", "period", "year"])
+    query = (
+        db.session.query(
+            SalesTotals.date,
+            SalesTotals.dow,
+            SalesTotals.week,
+            SalesTotals.period,
+            SalesTotals.year,
+            func.sum(SalesTotals.net_sales).label("total_sales"),
+        )
         .select_from(SalesTotals)
-        .group_by(time)
-        .order_by(time)
+        .group_by(
+            SalesTotals.date,
+            SalesTotals.dow,
+            SalesTotals.week,
+            SalesTotals.period,
+            SalesTotals.year,
+        )
+        .order_by(SalesTotals.date)
         .filter(SalesTotals.date.between(start, end), SalesTotals.id.in_(store_list))
+    ).all()
+    df = pd.DataFrame.from_records(
+        query, columns=["date", "dow", "week", "period", "year", "total_sales"]
     )
-    value = [v.total_sales for v in chart]
-    return value
+    df = df.merge(cal_df, how="outer", on=["date", "dow", "week", "period", "year"])
+    df = df.fillna(0)
+    df = df.sort_values(by=["date"])
+    sales_list = df["total_sales"].tolist()
+    return sales_list
 
 
 # daypart sales
@@ -108,8 +131,6 @@ def get_daypart_sales(start, end, store_list):
     df_dinner = df_dinner.sort_values(by=["date"])
     df_lunch = df_lunch.fillna(0)
     df_dinner = df_dinner.fillna(0)
-    print(df_lunch)
-    print(df_dinner)
     return df_lunch, df_dinner
 
 

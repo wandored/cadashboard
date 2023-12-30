@@ -104,7 +104,7 @@
   </div>
   <!-- Second Row -Charts -->
   <div class="row mt-4">
-    <div class="col-lg-4 col-md-6 mt-4 mb-4">
+    <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
       <div class="card z-index-2 ">
         <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
           <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
@@ -123,7 +123,7 @@
         </div>
       </div>
     </div>
-    <div class="col-lg-4 col-md-6 mt-4 mb-4">
+    <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
       <div class="card z-index-2  ">
         <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
           <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
@@ -187,7 +187,7 @@
               </div>
             </div>
             <div class="row">
-                <div class="col-lg-4 col-md-6 mt-4 mb-4">
+                <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
                   <div class="card z-index-2">
                     <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
                       <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
@@ -197,7 +197,7 @@
                       </div>
                     </div>
                     <div class="card-body">
-                      <h6 class="mb-0 ">Week to Date Lunch Sales</h6>
+                      <h6 class="mb-0 ">Lunch Sales</h6>
                       {% if week_lunch_sales_total > wtd_lunch_sales_total_ly %}
                       <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_lunch_sales_pct) }} over last year</p>
                       {% else %}
@@ -206,7 +206,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="col-lg-4 col-md-6 mt-4 mb-4">
+                <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
                   <div class="card z-index-2">
                     <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
                       <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
@@ -216,7 +216,7 @@
                       </div>
                     </div>
                     <div class="card-body">
-                      <h6 class="mb-0 ">Week to Date Dinner Sales</h6>
+                      <h6 class="mb-0 ">Dinner Sales</h6>
                       {% if week_dinner_sales_total > wtd_dinner_sales_total_ly %}
                       <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_dinner_sales_pct) }} over last year</p>
                       {% else %}
@@ -225,7 +225,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="col-lg-4 col-md-6 mt-4 mb-4">
+                <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
                   <div class="card z-index-2">
                     <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
                       <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
@@ -235,8 +235,8 @@
                       </div>
                     </div>
                     <div class="card-body">
-                      <h6 class="mb-0 ">Week to Date To-Go Sales</h6>
-                      {% if week_togo_sales_total > week_togo_sales_total_ly %}
+                      <h6 class="mb-0 ">To-Go Sales</h6>
+                      {% if week_togo_sales_total > wtd_togo_sales_total_ly %}
                       <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_togo_sales_pct) }} over last year</p>
                       {% else %}
                       <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_togo_sales_pct) }} below last year</p>
@@ -246,7 +246,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-lg-4 col-md-6 mt-4 mb-4">
+                <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
                   <div class="card z-index-2">
                     <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
                       <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
@@ -256,7 +256,7 @@
                       </div>
                     </div>
                     <div class="card-body">
-                      <h6 class="mb-0 ">Week to Date Beer Sales</h6>
+                      <h6 class="mb-0 ">Beer Sales</h6>
                       {% if week_beer_sales_total > wtd_beer_sales_total_ly %}
                       <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_beer_sales_pct) }} over last year</p>
                       {% else %}
@@ -265,7 +265,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="col-lg-4 col-md-6 mt-4 mb-4">
+                <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
                   <div class="card z-index-2">
                     <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
                       <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
@@ -275,7 +275,7 @@
                       </div>
                     </div>
                     <div class="card-body">
-                      <h6 class="mb-0 ">Week to Date Wine Sales</h6>
+                      <h6 class="mb-0 ">Wine Sales</h6>
                       {% if week_wine_sales_total > wtd_wine_sales_total_ly %}
                       <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_wine_sales_pct) }} over last year</p>
                       {% else %}
@@ -284,7 +284,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="col-lg-4 col-md-6 mt-4 mb-4">
+                <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
                   <div class="card z-index-2">
                     <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
                       <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
@@ -294,11 +294,30 @@
                       </div>
                     </div>
                     <div class="card-body">
-                      <h6 class="mb-0 ">Week to Date Liquor Sales</h6>
+                      <h6 class="mb-0 ">Liquor Sales</h6>
                       {% if week_liquor_sales_total > wtd_liquor_sales_total_ly %}
                       <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_liquor_sales_pct) }} over last year</p>
                       {% else %}
                       <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_liquor_sales_pct) }} below last year</p>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+                <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
+                  <div class="card z-index-2">
+                    <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                      <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
+                        <div class="chart">
+                          <canvas id="chart-week-giftcard-sales" class="chart-canvas" height="170"></canvas>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-body">
+                      <h6 class="mb-0 ">Gift Card Sales</h6>
+                      {% if week_giftcard_sales_total > week_giftcard_sales_total_ly %}
+                      <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_giftcard_sales_pct) }} over last year</p>
+                      {% else %}
+                      <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_giftcard_sales_pct) }} below last year</p>
                       {% endif %}
                     </div>
                   </div>
@@ -314,7 +333,7 @@
               </div>
             </div>
             <div class="row">
-                <div class="col-lg-4 col-md-6 mt-4 mb-4">
+                <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
                   <div class="card z-index-2">
                     <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
                       <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
@@ -324,7 +343,7 @@
                       </div>
                     </div>
                     <div class="card-body">
-                      <h6 class="mb-0 ">Period to Date Lunch Sales</h6>
+                      <h6 class="mb-0 ">Lunch Sales</h6>
                       {% if period_lunch_sales_total > ptd_lunch_sales_total_ly %}
                       <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_lunch_sales_pct) }} over last year</p>
                       {% else %}
@@ -333,7 +352,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="col-lg-4 col-md-6 mt-4 mb-4">
+                <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
                   <div class="card z-index-2">
                     <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
                       <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
@@ -343,7 +362,7 @@
                       </div>
                     </div>
                     <div class="card-body">
-                      <h6 class="mb-0 ">Period to Date Dinner Sales</h6>
+                      <h6 class="mb-0 ">Dinner Sales</h6>
                       {% if period_dinner_sales_total > ptd_dinner_sales_total_ly %}
                       <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_dinner_sales_pct) }} over last year</p>
                       {% else %}
@@ -352,7 +371,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="col-lg-4 col-md-6 mt-4 mb-4">
+                <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
                   <div class="card z-index-2">
                     <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
                       <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
@@ -362,11 +381,87 @@
                       </div>
                     </div>
                     <div class="card-body">
-                      <h6 class="mb-0 ">Period to Date To-Go Sales</h6>
-                      {% if period_togo_sales_total > period_togo_sales_total_ly %}
+                      <h6 class="mb-0 ">To-Go Sales</h6>
+                      {% if period_togo_sales_total > ptd_togo_sales_total_ly %}
                       <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_togo_sales_pct) }} over last year</p>
                       {% else %}
                       <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_togo_sales_pct) }} below last year</p>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+                <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
+                  <div class="card z-index-2">
+                    <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                      <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
+                        <div class="chart">
+                          <canvas id="chart-period-beer-sales" class="chart-canvas" height="170"></canvas>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-body">
+                      <h6 class="mb-0 ">Beer Sales</h6>
+                      {% if period_beer_sales_total > ptd_beer_sales_total_ly %}
+                      <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_beer_sales_pct) }} over last year</p>
+                      {% else %}
+                      <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_beer_sales_pct) }} below last year</p>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+                <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
+                  <div class="card z-index-2">
+                    <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                      <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
+                        <div class="chart">
+                          <canvas id="chart-period-wine-sales" class="chart-canvas" height="170"></canvas>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-body">
+                      <h6 class="mb-0 ">Wine Sales</h6>
+                      {% if period_wine_sales_total > ptd_wine_sales_total_ly %}
+                      <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_wine_sales_pct) }} over last year</p>
+                      {% else %}
+                      <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_wine_sales_pct) }} below last year</p>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+                <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
+                  <div class="card z-index-2">
+                    <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                      <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
+                        <div class="chart">
+                          <canvas id="chart-period-liquor-sales" class="chart-canvas" height="170"></canvas>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-body">
+                      <h6 class="mb-0 ">Liquor Sales</h6>
+                      {% if period_liquor_sales_total > ptd_liquor_sales_total_ly %}
+                      <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_liquor_sales_pct) }} over last year</p>
+                      {% else %}
+                      <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_liquor_sales_pct) }} below last year</p>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+                <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
+                  <div class="card z-index-2">
+                    <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                      <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
+                        <div class="chart">
+                          <canvas id="chart-period-giftcard-sales" class="chart-canvas" height="170"></canvas>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-body">
+                      <h6 class="mb-0 ">Gift Card Sales</h6>
+                      {% if period_giftcard_sales_total > period_giftcard_sales_total_ly %}
+                      <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_giftcard_sales_pct) }} over last year</p>
+                      {% else %}
+                      <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_giftcard_sales_pct) }} below last year</p>
                       {% endif %}
                     </div>
                   </div>
@@ -382,7 +477,7 @@
               </div>
             </div>
             <div class="row">
-                <div class="col-lg-4 col-md-6 mt-4 mb-4">
+                <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
                   <div class="card z-index-2">
                     <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
                       <div class="bg-gradient-warning shadow-warning border-radius-lg py-3 pe-1">
@@ -392,7 +487,7 @@
                       </div>
                     </div>
                     <div class="card-body">
-                      <h6 class="mb-0 ">Year to Date Lunch Sales</h6>
+                      <h6 class="mb-0 ">Lunch Sales</h6>
                       {% if year_lunch_sales_total > ytd_lunch_sales_total_ly %}
                       <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_lunch_sales_pct) }} over last year</p>
                       {% else %}
@@ -401,7 +496,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="col-lg-4 col-md-6 mt-4 mb-4">
+                <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
                   <div class="card z-index-2">
                     <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
                       <div class="bg-gradient-warning shadow-warning border-radius-lg py-3 pe-1">
@@ -411,7 +506,7 @@
                       </div>
                     </div>
                     <div class="card-body">
-                      <h6 class="mb-0 ">Year to Date Dinner Sales</h6>
+                      <h6 class="mb-0 ">Dinner Sales</h6>
                       {% if year_dinner_sales_total > ytd_dinner_sales_total_ly %}
                       <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_dinner_sales_pct) }} over last year</p>
                       {% else %}
@@ -420,7 +515,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="col-lg-4 col-md-6 mt-4 mb-4">
+                <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
                   <div class="card z-index-2">
                     <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
                       <div class="bg-gradient-warning shadow-warning border-radius-lg py-3 pe-1">
@@ -430,8 +525,8 @@
                       </div>
                     </div>
                     <div class="card-body">
-                      <h6 class="mb-0 ">Year to Date To-Go Sales</h6>
-                      {% if year_togo_sales_total > year_togo_sales_total_ly %}
+                      <h6 class="mb-0 ">To-Go Sales</h6>
+                      {% if year_togo_sales_total > ytd_togo_sales_total_ly %}
                       <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_togo_sales_pct) }} over last year</p>
                       {% else %}
                       <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_togo_sales_pct) }} below last year</p>
@@ -1403,7 +1498,7 @@
           },
           title: {
             display: true,
-            text: 'To-Go Sales/Expense',
+            text: 'Gift Card Sales',
           },
         },
         interaction: {
@@ -1468,25 +1563,31 @@
           label: "Lunch Sales",
           tension: 0.4,
           borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false,
-          backgroundColor: "rgba(255, 255, 255, .8)",
+          backgroundcolor: "rgba(255, 255, 255, .8)",
+          pointradius: 5,
+          pointbackgroundcolor: "rgba(255, 255, 255, .8)",
+          pointbordercolor: "transparent",
+          bordercolor: "rgba(255, 255, 255, .8)",
+          bordercolor: "rgba(255, 255, 255, .8)",
+          borderwidth: 4,
+          fill: true,
           data: {{ period_lunch_sales_list | safe }},
-          maxBarThickness: 6
+          maxbarthickness: 6
         }, {
-        label: "Same Week LY",
+          label: "Last Year",
           tension: 0,
-          borderWidth: 0,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(200, 200, 200, 1)",
-          pointBorderColor: "transparent",
-          borderColor: "rgba(200, 200, 200, 1)",
-          borderWidth: 4,
-          type: "line",
-          backgroundColor: "transparent",
+          borderwidth: 0,
+          pointradius: 5,
+          pointbackgroundcolor: "rgba(255, 255, 255, .8)",
+          pointbordercolor: "transparent",
+          bordercolor: "rgba(255, 255, 255, .8)",
+          bordercolor: "rgba(255, 255, 255, .8)",
+          borderwidth: 4,
+          type: "bar",
+          backgroundcolor: "transparent",
           fill: true,
           data: {{ period_lunch_sales_list_ly | safe }},
-          maxBarThickness: 6
+          maxbarthickness: 6
         }, ],
       },
       options: {
@@ -1517,6 +1618,7 @@
             },
             ticks: {
               display: true,
+              color: "#f8f9fa",
               padding: 10,
               font: {
                 size: 14,
@@ -1525,7 +1627,6 @@
                 style: 'normal',
                 lineHeight: 2
               },
-              color: "#fff",
               // Abbreviate the thousands
               callback: function(value, index, values) {
                 return value / 1e3 + ' T';
@@ -1568,25 +1669,31 @@
           label: "Dinner Sales",
           tension: 0.4,
           borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false,
-          backgroundColor: "rgba(255, 255, 255, .8)",
+          backgroundcolor: "rgba(255, 255, 255, .8)",
+          pointradius: 5,
+          pointbackgroundcolor: "rgba(255, 255, 255, .8)",
+          pointbordercolor: "transparent",
+          bordercolor: "rgba(255, 255, 255, .8)",
+          bordercolor: "rgba(255, 255, 255, .8)",
+          borderwidth: 4,
+          fill: true,
           data: {{ period_dinner_sales_list | safe }},
-          maxBarThickness: 6
+          maxbarthickness: 6
         }, {
-        label: "Same Week LY",
+          label: "Last Year",
           tension: 0,
-          borderWidth: 0,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(200, 200, 200, 1)",
-          pointBorderColor: "transparent",
-          borderColor: "rgba(200, 200, 200, 1)",
-          borderWidth: 4,
-          type: "line",
-          backgroundColor: "transparent",
+          borderwidth: 0,
+          pointradius: 5,
+          pointbackgroundcolor: "rgba(255, 255, 255, .8)",
+          pointbordercolor: "transparent",
+          bordercolor: "rgba(255, 255, 255, .8)",
+          bordercolor: "rgba(255, 255, 255, .8)",
+          borderwidth: 4,
+          type: "bar",
+          backgroundcolor: "transparent",
           fill: true,
           data: {{ period_dinner_sales_list_ly | safe }},
-          maxBarThickness: 6
+          maxbarthickness: 6
         }, ],
       },
       options: {
@@ -1617,6 +1724,7 @@
             },
             ticks: {
               display: true,
+              color: "#f8f9fa",
               padding: 10,
               font: {
                 size: 14,
@@ -1625,7 +1733,6 @@
                 style: 'normal',
                 lineHeight: 2
               },
-              color: "#fff",
               // Abbreviate the thousands
               callback: function(value, index, values) {
                 return value / 1e3 + ' T';
@@ -1668,25 +1775,31 @@
           label: "To-Go Sales",
           tension: 0.4,
           borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false,
-          backgroundColor: "rgba(255, 255, 255, .8)",
+          backgroundcolor: "rgba(255, 255, 255, .8)",
+          pointradius: 5,
+          pointbackgroundcolor: "rgba(255, 255, 255, .8)",
+          pointbordercolor: "transparent",
+          bordercolor: "rgba(255, 255, 255, .8)",
+          bordercolor: "rgba(255, 255, 255, .8)",
+          borderwidth: 4,
+          fill: true,
           data: {{ period_togo_sales_list | safe }},
-          maxBarThickness: 6
+          maxbarthickness: 6
         }, {
-        label: "Same Week LY",
+          label: "Last Year",
           tension: 0,
-          borderWidth: 0,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(200, 200, 200, 1)",
-          pointBorderColor: "transparent",
-          borderColor: "rgba(200, 200, 200, 1)",
-          borderWidth: 4,
-          type: "line",
-          backgroundColor: "transparent",
+          borderwidth: 0,
+          pointradius: 5,
+          pointbackgroundcolor: "rgba(255, 255, 255, .8)",
+          pointbordercolor: "transparent",
+          bordercolor: "rgba(255, 255, 255, .8)",
+          bordercolor: "rgba(255, 255, 255, .8)",
+          borderwidth: 4,
+          type: "bar",
+          backgroundcolor: "transparent",
           fill: true,
           data: {{ period_togo_sales_list_ly | safe }},
-          maxBarThickness: 6
+          maxbarthickness: 6
         }, ],
       },
       options: {
@@ -1717,6 +1830,7 @@
             },
             ticks: {
               display: true,
+              color: "#f8f9fa",
               padding: 10,
               font: {
                 size: 14,
@@ -1725,7 +1839,6 @@
                 style: 'normal',
                 lineHeight: 2
               },
-              color: "#fff",
               // Abbreviate the thousands
               callback: function(value, index, values) {
                 return value / 1e3 + ' T';
@@ -1768,25 +1881,31 @@
           label: "Beer Sales",
           tension: 0.4,
           borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false,
-          backgroundColor: "rgba(255, 255, 255, .8)",
+          backgroundcolor: "rgba(255, 255, 255, .8)",
+          pointradius: 5,
+          pointbackgroundcolor: "rgba(255, 255, 255, .8)",
+          pointbordercolor: "transparent",
+          bordercolor: "rgba(255, 255, 255, .8)",
+          bordercolor: "rgba(255, 255, 255, .8)",
+          borderwidth: 4,
+          fill: true,
           data: {{ period_beer_sales_list | safe }},
-          maxBarThickness: 6
+          maxbarthickness: 6
         }, {
-        label: "Same Week LY",
+          label: "Last Year",
           tension: 0,
-          borderWidth: 0,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(200, 200, 200, 1)",
-          pointBorderColor: "transparent",
-          borderColor: "rgba(200, 200, 200, 1)",
-          borderWidth: 4,
-          type: "line",
-          backgroundColor: "transparent",
+          borderwidth: 0,
+          pointradius: 5,
+          pointbackgroundcolor: "rgba(255, 255, 255, .8)",
+          pointbordercolor: "transparent",
+          bordercolor: "rgba(255, 255, 255, .8)",
+          bordercolor: "rgba(255, 255, 255, .8)",
+          borderwidth: 4,
+          type: "bar",
+          backgroundcolor: "transparent",
           fill: true,
           data: {{ period_beer_sales_list_ly | safe }},
-          maxBarThickness: 6
+          maxbarthickness: 6
         }, ],
       },
       options: {
@@ -1817,6 +1936,7 @@
             },
             ticks: {
               display: true,
+              color: "#f8f9fa",
               padding: 10,
               font: {
                 size: 14,
@@ -1825,7 +1945,6 @@
                 style: 'normal',
                 lineHeight: 2
               },
-              color: "#fff",
               // Abbreviate the thousands
               callback: function(value, index, values) {
                 return value / 1e3 + ' T';
@@ -1868,25 +1987,31 @@
           label: "Wine Sales",
           tension: 0.4,
           borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false,
-          backgroundColor: "rgba(255, 255, 255, .8)",
+          backgroundcolor: "rgba(255, 255, 255, .8)",
+          pointradius: 5,
+          pointbackgroundcolor: "rgba(255, 255, 255, .8)",
+          pointbordercolor: "transparent",
+          bordercolor: "rgba(255, 255, 255, .8)",
+          bordercolor: "rgba(255, 255, 255, .8)",
+          borderwidth: 4,
+          fill: true,
           data: {{ period_wine_sales_list | safe }},
-          maxBarThickness: 6
+          maxbarthickness: 6
         }, {
-        label: "Same Week LY",
+          label: "Last Year",
           tension: 0,
-          borderWidth: 0,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(200, 200, 200, 1)",
-          pointBorderColor: "transparent",
-          borderColor: "rgba(200, 200, 200, 1)",
-          borderWidth: 4,
-          type: "line",
-          backgroundColor: "transparent",
+          borderwidth: 0,
+          pointradius: 5,
+          pointbackgroundcolor: "rgba(255, 255, 255, .8)",
+          pointbordercolor: "transparent",
+          bordercolor: "rgba(255, 255, 255, .8)",
+          bordercolor: "rgba(255, 255, 255, .8)",
+          borderwidth: 4,
+          type: "bar",
+          backgroundcolor: "transparent",
           fill: true,
           data: {{ period_wine_sales_list_ly | safe }},
-          maxBarThickness: 6
+          maxbarthickness: 6
         }, ],
       },
       options: {
@@ -1917,6 +2042,7 @@
             },
             ticks: {
               display: true,
+            color: "#f8f9fa",
               padding: 10,
               font: {
                 size: 14,
@@ -1925,7 +2051,6 @@
                 style: 'normal',
                 lineHeight: 2
               },
-              color: "#fff",
               // Abbreviate the thousands
               callback: function(value, index, values) {
                 return value / 1e3 + ' T';
@@ -1968,25 +2093,31 @@
           label: "Liquor Sales",
           tension: 0.4,
           borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false,
-          backgroundColor: "rgba(255, 255, 255, .8)",
+          backgroundcolor: "rgba(255, 255, 255, .8)",
+          pointradius: 5,
+          pointbackgroundcolor: "rgba(255, 255, 255, .8)",
+          pointbordercolor: "transparent",
+          bordercolor: "rgba(255, 255, 255, .8)",
+          bordercolor: "rgba(255, 255, 255, .8)",
+          borderwidth: 4,
+          fill: true,
           data: {{ period_liquor_sales_list | safe }},
-          maxBarThickness: 6
+          maxbarthickness: 6
         }, {
-        label: "Same Week LY",
+          label: "Last Year",
           tension: 0,
-          borderWidth: 0,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(200, 200, 200, 1)",
-          pointBorderColor: "transparent",
-          borderColor: "rgba(200, 200, 200, 1)",
-          borderWidth: 4,
-          type: "line",
-          backgroundColor: "transparent",
+          borderwidth: 0,
+          pointradius: 5,
+          pointbackgroundcolor: "rgba(255, 255, 255, .8)",
+          pointbordercolor: "transparent",
+          bordercolor: "rgba(255, 255, 255, .8)",
+          bordercolor: "rgba(255, 255, 255, .8)",
+          borderwidth: 4,
+          type: "bar",
+          backgroundcolor: "transparent",
           fill: true,
           data: {{ period_liquor_sales_list_ly | safe }},
-          maxBarThickness: 6
+          maxbarthickness: 6
         }, ],
       },
       options: {
@@ -2017,6 +2148,7 @@
             },
             ticks: {
               display: true,
+              color: "#f8f9fa",
               padding: 10,
               font: {
                 size: 14,
@@ -2025,7 +2157,6 @@
                 style: 'normal',
                 lineHeight: 2
               },
-              color: "#fff",
               // Abbreviate the thousands
               callback: function(value, index, values) {
                 return value / 1e3 + ' T';
@@ -2077,23 +2208,34 @@
           data: {{ period_giftcard_sales_list_ly | safe }},
           type: "line"
         },{
-          label: "Sales",
+          label: "Gift Card Sales",
           tension: 0.4,
           borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false,
-          backgroundColor: "rgba(255, 255, 255, .8)",
+          backgroundcolor: "rgba(255, 255, 255, .8)",
+          pointradius: 5,
+          pointbackgroundcolor: "rgba(255, 255, 255, .8)",
+          pointbordercolor: "transparent",
+          bordercolor: "rgba(255, 255, 255, .8)",
+          bordercolor: "rgba(255, 255, 255, .8)",
+          borderwidth: 4,
+          fill: true,
           data: {{ period_giftcard_sales_list | safe }},
-          stack: 'Stack 0'
+          maxbarthickness: 6
         }, {
-        label: "Expense",
-          tension: 0.4,
-          borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false,
-          BackgroundColor: "rgba(255, 255, 255, 1)",
-          data: {{ period_giftcard_redeem_list | safe }},
-          stack: 'Stack 0'
+          label: "Gift Card Redeem",
+          tension: 0,
+          borderwidth: 0,
+          pointradius: 5,
+          pointbackgroundcolor: "rgba(255, 255, 255, .8)",
+          pointbordercolor: "transparent",
+          bordercolor: "rgba(255, 255, 255, .8)",
+          bordercolor: "rgba(255, 255, 255, .8)",
+          borderwidth: 4,
+          type: "bar",
+          backgroundcolor: "transparent",
+          fill: true,
+          data: {{ period_giftcard_sales_list_ly | safe }},
+          maxbarthickness: 6
         }, ],
       },
       options: {
@@ -2124,6 +2266,7 @@
             },
             ticks: {
               padding: 10,
+              color: "#f8f9fa",
               font: {
                 size: 14,
                 weight: 300,
@@ -2131,7 +2274,6 @@
                 style: 'normal',
                 lineHeight: 2
               },
-              color: "#fff",
             },
           },
           x: {
