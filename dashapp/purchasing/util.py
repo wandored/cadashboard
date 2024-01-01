@@ -10,7 +10,6 @@ from sqlalchemy import func
 
 from icecream import ic
 
-pd.set_option("display.max_rows", 20, "display.max_columns", None)
 
 def get_lastyear(date):
     target = Calendar.query.filter_by(date=date)
