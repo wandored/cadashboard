@@ -135,7 +135,7 @@ def index():
     daily_sales_list = get_sales_charts(
         fiscal_dates["start_week"],
         fiscal_dates["start_day"],
-        SalesTotals.date,
+        "date",
         session["store_list"],
     )
     weekly_sales = sum(daily_sales_list)
@@ -143,7 +143,7 @@ def index():
     daily_sales_list_ly = get_sales_charts(
         fiscal_dates["start_week_ly"],
         fiscal_dates["end_week_ly"],
-        SalesTotals.date,
+        "date",
         session["store_list"],
     )
     weekly_sales_ly = sum(daily_sales_list_ly)
@@ -151,7 +151,7 @@ def index():
     week_to_date_sales_ly = get_sales_charts(
         fiscal_dates["start_week_ly"],
         fiscal_dates["start_day_ly"],
-        SalesTotals.date,
+        "date",
         session["store_list"],
     )
     wtd_sales_ly = sum(week_to_date_sales_ly)
@@ -159,7 +159,7 @@ def index():
     weekly_sales_list = get_sales_charts(
         fiscal_dates["start_period"],
         fiscal_dates["start_day"],
-        SalesTotals.week,
+        "week",
         session["store_list"],
     )
     period_sales = sum(weekly_sales_list)
@@ -167,7 +167,7 @@ def index():
     weekly_sales_list_ly = get_sales_charts(
         fiscal_dates["start_period_ly"],
         fiscal_dates["end_period_ly"],
-        SalesTotals.week,
+        "week",
         session["store_list"],
     )
     period_sales_ly = sum(weekly_sales_list_ly)
@@ -175,7 +175,7 @@ def index():
     period_to_date_sales_ly = get_sales_charts(
         fiscal_dates["start_period_ly"],
         fiscal_dates["start_day_ly"],
-        SalesTotals.week,
+        "week",
         session["store_list"],
     )
     ptd_sales_ly = sum(period_to_date_sales_ly)
@@ -183,7 +183,7 @@ def index():
     period_sales_list = get_sales_charts(
         fiscal_dates["start_year"],
         fiscal_dates["start_day"],
-        SalesTotals.period,
+        "period",
         session["store_list"],
     )
     yearly_sales = sum(period_sales_list)
@@ -191,7 +191,7 @@ def index():
     period_sales_list_ly = get_sales_charts(
         fiscal_dates["start_year_ly"],
         fiscal_dates["end_year_ly"],
-        SalesTotals.period,
+        "period",
         session["store_list"],
     )
     yearly_sales_ly = sum(period_sales_list_ly)
@@ -199,7 +199,7 @@ def index():
     year_to_date_sales_ly = get_sales_charts(
         fiscal_dates["start_year_ly"],
         fiscal_dates["start_day_ly"],
-        SalesTotals.period,
+        "period",
         session["store_list"],
     )
     ytd_sales_ly = sum(year_to_date_sales_ly)
@@ -208,22 +208,24 @@ def index():
         sales = (
             db.session.query(
                 SalesTotals.store,
+                SalesTotals.id,
                 func.sum(SalesTotals.net_sales).label("total_sales"),
                 func.sum(SalesTotals.guest_count).label("total_guests"),
             )
             .filter(SalesTotals.date.between(start, end))
-            .group_by(SalesTotals.store)
+            .group_by(SalesTotals.store, SalesTotals.id)
             .all()
         )
 
         sales_ly = (
             db.session.query(
                 SalesTotals.store,
+                SalesTotals.id,
                 func.sum(SalesTotals.net_sales).label("total_sales_ly"),
                 func.sum(SalesTotals.guest_count).label("total_guests_ly"),
             )
             .filter(SalesTotals.date.between(start_ly, end_ly))
-            .group_by(SalesTotals.store)
+            .group_by(SalesTotals.store, SalesTotals.id)
             .all()
         )
         # Get the top sales for each store and merge with sales_table
@@ -231,61 +233,60 @@ def index():
             f"SalesRecords{time_frame}"
         ]  # how you use a variable in query
         sales_query = table_class.query.with_entities(
-            table_class.store, table_class.net_sales
+            table_class.store,
+            table_class.id,
+            table_class.net_sales
         ).all()
 
         top_sales = pd.DataFrame.from_records(
-            sales_query, columns=["store", "top_sales"]
+            sales_query, columns=["store", "id", "top_sales"]
         )
         # round to 2 decimal places
         top_sales["top_sales"] = top_sales["top_sales"].round(2)
         top_sales.set_index("store", inplace=True)
         sales_table = pd.DataFrame.from_records(
-            sales, columns=["store", "sales", "guests"]
+            sales, columns=["store", "id", "sales", "guests"]
         )
         sales_table_ly = pd.DataFrame.from_records(
-            sales_ly, columns=["store", "sales_ly", "guests_ly"]
+            sales_ly, columns=["store", "id", "sales_ly", "guests_ly"]
         )
         sales_table = sales_table.merge(sales_table_ly, how="outer", sort=True)
         sales_table = sales_table.merge(
-            top_sales, how="left", left_on="store", right_on="store"
+            top_sales, how="left", left_on=["store", "id"], right_on=["store", "id"]
         )
 
         labor = (
             db.session.query(
                 LaborTotals.store,
+                LaborTotals.id,
                 func.sum(LaborTotals.total_hours),
                 func.sum(LaborTotals.total_dollars),
             )
             .filter(LaborTotals.date.between(start, end))
-            .group_by(LaborTotals.store)
+            .group_by(LaborTotals.store, LaborTotals.id)
             .all()
         )
 
         labor_ly = (
             db.session.query(
                 LaborTotals.store,
+                LaborTotals.id,
                 func.sum(LaborTotals.total_hours).label("total_hours_ly"),
                 func.sum(LaborTotals.total_dollars).label("total_dollars_ly"),
             )
             .filter(LaborTotals.date.between(start_ly, end_ly))
-            .group_by(LaborTotals.store)
+            .group_by(LaborTotals.store, LaborTotals.id)
             .all()
         )
 
         df_labor = pd.DataFrame.from_records(
-            labor, columns=["store", "hours", "dollars"]
+            labor, columns=["store", "id", "hours", "dollars"]
         )
         df_labor_ly = pd.DataFrame.from_records(
-            labor_ly, columns=["store", "hours_ly", "dollars_ly"]
+            labor_ly, columns=["store", "id", "hours_ly", "dollars_ly"]
         )
         labor_table = df_labor.merge(df_labor_ly, how="outer", sort=True)
         table = sales_table.merge(labor_table, how="outer", sort=True)
-
-        # List of stores to add ID so i can pass to other templates
-        data = Restaurants.query.with_entities(Restaurants.name, Restaurants.id).all()
-        location_list = pd.DataFrame.from_records(data, columns=["store", "id"])
-        table = table.merge(location_list, on="store")
         table = table.set_index("store")
 
         # Grab top sales over last year before we add totals
@@ -404,7 +405,7 @@ def store(store_id):
     daily_sales_list = get_sales_charts(
         fiscal_dates["start_week"],
         fiscal_dates["start_day"],
-        SalesTotals.date,
+        "date",
         session["store_list"],
     )
     weekly_sales = sum(daily_sales_list)
@@ -412,7 +413,7 @@ def store(store_id):
     daily_sales_list_ly = get_sales_charts(
         fiscal_dates["start_week_ly"],
         fiscal_dates["end_week_ly"],
-        SalesTotals.date,
+        "date",
         session["store_list"],
     )
     weekly_sales_ly = sum(daily_sales_list_ly)
@@ -420,15 +421,15 @@ def store(store_id):
     week_to_date_sales_ly = get_sales_charts(
         fiscal_dates["start_week_ly"],
         fiscal_dates["start_day_ly"],
-        SalesTotals.date,
+        "date",
         session["store_list"],
     )
     wtd_sales_ly = sum(week_to_date_sales_ly)
 
     weekly_sales_list = get_sales_charts(
         fiscal_dates["start_period"],
-        fiscal_dates["start_day"],
-        SalesTotals.week,
+        fiscal_dates["period_to_date"],
+        "week",
         session["store_list"],
     )
     period_sales = sum(weekly_sales_list)
@@ -436,7 +437,7 @@ def store(store_id):
     weekly_sales_list_ly = get_sales_charts(
         fiscal_dates["start_period_ly"],
         fiscal_dates["end_period_ly"],
-        SalesTotals.week,
+        "week",
         session["store_list"],
     )
     period_sales_ly = sum(weekly_sales_list_ly)
@@ -444,7 +445,7 @@ def store(store_id):
     period_to_date_sales_ly = get_sales_charts(
         fiscal_dates["start_period_ly"],
         fiscal_dates["start_day_ly"],
-        SalesTotals.week,
+        "week",
         session["store_list"],
     )
     ptd_sales_ly = sum(period_to_date_sales_ly)
@@ -452,7 +453,7 @@ def store(store_id):
     period_sales_list = get_sales_charts(
         fiscal_dates["start_year"],
         fiscal_dates["start_day"],
-        SalesTotals.period,
+        "period",
         session["store_list"],
     )
     yearly_sales = sum(period_sales_list)
@@ -460,7 +461,7 @@ def store(store_id):
     period_sales_list_ly = get_sales_charts(
         fiscal_dates["start_year_ly"],
         fiscal_dates["end_year_ly"],
-        SalesTotals.period,
+        "period",
         session["store_list"],
     )
     yearly_sales_ly = sum(period_sales_list_ly)
@@ -468,7 +469,7 @@ def store(store_id):
     year_to_date_sales_ly = get_sales_charts(
         fiscal_dates["start_year_ly"],
         fiscal_dates["start_day_ly"],
-        SalesTotals.period,
+        "period",
         session["store_list"],
     )
     ytd_sales_ly = sum(year_to_date_sales_ly)

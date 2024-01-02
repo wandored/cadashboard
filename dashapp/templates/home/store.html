@@ -102,14 +102,14 @@
       </div>
     </div>
   </div>
-  <!-- Second Row -Charts -->
+  <!-- Sales-Charts -->
   <div class="row mt-4">
     <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
       <div class="card z-index-2 ">
         <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
           <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
             <div class="chart">
-              <canvas id="chart-bars" class="chart-canvas" height="170"></canvas>
+              <canvas id="wtd-sales-chart" class="chart-canvas" height="170"></canvas>
             </div>
           </div>
         </div>
@@ -128,7 +128,7 @@
         <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
           <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
             <div class="chart">
-              <canvas id="chart-line" class="chart-canvas" height="170"></canvas>
+              <canvas id="ptd-sales-chart" class="chart-canvas" height="170"></canvas>
             </div>
           </div>
         </div>
@@ -147,7 +147,7 @@
         <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
           <div class="bg-gradient-warning shadow-warning border-radius-lg py-3 pe-1">
             <div class="chart">
-              <canvas id="chart-line-tasks" class="chart-canvas" height="170"></canvas>
+              <canvas id="ytd-sales-chart" class="chart-canvas" height="170"></canvas>
             </div>
           </div>
         </div>
@@ -552,7 +552,7 @@
 
   <script src="/static/assets/js/plugins/chartjs.min.js"></script>
   <script>
-    var ctx1 = document.getElementById("chart-bars").getContext("2d");
+    var ctx1 = document.getElementById("wtd-sales-chart").getContext("2d");
 
     new Chart(ctx1, {
       type: "bar",
@@ -651,7 +651,7 @@
     });
 
 
-    var ctx2 = document.getElementById("chart-line").getContext("2d");
+    var ctx2 = document.getElementById("ptd-sales-chart").getContext("2d");
 
     new Chart(ctx2, {
       type: "bar",
@@ -752,7 +752,7 @@
       },
     });
 
-    var ctx3 = document.getElementById("chart-line-tasks").getContext("2d");
+    var ctx3 = document.getElementById("ytd-sales-chart").getContext("2d");
 
     new Chart(ctx3, {
       type: "line",
