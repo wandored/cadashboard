@@ -68,6 +68,7 @@ def get_sales_charts(start, end, time, store_list):
     df = df.merge(cal_df, how="outer", on=["date", "dow", "week", "period", "year"])
     df = df.fillna(0)
     df = df.sort_values(by=["date"])
+    df = df.groupby([time]).sum(numeric_only=True).reset_index()
     sales_list = df["total_sales"].tolist()
     return sales_list
 
