@@ -40,7 +40,7 @@ class Roles(db.Model, RoleMixin):
     __tablename__ = "roles"
 
     # Our Role has three fields, ID, name and description
-    id = db.Column(db.Integer(), primary_key=True)
+    id = db.Column(db.Integer(), primary_key=True, autoincrement=True)
     name = db.Column(db.String(80), unique=True)
     description = db.Column(db.String(255))
 
@@ -62,13 +62,13 @@ class Users(db.Model, UserMixin):
     password = db.Column(db.String(255))
     active = db.Column(db.Boolean())
     fs_uniquifier = db.Column(db.String(64), unique=True)
-    roles = db.relationship("Roles", secondary=roles_users, backref="users", lazy=True)
     confirmed_at = db.Column(db.DateTime())
     last_login_at = db.Column(db.DateTime())
     current_login_at = db.Column(db.DateTime())
     last_login_ip = db.Column(db.String(100))
     current_login_ip = db.Column(db.String(100))
     login_count = db.Column(db.Integer)
+    roles = db.relationship("Roles", secondary=roles_users, backref="users", lazy=True)
 
 
 user_datastore = SQLAlchemySessionUserDatastore(db.session, Users, Roles)

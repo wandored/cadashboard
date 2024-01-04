@@ -592,6 +592,55 @@ def store(store_id):
         year_dinner_sales_ly.groupby(["period", "daypart"]).sum().reset_index()
     )
     year_dinner_sales_list_ly = year_dinner_sales_ly["sales"].tolist()
+    # calculate percent of sales difference from previous year correcting for division by zero
+    if wtd_lunch_sales_total_ly != 0:
+        wtd_lunch_sales_pct = (
+            (week_lunch_sales_total - wtd_lunch_sales_total_ly)
+            / wtd_lunch_sales_total_ly
+            * 100
+        )
+    else:
+        wtd_lunch_sales_pct = 0
+    if wtd_dinner_sales_total_ly != 0:
+        wtd_dinner_sales_pct = (
+            (week_dinner_sales_total - wtd_dinner_sales_total_ly)
+            / wtd_dinner_sales_total_ly
+            * 100
+        )
+    else:
+        wtd_dinner_sales_pct = 0
+    if ptd_lunch_sales_total_ly != 0:
+        ptd_lunch_sales_pct = (
+            (period_lunch_sales_total - ptd_lunch_sales_total_ly)
+            / ptd_lunch_sales_total_ly
+            * 100
+        )
+    else:
+        ptd_lunch_sales_pct = 0
+    if ptd_dinner_sales_total_ly != 0:
+        ptd_dinner_sales_pct = (
+            (period_dinner_sales_total - ptd_dinner_sales_total_ly)
+            / ptd_dinner_sales_total_ly
+            * 100
+        )
+    else:
+        ptd_dinner_sales_pct = 0
+    if ytd_lunch_sales_total_ly != 0:
+        ytd_lunch_sales_pct = (
+            (year_lunch_sales_total - ytd_lunch_sales_total_ly)
+            / ytd_lunch_sales_total_ly
+            * 100
+        )
+    else:
+        ytd_lunch_sales_pct = 0
+    if ytd_dinner_sales_total_ly != 0:
+        ytd_dinner_sales_pct = (
+            (year_dinner_sales_total - ytd_dinner_sales_total_ly)
+            / ytd_dinner_sales_total_ly
+            * 100
+        )
+    else:
+        ytd_dinner_sales_pct = 0
 
     # togo sales
     week_togo_sales = get_togo_sales(
@@ -774,55 +823,6 @@ def store(store_id):
         diff += year_giftcard_sales_list[i] - year_giftcard_redeem_list[i]
         year_giftcard_balance.append(diff)
 
-    # calculate percent of sales difference from previous year correcting for division by zero
-    if wtd_lunch_sales_total_ly != 0:
-        wtd_lunch_sales_pct = (
-            (week_lunch_sales_total - wtd_lunch_sales_total_ly)
-            / wtd_lunch_sales_total_ly
-            * 100
-        )
-    else:
-        wtd_lunch_sales_pct = 0
-    if wtd_dinner_sales_total_ly != 0:
-        wtd_dinner_sales_pct = (
-            (week_dinner_sales_total - wtd_dinner_sales_total_ly)
-            / wtd_dinner_sales_total_ly
-            * 100
-        )
-    else:
-        wtd_dinner_sales_pct = 0
-    if ptd_lunch_sales_total_ly != 0:
-        ptd_lunch_sales_pct = (
-            (period_lunch_sales_total - ptd_lunch_sales_total_ly)
-            / ptd_lunch_sales_total_ly
-            * 100
-        )
-    else:
-        ptd_lunch_sales_pct = 0
-    if ptd_dinner_sales_total_ly != 0:
-        ptd_dinner_sales_pct = (
-            (period_dinner_sales_total - ptd_dinner_sales_total_ly)
-            / ptd_dinner_sales_total_ly
-            * 100
-        )
-    else:
-        ptd_dinner_sales_pct = 0
-    if ytd_lunch_sales_total_ly != 0:
-        ytd_lunch_sales_pct = (
-            (year_lunch_sales_total - ytd_lunch_sales_total_ly)
-            / ytd_lunch_sales_total_ly
-            * 100
-        )
-    else:
-        ytd_lunch_sales_pct = 0
-    if ytd_dinner_sales_total_ly != 0:
-        ytd_dinner_sales_pct = (
-            (year_dinner_sales_total - ytd_dinner_sales_total_ly)
-            / ytd_dinner_sales_total_ly
-            * 100
-        )
-    else:
-        ytd_dinner_sales_pct = 0
     if week_giftcard_sales_total_ly != 0:
         wtd_giftcard_sales_pct = (
             (week_giftcard_sales_total - week_giftcard_sales_total_ly)
@@ -1061,55 +1061,55 @@ def store(store_id):
     week_beer_sales = get_category_sales(
         fiscal_dates["start_week"],
         fiscal_dates["start_day"],
-        ["BEER"],
+        ["BEER", "Bottled Beer", "Draft Beer", "HH Beer", "BEER 1000"],
         session["store_list"],
     )
     period_beer_sales = get_category_sales(
         fiscal_dates["start_period"],
         fiscal_dates["start_day"],
-        ["BEER"],
+        ["BEER", "Bottled Beer", "Draft Beer", "HH Beer", "BEER 1000"],
         session["store_list"],
     )
     year_beer_sales = get_category_sales(
         fiscal_dates["start_year"],
         fiscal_dates["start_day"],
-        ["BEER"],
+        ["BEER", "Bottled Beer", "Draft Beer", "HH Beer", "BEER 1000"],
         session["store_list"],
     )
     week_liquor_sales = get_category_sales(
         fiscal_dates["start_week"],
         fiscal_dates["start_day"],
-        ["LIQUOR"],
+        ["LIQUOR", "HH Liquor"],
         session["store_list"],
     )
     period_liquor_sales = get_category_sales(
         fiscal_dates["start_period"],
         fiscal_dates["start_day"],
-        ["LIQUOR"],
+        ["LIQUOR", "HH Liquor"],
         session["store_list"],
     )
     year_liquor_sales = get_category_sales(
         fiscal_dates["start_year"],
         fiscal_dates["start_day"],
-        ["LIQUOR"],
+        ["LIQUOR", "HH Liquor"],
         session["store_list"],
     )
     week_wine_sales = get_category_sales(
         fiscal_dates["start_week"],
         fiscal_dates["start_day"],
-        ["WINE"],
+        ["WINE", "HH Wine", "Red Wine", "White Wine", "Sparkling Wine", "Rose Wine"],
         session["store_list"],
     )
     period_wine_sales = get_category_sales(
         fiscal_dates["start_period"],
         fiscal_dates["start_day"],
-        ["WINE"],
+        ["WINE", "HH Wine", "Red Wine", "White Wine", "Sparkling Wine", "Rose Wine"],
         session["store_list"],
     )
     year_wine_sales = get_category_sales(
         fiscal_dates["start_year"],
         fiscal_dates["start_day"],
-        ["WINE"],
+        ["WINE", "HH Wine", "Red Wine", "White Wine", "Sparkling Wine", "Rose Wine"],
         session["store_list"],
     )
 
@@ -1117,55 +1117,55 @@ def store(store_id):
     week_beer_sales_ly = get_category_sales(
         fiscal_dates["start_week_ly"],
         fiscal_dates["end_week_ly"],
-        ["BEER"],
+        ["BEER", "Bottled Beer", "Draft Beer", "HH Beer", "BEER 1000"],
         session["store_list"],
     )
     period_beer_sales_ly = get_category_sales(
         fiscal_dates["start_period_ly"],
         fiscal_dates["end_period_ly"],
-        ["BEER"],
+        ["BEER", "Bottled Beer", "Draft Beer", "HH Beer", "BEER 1000"],
         session["store_list"],
     )
     year_beer_sales_ly = get_category_sales(
         fiscal_dates["start_year_ly"],
         fiscal_dates["end_year_ly"],
-        ["BEER"],
+        ["BEER", "Bottled Beer", "Draft Beer", "HH Beer", "BEER 1000"],
         session["store_list"],
     )
     week_liquor_sales_ly = get_category_sales(
         fiscal_dates["start_week_ly"],
         fiscal_dates["end_week_ly"],
-        ["LIQUOR"],
+        ["LIQUOR", "HH Liquor"],
         session["store_list"],
     )
     period_liquor_sales_ly = get_category_sales(
         fiscal_dates["start_period_ly"],
         fiscal_dates["end_period_ly"],
-        ["LIQUOR"],
+        ["LIQUOR", "HH Liquor"],
         session["store_list"],
     )
     year_liquor_sales_ly = get_category_sales(
         fiscal_dates["start_year_ly"],
         fiscal_dates["end_year_ly"],
-        ["LIQUOR"],
+        ["LIQUOR", "HH Liquor"],
         session["store_list"],
     )
     week_wine_sales_ly = get_category_sales(
         fiscal_dates["start_week_ly"],
         fiscal_dates["end_week_ly"],
-        ["WINE"],
+        ["WINE", "HH Wine", "Red Wine", "White Wine", "Sparkling Wine", "Rose Wine"],
         session["store_list"],
     )
     period_wine_sales_ly = get_category_sales(
         fiscal_dates["start_period_ly"],
         fiscal_dates["end_period_ly"],
-        ["WINE"],
+        ["WINE", "HH Wine", "Red Wine", "White Wine", "Sparkling Wine", "Rose Wine"],
         session["store_list"],
     )
     year_wine_sales_ly = get_category_sales(
         fiscal_dates["start_year_ly"],
         fiscal_dates["end_year_ly"],
-        ["WINE"],
+        ["WINE", "HH Wine", "Red Wine", "White Wine", "Sparkling Wine", "Rose Wine"],
         session["store_list"],
     )
     # sales lists for charts
@@ -1176,18 +1176,30 @@ def store(store_id):
     week_liquor_sales_list_ly = week_liquor_sales_ly["sales"].tolist()
     week_wine_sales_list = week_wine_sales["sales"].tolist()
     week_wine_sales_list_ly = week_wine_sales_ly["sales"].tolist()
-    period_beer_sales_list = period_beer_sales["sales"].tolist()
-    period_beer_sales_list_ly = period_beer_sales_ly["sales"].tolist()
-    period_liquor_sales_list = period_liquor_sales["sales"].tolist()
-    period_liquor_sales_list_ly = period_liquor_sales_ly["sales"].tolist()
-    period_wine_sales_list = period_wine_sales["sales"].tolist()
-    period_wine_sales_list_ly = period_wine_sales_ly["sales"].tolist()
-    year_beer_sales_list = year_beer_sales["sales"].tolist()
-    year_beer_sales_list_ly = year_beer_sales_ly["sales"].tolist()
-    year_liquor_sales_list = year_liquor_sales["sales"].tolist()
-    year_liquor_sales_list_ly = year_liquor_sales_ly["sales"].tolist()
-    year_wine_sales_list = year_wine_sales["sales"].tolist()
-    year_wine_sales_list_ly = year_wine_sales_ly["sales"].tolist()
+    ptd_beer_sales = period_beer_sales.groupby(["week"]).sum(numeric_only=True).reset_index()
+    ptd_beer_sales_ly = period_beer_sales_ly.groupby(["week"]).sum(numeric_only=True).reset_index()
+    period_beer_sales_list = ptd_beer_sales["sales"].tolist()
+    period_beer_sales_list_ly = ptd_beer_sales_ly["sales"].tolist()
+    ptd_liquor_sales = period_liquor_sales.groupby(["week"]).sum(numeric_only=True).reset_index()
+    ptd_liquor_sales_ly = period_liquor_sales_ly.groupby(["week"]).sum(numeric_only=True).reset_index()
+    period_liquor_sales_list = ptd_liquor_sales["sales"].tolist()
+    period_liquor_sales_list_ly = ptd_liquor_sales_ly["sales"].tolist()
+    ptd_wine_sales = period_wine_sales.groupby(["week"]).sum(numeric_only=True).reset_index()
+    ptd_wine_sales_ly = period_wine_sales_ly.groupby(["week"]).sum(numeric_only=True).reset_index()
+    period_wine_sales_list = ptd_wine_sales["sales"].tolist()
+    period_wine_sales_list_ly = ptd_wine_sales_ly["sales"].tolist()
+    ytd_beer_sales = year_beer_sales.groupby(["period"]).sum(numeric_only=True).reset_index()
+    ytd_beer_sales_ly = year_beer_sales_ly.groupby(["period"]).sum(numeric_only=True).reset_index()
+    year_beer_sales_list = ytd_beer_sales["sales"].tolist()
+    year_beer_sales_list_ly = ytd_beer_sales_ly["sales"].tolist()
+    ytd_liquor_sales = year_liquor_sales.groupby(["period"]).sum(numeric_only=True).reset_index()
+    ytd_liquor_sales_ly = year_liquor_sales_ly.groupby(["period"]).sum(numeric_only=True).reset_index()
+    year_liquor_sales_list = ytd_liquor_sales["sales"].tolist()
+    year_liquor_sales_list_ly = ytd_liquor_sales_ly["sales"].tolist()
+    ytd_wine_sales = year_wine_sales.groupby(["period"]).sum(numeric_only=True).reset_index()
+    ytd_wine_sales_ly = year_wine_sales_ly.groupby(["period"]).sum(numeric_only=True).reset_index()
+    year_wine_sales_list = ytd_wine_sales["sales"].tolist()
+    year_wine_sales_list_ly = ytd_wine_sales_ly["sales"].tolist()
 
     # sales totals for tables
     week_beer_sales_total = week_beer_sales["sales"].sum()
@@ -1195,7 +1207,7 @@ def store(store_id):
         week_beer_sales_ly["date"] <= fiscal_dates["start_day_ly"]
     ]["sales"].sum()
     period_beer_sales_total = period_beer_sales["sales"].sum()
-    ptd_beer_sales_total_ly = period_beer_sales_ly[
+    ptd_beer_sales_total_ly = ptd_beer_sales_ly[
         period_beer_sales_ly["date"] <= fiscal_dates["start_day"]
     ]["sales"].sum()
     year_beer_sales_total = year_beer_sales["sales"].sum()
