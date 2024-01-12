@@ -7,6 +7,8 @@ Copyright (c) 2019 - present AppSeed.us
 from flask import current_app
 from flask_security import current_user
 from flask_security.datastore import SQLAlchemySessionUserDatastore
+from flask_admin.contrib.sqla.fields import QuerySelectMultipleField
+from flask_admin.form import Select2Widget
 from flask_security.core import (
     UserMixin,
     RoleMixin,
@@ -111,8 +113,16 @@ class UserAdmin(sqla.ModelView):
 
         # Add a password field, naming it "password2" and labeling it "New Password".
         form_class.password2 = PasswordField("New Password")
+    
+        # Add a field for the user's roles
+        form_class.roles = QuerySelectMultipleField(
+            query_factory=lambda: self.session.query(Roles),
+            allow_blank=False,
+            blank_text='Select Role',
+            widget=Select2Widget(multiple=True) # change this to True if you allow multiple roles
+        )
+        
         return form_class
-
     # This callback executes when the user saves changes to a newly-created or edited User -- before the changes are
     # committed to the database.
     def on_model_change(self, form, model, is_created):
