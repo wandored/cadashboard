@@ -161,7 +161,6 @@ def get_cost_per_vendor(regex, start, end, stores):
             index=["company", "uofm"],
             aggfunc={"unit_cost": np.mean, "count": np.sum, "base_cost": np.mean},
         )
-        ic(table)
         if not table.empty:
             table.sort_values(by=["base_cost"], inplace=True)
             return table
