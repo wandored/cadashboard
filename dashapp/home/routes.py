@@ -473,7 +473,9 @@ def store(store_id):
     ytd_sales_ly = sum(year_to_date_sales_ly)
 
     daily_sales = daily_sales_list[-1]
-    daily_sales_ly = daily_sales_list_ly[-1]
+    daily_sales_ly = daily_sales_list_ly[fiscal_dates["dow"] - 1]
+    ic(fiscal_dates["dow"])
+    ic(daily_sales_ly)
 
     # lunch and dinner sales
     week_lunch_sales, week_dinner_sales = get_daypart_sales(
@@ -1655,15 +1657,22 @@ def support():
             "login_count",
         ],
     )
-    top_users = user_table[user_table["login_count"] > 0].sort_values("login_count")
+    # get interger from confirmed_at till today
+    user_table["days_since_confirmed"] = user_table["confirmed_at"].apply(
+        lambda x: (TODAY - x).days
+    )
+    user_table["avg_login"] = (
+        user_table["login_count"] / user_table["days_since_confirmed"] * 28
+    ).round(1)
     no_login = user_table[user_table["last_login_at"].isnull()]
     lapsed_users = user_table[
         user_table["last_login_at"] < TODAY - timedelta(days=30)
     ].sort_values(by=["last_login_at"], ascending=False)
-    user_table = user_table[user_table["last_login_at"].notnull()].sort_values(
-        by=["login_count"], ascending=False
+    top_users = (
+        user_table[user_table["last_login_at"].notnull()]
+        .sort_values(by=["avg_login"], ascending=False)
+        .head(25)
     )
-    top_users = user_table
 
     query = (
         db.session.query(StockCount.store, StockCount.item)
