@@ -187,141 +187,122 @@
               </div>
             </div>
             <div class="row">
-                <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
-                  <div class="card z-index-2">
-                    <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                      <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
-                        <div class="chart">
-                          <canvas id="chart-week-lunch-sales" class="chart-canvas" height="170"></canvas>
-                        </div>
+              <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
+                <div class="card z-index-2">
+                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                    <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
+                      <div class="chart">
+                        <canvas id="chart-week-lunch-sales" class="chart-canvas" height="170"></canvas>
                       </div>
                     </div>
-                    <div class="card-body">
-                      <h6 class="mb-0 ">Lunch Sales</h6>
-                      {% if week_lunch_sales_total > wtd_lunch_sales_total_ly %}
-                      <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_lunch_sales_pct) }} over last year</p>
-                      {% else %}
-                      <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_lunch_sales_pct) }} below last year</p>
-                      {% endif %}
-                    </div>
+                  </div>
+                  <div class="card-body">
+                    <h6 class="mb-0 ">Lunch Sales</h6>
+                    {% if week_lunch_sales_total > wtd_lunch_sales_total_ly %}
+                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_lunch_sales_pct) }} over last year</p>
+                    {% else %}
+                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_lunch_sales_pct) }} below last year</p>
+                    {% endif %}
                   </div>
                 </div>
-                <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
-                  <div class="card z-index-2">
-                    <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                      <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
-                        <div class="chart">
-                          <canvas id="chart-week-dinner-sales" class="chart-canvas" height="170"></canvas>
-                        </div>
+              </div>
+              <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
+                <div class="card z-index-2">
+                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                    <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
+                      <div class="chart">
+                        <canvas id="chart-week-dinner-sales" class="chart-canvas" height="170"></canvas>
                       </div>
                     </div>
-                    <div class="card-body">
-                      <h6 class="mb-0 ">Dinner Sales</h6>
-                      {% if week_dinner_sales_total > wtd_dinner_sales_total_ly %}
-                      <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_dinner_sales_pct) }} over last year</p>
-                      {% else %}
-                      <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_dinner_sales_pct) }} below last year</p>
-                      {% endif %}
-                    </div>
+                  </div>
+                  <div class="card-body">
+                    <h6 class="mb-0 ">Dinner Sales</h6>
+                    {% if week_dinner_sales_total > wtd_dinner_sales_total_ly %}
+                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_dinner_sales_pct) }} over last year</p>
+                    {% else %}
+                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_dinner_sales_pct) }} below last year</p>
+                    {% endif %}
                   </div>
                 </div>
-                <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
-                  <div class="card z-index-2">
-                    <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                      <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
-                        <div class="chart">
-                          <canvas id="chart-week-togo-sales" class="chart-canvas" height="170"></canvas>
-                        </div>
+              </div>
+              <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
+                <div class="card z-index-2">
+                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                    <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
+                      <div class="chart">
+                        <canvas id="chart-week-togo-sales" class="chart-canvas" height="170"></canvas>
                       </div>
                     </div>
-                    <div class="card-body">
-                      <h6 class="mb-0 ">To-Go Sales</h6>
-                      {% if week_togo_sales_total > wtd_togo_sales_total_ly %}
-                      <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_togo_sales_pct) }} over last year</p>
-                      {% else %}
-                      <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_togo_sales_pct) }} below last year</p>
-                      {% endif %}
-                    </div>
+                  </div>
+                  <div class="card-body">
+                    <h6 class="mb-0 ">To-Go Sales</h6>
+                    {% if week_togo_sales_total > wtd_togo_sales_total_ly %}
+                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_togo_sales_pct) }} over last year</p>
+                    {% else %}
+                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_togo_sales_pct) }} below last year</p>
+                    {% endif %}
                   </div>
                 </div>
+              </div>
             </div>
             <div class="row">
-                <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
-                  <div class="card z-index-2">
-                    <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                      <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
-                        <div class="chart">
-                          <canvas id="chart-week-beer-sales" class="chart-canvas" height="170"></canvas>
-                        </div>
+              <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
+                <div class="card z-index-2">
+                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                    <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
+                      <div class="chart">
+                        <canvas id="chart-week-beer-sales" class="chart-canvas" height="170"></canvas>
                       </div>
                     </div>
-                    <div class="card-body">
-                      <h6 class="mb-0 ">Beer Sales</h6>
-                      {% if week_beer_sales_total > wtd_beer_sales_total_ly %}
-                      <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_beer_sales_pct) }} over last year</p>
-                      {% else %}
-                      <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_beer_sales_pct) }} below last year</p>
-                      {% endif %}
-                    </div>
+                  </div>
+                  <div class="card-body">
+                    <h6 class="mb-0 ">Beer Sales</h6>
+                    {% if week_beer_sales_total > wtd_beer_sales_total_ly %}
+                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_beer_sales_pct) }} over last year</p>
+                    {% else %}
+                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_beer_sales_pct) }} below last year</p>
+                    {% endif %}
                   </div>
                 </div>
-                <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
-                  <div class="card z-index-2">
-                    <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                      <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
-                        <div class="chart">
-                          <canvas id="chart-week-wine-sales" class="chart-canvas" height="170"></canvas>
-                        </div>
+              </div>
+              <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
+                <div class="card z-index-2">
+                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                    <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
+                      <div class="chart">
+                        <canvas id="chart-week-wine-sales" class="chart-canvas" height="170"></canvas>
                       </div>
                     </div>
-                    <div class="card-body">
-                      <h6 class="mb-0 ">Wine Sales</h6>
-                      {% if week_wine_sales_total > wtd_wine_sales_total_ly %}
-                      <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_wine_sales_pct) }} over last year</p>
-                      {% else %}
-                      <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_wine_sales_pct) }} below last year</p>
-                      {% endif %}
-                    </div>
+                  </div>
+                  <div class="card-body">
+                    <h6 class="mb-0 ">Wine Sales</h6>
+                    {% if week_wine_sales_total > wtd_wine_sales_total_ly %}
+                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_wine_sales_pct) }} over last year</p>
+                    {% else %}
+                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_wine_sales_pct) }} below last year</p>
+                    {% endif %}
                   </div>
                 </div>
-                <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
-                  <div class="card z-index-2">
-                    <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                      <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
-                        <div class="chart">
-                          <canvas id="chart-week-liquor-sales" class="chart-canvas" height="170"></canvas>
-                        </div>
+              </div>
+              <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
+                <div class="card z-index-2">
+                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                    <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
+                      <div class="chart">
+                        <canvas id="chart-week-liquor-sales" class="chart-canvas" height="170"></canvas>
                       </div>
                     </div>
-                    <div class="card-body">
-                      <h6 class="mb-0 ">Liquor Sales</h6>
-                      {% if week_liquor_sales_total > wtd_liquor_sales_total_ly %}
-                      <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_liquor_sales_pct) }} over last year</p>
-                      {% else %}
-                      <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_liquor_sales_pct) }} below last year</p>
-                      {% endif %}
-                    </div>
+                  </div>
+                  <div class="card-body">
+                    <h6 class="mb-0 ">Liquor Sales</h6>
+                    {% if week_liquor_sales_total > wtd_liquor_sales_total_ly %}
+                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_liquor_sales_pct) }} over last year</p>
+                    {% else %}
+                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_liquor_sales_pct) }} below last year</p>
+                    {% endif %}
                   </div>
                 </div>
-                <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
-                  <div class="card z-index-2">
-                    <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                      <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
-                        <div class="chart">
-                          <canvas id="chart-week-giftcard-sales" class="chart-canvas" height="170"></canvas>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="card-body">
-                      <h6 class="mb-0 ">Gift Card Sales</h6>
-                      {% if week_giftcard_sales_total > week_giftcard_sales_total_ly %}
-                      <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_giftcard_sales_pct) }} over last year</p>
-                      {% else %}
-                      <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_giftcard_sales_pct) }} below last year</p>
-                      {% endif %}
-                    </div>
-                  </div>
-                </div>
+              </div>
             </div>
           </div>
           <div class="tab-pane fade" id="nav-period" role="tabpanel" aria-labelledby="nav-period-tab">
@@ -333,139 +314,120 @@
               </div>
             </div>
             <div class="row">
-                <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
-                  <div class="card z-index-2">
-                    <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                      <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
-                        <div class="chart">
-                          <canvas id="chart-period-lunch-sales" class="chart-canvas" height="170"></canvas>
-                        </div>
+              <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
+                <div class="card z-index-2">
+                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                    <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
+                      <div class="chart">
+                        <canvas id="chart-period-lunch-sales" class="chart-canvas" height="170"></canvas>
                       </div>
                     </div>
-                    <div class="card-body">
-                      <h6 class="mb-0 ">Lunch Sales</h6>
-                      {% if period_lunch_sales_total > ptd_lunch_sales_total_ly %}
-                      <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_lunch_sales_pct) }} over last year</p>
-                      {% else %}
-                      <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_lunch_sales_pct) }} below last year</p>
-                      {% endif %}
-                    </div>
+                  </div>
+                  <div class="card-body">
+                    <h6 class="mb-0 ">Lunch Sales</h6>
+                    {% if period_lunch_sales_total > ptd_lunch_sales_total_ly %}
+                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_lunch_sales_pct) }} over last year</p>
+                    {% else %}
+                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_lunch_sales_pct) }} below last year</p>
+                    {% endif %}
                   </div>
                 </div>
-                <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
-                  <div class="card z-index-2">
-                    <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                      <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
-                        <div class="chart">
-                          <canvas id="chart-period-dinner-sales" class="chart-canvas" height="170"></canvas>
-                        </div>
+              </div>
+              <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
+                <div class="card z-index-2">
+                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                    <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
+                      <div class="chart">
+                        <canvas id="chart-period-dinner-sales" class="chart-canvas" height="170"></canvas>
                       </div>
                     </div>
-                    <div class="card-body">
-                      <h6 class="mb-0 ">Dinner Sales</h6>
-                      {% if period_dinner_sales_total > ptd_dinner_sales_total_ly %}
-                      <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_dinner_sales_pct) }} over last year</p>
-                      {% else %}
-                      <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_dinner_sales_pct) }} below last year</p>
-                      {% endif %}
-                    </div>
+                  </div>
+                  <div class="card-body">
+                    <h6 class="mb-0 ">Dinner Sales</h6>
+                    {% if period_dinner_sales_total > ptd_dinner_sales_total_ly %}
+                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_dinner_sales_pct) }} over last year</p>
+                    {% else %}
+                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_dinner_sales_pct) }} below last year</p>
+                    {% endif %}
                   </div>
                 </div>
-                <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
-                  <div class="card z-index-2">
-                    <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                      <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
-                        <div class="chart">
-                          <canvas id="chart-period-togo-sales" class="chart-canvas" height="170"></canvas>
-                        </div>
+              </div>
+              <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
+                <div class="card z-index-2">
+                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                    <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
+                      <div class="chart">
+                        <canvas id="chart-period-togo-sales" class="chart-canvas" height="170"></canvas>
                       </div>
                     </div>
-                    <div class="card-body">
-                      <h6 class="mb-0 ">To-Go Sales</h6>
-                      {% if period_togo_sales_total > ptd_togo_sales_total_ly %}
-                      <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_togo_sales_pct) }} over last year</p>
-                      {% else %}
-                      <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_togo_sales_pct) }} below last year</p>
-                      {% endif %}
-                    </div>
+                  </div>
+                  <div class="card-body">
+                    <h6 class="mb-0 ">To-Go Sales</h6>
+                    {% if period_togo_sales_total > ptd_togo_sales_total_ly %}
+                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_togo_sales_pct) }} over last year</p>
+                    {% else %}
+                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_togo_sales_pct) }} below last year</p>
+                    {% endif %}
                   </div>
                 </div>
-                <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
-                  <div class="card z-index-2">
-                    <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                      <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
-                        <div class="chart">
-                          <canvas id="chart-period-beer-sales" class="chart-canvas" height="170"></canvas>
-                        </div>
+              </div>
+              <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
+                <div class="card z-index-2">
+                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                    <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
+                      <div class="chart">
+                        <canvas id="chart-period-beer-sales" class="chart-canvas" height="170"></canvas>
                       </div>
                     </div>
-                    <div class="card-body">
-                      <h6 class="mb-0 ">Beer Sales</h6>
-                      {% if period_beer_sales_total > ptd_beer_sales_total_ly %}
-                      <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_beer_sales_pct) }} over last year</p>
-                      {% else %}
-                      <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_beer_sales_pct) }} below last year</p>
-                      {% endif %}
-                    </div>
+                  </div>
+                  <div class="card-body">
+                    <h6 class="mb-0 ">Beer Sales</h6>
+                    {% if period_beer_sales_total > ptd_beer_sales_total_ly %}
+                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_beer_sales_pct) }} over last year</p>
+                    {% else %}
+                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_beer_sales_pct) }} below last year</p>
+                    {% endif %}
                   </div>
                 </div>
-                <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
-                  <div class="card z-index-2">
-                    <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                      <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
-                        <div class="chart">
-                          <canvas id="chart-period-wine-sales" class="chart-canvas" height="170"></canvas>
-                        </div>
+              </div>
+              <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
+                <div class="card z-index-2">
+                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                    <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
+                      <div class="chart">
+                        <canvas id="chart-period-wine-sales" class="chart-canvas" height="170"></canvas>
                       </div>
                     </div>
-                    <div class="card-body">
-                      <h6 class="mb-0 ">Wine Sales</h6>
-                      {% if period_wine_sales_total > ptd_wine_sales_total_ly %}
-                      <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_wine_sales_pct) }} over last year</p>
-                      {% else %}
-                      <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_wine_sales_pct) }} below last year</p>
-                      {% endif %}
-                    </div>
+                  </div>
+                  <div class="card-body">
+                    <h6 class="mb-0 ">Wine Sales</h6>
+                    {% if period_wine_sales_total > ptd_wine_sales_total_ly %}
+                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_wine_sales_pct) }} over last year</p>
+                    {% else %}
+                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_wine_sales_pct) }} below last year</p>
+                    {% endif %}
                   </div>
                 </div>
-                <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
-                  <div class="card z-index-2">
-                    <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                      <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
-                        <div class="chart">
-                          <canvas id="chart-period-liquor-sales" class="chart-canvas" height="170"></canvas>
-                        </div>
+              </div>
+              <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
+                <div class="card z-index-2">
+                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                    <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
+                      <div class="chart">
+                        <canvas id="chart-period-liquor-sales" class="chart-canvas" height="170"></canvas>
                       </div>
                     </div>
-                    <div class="card-body">
-                      <h6 class="mb-0 ">Liquor Sales</h6>
-                      {% if period_liquor_sales_total > ptd_liquor_sales_total_ly %}
-                      <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_liquor_sales_pct) }} over last year</p>
-                      {% else %}
-                      <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_liquor_sales_pct) }} below last year</p>
-                      {% endif %}
-                    </div>
+                  </div>
+                  <div class="card-body">
+                    <h6 class="mb-0 ">Liquor Sales</h6>
+                    {% if period_liquor_sales_total > ptd_liquor_sales_total_ly %}
+                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_liquor_sales_pct) }} over last year</p>
+                    {% else %}
+                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_liquor_sales_pct) }} below last year</p>
+                    {% endif %}
                   </div>
                 </div>
-                <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
-                  <div class="card z-index-2">
-                    <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                      <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
-                        <div class="chart">
-                          <canvas id="chart-period-giftcard-sales" class="chart-canvas" height="170"></canvas>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="card-body">
-                      <h6 class="mb-0 ">Gift Card Sales</h6>
-                      {% if period_giftcard_sales_total > period_giftcard_sales_total_ly %}
-                      <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_giftcard_sales_pct) }} over last year</p>
-                      {% else %}
-                      <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_giftcard_sales_pct) }} below last year</p>
-                      {% endif %}
-                    </div>
-                  </div>
-                </div>
+              </div>
             </div>
           </div>
           <div class="tab-pane fade" id="nav-year" role="tabpanel" aria-labelledby="nav-year-tab">
@@ -477,65 +439,120 @@
               </div>
             </div>
             <div class="row">
-                <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
-                  <div class="card z-index-2">
-                    <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                      <div class="bg-gradient-warning shadow-warning border-radius-lg py-3 pe-1">
-                        <div class="chart">
-                          <canvas id="chart-year-lunch-sales" class="chart-canvas" height="170"></canvas>
-                        </div>
+              <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
+                <div class="card z-index-2">
+                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                    <div class="bg-gradient-warning shadow-warning border-radius-lg py-3 pe-1">
+                      <div class="chart">
+                        <canvas id="chart-year-lunch-sales" class="chart-canvas" height="170"></canvas>
                       </div>
                     </div>
-                    <div class="card-body">
-                      <h6 class="mb-0 ">Lunch Sales</h6>
-                      {% if year_lunch_sales_total > ytd_lunch_sales_total_ly %}
-                      <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_lunch_sales_pct) }} over last year</p>
-                      {% else %}
-                      <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_lunch_sales_pct) }} below last year</p>
-                      {% endif %}
-                    </div>
+                  </div>
+                  <div class="card-body">
+                    <h6 class="mb-0 ">Lunch Sales</h6>
+                    {% if year_lunch_sales_total > ytd_lunch_sales_total_ly %}
+                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_lunch_sales_pct) }} over last year</p>
+                    {% else %}
+                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_lunch_sales_pct) }} below last year</p>
+                    {% endif %}
                   </div>
                 </div>
-                <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
-                  <div class="card z-index-2">
-                    <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                      <div class="bg-gradient-warning shadow-warning border-radius-lg py-3 pe-1">
-                        <div class="chart">
-                          <canvas id="chart-year-dinner-sales" class="chart-canvas" height="170"></canvas>
-                        </div>
+              </div>
+              <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
+                <div class="card z-index-2">
+                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                    <div class="bg-gradient-warning shadow-warning border-radius-lg py-3 pe-1">
+                      <div class="chart">
+                        <canvas id="chart-year-dinner-sales" class="chart-canvas" height="170"></canvas>
                       </div>
                     </div>
-                    <div class="card-body">
-                      <h6 class="mb-0 ">Dinner Sales</h6>
-                      {% if year_dinner_sales_total > ytd_dinner_sales_total_ly %}
-                      <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_dinner_sales_pct) }} over last year</p>
-                      {% else %}
-                      <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_dinner_sales_pct) }} below last year</p>
-                      {% endif %}
-                    </div>
+                  </div>
+                  <div class="card-body">
+                    <h6 class="mb-0 ">Dinner Sales</h6>
+                    {% if year_dinner_sales_total > ytd_dinner_sales_total_ly %}
+                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_dinner_sales_pct) }} over last year</p>
+                    {% else %}
+                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_dinner_sales_pct) }} below last year</p>
+                    {% endif %}
                   </div>
                 </div>
-                <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
-                  <div class="card z-index-2">
-                    <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                      <div class="bg-gradient-warning shadow-warning border-radius-lg py-3 pe-1">
-                        <div class="chart">
-                          <canvas id="chart-year-togo-sales" class="chart-canvas" height="170"></canvas>
-                        </div>
+              </div>
+              <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
+                <div class="card z-index-2">
+                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                    <div class="bg-gradient-warning shadow-warning border-radius-lg py-3 pe-1">
+                      <div class="chart">
+                        <canvas id="chart-year-togo-sales" class="chart-canvas" height="170"></canvas>
                       </div>
                     </div>
-                    <div class="card-body">
-                      <h6 class="mb-0 ">To-Go Sales</h6>
-                      {% if year_togo_sales_total > ytd_togo_sales_total_ly %}
-                      <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_togo_sales_pct) }} over last year</p>
-                      {% else %}
-                      <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_togo_sales_pct) }} below last year</p>
-                      {% endif %}
-                    </div>
+                  </div>
+                  <div class="card-body">
+                    <h6 class="mb-0 ">To-Go Sales</h6>
+                    {% if year_togo_sales_total > ytd_togo_sales_total_ly %}
+                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_togo_sales_pct) }} over last year</p>
+                    {% else %}
+                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_togo_sales_pct) }} below last year</p>
+                    {% endif %}
                   </div>
                 </div>
-            </div>
-            <div class="card-body px-0 pb-2">
+              </div>
+              <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
+                <div class="card z-index-2">
+                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                    <div class="bg-gradient-warning shadow-warning border-radius-lg py-3 pe-1">
+                      <div class="chart">
+                        <canvas id="chart-year-beer-sales" class="chart-canvas" height="170"></canvas>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <h6 class="mb-0 ">Beer Sales</h6>
+                    {% if year_beer_sales_total > ytd_beer_sales_total_ly %}
+                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_beer_sales_pct) }} over last year</p>
+                    {% else %}
+                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_beer_sales_pct) }} below last year</p>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
+                <div class="card z-index-2">
+                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                    <div class="bg-gradient-warning shadow-warning border-radius-lg py-3 pe-1">
+                      <div class="chart">
+                        <canvas id="chart-year-wine-sales" class="chart-canvas" height="170"></canvas>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <h6 class="mb-0 ">Wine Sales</h6>
+                    {% if year_wine_sales_total > ytd_wine_sales_total_ly %}
+                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_wine_sales_pct) }} over last year</p>
+                    {% else %}
+                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_wine_sales_pct) }} below last year</p>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
+                <div class="card z-index-2">
+                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                    <div class="bg-gradient-warning shadow-warning border-radius-lg py-3 pe-1">
+                      <div class="chart">
+                        <canvas id="chart-year-liquor-sales" class="chart-canvas" height="170"></canvas>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <h6 class="mb-0 ">Liquor Sales</h6>
+                    {% if year_liquor_sales_total > ytd_liquor_sales_total_ly %}
+                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_liquor_sales_pct) }} over last year</p>
+                    {% else %}
+                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_liquor_sales_pct) }} below last year</p>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -550,2461 +567,668 @@
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
 
-  <script src="/static/assets/js/plugins/chartjs.min.js"></script>
-  <script>
-    var ctx1 = document.getElementById("wtd-sales-chart").getContext("2d");
-
-    new Chart(ctx1, {
-      type: "bar",
-      data: {
-        labels: ["W", "T", "F", "S", "S", "M", "T"],
-        datasets: [{
-          label: "Daily Sales",
-          tension: 0.4,
-          borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false,
-          backgroundColor: "rgba(255, 255, 255, .8)",
-          data: {{ daily_sales_list | safe }},
-          maxBarThickness: 6
-        }, {
-          label: "Last Year",
-          tension: 0,
-          borderWidth: 0,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(200, 200, 200, 1)",
-          pointBorderColor: "transparent",
-          borderColor: "rgba(200, 200, 200, 1)",
-          borderWidth: 4,
-          type: "line",
-          backgroundColor: "transparent",
-          fill: true,
-          data: {{ daily_sales_list_ly | safe }},
-          maxBarThickness: 6
-        }, ],
+<script src="/static/assets/js/plugins/chartjs.min.js"></script>
+<script>
+  var cts1 = document.getElementById("wtd-sales-chart").getContext("2d");
+  new Chart(cts1, {
+    type: "bar",
+    data: {
+      labels: ["W", "T", "F", "S", "S", "M", "T"],
+      datasets: [{
+        label: "Daily Sales",
+        tension: 0.4,
+        borderWidth: 0,
+        borderRadius: 4,
+        borderSkipped: false,
+        backgroundColor: "rgba(255, 255, 255, .8)",
+        data: {{ daily_sales_list | safe }},
+        maxBarThickness: 6
+      }, {
+        label: "Last Year",
+        tension: 0,
+        borderWidth: 0,
+        pointRadius: 5,
+        pointBackgroundColor: "rgba(200, 200, 200, 1)",
+        pointBorderColor: "transparent",
+        borderColor: "rgba(200, 200, 200, 1)",
+        borderWidth: 4,
+        type: "line",
+        backgroundColor: "transparent",
+        fill: true,
+        data: {{ daily_sales_list_ly | safe }},
+        maxBarThickness: 6
+      }, ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false,
+        }
       },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
+      interaction: {
+        intersect: false,
+        mode: 'index',
+      },
+      scales: {
+        y: {
+          grid: {
+            drawBorder: false,
+            display: true,
+            drawOnChartArea: true,
+            drawTicks: false,
+            borderDash: [5, 5],
+            color: 'rgba(255, 255, 255, .2)'
+          },
+          ticks: {
+            suggestedMin: 0,
+            suggestedMax: 500,
+            beginAtZero: true,
+            padding: 10,
+            font: {
+              size: 14,
+              weight: 300,
+              family: "Roboto",
+              style: 'normal',
+              lineHeight: 2
+            },
+            color: "#fff",
+            // Abbreviate the thousands
+            callback: function(value, index, values) {
+              return value / 1e3 + ' T';
+            },
+          },
+        },
+        x: {
+          grid: {
+            drawBorder: false,
+            display: true,
+            drawOnChartArea: true,
+            drawTicks: false,
+            borderDash: [5, 5],
+            color: 'rgba(255, 255, 255, .2)'
+          },
+          ticks: {
+            display: true,
+            color: '#f8f9fa',
+            padding: 10,
+            font: {
+              size: 14,
+              weight: 300,
+              family: "Roboto",
+              style: 'normal',
+              lineHeight: 2
+            },
           }
         },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              suggestedMin: 0,
-              suggestedMax: 500,
-              beginAtZero: true,
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-              color: "#fff",
-              // Abbreviate the thousands
-              callback: function(value, index, values) {
-                return value / 1e3 + ' T';
-              },
-            },
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              color: '#f8f9fa',
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-            }
-          },
-        },
       },
-    });
+    },
+  });
 
-
-    var ctx2 = document.getElementById("ptd-sales-chart").getContext("2d");
-
-    new Chart(ctx2, {
-      type: "bar",
-      data: {
-        labels: ["W1", "W2", "W3", "W4"],
-        datasets: [{
-          label: "Weekly Sales",
-          tension: 0.4,
-          borderWidth: 0,
-          backgroundcolor: "rgba(255, 255, 255, .8)",
-          pointradius: 5,
-          pointbackgroundcolor: "rgba(255, 255, 255, .8)",
-          pointbordercolor: "transparent",
-          bordercolor: "rgba(255, 255, 255, .8)",
-          bordercolor: "rgba(255, 255, 255, .8)",
-          borderwidth: 4,
-          fill: true,
-          data: {{ weekly_sales_list | safe }},
-          maxbarthickness: 6
-        }, {
-          label: "Last Year",
-          tension: 0,
-          borderwidth: 0,
-          pointradius: 5,
-          pointbackgroundcolor: "rgba(255, 255, 255, .8)",
-          pointbordercolor: "transparent",
-          bordercolor: "rgba(255, 255, 255, .8)",
-          bordercolor: "rgba(255, 255, 255, .8)",
-          borderwidth: 4,
-          type: "bar",
-          backgroundcolor: "transparent",
-          fill: true,
-          data: {{ weekly_sales_list_ly | safe }},
-          maxbarthickness: 6
-        }, ],
+  var cts2 = document.getElementById("ptd-sales-chart").getContext("2d");
+  new Chart(cts2, {
+    type: "bar",
+    data: {
+      labels: ["W1", "W2", "W3", "W4"],
+      datasets: [{
+        label: "Weekly Sales",
+        tension: 0.4,
+        borderWidth: 0,
+        backgroundcolor: "rgba(255, 255, 255, .8)",
+        pointradius: 5,
+        pointbackgroundcolor: "rgba(255, 255, 255, .8)",
+        pointbordercolor: "transparent",
+        bordercolor: "rgba(255, 255, 255, .8)",
+        bordercolor: "rgba(255, 255, 255, .8)",
+        borderwidth: 4,
+        fill: true,
+        data: {{ weekly_sales_list | safe }},
+        maxbarthickness: 6
+      }, {
+        label: "Last Year",
+        tension: 0,
+        borderwidth: 0,
+        pointradius: 5,
+        pointbackgroundcolor: "rgba(255, 255, 255, .8)",
+        pointbordercolor: "transparent",
+        bordercolor: "rgba(255, 255, 255, .8)",
+        bordercolor: "rgba(255, 255, 255, .8)",
+        borderwidth: 4,
+        type: "bar",
+        backgroundcolor: "transparent",
+        fill: true,
+        data: {{ weekly_sales_list_ly | safe }},
+        maxbarthickness: 6
+      }, ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false,
+        }
       },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
+      interaction: {
+        intersect: false,
+        mode: 'index',
+      },
+      scales: {
+        y: {
+          grid: {
+            drawBorder: false,
+            display: true,
+            drawOnChartArea: true,
+            drawTicks: false,
+            borderDash: [5, 5],
+            color: 'rgba(255, 255, 255, .2)'
+          },
+          ticks: {
+            display: true,
+            color: '#f8f9fa',
+            padding: 10,
+            font: {
+              size: 14,
+              weight: 300,
+              family: "Roboto",
+              style: 'normal',
+              lineHeight: 2
+            },
+            // Abbreviate the millions
+            callback: function(value, index, values) {
+              return value / 1e3 + ' T';
+            },
           }
         },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              color: '#f8f9fa',
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-              // Abbreviate the millions
-              callback: function(value, index, values) {
-                return value / 1e6 + ' M';
-              },
-            }
+        x: {
+          grid: {
+            drawBorder: false,
+            display: false,
+            drawOnChartArea: false,
+            drawTicks: false,
+            borderDash: [5, 5]
           },
-          x: {
-            grid: {
-              drawBorder: false,
+          ticks: {
+            display: true,
+            color: '#f8f9fa',
+            padding: 10,
+            font: {
+              size: 14,
+              weight: 300,
+              family: "Roboto",
+              style: 'normal',
+              lineHeight: 2
+            },
+          }
+        },
+      },
+    },
+  });
+
+  var cts3 = document.getElementById("ytd-sales-chart").getContext("2d");
+  new Chart(cts3, {
+    type: "line",
+    data: {
+      labels: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13"],
+      datasets: [{
+        label: "Period Sales",
+        tension: 0,
+        borderWidth: 0,
+        pointRadius: 5,
+        pointBackgroundColor: "rgba(255, 255, 255, .8)",
+        pointBorderColor: "transparent",
+        borderColor: "rgba(255, 255, 255, .8)",
+        borderWidth: 4,
+        backgroundColor: "transparent",
+        fill: true,
+        data: {{ period_sales_list | safe }},
+        maxBarThickness: 6
+      }, {
+        label: "Last Year",
+        tension: 0,
+        borderWidth: 0,
+        pointRadius: 5,
+        pointBackgroundColor: "rgba(200, 200, 200, 1)",
+        pointBorderColor: "transparent",
+        borderColor: "rgba(200, 200, 200, 1)",
+        borderWidth: 4,
+        type: "line",
+        backgroundColor: "transparent",
+        fill: true,
+        data: {{ period_sales_list_ly | safe }},
+        maxBarThickness: 6
+      }, ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false,
+        }
+      },
+      interaction: {
+        intersect: false,
+        mode: 'index',
+      },
+      scales: {
+        y: {
+          grid: {
+            drawBorder: false,
+            display: true,
+            drawOnChartArea: true,
+            drawTicks: false,
+            borderDash: [5, 5],
+            color: 'rgba(255, 255, 255, .2)'
+          },
+          ticks: {
+            display: true,
+            padding: 10,
+            color: '#f8f9fa',
+            font: {
+              size: 14,
+              weight: 300,
+              family: "Roboto",
+              style: 'normal',
+              lineHeight: 2
+            },
+            // Abbreviate the millions
+            callback: function(value, index, values) {
+              return value / 1e3 + ' T';
+            },
+          },
+        },
+        x: {
+          grid: {
+            drawBorder: false,
+            display: false,
+            drawOnChartArea: false,
+            drawTicks: false,
+            borderDash: [5, 5]
+          },
+          ticks: {
+            display: true,
+            color: '#f8f9fa',
+            padding: 10,
+            font: {
+              size: 14,
+              weight: 300,
+              family: "Roboto",
+              style: 'normal',
+              lineHeight: 2
+            },
+          }
+        },
+      },
+    },
+  });
+
+  // Weekly Charts
+  function weeklyCommonChart(ctx, chart_type, tyData, label, lyData, lyLabel, chTitle){
+      return new Chart(ctx, {
+        type: chart_type,
+        data: {
+          labels: ["W", "T", "F", "S", "S", "M", "T"],
+          datasets: [{
+            label: label,
+            tension: 0.4,
+            borderWidth: 0,
+            borderRadius: 4,
+            borderSkipped: false,
+            backgroundColor: "rgba(255, 255, 255, .8)",
+            data: tyData,
+            maxBarThickness: 6
+          }, {
+          label: lyLabel,
+            tension: 0,
+            borderWidth: 0,
+            pointRadius: 5,
+            pointBackgroundColor: "rgba(200, 200, 200, 1)",
+            pointBorderColor: "transparent",
+            borderColor: "rgba(200, 200, 200, 1)",
+            borderWidth: 4,
+            type: "line",
+            backgroundColor: "transparent",
+            fill: true,
+            data: lyData,
+            maxBarThickness: 6
+          }, ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
               display: false,
-              drawOnChartArea: false,
-              drawTicks: false,
-              borderDash: [5, 5]
             },
-            ticks: {
+            title: {
               display: true,
-              color: '#f8f9fa',
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-            }
-          },
-        },
-      },
-    });
-
-    var ctx3 = document.getElementById("ytd-sales-chart").getContext("2d");
-
-    new Chart(ctx3, {
-      type: "line",
-      data: {
-        labels: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13"],
-        datasets: [{
-          label: "Period Sales",
-          tension: 0,
-          borderWidth: 0,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(255, 255, 255, .8)",
-          pointBorderColor: "transparent",
-          borderColor: "rgba(255, 255, 255, .8)",
-          borderWidth: 4,
-          backgroundColor: "transparent",
-          fill: true,
-          data: {{ period_sales_list | safe }},
-          maxBarThickness: 6
-        }, {
-          label: "Last Year",
-          tension: 0,
-          borderWidth: 0,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(200, 200, 200, 1)",
-          pointBorderColor: "transparent",
-          borderColor: "rgba(200, 200, 200, 1)",
-          borderWidth: 4,
-          type: "line",
-          backgroundColor: "transparent",
-          fill: true,
-          data: {{ period_sales_list_ly | safe }},
-          maxBarThickness: 6
-        }, ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          }
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              padding: 10,
-              color: '#f8f9fa',
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-              // Abbreviate the millions
-              callback: function(value, index, values) {
-                return value / 1e6 + ' M';
-              },
+              text: chTitle,
             },
           },
-          x: {
-            grid: {
-              drawBorder: false,
+          interaction: {
+            intersect: false,
+            mode: 'index',
+          },
+          scales: {
+            y: {
+              grid: {
+                drawBorder: false,
+                display: true,
+                drawOnChartArea: true,
+                drawTicks: false,
+                borderDash: [5, 5],
+                color: 'rgba(255, 255, 255, .2)'
+              },
+              ticks: {
+                display: true,
+                padding: 10,
+                font: {
+                  size: 14,
+                  weight: 300,
+                  family: "Roboto",
+                  style: 'normal',
+                  lineHeight: 2
+                },
+                color: "#fff",
+                // Abbreviate the thousands
+                callback: function(value, index, values) {
+                  return value / 1e3 + ' T';
+                },
+              },
+            },
+            x: {
+              grid: {
+                drawBorder: false,
+                display: true,
+                drawOnChartArea: true,
+                drawTicks: false,
+                borderDash: [5, 5],
+                color: 'rgba(255, 255, 255, .2)'
+              },
+              ticks: {
+                display: true,
+                color: '#f8f9fa',
+                padding: 10,
+                font: {
+                  size: 14,
+                  weight: 300,
+                  family: "Roboto",
+                  style: 'normal',
+                  lineHeight: 2
+                },
+              }
+            },
+          },
+        },
+      });
+  }
+
+  var ctw1 = document.getElementById("chart-week-lunch-sales").getContext("2d");
+  weeklyCommonChart(ctw1, "bar", {{ week_lunch_sales_list | safe }}, "Lunch Sales", {{ week_lunch_sales_list_ly | safe }}, "Same Day LY", "Lunch Sales");
+
+  var ctw2 = document.getElementById("chart-week-dinner-sales").getContext("2d");
+  weeklyCommonChart(ctw2, "bar", {{ week_dinner_sales_list | safe }}, "Dinner Sales", {{ week_dinner_sales_list_ly | safe }}, "Same Day LY", "Dinner Sales");
+
+  var ctw3 = document.getElementById("chart-week-togo-sales").getContext("2d");
+  weeklyCommonChart(ctw3, "bar", {{ week_togo_sales_list | safe }}, "To-Go Sales", {{ week_togo_sales_list_ly | safe }}, "Same Day LY", "To-Go Sales");
+
+  var ctw4 = document.getElementById("chart-week-beer-sales").getContext("2d");
+  weeklyCommonChart(ctw4, "bar", {{ week_beer_sales_list | safe }}, "Beer Sales", {{ week_beer_sales_list_ly | safe }}, "Same Day LY", "Beer Sales");
+
+  var ctw5 = document.getElementById("chart-week-wine-sales").getContext("2d");
+  weeklyCommonChart(ctw5, "bar", {{ week_wine_sales_list | safe }}, "Wine Sales", {{ week_wine_sales_list_ly | safe }}, "Same Day LY", "Wine Sales");
+
+  var ctw6 = document.getElementById("chart-week-liquor-sales").getContext("2d");
+  weeklyCommonChart(ctw6, "bar", {{ week_liquor_sales_list | safe }}, "Liquor Sales", {{ week_liquor_sales_list_ly | safe }}, "Same Day LY", "Liquor Sales");
+
+  // Period Charts
+  function periodCommonChart(ctx, chart_type, tyData, label, lyData, lyLabel, chTitle){
+      return new Chart(ctx, {
+        type: chart_type,
+        data: {
+          labels: ["W1", "W2", "W3", "W4"],
+          datasets: [{
+            label: label,
+            tension: 0.4,
+            borderWidth: 0,
+            backgroundcolor: "rgba(255, 255, 255, .8)",
+            pointradius: 5,
+            pointbackgroundcolor: "rgba(255, 255, 255, .8)",
+            pointbordercolor: "transparent",
+            bordercolor: "rgba(255, 255, 255, .8)",
+            bordercolor: "rgba(255, 255, 255, .8)",
+            borderwidth: 4,
+            fill: true,
+            data: tyData,
+            maxbarthickness: 6
+          }, {
+            label: lyLabel,
+            tension: 0,
+            borderwidth: 0,
+            pointradius: 5,
+            pointbackgroundcolor: "rgba(255, 255, 255, .8)",
+            pointbordercolor: "transparent",
+            bordercolor: "rgba(255, 255, 255, .8)",
+            bordercolor: "rgba(255, 255, 255, .8)",
+            borderwidth: 4,
+            type: chart_type,
+            backgroundcolor: "transparent",
+            fill: true,
+            data: lyData,
+            maxbarthickness: 6
+          }, ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
               display: false,
-              drawOnChartArea: false,
-              drawTicks: false,
-              borderDash: [5, 5]
             },
-            ticks: {
+            title: {
               display: true,
-              color: '#f8f9fa',
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
+              text: chTitle,
+            },
+          },
+          interaction: {
+            intersect: false,
+            mode: 'index',
+          },
+          scales: {
+            y: {
+              grid: {
+                drawBorder: false,
+                display: true,
+                drawOnChartArea: true,
+                drawTicks: false,
+                borderDash: [5, 5],
+                color: 'rgba(255, 255, 255, .2)'
               },
-            }
+              ticks: {
+                display: true,
+                color: "#f8f9fa",
+                padding: 10,
+                font: {
+                  size: 14,
+                  weight: 300,
+                  family: "Roboto",
+                  style: 'normal',
+                  lineHeight: 2
+                },
+                // Abbreviate the thousands
+                callback: function(value, index, values) {
+                  return value / 1e3 + ' T';
+                },
+              },
+            },
+            x: {
+              grid: {
+                drawBorder: false,
+                display: true,
+                drawOnChartArea: true,
+                drawTicks: false,
+                borderDash: [5, 5],
+                color: 'rgba(255, 255, 255, .2)'
+              },
+              ticks: {
+                display: true,
+                color: '#f8f9fa',
+                padding: 10,
+                font: {
+                  size: 14,
+                  weight: 300,
+                  family: "Roboto",
+                  style: 'normal',
+                  lineHeight: 2
+                },
+              }
+            },
           },
         },
-      },
-    });
+      })
+  }
 
-    var ctw1 = document.getElementById("chart-week-lunch-sales").getContext("2d");
+  var ctp1 = document.getElementById("chart-period-lunch-sales").getContext("2d");
+  periodCommonChart(ctp1, "bar", {{ period_lunch_sales_list | safe }}, "Lunch Sales", {{ period_lunch_sales_list_ly | safe }}, "Same Week LY", "Lunch Sales");
 
-    new Chart(ctw1, {
-      type: "bar",
-      data: {
-        labels: ["W", "T", "F", "S", "S", "M", "T"],
-        datasets: [{
-          label: "Lunch Sales",
-          tension: 0.4,
-          borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false,
-          backgroundColor: "rgba(255, 255, 255, .8)",
-          data: {{ week_lunch_sales_list | safe }},
-          maxBarThickness: 6
-        }, {
-        label: "Same Day LY",
-          tension: 0,
-          borderWidth: 0,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(200, 200, 200, 1)",
-          pointBorderColor: "transparent",
-          borderColor: "rgba(200, 200, 200, 1)",
-          borderWidth: 4,
-          type: "line",
-          backgroundColor: "transparent",
-          fill: true,
-          data: {{ week_lunch_sales_list_ly | safe }},
-          maxBarThickness: 6
-        }, ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          },
-          title: {
-            display: true,
-            text: 'Lunch Sales',
-          },
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-              color: "#fff",
-              // Abbreviate the thousands
-              callback: function(value, index, values) {
-                return value / 1e3 + ' T';
-              },
-            },
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              color: '#f8f9fa',
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-            }
-          },
-        },
-      },
-    });
+  var ctp2 = document.getElementById("chart-period-dinner-sales").getContext("2d");
+  periodCommonChart(ctp2, "bar", {{ period_dinner_sales_list | safe }}, "Dinner Sales", {{ period_dinner_sales_list_ly | safe }}, "Same Week LY", "Dinner Sales");
 
-    var ctw2 = document.getElementById("chart-week-dinner-sales").getContext("2d");
+  var ctp3 = document.getElementById("chart-period-togo-sales").getContext("2d");
+  periodCommonChart(ctp3, "bar", {{ period_togo_sales_list | safe }}, "To-Go Sales", {{ period_togo_sales_list_ly | safe }}, "Same Week LY", "To-Go Sales");
 
-    new Chart(ctw2, {
-      type: "bar",
-      data: {
-        labels: ["W", "T", "F", "S", "S", "M", "T"],
-        datasets: [{
-          label: "Dinner Sales",
-          tension: 0.4,
-          borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false,
-          backgroundColor: "rgba(255, 255, 255, .8)",
-          data: {{ week_dinner_sales_list | safe }},
-          maxBarThickness: 6
-        }, {
-        label: "Same Day LY",
-          tension: 0,
-          borderWidth: 0,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(200, 200, 200, 1)",
-          pointBorderColor: "transparent",
-          borderColor: "rgba(200, 200, 200, 1)",
-          borderWidth: 4,
-          type: "line",
-          backgroundColor: "transparent",
-          fill: true,
-          data: {{ week_dinner_sales_list_ly | safe }},
-          maxBarThickness: 6
-        }, ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          },
-          title: {
-            display: true,
-            text: 'Dinner Sales',
-          },
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-              color: "#fff",
-              // Abbreviate the thousands
-              callback: function(value, index, values) {
-                return value / 1e3 + ' T';
-              },
-            },
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              color: '#f8f9fa',
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-            }
-          },
-        },
-      },
-    });
+  var ctp4 = document.getElementById("chart-period-beer-sales").getContext("2d");
+  periodCommonChart(ctp4, "bar", {{ period_beer_sales_list | safe }}, "Beer Sales", {{ period_beer_sales_list_ly | safe }}, "Same Week LY", "Beer Sales");
+  
+  var ctp5 = document.getElementById("chart-period-wine-sales").getContext("2d");
+  periodCommonChart(ctp5, "bar", {{ period_wine_sales_list | safe }}, "Wine Sales", {{ period_wine_sales_list_ly | safe }}, "Same Week LY", "Wine Sales");
 
-    var ctw3 = document.getElementById("chart-week-togo-sales").getContext("2d");
+  var ctp6 = document.getElementById("chart-period-liquor-sales").getContext("2d");
+  periodCommonChart(ctp6, "bar", {{ period_liquor_sales_list | safe }}, "Liquor Sales", {{ period_liquor_sales_list_ly | safe }}, "Same Week LY", "Liquor Sales");
 
-    new Chart(ctw3, {
-      type: "bar",
-      data: {
-        labels: ["W", "T", "F", "S", "S", "M", "T"],
-        datasets: [{
-          label: "To-Go Sales",
-          tension: 0.4,
-          borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false,
-          backgroundColor: "rgba(255, 255, 255, .8)",
-          data: {{ week_togo_sales_list | safe }},
-          maxBarThickness: 6
-        }, {
-        label: "Same Day LY",
-          tension: 0,
-          borderWidth: 0,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(200, 200, 200, 1)",
-          pointBorderColor: "transparent",
-          borderColor: "rgba(200, 200, 200, 1)",
-          borderWidth: 4,
-          type: "line",
-          backgroundColor: "transparent",
-          fill: true,
-          data: {{ week_togo_sales_list_ly | safe }},
-          maxBarThickness: 6
-        }, ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          },
-          title: {
-            display: true,
-            text: 'To-Go Sales',
-          },
+  // Year Charts
+  function yearlyCommonChart(ctx, chart_type, tyData, label, lyData, lyLabel, chTitle){
+      return new Chart(ctx, {
+        type: chart_type,
+        data: {
+          labels: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13"],
+          datasets: [{
+            label: label,
+            tension: 0,
+            borderWidth: 0,
+            pointRadius: 5,
+            pointBackgroundColor: "rgba(255, 255, 255, .8)",
+            pointBorderColor: "transparent",
+            borderColor: "rgba(255, 255, 255, .8)",
+            borderWidth: 4,
+            backgroundColor: "transparent",
+            fill: true,
+            data: tyData,
+            maxBarThickness: 6
+          }, {
+          label: lyLabel,
+            tension: 0,
+            borderWidth: 0,
+            pointRadius: 5,
+            pointBackgroundColor: "rgba(200, 200, 200, 1)",
+            pointBorderColor: "transparent",
+            borderColor: "rgba(200, 200, 200, 1)",
+            borderWidth: 4,
+            type: chart_type,
+            backgroundColor: "transparent",
+            fill: true,
+            data: lyData,
+            maxBarThickness: 6
+          }, ],
         },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false,
             },
-            ticks: {
+            title: {
               display: true,
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-              color: "#fff",
-              // Abbreviate the thousands
-              callback: function(value, index, values) {
-                return value / 1e3 + ' T';
-              },
+              text: chTitle,
             },
           },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              color: '#f8f9fa',
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
+          interaction: {
+            intersect: false,
+            mode: 'index',
+          },
+          scales: {
+            y: {
+              grid: {
+                drawBorder: false,
+                display: true,
+                drawOnChartArea: true,
+                drawTicks: false,
+                borderDash: [5, 5],
+                color: 'rgba(255, 255, 255, .2)'
               },
-            }
+              ticks: {
+                display: true,
+                padding: 10,
+                color: '#f8f9fa',
+                font: {
+                  size: 14,
+                  weight: 300,
+                  family: "Roboto",
+                  style: 'normal',
+                  lineHeight: 2
+                },
+                // Abbreviate the millions
+                callback: function(value, index, values) {
+                  return value / 1e3 + ' T';
+                },
+              },
+            },
+            x: {
+              grid: {
+                drawBorder: false,
+                display: false,
+                drawOnChartArea: false,
+                drawTicks: false,
+                borderDash: [5, 5]
+              },
+              ticks: {
+                display: true,
+                color: '#f8f9fa',
+                padding: 10,
+                font: {
+                  size: 14,
+                  weight: 300,
+                  family: "Roboto",
+                  style: 'normal',
+                  lineHeight: 2
+                },
+              }
+            },
           },
         },
-      },
-    });
+      });
+  }
 
-    var ctw4 = document.getElementById("chart-week-beer-sales").getContext("2d");
+  var cty1 = document.getElementById("chart-year-lunch-sales").getContext("2d");
+  yearlyCommonChart(cty1, "line", {{ year_lunch_sales_list | safe }}, "Lunch Sales", {{ year_lunch_sales_list_ly | safe }}, "Same Period LY", "Lunch Sales");
 
-    new Chart(ctw4, {
-      type: "bar",
-      data: {
-        labels: ["W", "T", "F", "S", "S", "M", "T"],
-        datasets: [{
-          label: "Beer Sales",
-          tension: 0.4,
-          borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false,
-          backgroundColor: "rgba(255, 255, 255, .8)",
-          data: {{ week_beer_sales_list | safe }},
-          maxBarThickness: 6
-        }, {
-        label: "Same Day LY",
-          tension: 0,
-          borderWidth: 0,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(200, 200, 200, 1)",
-          pointBorderColor: "transparent",
-          borderColor: "rgba(200, 200, 200, 1)",
-          borderWidth: 4,
-          type: "line",
-          backgroundColor: "transparent",
-          fill: true,
-          data: {{ week_beer_sales_list_ly | safe }},
-          maxBarThickness: 6
-        }, ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          },
-          title: {
-            display: true,
-            text: 'Beer Sales',
-          },
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-              color: "#fff",
-              // Abbreviate the thousands
-              callback: function(value, index, values) {
-                return value / 1e3 + ' T';
-              },
-            },
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              color: '#f8f9fa',
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-            }
-          },
-        },
-      },
-    });
+  var cty2 = document.getElementById("chart-year-dinner-sales").getContext("2d");
+  yearlyCommonChart(cty2, "line", {{ year_dinner_sales_list | safe }}, "Dinner Sales", {{ year_dinner_sales_list_ly | safe }}, "Same Period LY", "Dinner Sales");
 
-    var ctw5 = document.getElementById("chart-week-wine-sales").getContext("2d");
+  var cty3 = document.getElementById("chart-year-togo-sales").getContext("2d");
+  yearlyCommonChart(cty3, "line", {{ year_togo_sales_list | safe }}, "To-Go Sales", {{ year_togo_sales_list_ly | safe }}, "Same Period LY", "To-Go Sales");
 
-    new Chart(ctw5, {
-      type: "bar",
-      data: {
-        labels: ["W", "T", "F", "S", "S", "M", "T"],
-        datasets: [{
-          label: "Wine Sales",
-          tension: 0.4,
-          borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false,
-          backgroundColor: "rgba(255, 255, 255, .8)",
-          data: {{ week_wine_sales_list | safe }},
-          maxBarThickness: 6
-        }, {
-        label: "Same Day LY",
-          tension: 0,
-          borderWidth: 0,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(200, 200, 200, 1)",
-          pointBorderColor: "transparent",
-          borderColor: "rgba(200, 200, 200, 1)",
-          borderWidth: 4,
-          type: "line",
-          backgroundColor: "transparent",
-          fill: true,
-          data: {{ week_wine_sales_list_ly | safe }},
-          maxBarThickness: 6
-        }, ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          },
-          title: {
-            display: true,
-            text: 'Wine Sales',
-          },
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-              color: "#fff",
-              // Abbreviate the thousands
-              callback: function(value, index, values) {
-                return value / 1e3 + ' T';
-              },
-            },
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              color: '#f8f9fa',
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-            }
-          },
-        },
-      },
-    });
+  var cty4 = document.getElementById("chart-year-beer-sales").getContext("2d");
+  yearlyCommonChart(cty4, "line", {{ year_beer_sales_list | safe }}, "Beer Sales", {{ year_beer_sales_list_ly | safe }}, "Same Period LY", "Beer Sales");
 
-    var ctw6 = document.getElementById("chart-week-liquor-sales").getContext("2d");
+  var cty5 = document.getElementById("chart-year-wine-sales").getContext("2d");
+  yearlyCommonChart(cty5, "line", {{ year_wine_sales_list | safe }}, "Wine Sales", {{ year_wine_sales_list_ly | safe }}, "Same Period LY", "Wine Sales");
 
-    new Chart(ctw6, {
-      type: "bar",
-      data: {
-        labels: ["W", "T", "F", "S", "S", "M", "T"],
-        datasets: [{
-          label: "Liquor Sales",
-          tension: 0.4,
-          borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false,
-          backgroundColor: "rgba(255, 255, 255, .8)",
-          data: {{ week_liquor_sales_list | safe }},
-          maxBarThickness: 6
-        }, {
-        label: "Same Day LY",
-          tension: 0,
-          borderWidth: 0,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(200, 200, 200, 1)",
-          pointBorderColor: "transparent",
-          borderColor: "rgba(200, 200, 200, 1)",
-          borderWidth: 4,
-          type: "line",
-          backgroundColor: "transparent",
-          fill: true,
-          data: {{ week_liquor_sales_list_ly | safe }},
-          maxBarThickness: 6
-        }, ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          },
-          title: {
-            display: true,
-            text: 'Liquor Sales',
-          },
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-              color: "#fff",
-              // Abbreviate the thousands
-              callback: function(value, index, values) {
-                return value / 1e3 + ' T';
-              },
-            },
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              color: '#f8f9fa',
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-            }
-          },
-        },
-      },
-    });
+  var cty6 = document.getElementById("chart-year-liquor-sales").getContext("2d");
+  yearlyCommonChart(cty6, "line", {{ year_liquor_sales_list | safe }}, "Liquor Sales", {{ year_liquor_sales_list_ly | safe }}, "Same Period LY", "Liquor Sales");
 
-    var ctw7 = document.getElementById("chart-week-giftcard-sales").getContext("2d");
-
-    new Chart(ctw7, {
-      type: "bar",
-      data: {
-        labels: ["W", "T", "F", "S", "S", "M", "T"],
-        datasets: [{
-          label: "SDLY",
-          tension: 0,
-          borderWidth: 5,
-          borderRadius: 5,
-          borderColor: "rgba(100, 100, 100, 1)",
-          pointBackgroundColor: "rgba(100, 100, 100, 1)",
-          pointBorderColor: "transparent",
-          backgroundColor: "rgba(100, 100, 100, 1)",
-          fill: false,
-          data: {{ week_giftcard_sales_list_ly | safe }},
-          type: "line"
-        },{
-          label: "Sales",
-          tension: 0.4,
-          borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false,
-          backgroundColor: "rgba(255, 255, 255, .8)",
-          data: {{ week_giftcard_sales_list | safe }},
-          stack: 'Stack 0'
-        }, {
-        label: "Expense",
-          tension: 0.4,
-          borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false,
-          BackgroundColor: "rgba(255, 255, 255, 1)",
-          data: {{ week_giftcard_redeem_list | safe }},
-          stack: 'Stack 0'
-        }, ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          },
-          title: {
-            display: true,
-            text: 'Gift Card Sales',
-          },
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-              color: "#fff",
-            },
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              color: '#f8f9fa',
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-            }
-          },
-        },
-      },
-    });
-
-    var ctp1 = document.getElementById("chart-period-lunch-sales").getContext("2d");
-
-    new Chart(ctp1, {
-      type: "bar",
-      data: {
-        labels: ["W1", "W2", "W3", "W4"],
-        datasets: [{
-          label: "Lunch Sales",
-          tension: 0.4,
-          borderWidth: 0,
-          backgroundcolor: "rgba(255, 255, 255, .8)",
-          pointradius: 5,
-          pointbackgroundcolor: "rgba(255, 255, 255, .8)",
-          pointbordercolor: "transparent",
-          bordercolor: "rgba(255, 255, 255, .8)",
-          bordercolor: "rgba(255, 255, 255, .8)",
-          borderwidth: 4,
-          fill: true,
-          data: {{ period_lunch_sales_list | safe }},
-          maxbarthickness: 6
-        }, {
-          label: "Last Year",
-          tension: 0,
-          borderwidth: 0,
-          pointradius: 5,
-          pointbackgroundcolor: "rgba(255, 255, 255, .8)",
-          pointbordercolor: "transparent",
-          bordercolor: "rgba(255, 255, 255, .8)",
-          bordercolor: "rgba(255, 255, 255, .8)",
-          borderwidth: 4,
-          type: "bar",
-          backgroundcolor: "transparent",
-          fill: true,
-          data: {{ period_lunch_sales_list_ly | safe }},
-          maxbarthickness: 6
-        }, ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          },
-          title: {
-            display: true,
-            text: 'Lunch Sales',
-          },
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              color: "#f8f9fa",
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-              // Abbreviate the thousands
-              callback: function(value, index, values) {
-                return value / 1e3 + ' T';
-              },
-            },
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              color: '#f8f9fa',
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-            }
-          },
-        },
-      },
-    });
-
-    var ctp2 = document.getElementById("chart-period-dinner-sales").getContext("2d");
-
-    new Chart(ctp2, {
-      type: "bar",
-      data: {
-        labels: ["W1", "W2", "W3", "W4"],
-        datasets: [{
-          label: "Dinner Sales",
-          tension: 0.4,
-          borderWidth: 0,
-          backgroundcolor: "rgba(255, 255, 255, .8)",
-          pointradius: 5,
-          pointbackgroundcolor: "rgba(255, 255, 255, .8)",
-          pointbordercolor: "transparent",
-          bordercolor: "rgba(255, 255, 255, .8)",
-          bordercolor: "rgba(255, 255, 255, .8)",
-          borderwidth: 4,
-          fill: true,
-          data: {{ period_dinner_sales_list | safe }},
-          maxbarthickness: 6
-        }, {
-          label: "Last Year",
-          tension: 0,
-          borderwidth: 0,
-          pointradius: 5,
-          pointbackgroundcolor: "rgba(255, 255, 255, .8)",
-          pointbordercolor: "transparent",
-          bordercolor: "rgba(255, 255, 255, .8)",
-          bordercolor: "rgba(255, 255, 255, .8)",
-          borderwidth: 4,
-          type: "bar",
-          backgroundcolor: "transparent",
-          fill: true,
-          data: {{ period_dinner_sales_list_ly | safe }},
-          maxbarthickness: 6
-        }, ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          },
-          title: {
-            display: true,
-            text: 'Dinner Sales',
-          },
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              color: "#f8f9fa",
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-              // Abbreviate the thousands
-              callback: function(value, index, values) {
-                return value / 1e3 + ' T';
-              },
-            },
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              color: '#f8f9fa',
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-            }
-          },
-        },
-      },
-    });
-
-    var ctp3 = document.getElementById("chart-period-togo-sales").getContext("2d");
-
-    new Chart(ctp3, {
-      type: "bar",
-      data: {
-        labels: ["W1", "W2", "W3", "W4"],
-        datasets: [{
-          label: "To-Go Sales",
-          tension: 0.4,
-          borderWidth: 0,
-          backgroundcolor: "rgba(255, 255, 255, .8)",
-          pointradius: 5,
-          pointbackgroundcolor: "rgba(255, 255, 255, .8)",
-          pointbordercolor: "transparent",
-          bordercolor: "rgba(255, 255, 255, .8)",
-          bordercolor: "rgba(255, 255, 255, .8)",
-          borderwidth: 4,
-          fill: true,
-          data: {{ period_togo_sales_list | safe }},
-          maxbarthickness: 6
-        }, {
-          label: "Last Year",
-          tension: 0,
-          borderwidth: 0,
-          pointradius: 5,
-          pointbackgroundcolor: "rgba(255, 255, 255, .8)",
-          pointbordercolor: "transparent",
-          bordercolor: "rgba(255, 255, 255, .8)",
-          bordercolor: "rgba(255, 255, 255, .8)",
-          borderwidth: 4,
-          type: "bar",
-          backgroundcolor: "transparent",
-          fill: true,
-          data: {{ period_togo_sales_list_ly | safe }},
-          maxbarthickness: 6
-        }, ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          },
-          title: {
-            display: true,
-            text: 'To-Go Sales',
-          },
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              color: "#f8f9fa",
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-              // Abbreviate the thousands
-              callback: function(value, index, values) {
-                return value / 1e3 + ' T';
-              },
-            },
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              color: '#f8f9fa',
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-            }
-          },
-        },
-      },
-    });
-
-    var ctp4 = document.getElementById("chart-period-beer-sales").getContext("2d");
-
-    new Chart(ctp4, {
-      type: "bar",
-      data: {
-        labels: ["W1", "W2", "W3", "W4"],
-        datasets: [{
-          label: "Beer Sales",
-          tension: 0.4,
-          borderWidth: 0,
-          backgroundcolor: "rgba(255, 255, 255, .8)",
-          pointradius: 5,
-          pointbackgroundcolor: "rgba(255, 255, 255, .8)",
-          pointbordercolor: "transparent",
-          bordercolor: "rgba(255, 255, 255, .8)",
-          bordercolor: "rgba(255, 255, 255, .8)",
-          borderwidth: 4,
-          fill: true,
-          data: {{ period_beer_sales_list | safe }},
-          maxbarthickness: 6
-        }, {
-          label: "Last Year",
-          tension: 0,
-          borderwidth: 0,
-          pointradius: 5,
-          pointbackgroundcolor: "rgba(255, 255, 255, .8)",
-          pointbordercolor: "transparent",
-          bordercolor: "rgba(255, 255, 255, .8)",
-          bordercolor: "rgba(255, 255, 255, .8)",
-          borderwidth: 4,
-          type: "bar",
-          backgroundcolor: "transparent",
-          fill: true,
-          data: {{ period_beer_sales_list_ly | safe }},
-          maxbarthickness: 6
-        }, ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          },
-          title: {
-            display: true,
-            text: 'Beer Sales',
-          },
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              color: "#f8f9fa",
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-              // Abbreviate the thousands
-              callback: function(value, index, values) {
-                return value / 1e3 + ' T';
-              },
-            },
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              color: '#f8f9fa',
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-            }
-          },
-        },
-      },
-    });
-
-    var ctp5 = document.getElementById("chart-period-wine-sales").getContext("2d");
-
-    new Chart(ctp5, {
-      type: "bar",
-      data: {
-        labels: ["W1", "W2", "W3", "W4"],
-        datasets: [{
-          label: "Wine Sales",
-          tension: 0.4,
-          borderWidth: 0,
-          backgroundcolor: "rgba(255, 255, 255, .8)",
-          pointradius: 5,
-          pointbackgroundcolor: "rgba(255, 255, 255, .8)",
-          pointbordercolor: "transparent",
-          bordercolor: "rgba(255, 255, 255, .8)",
-          bordercolor: "rgba(255, 255, 255, .8)",
-          borderwidth: 4,
-          fill: true,
-          data: {{ period_wine_sales_list | safe }},
-          maxbarthickness: 6
-        }, {
-          label: "Last Year",
-          tension: 0,
-          borderwidth: 0,
-          pointradius: 5,
-          pointbackgroundcolor: "rgba(255, 255, 255, .8)",
-          pointbordercolor: "transparent",
-          bordercolor: "rgba(255, 255, 255, .8)",
-          bordercolor: "rgba(255, 255, 255, .8)",
-          borderwidth: 4,
-          type: "bar",
-          backgroundcolor: "transparent",
-          fill: true,
-          data: {{ period_wine_sales_list_ly | safe }},
-          maxbarthickness: 6
-        }, ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          },
-          title: {
-            display: true,
-            text: 'Wine Sales',
-          },
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-            color: "#f8f9fa",
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-              // Abbreviate the thousands
-              callback: function(value, index, values) {
-                return value / 1e3 + ' T';
-              },
-            },
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              color: '#f8f9fa',
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-            }
-          },
-        },
-      },
-    });
-
-    var ctp6 = document.getElementById("chart-period-liquor-sales").getContext("2d");
-
-    new Chart(ctp6, {
-      type: "bar",
-      data: {
-        labels: ["W1", "W2", "W3", "W4"],
-        datasets: [{
-          label: "Liquor Sales",
-          tension: 0.4,
-          borderWidth: 0,
-          backgroundcolor: "rgba(255, 255, 255, .8)",
-          pointradius: 5,
-          pointbackgroundcolor: "rgba(255, 255, 255, .8)",
-          pointbordercolor: "transparent",
-          bordercolor: "rgba(255, 255, 255, .8)",
-          bordercolor: "rgba(255, 255, 255, .8)",
-          borderwidth: 4,
-          fill: true,
-          data: {{ period_liquor_sales_list | safe }},
-          maxbarthickness: 6
-        }, {
-          label: "Last Year",
-          tension: 0,
-          borderwidth: 0,
-          pointradius: 5,
-          pointbackgroundcolor: "rgba(255, 255, 255, .8)",
-          pointbordercolor: "transparent",
-          bordercolor: "rgba(255, 255, 255, .8)",
-          bordercolor: "rgba(255, 255, 255, .8)",
-          borderwidth: 4,
-          type: "bar",
-          backgroundcolor: "transparent",
-          fill: true,
-          data: {{ period_liquor_sales_list_ly | safe }},
-          maxbarthickness: 6
-        }, ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          },
-          title: {
-            display: true,
-            text: 'Liquor Sales',
-          },
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              color: "#f8f9fa",
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-              // Abbreviate the thousands
-              callback: function(value, index, values) {
-                return value / 1e3 + ' T';
-              },
-            },
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              color: '#f8f9fa',
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-            }
-          },
-        },
-      },
-    });
-
-    var ctp7 = document.getElementById("chart-period-giftcard-sales").getContext("2d");
-
-    new Chart(ctp7, {
-      type: "bar",
-      data: {
-        labels: ["W1", "W2", "W3", "W4"],
-        datasets: [{
-          label: "SWLY",
-          tension: 0,
-          borderWidth: 5,
-          borderRadius: 5,
-          borderColor: "rgba(100, 100, 100, 1)",
-          pointBackgroundColor: "rgba(100, 100, 100, 1)",
-          pointBorderColor: "transparent",
-          backgroundColor: "rgba(100, 100, 100, 1)",
-          fill: false,
-          data: {{ period_giftcard_sales_list_ly | safe }},
-          type: "line"
-        },{
-          label: "Gift Card Sales",
-          tension: 0.4,
-          borderWidth: 0,
-          backgroundcolor: "rgba(255, 255, 255, .8)",
-          pointradius: 5,
-          pointbackgroundcolor: "rgba(255, 255, 255, .8)",
-          pointbordercolor: "transparent",
-          bordercolor: "rgba(255, 255, 255, .8)",
-          bordercolor: "rgba(255, 255, 255, .8)",
-          borderwidth: 4,
-          fill: true,
-          data: {{ period_giftcard_sales_list | safe }},
-          maxbarthickness: 6
-        }, {
-          label: "Gift Card Redeem",
-          tension: 0,
-          borderwidth: 0,
-          pointradius: 5,
-          pointbackgroundcolor: "rgba(255, 255, 255, .8)",
-          pointbordercolor: "transparent",
-          bordercolor: "rgba(255, 255, 255, .8)",
-          bordercolor: "rgba(255, 255, 255, .8)",
-          borderwidth: 4,
-          type: "bar",
-          backgroundcolor: "transparent",
-          fill: true,
-          data: {{ period_giftcard_sales_list_ly | safe }},
-          maxbarthickness: 6
-        }, ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          },
-          title: {
-            display: true,
-            text: 'To-Go Sales/Expense',
-          },
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              padding: 10,
-              color: "#f8f9fa",
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-            },
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              color: '#f8f9fa',
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-            }
-          },
-        },
-      },
-    });
-
-    var cty1 = document.getElementById("chart-year-lunch-sales").getContext("2d");
-
-    new Chart(cty1, {
-      type: "bar",
-      data: {
-        labels: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13"],
-        datasets: [{
-          label: "Lunch Sales",
-          tension: 0.4,
-          borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false,
-          backgroundColor: "rgba(255, 255, 255, .8)",
-          data: {{ year_lunch_sales_list | safe }},
-          maxBarThickness: 6
-        }, {
-        label: "Same Period LY",
-          tension: 0,
-          borderWidth: 0,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(200, 200, 200, 1)",
-          pointBorderColor: "transparent",
-          borderColor: "rgba(200, 200, 200, 1)",
-          borderWidth: 4,
-          type: "line",
-          backgroundColor: "transparent",
-          fill: true,
-          data: {{ year_lunch_sales_list_ly | safe }},
-          maxBarThickness: 6
-        }, ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          },
-          title: {
-            display: true,
-            text: 'Lunch Sales',
-          },
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-              color: "#fff",
-              // Abbreviate the thousands
-              callback: function(value, index, values) {
-                return value / 1e3 + ' T';
-              },
-            },
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              color: '#f8f9fa',
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-            }
-          },
-        },
-      },
-    });
-
-    var cty2 = document.getElementById("chart-year-dinner-sales").getContext("2d");
-
-    new Chart(cty2, {
-      type: "bar",
-      data: {
-        labels: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13"],
-        datasets: [{
-          label: "Dinner Sales",
-          tension: 0.4,
-          borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false,
-          backgroundColor: "rgba(255, 255, 255, .8)",
-          data: {{ year_dinner_sales_list | safe }},
-          maxBarThickness: 6
-        }, {
-        label: "Same Period LY",
-          tension: 0,
-          borderWidth: 0,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(200, 200, 200, 1)",
-          pointBorderColor: "transparent",
-          borderColor: "rgba(200, 200, 200, 1)",
-          borderWidth: 4,
-          type: "line",
-          backgroundColor: "transparent",
-          fill: true,
-          data: {{ year_dinner_sales_list_ly | safe }},
-          maxBarThickness: 6
-        }, ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          },
-          title: {
-            display: true,
-            text: 'Dinner Sales',
-          },
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-              color: "#fff",
-              // Abbreviate the thousands
-              callback: function(value, index, values) {
-                return value / 1e3 + ' T';
-              },
-            },
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              color: '#f8f9fa',
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-            }
-          },
-        },
-      },
-    });
-
-    var cty3 = document.getElementById("chart-year-togo-sales").getContext("2d");
-
-    new Chart(cty3, {
-      type: "bar",
-      data: {
-        labels: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13"],
-        datasets: [{
-          label: "To-Go Sales",
-          tension: 0.4,
-          borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false,
-          backgroundColor: "rgba(255, 255, 255, .8)",
-          data: {{ year_togo_sales_list | safe }},
-          maxBarThickness: 6
-        }, {
-        label: "Same Period LY",
-          tension: 0,
-          borderWidth: 0,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(200, 200, 200, 1)",
-          pointBorderColor: "transparent",
-          borderColor: "rgba(200, 200, 200, 1)",
-          borderWidth: 4,
-          type: "line",
-          backgroundColor: "transparent",
-          fill: true,
-          data: {{ year_togo_sales_list_ly | safe }},
-          maxBarThickness: 6
-        }, ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          },
-          title: {
-            display: true,
-            text: 'To-Go Sales',
-          },
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-              color: "#fff",
-              // Abbreviate the thousands
-              callback: function(value, index, values) {
-                return value / 1e3 + ' T';
-              },
-            },
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              color: '#f8f9fa',
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-            }
-          },
-        },
-      },
-    });
-
-    var cty4 = document.getElementById("chart-year-beer-sales").getContext("2d");
-
-    new Chart(cty4, {
-      type: "bar",
-      data: {
-        labels: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13"],
-        datasets: [{
-          label: "Beer Sales",
-          tension: 0.4,
-          borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false,
-          backgroundColor: "rgba(255, 255, 255, .8)",
-          data: {{ year_beer_sales_list | safe }},
-          maxBarThickness: 6
-        }, {
-        label: "Same Period LY",
-          tension: 0,
-          borderWidth: 0,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(200, 200, 200, 1)",
-          pointBorderColor: "transparent",
-          borderColor: "rgba(200, 200, 200, 1)",
-          borderWidth: 4,
-          type: "line",
-          backgroundColor: "transparent",
-          fill: true,
-          data: {{ year_beer_sales_list_ly | safe }},
-          maxBarThickness: 6
-        }, ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          },
-          title: {
-            display: true,
-            text: 'Beer Sales',
-          },
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-              color: "#fff",
-              // Abbreviate the thousands
-              callback: function(value, index, values) {
-                return value / 1e3 + ' T';
-              },
-            },
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              color: '#f8f9fa',
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-            }
-          },
-        },
-      },
-    });
-
-    var cty5 = document.getElementById("chart-year-wine-sales").getContext("2d");
-
-    new Chart(cty5, {
-      type: "bar",
-      data: {
-        labels: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13"],
-        datasets: [{
-          label: "Wine Sales",
-          tension: 0.4,
-          borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false,
-          backgroundColor: "rgba(255, 255, 255, .8)",
-          data: {{ year_wine_sales_list | safe }},
-          maxBarThickness: 6
-        }, {
-        label: "Same Period LY",
-          tension: 0,
-          borderWidth: 0,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(200, 200, 200, 1)",
-          pointBorderColor: "transparent",
-          borderColor: "rgba(200, 200, 200, 1)",
-          borderWidth: 4,
-          type: "line",
-          backgroundColor: "transparent",
-          fill: true,
-          data: {{ year_wine_sales_list_ly | safe }},
-          maxBarThickness: 6
-        }, ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          },
-          title: {
-            display: true,
-            text: 'Wine Sales',
-          },
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-              color: "#fff",
-              // Abbreviate the thousands
-              callback: function(value, index, values) {
-                return value / 1e3 + ' T';
-              },
-            },
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              color: '#f8f9fa',
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-            }
-          },
-        },
-      },
-    });
-
-    var cty6 = document.getElementById("chart-year-liquor-sales").getContext("2d");
-
-    new Chart(cty6, {
-      type: "bar",
-      data: {
-        labels: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13"],
-        datasets: [{
-          label: "Liquor Sales",
-          tension: 0.4,
-          borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false,
-          backgroundColor: "rgba(255, 255, 255, .8)",
-          data: {{ year_liquor_sales_list | safe }},
-          maxBarThickness: 6
-        }, {
-        label: "Same Period LY",
-          tension: 0,
-          borderWidth: 0,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(200, 200, 200, 1)",
-          pointBorderColor: "transparent",
-          borderColor: "rgba(200, 200, 200, 1)",
-          borderWidth: 4,
-          type: "line",
-          backgroundColor: "transparent",
-          fill: true,
-          data: {{ year_liquor_sales_list_ly | safe }},
-          maxBarThickness: 6
-        }, ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          },
-          title: {
-            display: true,
-            text: 'Liquor Sales',
-          },
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-              color: "#fff",
-              // Abbreviate the thousands
-              callback: function(value, index, values) {
-                return value / 1e3 + ' T';
-              },
-            },
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              color: '#f8f9fa',
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-            }
-          },
-        },
-      },
-    });
-
-    var cty7 = document.getElementById("chart-year-giftcard-sales").getContext("2d");
-
-    new Chart(cty7, {
-      type: "bar",
-      data: {
-        labels: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13"],
-        datasets: [{
-          label: "SPLY",
-          tension: 0,
-          borderWidth: 5,
-          borderRadius: 5,
-          borderColor: "rgba(100, 100, 100, 1)",
-          pointBackgroundColor: "rgba(100, 100, 100, 1)",
-          pointBorderColor: "transparent",
-          backgroundColor: "rgba(100, 100, 100, 1)",
-          fill: false,
-          data: {{ year_giftcard_sales_list_ly | safe }},
-          type: "line"
-        },{
-          label: "Sales",
-          tension: 0.4,
-          borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false,
-          backgroundColor: "rgba(255, 255, 255, .8)",
-          data: {{ year_giftcard_sales_list | safe }},
-          stack: 'Stack 0'
-        }, {
-        label: "Expense",
-          tension: 0.4,
-          borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false,
-          BackgroundColor: "rgba(255, 255, 255, 1)",
-          data: {{ year_giftcard_redeem_list | safe }},
-          stack: 'Stack 0'
-        }, ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          },
-          title: {
-            display: true,
-            text: 'To-Go Sales/Expense',
-          },
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-              color: "#fff",
-            },
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              color: '#f8f9fa',
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-            }
-          },
-        },
-      },
-    });
-
-
-  </script>
-
+</script>
 {% endblock javascripts %}

@@ -31,6 +31,8 @@ from dashapp.authentication.models import (
     Calendar,  # noqa: F401
     GiftCardSales,
     GiftCardRedeem,
+    Purchases,
+    UnitsOfMeasure,
 )
 from sqlalchemy import func
 

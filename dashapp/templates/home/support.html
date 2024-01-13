@@ -21,7 +21,7 @@
             <thead>
               <tr>
                 <th scope="col">USER</th>
-                <th scope="col">ALL-TIME LOGINS</th>
+                <th scope="col">AVG LOGINS/PERIOD</th>
               </tr>
             </thead>
             <tbody>
@@ -29,7 +29,7 @@
                     <tr>
                       <th scope="row">{{ v.email }}</th>
                         <td>
-                          <p class="mb-0 ms-1 text-begin">{{ v.login_count }}</p>
+                          <p class="mb-0 ms-1 text-begin">{{ v.avg_login }}</p>
                         </td>
                     </tr>
                   {% endfor %}
@@ -42,7 +42,7 @@
     <div class="col-lg-4 col-md-6 mt-4 mb-4">
       <div class="card h-100">
         <div class="card-header bg-primary pb-0">
-          <h4>NO LOGIN USER LIST</h4>
+          <h4>NO LOGIN LIST</h4>
           <h6>User has never Logged in</h6>
         </div>
         <div class="card">
@@ -50,7 +50,7 @@
             <thead>
               <tr>
                 <th scope="col">USER</th>
-                <th scope="col">ALL-TIME LOGINS</th>
+                <th scope="col">ACTIVATION</th>
               </tr>
             </thead>
             <tbody>
@@ -72,7 +72,7 @@
       <div class="card h-100">
         <div class="card-header bg-primary pb-0">
           <h4>LAPSED USERS</h4>
-          <h6>Not logged in past 30 days</h6>
+          <h6>Haven't logged in past 30 days</h6>
         </div>
         <div class="card">
           <table class="table-responsive table-md">

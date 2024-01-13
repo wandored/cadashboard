@@ -7,6 +7,8 @@ Copyright (c) 2019 - present AppSeed.us
 from flask import current_app
 from flask_security import current_user
 from flask_security.datastore import SQLAlchemySessionUserDatastore
+from flask_admin.contrib.sqla.fields import QuerySelectMultipleField
+from flask_admin.form import Select2Widget
 from flask_security.core import (
     UserMixin,
     RoleMixin,
@@ -40,7 +42,7 @@ class Roles(db.Model, RoleMixin):
     __tablename__ = "roles"
 
     # Our Role has three fields, ID, name and description
-    id = db.Column(db.Integer(), primary_key=True)
+    id = db.Column(db.Integer(), primary_key=True, autoincrement=True)
     name = db.Column(db.String(80), unique=True)
     description = db.Column(db.String(255))
 
@@ -57,18 +59,18 @@ class Roles(db.Model, RoleMixin):
 class Users(db.Model, UserMixin):
     __tablename__ = "users"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     email = db.Column(db.String(255), unique=True)
     password = db.Column(db.String(255))
     active = db.Column(db.Boolean())
     fs_uniquifier = db.Column(db.String(64), unique=True)
-    roles = db.relationship("Roles", secondary=roles_users, backref="users", lazy=True)
     confirmed_at = db.Column(db.DateTime())
     last_login_at = db.Column(db.DateTime())
     current_login_at = db.Column(db.DateTime())
     last_login_ip = db.Column(db.String(100))
     current_login_ip = db.Column(db.String(100))
     login_count = db.Column(db.Integer)
+    roles = db.relationship("Roles", secondary=roles_users, backref="users", lazy=True)
 
 
 user_datastore = SQLAlchemySessionUserDatastore(db.session, Users, Roles)
@@ -111,8 +113,16 @@ class UserAdmin(sqla.ModelView):
 
         # Add a password field, naming it "password2" and labeling it "New Password".
         form_class.password2 = PasswordField("New Password")
+    
+        # Add a field for the user's roles
+        form_class.roles = QuerySelectMultipleField(
+            query_factory=lambda: self.session.query(Roles),
+            allow_blank=False,
+            blank_text='Select Role',
+            widget=Select2Widget(multiple=True) # change this to True if you allow multiple roles
+        )
+        
         return form_class
-
     # This callback executes when the user saves changes to a newly-created or edited User -- before the changes are
     # committed to the database.
     def on_model_change(self, form, model, is_created):
