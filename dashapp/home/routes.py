@@ -106,6 +106,12 @@ def index():
         session["date_selected"] = fiscal_dates["start_day"]
         data = form3.stores.data
         session["store_list"] = tuple([x.id for x in data])
+        if 98 in session["store_list"] and 99 in session["store_list"]:
+            session["store_list"] = tuple([19, 9, 4, 11, 17, 16, 10, 5, 18, 12, 14, 3, 6, 15, 13])
+        elif 99 in session["store_list"]:
+            session["store_list"] = tuple([19, 9, 4, 11, 17, 16])
+        elif 98 in session["store_list"]:
+            session["store_list"] = tuple([10, 5, 18, 12, 14, 3, 6, 15, 13])
         return redirect(url_for("home_blueprint.index"))
 
     if form4.submit4.data and form4.validate():
@@ -380,11 +386,18 @@ def store(store_id):
     if form3.submit3.data and form3.validate():
         session["date_selected"] = fiscal_dates["start_day"]
         data = form3.stores.data
+        session["store_list"] = tuple([x.id for x in data])
+        if 98 in session["store_list"] and 99 in session["store_list"]:
+            session["store_list"] = tuple([19, 9, 4, 11, 17, 16, 10, 5, 18, 12, 14, 3, 6, 15, 13])
+        elif 99 in session["store_list"]:
+            session["store_list"] = tuple([19, 9, 4, 11, 17, 16])
+        elif 98 in session["store_list"]:
+            session["store_list"] = tuple([10, 5, 18, 12, 14, 3, 6, 15, 13])
         for x in data:
             # select only 1 store for store page
-            store_id = x.id
-            break
-        session["store_list"] = tuple([x.id for x in data])
+            if x.id in session["store_list"]:
+                store_id = x.id
+                break
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
     if form4.submit4.data and form4.validate():
@@ -1531,8 +1544,19 @@ def marketing():
     form3 = StoreForm()
     if form3.submit3.data and form3.validate():
         session["date_selected"] = fiscal_dates["start_day"]
-        data = form3.store.data
+        data = form3.stores.data
         session["store_list"] = tuple([x.id for x in data])
+        if 98 in session["store_list"] and 99 in session["store_list"]:
+            session["store_list"] = tuple([19, 9, 4, 11, 17, 16, 10, 5, 18, 12, 14, 3, 6, 15, 13])
+        elif 99 in session["store_list"]:
+            session["store_list"] = tuple([19, 9, 4, 11, 17, 16])
+        elif 98 in session["store_list"]:
+            session["store_list"] = tuple([10, 5, 18, 12, 14, 3, 6, 15, 13])
+        for x in data:
+            # select only 1 store for store page
+            if x.id in session["store_list"]:
+                store_id = x.id
+                break
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
     if form4.submit4.data and form4.validate():
@@ -1701,9 +1725,19 @@ def support():
 
     if form3.submit3.data and form3.validate():
         session["date_selected"] = fiscal_dates["start_day"]
-        data = form3.store.data
+        data = form3.stores.data
         session["store_list"] = tuple([x.id for x in data])
-
+        if 98 in session["store_list"] and 99 in session["store_list"]:
+            session["store_list"] = tuple([19, 9, 4, 11, 17, 16, 10, 5, 18, 12, 14, 3, 6, 15, 13])
+        elif 99 in session["store_list"]:
+            session["store_list"] = tuple([19, 9, 4, 11, 17, 16])
+        elif 98 in session["store_list"]:
+            session["store_list"] = tuple([10, 5, 18, 12, 14, 3, 6, 15, 13])
+        for x in data:
+            # select only 1 store for store page
+            if x.id in session["store_list"]:
+                store_id = x.id
+                break
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
     if form4.submit4.data and form4.validate():
@@ -1796,8 +1830,14 @@ def profile():
 
     if form3.submit3.data and form3.validate():
         session["date_selected"] = fiscal_dates["start_day"]
-        data = form3.store.data
+        data = form3.stores.data
         session["store_list"] = tuple([x.id for x in data])
+        if 98 in session["store_list"] and 99 in session["store_list"]:
+            session["store_list"] = tuple([19, 9, 4, 11, 17, 16, 10, 5, 18, 12, 14, 3, 6, 15, 13])
+        elif 99 in session["store_list"]:
+            session["store_list"] = tuple([19, 9, 4, 11, 17, 16])
+        elif 98 in session["store_list"]:
+            session["store_list"] = tuple([10, 5, 18, 12, 14, 3, 6, 15, 13])
         return redirect(url_for("home_blueprint.profile"))
 
     if form4.submit4.data and form4.validate():

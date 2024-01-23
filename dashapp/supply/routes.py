@@ -41,8 +41,16 @@ def supplies():
         return redirect(url_for("supply_blueprint.supplies"))
 
     if form3.submit3.data and form3.validate():
-        session["token"] = fiscal_dates["start_day"]
-        store_id = form3.store.data.id
+        session["date_selected"] = fiscal_dates["start_day"]
+        data = form3.stores.data
+        session["store_list"] = tuple([x.id for x in data])
+        if 98 in session["store_list"] and 99 in session["store_list"]:
+            session["store_list"] = tuple([19, 9, 4, 11, 17, 16, 10, 5, 18, 12, 14, 3, 6, 15, 13])
+        elif 99 in session["store_list"]:
+            session["store_list"] = tuple([19, 9, 4, 11, 17, 16])
+        elif 98 in session["store_list"]:
+            session["store_list"] = tuple([10, 5, 18, 12, 14, 3, 6, 15, 13])
+        store_id = form3.stores.data.id
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
     category_list = [
@@ -123,8 +131,16 @@ def smallwares():
         return redirect(url_for("supply_blueprint.smallwares"))
 
     if form3.submit3.data and form3.validate():
-        session["token"] = fiscal_dates["start_day"]
-        store_id = form3.store.data.id
+        session["date_selected"] = fiscal_dates["start_day"]
+        data = form3.stores.data
+        session["store_list"] = tuple([x.id for x in data])
+        if 98 in session["store_list"] and 99 in session["store_list"]:
+            session["store_list"] = tuple([19, 9, 4, 11, 17, 16, 10, 5, 18, 12, 14, 3, 6, 15, 13])
+        elif 99 in session["store_list"]:
+            session["store_list"] = tuple([19, 9, 4, 11, 17, 16])
+        elif 98 in session["store_list"]:
+            session["store_list"] = tuple([10, 5, 18, 12, 14, 3, 6, 15, 13])
+        store_id = form3.stores.data.id
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
     category_list = [
@@ -186,8 +202,16 @@ def linen():
         return redirect(url_for("supply_blueprint.linen"))
 
     if form3.submit3.data and form3.validate():
-        session["token"] = fiscal_dates["start_day"]
-        store_id = form3.store.data.id
+        session["date_selected"] = fiscal_dates["start_day"]
+        data = form3.stores.data
+        session["store_list"] = tuple([x.id for x in data])
+        if 98 in session["store_list"] and 99 in session["store_list"]:
+            session["store_list"] = tuple([19, 9, 4, 11, 17, 16, 10, 5, 18, 12, 14, 3, 6, 15, 13])
+        elif 99 in session["store_list"]:
+            session["store_list"] = tuple([19, 9, 4, 11, 17, 16])
+        elif 98 in session["store_list"]:
+            session["store_list"] = tuple([10, 5, 18, 12, 14, 3, 6, 15, 13])
+        store_id = form3.stores.data.id
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
     category_list = ["Linen"]
