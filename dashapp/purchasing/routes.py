@@ -3,29 +3,34 @@
 routes for purchasing pages
 """
 
-from flask import render_template, session, redirect, url_for
+from flask import redirect, render_template, session, url_for
 from flask.helpers import url_for
 from flask_security import login_required
+from icecream import ic
+
+from dashapp.authentication.forms import (
+    DateForm,
+    LobsterForm,
+    PotatoForm,
+    StoneForm,
+    StoreForm,
+)
+from dashapp.authentication.models import (
+    Restaurants,
+    db,
+)
+from dashapp.config import Config
 from dashapp.purchasing import blueprint
 from dashapp.purchasing.util import (
-        get_lastyear,
-        set_dates,
-        convert_uofm,
-        get_vendors,
-        get_cost_per_vendor,
-        get_cost_per_store,
-        period_purchases,
-        get_category_costs,
-        get_category_topten,
-        get_restaurant_topten,
-        get_vendor_topten,
-        get_item_topten
-        )
-from dashapp.config import Config
-from dashapp.authentication.forms import *
-from dashapp.authentication.models import *
-
-from icecream import ic
+    get_category_costs,
+    get_category_topten,
+    get_cost_per_store,
+    get_cost_per_vendor,
+    get_restaurant_topten,
+    get_vendor_topten,
+    period_purchases,
+    set_dates,
+)
 
 
 @blueprint.route("/purchasing/", methods=["GET", "POST"])

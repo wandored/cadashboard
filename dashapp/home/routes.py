@@ -26,38 +26,28 @@ from dashapp.authentication.forms import (
     UpdateForm,
 )
 from dashapp.authentication.models import (
+    GiftCardRedeem,
+    GiftCardSales,
     LaborTotals,
-    PotatoChart,  # noqa: F401
-    PotatoLoadTimes,  # noqa: F401
     PotatoSales,
     Restaurants,
-    SalesCategory,
-    SalesRecordsDay,  # noqa: F401
-    SalesRecordsPeriod,  # noqa: F401
-    SalesRecordsWeek,  # noqa: F401
-    SalesRecordsYear,  # noqa: F401
     SalesTotals,
-    SalesDaypart,
     StockCount,
-    TableTurns,
     Users,
     db,
-    Calendar,  # noqa: F401
-    GiftCardSales,
-    GiftCardRedeem,
 )
 from dashapp.config import Config
 from dashapp.home import blueprint
 from dashapp.home.util import (
-    get_daypart_sales,
-    get_giftcard_sales,
-    get_giftcard_redeem,
-    get_category_sales,
-    get_togo_sales,
-    get_sales_charts,
     find_day_with_sales,
+    get_category_sales,
+    get_daypart_sales,
+    get_giftcard_redeem,
+    get_giftcard_sales,
     get_item_avg_cost,
+    get_sales_charts,
     get_timeing_data,
+    get_togo_sales,
     set_dates,
 )
 
@@ -2158,7 +2148,7 @@ def stone(store_id):
 @blueprint.route("/users/", methods=["GET", "POST"])
 @login_required
 def users():
-    user_list = get_user_list()
+    # user_list = get_user_list()
     # ask user to select directory to save file
     #    file_path = filedialog.askdirectory()
     #    # export user_list to csv file
