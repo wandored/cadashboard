@@ -304,6 +304,46 @@
                 </div>
               </div>
             </div>
+            <div class="row">
+              <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
+                <div class="card z-index-2">
+                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                    <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
+                      <div class="chart">
+                        <canvas id="chart-week-giftcard-sales" class="chart-canvas" height="170"></canvas>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <h6 class="mb-0 ">Gift Card Sales</h6>
+                    {% if week_giftcard_sales_total > wtd_giftcard_sales_total_ly %}
+                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_giftcard_sales_pct) }} over last year</p>
+                    {% else %}
+                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_giftcard_sales_pct) }} below last year</p>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
+                <div class="card z-index-2">
+                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                    <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
+                      <div class="chart">
+                        <canvas id="chart-week-giftcard-redeem" class="chart-canvas" height="170"></canvas>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <h6 class="mb-0 ">Gift Cards Redeemed</h6>
+                    {% if week_giftcard_redeem_total > wtd_giftcard_redeem_total_ly %}
+                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_giftcard_redeem_pct) }} over last year</p>
+                    {% else %}
+                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_giftcard_redeem_pct) }} below last year</p>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
           <div class="tab-pane fade" id="nav-period" role="tabpanel" aria-labelledby="nav-period-tab">
             <div class="card-header pb-0">
@@ -429,6 +469,46 @@
                 </div>
               </div>
             </div>
+            <div class="row">
+              <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
+                <div class="card z-index-2">
+                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                    <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
+                      <div class="chart">
+                        <canvas id="chart-period-giftcard-sales" class="chart-canvas" height="170"></canvas>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <h6 class="mb-0 ">Gift Card Sales</h6>
+                    {% if period_giftcard_sales_total > ptd_giftcard_sales_total_ly %}
+                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_giftcard_sales_pct) }} over last year</p>
+                    {% else %}
+                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_giftcard_sales_pct) }} below last year</p>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
+                <div class="card z-index-2">
+                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                    <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
+                      <div class="chart">
+                        <canvas id="chart-period-giftcard-redeem" class="chart-canvas" height="170"></canvas>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <h6 class="mb-0 ">Gift Cards Redeemed</h6>
+                    {% if period_giftcard_redeem_total > ptd_giftcard_redeem_total_ly %}
+                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_giftcard_redeem_pct) }} over last year</p>
+                    {% else %}
+                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_giftcard_redeem_pct) }} below last year</p>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
           <div class="tab-pane fade" id="nav-year" role="tabpanel" aria-labelledby="nav-year-tab">
             <div class="card-header pb-0">
@@ -549,6 +629,46 @@
                     <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_liquor_sales_pct) }} over last year</p>
                     {% else %}
                     <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_liquor_sales_pct) }} below last year</p>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
+                <div class="card z-index-2">
+                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                    <div class="bg-gradient-warning shadow-warning border-radius-lg py-3 pe-1">
+                      <div class="chart">
+                        <canvas id="chart-year-giftcard-sales" class="chart-canvas" height="170"></canvas>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <h6 class="mb-0 ">Gift Card Sales</h6>
+                    {% if year_giftcard_sales_total > ytd_giftcard_sales_total_ly %}
+                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_giftcard_sales_pct) }} over last year</p>
+                    {% else %}
+                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_giftcard_sales_pct) }} below last year</p>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
+                <div class="card z-index-2">
+                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+                    <div class="bg-gradient-warning shadow-warning border-radius-lg py-3 pe-1">
+                      <div class="chart">
+                        <canvas id="chart-year-giftcard-redeem" class="chart-canvas" height="170"></canvas>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <h6 class="mb-0 ">Gift Cards Redeemed</h6>
+                    {% if year_giftcard_redeem_total > ytd_giftcard_redeem_total_ly %}
+                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_giftcard_redeem_pct) }} over last year</p>
+                    {% else %}
+                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_giftcard_redeem_pct) }} below last year</p>
                     {% endif %}
                   </div>
                 </div>
@@ -983,6 +1103,12 @@
   var ctw6 = document.getElementById("chart-week-liquor-sales").getContext("2d");
   weeklyCommonChart(ctw6, "bar", {{ week_liquor_sales_list | safe }}, "Liquor Sales", {{ week_liquor_sales_list_ly | safe }}, "Same Day LY", "Liquor Sales");
 
+  var ctw7 = document.getElementById("chart-week-giftcard-sales").getContext("2d");
+  weeklyCommonChart(ctw7, "bar", {{ week_giftcard_sales_list | safe }}, "Gift Card Sales", {{ week_giftcard_sales_list_ly | safe }}, "Same Day LY", "Gift Card Sales");
+
+  var ctw8 = document.getElementById("chart-week-giftcard-redeem").getContext("2d");
+  weeklyCommonChart(ctw8, "bar", {{ week_giftcard_redeem_list | safe }}, "Gift Cards Redeemed", {{ week_giftcard_redeem_list_ly | safe }}, "Same Day LY", "Gift Cards Redeemed");
+
   // Period Charts
   function periodCommonChart(ctx, chart_type, tyData, label, lyData, lyLabel, chTitle){
       return new Chart(ctx, {
@@ -1108,6 +1234,12 @@
   var ctp6 = document.getElementById("chart-period-liquor-sales").getContext("2d");
   periodCommonChart(ctp6, "bar", {{ period_liquor_sales_list | safe }}, "Liquor Sales", {{ period_liquor_sales_list_ly | safe }}, "Same Week LY", "Liquor Sales");
 
+  var ctp7 = document.getElementById("chart-period-giftcard-sales").getContext("2d");
+  periodCommonChart(ctp7, "bar", {{ period_giftcard_sales_list | safe }}, "Gift Card Sales", {{ period_giftcard_sales_list_ly | safe }}, "Same Week LY", "Gift Card Sales");
+  
+  var ctp8 = document.getElementById("chart-period-giftcard-redeem").getContext("2d");
+  periodCommonChart(ctp8, "bar", {{ period_giftcard_redeem_list | safe }}, "Gift Cards Redeemed", {{ period_giftcard_redeem_list_ly | safe }}, "Same Week LY", "Gift Cards Redeemed");
+
   // Year Charts
   function yearlyCommonChart(ctx, chart_type, tyData, label, lyData, lyLabel, chTitle){
       return new Chart(ctx, {
@@ -1229,6 +1361,12 @@
 
   var cty6 = document.getElementById("chart-year-liquor-sales").getContext("2d");
   yearlyCommonChart(cty6, "line", {{ year_liquor_sales_list | safe }}, "Liquor Sales", {{ year_liquor_sales_list_ly | safe }}, "Same Period LY", "Liquor Sales");
+
+  var cty7 = document.getElementById("chart-year-giftcard-sales").getContext("2d");
+  yearlyCommonChart(cty7, "line", {{ year_giftcard_sales_list | safe }}, "Gift Card Sales", {{ year_giftcard_sales_list_ly | safe }}, "Same Period LY", "Gift Card Sales");
+  
+  var cty8 = document.getElementById("chart-year-giftcard-redeem").getContext("2d");
+  yearlyCommonChart(cty8, "line", {{ year_giftcard_redeem_list | safe }}, "Gift Cards Redeemed", {{ year_giftcard_redeem_list_ly | safe }}, "Same Period LY", "Gift Cards Redeemed");
 
 </script>
 {% endblock javascripts %}

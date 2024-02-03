@@ -1,14 +1,20 @@
 """
 Dashboard by wandored
 """
+from datetime import timedelta
 from functools import cache
+
 import numpy as np
 import pandas as pd
-from datetime import timedelta
-from dashapp.authentication.models import *
+from icecream import ic
 from sqlalchemy import func
 
-from icecream import ic
+from dashapp.authentication.models import (
+    Calendar,
+    Purchases,
+    UnitsOfMeasure,
+    db,
+)
 
 
 def get_lastyear(date):
@@ -237,7 +243,6 @@ def get_cost_per_store(regex, start, end, stores):
     return df
 
 
-@cache
 def period_purchases(regex, start, end, stores):
     # generate list of purchase costs per period for charts
     cal_query = Calendar.query.with_entities(

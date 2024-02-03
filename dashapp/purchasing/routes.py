@@ -3,16 +3,34 @@
 routes for purchasing pages
 """
 
-from flask import render_template, session, redirect, url_for
+from flask import redirect, render_template, session, url_for
 from flask.helpers import url_for
 from flask_security import login_required
-from dashapp.purchasing import blueprint
-from dashapp.purchasing.util import *
-from dashapp.config import Config
-from dashapp.authentication.forms import *
-from dashapp.authentication.models import *
-
 from icecream import ic
+
+from dashapp.authentication.forms import (
+    DateForm,
+    LobsterForm,
+    PotatoForm,
+    StoneForm,
+    StoreForm,
+)
+from dashapp.authentication.models import (
+    Restaurants,
+    db,
+)
+from dashapp.config import Config
+from dashapp.purchasing import blueprint
+from dashapp.purchasing.util import (
+    get_category_costs,
+    get_category_topten,
+    get_cost_per_store,
+    get_cost_per_vendor,
+    get_restaurant_topten,
+    get_vendor_topten,
+    period_purchases,
+    set_dates,
+)
 
 
 @blueprint.route("/purchasing/", methods=["GET", "POST"])
@@ -34,6 +52,12 @@ def purchasing():
         session["date_selected"] = fiscal_dates["start_day"]
         data = form3.stores.data
         session["store_list"] = tuple([x.id for x in data])
+        if 98 in session["store_list"] and 99 in session["store_list"]:
+            session["store_list"] = tuple([19, 9, 4, 11, 17, 16, 10, 5, 18, 12, 14, 3, 6, 15, 13])
+        elif 99 in session["store_list"]:
+            session["store_list"] = tuple([19, 9, 4, 11, 17, 16])
+        elif 98 in session["store_list"]:
+            session["store_list"] = tuple([10, 5, 18, 12, 14, 3, 6, 15, 13])
         return redirect(url_for("purchasing_blueprint.purchasing"))
 
     if form4.submit4.data and form4.validate():
@@ -115,6 +139,12 @@ def purchase(product):
         session["date_selected"] = fiscal_dates["start_day"]
         data = form3.stores.data
         session["store_list"] = tuple([x.id for x in data])
+        if 98 in session["store_list"] and 99 in session["store_list"]:
+            session["store_list"] = tuple([19, 9, 4, 11, 17, 16, 10, 5, 18, 12, 14, 3, 6, 15, 13])
+        elif 99 in session["store_list"]:
+            session["store_list"] = tuple([19, 9, 4, 11, 17, 16])
+        elif 98 in session["store_list"]:
+            session["store_list"] = tuple([10, 5, 18, 12, 14, 3, 6, 15, 13])
         return redirect(url_for("purchasing_blueprint.purchase", product=product))
 
     if form4.submit4.data and form4.validate():

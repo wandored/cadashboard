@@ -9,14 +9,14 @@ from wtforms import widgets, SubmitField, StringField, PasswordField
 from wtforms.fields import DateField
 from wtforms_sqlalchemy.fields import QuerySelectMultipleField, QuerySelectField
 from wtforms.validators import Email, DataRequired
-from dashapp.authentication.models import *
+from dashapp.authentication.models import Restaurants
 
 # login and registration
 
 
 def store_query():
     return (
-        Restaurants.query.filter(Restaurants.active == True)
+        Restaurants.query.filter(Restaurants.active == "true")
         .order_by(Restaurants.name)
         .all()
     )

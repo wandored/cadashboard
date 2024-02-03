@@ -26,38 +26,32 @@ from dashapp.authentication.forms import (
     UpdateForm,
 )
 from dashapp.authentication.models import (
+    GiftCardRedeem,
+    GiftCardSales,
     LaborTotals,
-    PotatoChart,  # noqa: F401
-    PotatoLoadTimes,  # noqa: F401
     PotatoSales,
     Restaurants,
-    SalesCategory,
-    SalesRecordsDay,  # noqa: F401
-    SalesRecordsPeriod,  # noqa: F401
-    SalesRecordsWeek,  # noqa: F401
-    SalesRecordsYear,  # noqa: F401
     SalesTotals,
-    SalesDaypart,
     StockCount,
-    TableTurns,
     Users,
     db,
-    Calendar,  # noqa: F401
-    GiftCardSales,
-    GiftCardRedeem,
 )
 from dashapp.config import Config
 from dashapp.home import blueprint
 from dashapp.home.util import (
-    get_daypart_sales,
-    get_giftcard_sales,
-    get_giftcard_redeem,
-    get_category_sales,
-    get_togo_sales,
-    get_sales_charts,
     find_day_with_sales,
+    get_category_sales,
+    get_daypart_sales,
+    get_giftcard_redeem,
+    get_giftcard_sales,
     get_item_avg_cost,
+    get_sales_charts,
     get_timeing_data,
+    get_togo_sales,
+    SalesRecordsDay,
+    SalesRecordsPeriod,
+    SalesRecordsWeek,
+    SalesRecordsYear,
     set_dates,
 )
 
@@ -106,6 +100,12 @@ def index():
         session["date_selected"] = fiscal_dates["start_day"]
         data = form3.stores.data
         session["store_list"] = tuple([x.id for x in data])
+        if 98 in session["store_list"] and 99 in session["store_list"]:
+            session["store_list"] = tuple([19, 9, 4, 11, 17, 16, 10, 5, 18, 12, 14, 3, 6, 15, 13])
+        elif 99 in session["store_list"]:
+            session["store_list"] = tuple([19, 9, 4, 11, 17, 16])
+        elif 98 in session["store_list"]:
+            session["store_list"] = tuple([10, 5, 18, 12, 14, 3, 6, 15, 13])
         return redirect(url_for("home_blueprint.index"))
 
     if form4.submit4.data and form4.validate():
@@ -229,6 +229,7 @@ def index():
             .all()
         )
         # Get the top sales for each store and merge with sales_table
+        ic(globals())
         table_class = globals()[
             f"SalesRecords{time_frame}"
         ]  # how you use a variable in query
@@ -380,11 +381,18 @@ def store(store_id):
     if form3.submit3.data and form3.validate():
         session["date_selected"] = fiscal_dates["start_day"]
         data = form3.stores.data
+        session["store_list"] = tuple([x.id for x in data])
+        if 98 in session["store_list"] and 99 in session["store_list"]:
+            session["store_list"] = tuple([19, 9, 4, 11, 17, 16, 10, 5, 18, 12, 14, 3, 6, 15, 13])
+        elif 99 in session["store_list"]:
+            session["store_list"] = tuple([19, 9, 4, 11, 17, 16])
+        elif 98 in session["store_list"]:
+            session["store_list"] = tuple([10, 5, 18, 12, 14, 3, 6, 15, 13])
         for x in data:
             # select only 1 store for store page
-            store_id = x.id
-            break
-        session["store_list"] = tuple([x.id for x in data])
+            if x.id in session["store_list"]:
+                store_id = x.id
+                break
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
     if form4.submit4.data and form4.validate():
@@ -474,8 +482,6 @@ def store(store_id):
 
     daily_sales = daily_sales_list[-1]
     daily_sales_ly = daily_sales_list_ly[fiscal_dates["dow"] - 1]
-    ic(fiscal_dates["dow"])
-    ic(daily_sales_ly)
 
     # lunch and dinner sales
     week_lunch_sales, week_dinner_sales = get_daypart_sales(
@@ -752,35 +758,56 @@ def store(store_id):
         session["store_list"],
     )
     week_giftcard_sales_list_ly = week_giftcard_sales_ly["sales"].tolist()
-    week_giftcard_sales_total_ly = sum(
-        week_giftcard_sales_list_ly[: fiscal_dates["dow"]]
-    )
+    wtd_giftcard_sales_total_ly = sum(week_giftcard_sales_list_ly[: fiscal_dates["dow"]])
     period_giftcard_sales_ly = get_giftcard_sales(
         fiscal_dates["start_period_ly"],
         fiscal_dates["end_period_ly"],
         session["store_list"],
     )
+    ptd_giftcard_sales_ly = period_giftcard_sales_ly[
+            period_giftcard_sales_ly["date"] <= fiscal_dates["start_day_ly"]]
+    ptd_giftcard_sales_total_ly = sum(ptd_giftcard_sales_ly["sales"])
     period_giftcard_sales_ly = period_giftcard_sales_ly.drop(columns=["date"])
-    period_giftcard_sales_ly = (
-        period_giftcard_sales_ly.groupby(["week"]).sum().reset_index()
-    )
+    period_giftcard_sales_ly = (period_giftcard_sales_ly.groupby(["week"]).sum().reset_index())
     period_giftcard_sales_list_ly = period_giftcard_sales_ly["sales"].tolist()
-    period_giftcard_sales_total_ly = sum(
-        period_giftcard_sales_list_ly[: fiscal_dates["week"]]
-    )
     year_giftcard_sales_ly = get_giftcard_sales(
         fiscal_dates["start_year_ly"],
         fiscal_dates["end_year_ly"],
         session["store_list"],
     )
+    ytd_giftcard_sales_ly = year_giftcard_sales_ly[year_giftcard_sales_ly["date"] <= fiscal_dates["start_day_ly"]]
+    ytd_giftcard_sales_total_ly = sum(ytd_giftcard_sales_ly["sales"])
     year_giftcard_sales_ly = year_giftcard_sales_ly.drop(columns=["date"])
     year_giftcard_sales_ly = (
         year_giftcard_sales_ly.groupby(["period"]).sum().reset_index()
     )
     year_giftcard_sales_list_ly = year_giftcard_sales_ly["sales"].tolist()
-    year_giftcard_sales_total_ly = sum(
-        year_giftcard_sales_list_ly[: fiscal_dates["period"]]
-    )
+    # calculate percent of giftcard sales difference from previous year correcting for division by zero
+    if wtd_giftcard_sales_total_ly != 0:
+        wtd_giftcard_sales_pct = (
+            (week_giftcard_sales_total - wtd_giftcard_sales_total_ly)
+            / wtd_giftcard_sales_total_ly
+            * 100
+        )
+    else:
+        wtd_giftcard_sales_pct = 0
+    if ptd_giftcard_sales_total_ly != 0:
+        ptd_giftcard_sales_pct = (
+            (period_giftcard_sales_total - ptd_giftcard_sales_total_ly)
+            / ptd_giftcard_sales_total_ly
+            * 100
+        )
+    else:
+        ptd_giftcard_sales_pct = 0
+    if ytd_giftcard_sales_total_ly != 0:
+        ytd_giftcard_sales_pct = (
+            (year_giftcard_sales_total - ytd_giftcard_sales_total_ly)
+            / ytd_giftcard_sales_total_ly
+            * 100
+        )
+    else:
+        ytd_giftcard_sales_pct = 0
+
 
     # giftcard redeem
     week_giftcard_redeem = get_giftcard_redeem(
@@ -788,65 +815,130 @@ def store(store_id):
     )
     week_giftcard_redeem_list = week_giftcard_redeem["sales"].tolist()
     week_giftcard_redeem_total = sum(week_giftcard_redeem_list)
-    week_giftcard_redeem_list[:] = [-abs(x) for x in week_giftcard_redeem_list]
     period_giftcard_redeem = get_giftcard_redeem(
         fiscal_dates["start_period"],
         fiscal_dates["period_to_date"],
         session["store_list"],
     )
+    period_giftcard_redeem = period_giftcard_redeem.drop(columns=["date"])
+    period_giftcard_redeem = period_giftcard_redeem.groupby(["week"]).sum().reset_index()
     period_giftcard_redeem_list = period_giftcard_redeem["sales"].tolist()
+    ic(period_giftcard_redeem_list)
     period_giftcard_redeem_total = sum(period_giftcard_redeem_list)
-    period_giftcard_redeem_list[:] = [-abs(x) for x in period_giftcard_redeem_list]
+    ic(period_giftcard_redeem_list)
     year_giftcard_redeem = get_giftcard_redeem(
         fiscal_dates["start_year"], fiscal_dates["year_to_date"], session["store_list"]
     )
+    year_giftcard_redeem = year_giftcard_redeem.drop(columns=["date"])
+    year_giftcard_redeem = year_giftcard_redeem.groupby(["period"]).sum().reset_index()
     year_giftcard_redeem_list = year_giftcard_redeem["sales"].tolist()
     year_giftcard_redeem_total = sum(year_giftcard_redeem_list)
-    year_giftcard_redeem_list[:] = [-abs(x) for x in year_giftcard_redeem_list]
 
-    # giftcard balance
-    week_giftcard_balance = []
-    diff = 0
-    for i in range(len(week_giftcard_sales_list)):
-        diff += week_giftcard_sales_list[i] - week_giftcard_redeem_list[i]
-        week_giftcard_balance.append(diff)
-
-    period_giftcard_balance = []
-    diff = 0
-    for i in range(len(period_giftcard_sales_list)):
-        diff += period_giftcard_sales_list[i] - period_giftcard_redeem_list[i]
-        period_giftcard_balance.append(diff)
-
-    year_giftcard_balance = []
-    diff = 0
-    for i in range(len(year_giftcard_sales_list)):
-        diff += year_giftcard_sales_list[i] - year_giftcard_redeem_list[i]
-        year_giftcard_balance.append(diff)
-
-    if week_giftcard_sales_total_ly != 0:
-        wtd_giftcard_sales_pct = (
-            (week_giftcard_sales_total - week_giftcard_sales_total_ly)
-            / week_giftcard_sales_total_ly
+    # giftcard redeem last year
+    week_giftcard_redeem_ly = get_giftcard_redeem(
+            fiscal_dates["start_week_ly"],
+            fiscal_dates["end_week_ly"],
+            session["store_list"],
+            )
+    week_giftcard_redeem_list_ly = week_giftcard_redeem_ly["sales"].tolist()
+    wtd_giftcard_redeem_total_ly = sum(week_giftcard_redeem_list_ly[: fiscal_dates["dow"]])
+    period_giftcard_redeem_ly = get_giftcard_redeem(
+            fiscal_dates["start_period_ly"],
+            fiscal_dates["end_period_ly"],
+            session["store_list"],
+            )
+    ptd_giftcard_redeem_ly = period_giftcard_redeem_ly[period_giftcard_redeem_ly["date"] <= fiscal_dates["start_day_ly"]]
+    ptd_giftcard_redeem_total_ly = sum(ptd_giftcard_redeem_ly["sales"])
+    period_giftcard_redeem_ly = period_giftcard_redeem_ly.drop(columns=["date"])
+    period_giftcard_redeem_ly = (period_giftcard_redeem_ly.groupby(["week"]).sum().reset_index())
+    period_giftcard_redeem_list_ly = period_giftcard_redeem_ly["sales"].tolist()
+    year_giftcard_redeem_ly = get_giftcard_redeem(
+            fiscal_dates["start_year_ly"],
+            fiscal_dates["end_year_ly"],
+            session["store_list"],
+            )
+    ytd_giftcard_redeem_ly = year_giftcard_redeem_ly[year_giftcard_redeem_ly["date"] <= fiscal_dates["start_day_ly"]]
+    ytd_giftcard_redeem_total_ly = sum(ytd_giftcard_redeem_ly["sales"])
+    year_giftcard_redeem_ly = year_giftcard_redeem_ly.drop(columns=["date"])
+    year_giftcard_redeem_ly = (
+            year_giftcard_redeem_ly.groupby(["period"]).sum().reset_index())
+    year_giftcard_redeem_list_ly = year_giftcard_redeem_ly["sales"].tolist()
+    # calculate percent of giftcard redeem difference from previous year correcting for division by zero
+    if wtd_giftcard_redeem_total_ly != 0:
+        wtd_giftcard_redeem_pct = (
+            (week_giftcard_redeem_total - wtd_giftcard_redeem_total_ly)
+            / wtd_giftcard_redeem_total_ly
             * 100
         )
     else:
-        wtd_giftcard_sales_pct = 0
-    if period_giftcard_sales_total_ly != 0:
-        ptd_giftcard_sales_pct = (
-            (period_giftcard_sales_total - period_giftcard_sales_total_ly)
-            / period_giftcard_sales_total_ly
+        wtd_giftcard_redeem_pct = 0
+    if ptd_giftcard_redeem_total_ly != 0:
+        ptd_giftcard_redeem_pct = (
+            (period_giftcard_redeem_total - ptd_giftcard_redeem_total_ly)
+            / ptd_giftcard_redeem_total_ly
             * 100
         )
     else:
-        ptd_giftcard_sales_pct = 0
-    if year_giftcard_sales_total_ly != 0:
-        ytd_giftcard_sales_pct = (
-            (year_giftcard_sales_total - year_giftcard_sales_total_ly)
-            / year_giftcard_sales_total_ly
+        ptd_giftcard_redeem_pct = 0
+    if ytd_giftcard_redeem_total_ly != 0:
+        ytd_giftcard_redeem_pct = (
+            (year_giftcard_redeem_total - ytd_giftcard_redeem_total_ly)
+            / ytd_giftcard_redeem_total_ly
             * 100
         )
     else:
-        ytd_giftcard_sales_pct = 0
+        ytd_giftcard_redeem_pct = 0
+
+#    # giftcard balance
+#    week_giftcard_balance = []
+#    diff = 0
+#    for i in range(len(week_giftcard_sales_list)):
+#        diff += week_giftcard_sales_list[i] - week_giftcard_redeem_list[i]
+#        week_giftcard_balance.append(diff)
+#    week_giftcard_balance_total = sum(week_giftcard_balance)
+#    week_giftcard_balance_ly = []
+#    diff = 0
+#    for i in range(len(week_giftcard_sales_list_ly)):
+#        diff += week_giftcard_sales_list_ly[i] - week_giftcard_redeem_list_ly[i]
+#        week_giftcard_balance_ly.append(diff)
+#    week_giftcard_balance_total_ly = sum(week_giftcard_balance_ly[: fiscal_dates["dow"]])
+#
+#    period_giftcard_balance = []
+#    diff = 0
+#    for i in range(len(period_giftcard_sales_list)):
+#        diff += period_giftcard_sales_list[i] - period_giftcard_redeem_list[i]
+#        period_giftcard_balance.append(diff)
+#
+#    year_giftcard_balance = []
+#    diff = 0
+#    for i in range(len(year_giftcard_sales_list)):
+#        diff += year_giftcard_sales_list[i] - year_giftcard_redeem_list[i]
+#        year_giftcard_balance.append(diff)
+#
+#    if week_giftcard_balance_total_ly != 0:
+#        wtd_giftcard_balance_pct = (
+#            (week_giftcard_balance_total - week_giftcard_balance_total_ly)
+#            / week_giftcard_balance_total_ly
+#            * 100
+#        )
+#    else:
+#        wtd_giftcard_sales_pct = 0
+#    if ptd_giftcard_sales_total_ly != 0:
+#        ptd_giftcard_sales_pct = (
+#            (period_giftcard_sales_total - ptd_giftcard_sales_total_ly)
+#            / ptd_giftcard_sales_total_ly
+#            * 100
+#        )
+#    else:
+#        ptd_giftcard_sales_pct = 0
+#    if ytd_giftcard_sales_total_ly != 0:
+#        ytd_giftcard_sales_pct = (
+#            (year_giftcard_sales_total - ytd_giftcard_sales_total_ly)
+#            / ytd_giftcard_sales_total_ly
+#            * 100
+#        )
+#    else:
+#        ytd_giftcard_sales_pct = 0
 
     # labor tables
 
@@ -1447,8 +1539,19 @@ def marketing():
     form3 = StoreForm()
     if form3.submit3.data and form3.validate():
         session["date_selected"] = fiscal_dates["start_day"]
-        data = form3.store.data
+        data = form3.stores.data
         session["store_list"] = tuple([x.id for x in data])
+        if 98 in session["store_list"] and 99 in session["store_list"]:
+            session["store_list"] = tuple([19, 9, 4, 11, 17, 16, 10, 5, 18, 12, 14, 3, 6, 15, 13])
+        elif 99 in session["store_list"]:
+            session["store_list"] = tuple([19, 9, 4, 11, 17, 16])
+        elif 98 in session["store_list"]:
+            session["store_list"] = tuple([10, 5, 18, 12, 14, 3, 6, 15, 13])
+        for x in data:
+            # select only 1 store for store page
+            if x.id in session["store_list"]:
+                store_id = x.id
+                break
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
     if form4.submit4.data and form4.validate():
@@ -1617,9 +1720,19 @@ def support():
 
     if form3.submit3.data and form3.validate():
         session["date_selected"] = fiscal_dates["start_day"]
-        data = form3.store.data
+        data = form3.stores.data
         session["store_list"] = tuple([x.id for x in data])
-
+        if 98 in session["store_list"] and 99 in session["store_list"]:
+            session["store_list"] = tuple([19, 9, 4, 11, 17, 16, 10, 5, 18, 12, 14, 3, 6, 15, 13])
+        elif 99 in session["store_list"]:
+            session["store_list"] = tuple([19, 9, 4, 11, 17, 16])
+        elif 98 in session["store_list"]:
+            session["store_list"] = tuple([10, 5, 18, 12, 14, 3, 6, 15, 13])
+        for x in data:
+            # select only 1 store for store page
+            if x.id in session["store_list"]:
+                store_id = x.id
+                break
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
     if form4.submit4.data and form4.validate():
@@ -1712,8 +1825,14 @@ def profile():
 
     if form3.submit3.data and form3.validate():
         session["date_selected"] = fiscal_dates["start_day"]
-        data = form3.store.data
+        data = form3.stores.data
         session["store_list"] = tuple([x.id for x in data])
+        if 98 in session["store_list"] and 99 in session["store_list"]:
+            session["store_list"] = tuple([19, 9, 4, 11, 17, 16, 10, 5, 18, 12, 14, 3, 6, 15, 13])
+        elif 99 in session["store_list"]:
+            session["store_list"] = tuple([19, 9, 4, 11, 17, 16])
+        elif 98 in session["store_list"]:
+            session["store_list"] = tuple([10, 5, 18, 12, 14, 3, 6, 15, 13])
         return redirect(url_for("home_blueprint.profile"))
 
     if form4.submit4.data and form4.validate():
@@ -2034,7 +2153,7 @@ def stone(store_id):
 @blueprint.route("/users/", methods=["GET", "POST"])
 @login_required
 def users():
-    user_list = get_user_list()
+    # user_list = get_user_list()
     # ask user to select directory to save file
     #    file_path = filedialog.askdirectory()
     #    # export user_list to csv file
