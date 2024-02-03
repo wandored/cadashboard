@@ -48,6 +48,10 @@ from dashapp.home.util import (
     get_sales_charts,
     get_timeing_data,
     get_togo_sales,
+    SalesRecordsDay,
+    SalesRecordsPeriod,
+    SalesRecordsWeek,
+    SalesRecordsYear,
     set_dates,
 )
 
@@ -225,6 +229,7 @@ def index():
             .all()
         )
         # Get the top sales for each store and merge with sales_table
+        ic(globals())
         table_class = globals()[
             f"SalesRecords{time_frame}"
         ]  # how you use a variable in query
