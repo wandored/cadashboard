@@ -3,26 +3,26 @@
 Copyright (c) 2019 - present AppSeed.us
 """
 
-# from flask_login import LoginManager
-from flask import current_app
-from flask_security import current_user
-from flask_security.datastore import SQLAlchemySessionUserDatastore
-from flask_admin.contrib.sqla.fields import QuerySelectMultipleField
-from flask_admin.form import Select2Widget
-from flask_security.core import (
-    UserMixin,
-    RoleMixin,
-    Security,
-)
-from flask_sqlalchemy import SQLAlchemy
-from flask_admin import Admin
-from flask_admin.contrib import sqla
-from sqlalchemy import Column
-from dashapp.authentication.util import hash_pass
-from wtforms.fields import PasswordField
-from flask_mail import Mail
 import uuid
 
+from flask import current_app
+from flask_admin import Admin
+from flask_admin.contrib import sqla
+from flask_admin.contrib.sqla.fields import QuerySelectMultipleField
+from flask_admin.form import Select2Widget
+from flask_mailman import EmailMessage, Mail
+from flask_security import current_user, utils
+from flask_security.core import (
+    RoleMixin,
+    Security,
+    UserMixin,
+)
+from flask_security.datastore import SQLAlchemySessionUserDatastore
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import Column
+from wtforms.fields import PasswordField
+
+from dashapp.authentication.util import hash_pass
 
 db = SQLAlchemy()
 mail = Mail()
@@ -134,6 +134,18 @@ class UserAdmin(sqla.ModelView):
 
         if model.fs_uniquifier is None:
             model.fs_uniquifier = uuid.uuid4().hex
+
+        # if a new user is_created send welcome email to user
+        if is_created:
+            print(f'New User Created: {model.email}')
+            subject = 'CentraArchy Dashboard Registration'
+            body = 'You have been registered for the CentraArchy Dashboard:  dashboard.centraarchy.com. Your login is: {} and your password is: {}'.format(model.email, model.password2)
+            to, cc = [model.email], ['it@centraarchy.com']
+            reply_to = ['support@centraarchy.com']
+
+            msg = EmailMessage(subject, body, [to], [cc], [reply_to])
+            msg.send()
+
 
 
 # Customized Role model for SQL-Admin
