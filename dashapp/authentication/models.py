@@ -5,7 +5,7 @@ Copyright (c) 2019 - present AppSeed.us
 
 import uuid
 
-from flask import current_app
+from flask import current_app, render_template
 from flask_admin import Admin
 from flask_admin.contrib import sqla
 from flask_admin.contrib.sqla.fields import QuerySelectMultipleField
@@ -137,13 +137,14 @@ class UserAdmin(sqla.ModelView):
 
         # if a new user is_created send welcome email to user
         if is_created:
-            print(f'New User Created: {model.email}')
             subject = 'CentraArchy Dashboard Registration'
-            body = 'You have been registered for the CentraArchy Dashboard:  dashboard.centraarchy.com. Your login is: {} and your password is: {}'.format(model.email, model.password2)
-            to, cc = [model.email], ['it@centraarchy.com']
-            reply_to = ['support@centraarchy.com']
+            html_content = render_template('security/email/welcome.html', email=model.email, password=model.password2)
+            to, cc = model.email, 'it@centraarchy.com'
+            reply_to = 'support@centraarchy.com'
+            # headers = {'Message-ID': 'centraarchy.com'}
 
-            msg = EmailMessage(subject, body, [to], [cc], [reply_to])
+            msg = EmailMessage(subject, html_content, to=[to], cc=[cc], reply_to=[reply_to])
+            msg.content_subtype = 'html'
             msg.send()
 
 
