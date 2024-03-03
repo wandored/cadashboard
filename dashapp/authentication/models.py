@@ -3,26 +3,26 @@
 Copyright (c) 2019 - present AppSeed.us
 """
 
-# from flask_login import LoginManager
-from flask import current_app
-from flask_security import current_user
-from flask_security.datastore import SQLAlchemySessionUserDatastore
-from flask_admin.contrib.sqla.fields import QuerySelectMultipleField
-from flask_admin.form import Select2Widget
-from flask_security.core import (
-    UserMixin,
-    RoleMixin,
-    Security,
-)
-from flask_sqlalchemy import SQLAlchemy
-from flask_admin import Admin
-from flask_admin.contrib import sqla
-from sqlalchemy import Column
-from dashapp.authentication.util import hash_pass
-from wtforms.fields import PasswordField
-from flask_mail import Mail
 import uuid
 
+from flask import current_app, render_template
+from flask_admin import Admin
+from flask_admin.contrib import sqla
+from flask_admin.contrib.sqla.fields import QuerySelectMultipleField
+from flask_admin.form import Select2Widget
+from flask_mailman import EmailMessage, Mail
+from flask_security import current_user, utils
+from flask_security.core import (
+    RoleMixin,
+    Security,
+    UserMixin,
+)
+from flask_security.datastore import SQLAlchemySessionUserDatastore
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import Column
+from wtforms.fields import PasswordField
+
+from dashapp.authentication.util import hash_pass
 
 db = SQLAlchemy()
 mail = Mail()
@@ -34,6 +34,13 @@ roles_users = db.Table(
     "roles_users",
     db.Column("users_id", db.Integer, db.ForeignKey("users.id")),
     db.Column("roles_id", db.Integer, db.ForeignKey("roles.id")),
+)
+
+# Create a table to support a many-to-many relationship between Users and Stores
+stores_users = db.Table(
+    "stores_users",
+    db.Column("users_id", db.Integer, db.ForeignKey("users.id")),
+    db.Column("restaurants_id", db.Integer, db.ForeignKey("restaurants.id")),
 )
 
 
@@ -56,10 +63,31 @@ class Roles(db.Model, RoleMixin):
         return hash(self.name)
 
 
+class Restaurants(db.Model):
+    __tablename__ = "restaurants"
+
+    id = db.Column(db.Integer, primary_key=True)
+    locationid = db.Column(db.String(64), unique=True)
+    name = db.Column(db.String(64), unique=True)
+    toast_id = db.Column(db.Integer)
+    active = db.Column(db.Boolean())
+
+    # __str__ is required by Flask-Admin, so we can have human-readable values for the Role when editing a User.
+    # If we were using Python 2.7, this would be __unicode__ instead.
+    def __str__(self):
+        return self.name
+
+    # __hash__ is required to avoid the exception TypeError: unhashable type: 'Role' when saving a User
+    def __hash__(self):
+        return hash(self.name)
+
+
 class Users(db.Model, UserMixin):
     __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    first_name = db.Column(db.String(255))
+    last_name = db.Column(db.String(255))
     email = db.Column(db.String(255), unique=True)
     password = db.Column(db.String(255))
     active = db.Column(db.Boolean())
@@ -71,6 +99,9 @@ class Users(db.Model, UserMixin):
     current_login_ip = db.Column(db.String(100))
     login_count = db.Column(db.Integer)
     roles = db.relationship("Roles", secondary=roles_users, backref="users", lazy=True)
+    stores = db.relationship(
+        "Restaurants", secondary=stores_users, backref="users", lazy=True
+    )
 
 
 user_datastore = SQLAlchemySessionUserDatastore(db.session, Users, Roles)
@@ -95,7 +126,7 @@ class UserAdmin(sqla.ModelView):
 
     # Automatically display human-readable names for the current and available Roles when creating or editing a User
     column_auto_select_related = True
-    column_searchable_list = ["email"]
+    column_searchable_list = ["email", "first_name", "last_name"]
     column_filters = ["active"]
     page_size = 50
 
@@ -113,16 +144,27 @@ class UserAdmin(sqla.ModelView):
 
         # Add a password field, naming it "password2" and labeling it "New Password".
         form_class.password2 = PasswordField("New Password")
-    
+
         # Add a field for the user's roles
         form_class.roles = QuerySelectMultipleField(
             query_factory=lambda: self.session.query(Roles),
             allow_blank=False,
-            blank_text='Select Role',
-            widget=Select2Widget(multiple=True) # change this to True if you allow multiple roles
+            blank_text="Select Role",
+            widget=Select2Widget(
+                multiple=True
+            ),  # change this to True if you allow multiple roles
         )
-        
+        # Add a filed for the user's store
+        form_class.stores = QuerySelectMultipleField(
+            query_factory=lambda: self.session.query(Restaurants),
+            allow_blank=False,
+            blank_text="Select Store(s)",
+            widget=Select2Widget(
+                multiple=True
+            ),  # change this to True if you allow multiple stores
+        )
         return form_class
+
     # This callback executes when the user saves changes to a newly-created or edited User -- before the changes are
     # committed to the database.
     def on_model_change(self, form, model, is_created):
@@ -134,6 +176,26 @@ class UserAdmin(sqla.ModelView):
 
         if model.fs_uniquifier is None:
             model.fs_uniquifier = uuid.uuid4().hex
+
+        # if a new user is_created send welcome email to user
+        if is_created:
+            subject = "CentraArchy Dashboard Registration"
+            html_content = render_template(
+                "security/email/welcome.html",
+                email=model.email,
+                password=model.password2,
+                fname=model.first_name,
+                lname=model.last_name,
+            )
+            to, cc = model.email, "it@centraarchy.com"
+            reply_to = "support@centraarchy.com"
+            # headers = {'Message-ID': 'centraarchy.com'}
+
+            msg = EmailMessage(
+                subject, html_content, to=[to], cc=[cc], reply_to=[reply_to]
+            )
+            msg.content_subtype = "html"
+            msg.send()
 
 
 # Customized Role model for SQL-Admin
@@ -168,16 +230,6 @@ class UnitsOfMeasure(db.Model):
     measure_type = db.Column(db.String(64))
     base_qty = db.Column(db.Float)
     base_uofm = db.Column(db.String(64))
-
-
-class Restaurants(db.Model):
-    __tablename__ = "restaurants"
-
-    id = db.Column(db.Integer, primary_key=True)
-    locationid = db.Column(db.String(64), unique=True)
-    name = db.Column(db.String(64), unique=True)
-    toast_id = db.Column(db.Integer)
-    active = db.Column(db.Boolean())
 
 
 class Calendar(db.Model):

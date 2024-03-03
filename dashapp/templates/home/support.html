@@ -27,7 +27,7 @@
             <tbody>
                 {% for k, v in top_users.iterrows() %}
                     <tr>
-                      <th scope="row">{{ v.email }}</th>
+                      <th scope="row">{{ v.first_name }} {{ v.last_name }}</th>
                         <td>
                           <p class="mb-0 ms-1 text-begin">{{ v.avg_login }}</p>
                         </td>
@@ -56,7 +56,7 @@
             <tbody>
                 {% for k, v in no_login.iterrows() %}
                     <tr>
-                      <th scope="row">{{ v.email }}</th>
+                      <th scope="row">{{ v.first_name }} {{ v.last_name }}</th>
                         <td>
                           <p class="mb-0 ms-1 text-begin">{{ v.confirmed_at }}</p>
                         </td>
@@ -85,7 +85,7 @@
             <tbody>
                 {% for k, v in lapsed_users.iterrows() %}
                     <tr>
-                      <th scope="row">{{ v.email }}</th>
+                      <th scope="row">{{ v.first_name }} {{ v.last_name }}</th>
                         <td>
                           <p class="mb-0 ms-1 text-begin">{{ v.last_login_at }}</p>
                         </td>
