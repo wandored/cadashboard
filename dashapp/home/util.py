@@ -357,7 +357,7 @@ def get_timeing_data(start, end, store_list):
             Calendar.date, Calendar.dow, Calendar.week, Calendar.period, Calendar.year
         ).filter(Calendar.date.between(start, end))
         df = pd.DataFrame(cal_query, columns=["date", "dow", "week", "period", "year"])
-        df["store"] = results.name
+        df["store"] = data[0]
         df["bar"] = 0
         df["dining_room"] = 0
         df["handheld"] = 0
