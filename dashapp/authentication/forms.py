@@ -1,6 +1,15 @@
 # -*- encoding: utf-8 -*-
 """
-Copyright (c) 2019 - present AppSeed.us
+authentication/forms.py
+
+This module provides forms for user authentication and data input.
+
+Classes:
+    - LoginForm: Form for user login.
+    - DateForm: Form for selecting a date.
+    - UpdateForm: Form for updating data.
+    - MultiCheckboxField: Field for selecting multiple checkboxes.
+    - StoreForm: Form for selecting stores.
 """
 
 from flask_wtf import FlaskForm
@@ -27,16 +36,6 @@ class LoginForm(FlaskForm):
         "Email Address", id="email_login", validators=[DataRequired(), Email()]
     )
     password = PasswordField("Password", id="pwd_login", validators=[DataRequired()])
-
-
-#class CreateAccountForm(FlaskForm):
-#    username = StringField(
-#        "Username", id="username_create", validators=[DataRequired()]
-#    )
-#    email = StringField(
-#        "Email", id="email_create", validators=[DataRequired(), Email()]
-#    )
-#    password = PasswordField("Password", id="pwd_create", validators=[DataRequired()])
 
 
 class DateForm(FlaskForm):
