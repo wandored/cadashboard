@@ -110,6 +110,10 @@ security = Security()
 
 # Customized User model for SQL-Admin
 class UserAdmin(sqla.ModelView):
+    # Prevent administration of Users unless the currently logged-in user has the "admin" role
+    def is_accessible(self):
+        return current_user.has_role("admin")
+
     # Don't display the password on the list of Users
     column_exclude_list = ("password", "fs_uniquifier")
 
@@ -122,6 +126,7 @@ class UserAdmin(sqla.ModelView):
         "last_login_ip",
         "current_login_ip",
         "login_count",
+        "confirmed_at"
     )
 
     # Automatically display human-readable names for the current and available Roles when creating or editing a User
@@ -129,10 +134,6 @@ class UserAdmin(sqla.ModelView):
     column_searchable_list = ["email", "first_name", "last_name"]
     column_filters = ["active"]
     page_size = 50
-
-    # Prevent administration of Users unless the currently logged-in user has the "admin" role
-    def is_accessible(self):
-        return current_user.has_role("admin")
 
     # On the form for creating or editing a User, don't display a field corresponding to the model's password field.
     # There are two reasons for this. First, we want to encrypt the password before storing in the database. Second,
@@ -195,7 +196,11 @@ class UserAdmin(sqla.ModelView):
                 subject, html_content, to=[to], cc=[cc], reply_to=[reply_to]
             )
             msg.content_subtype = "html"
-            msg.send()
+            try:
+                msg.send()
+                print("Email was sent")
+            except Exception as e:
+                print('Email was not sent', e)
 
 
 # Customized Role model for SQL-Admin
@@ -205,9 +210,17 @@ class RoleAdmin(sqla.ModelView):
         return current_user.has_role("admin")
 
 
+class StoreAdmin(sqla.ModelView):
+    # Prevent administration of Roles unless the currently logged-in user has the "admin" role
+    def is_accessible(self):
+        return current_user.has_role("admin")
+
+
+
 # Add Flask-Admin views for Users and Roles
 admin.add_view(UserAdmin(Users, db.session))
 admin.add_view(RoleAdmin(Roles, db.session))
+admin.add_view(StoreAdmin(Restaurants, db.session))
 
 
 class PotatoLoadTimes(db.Model):
@@ -430,9 +443,11 @@ class Purchases(db.Model):
 
     transactionid = db.Column(db.String, primary_key=True)
     date = db.Column(db.Date, primary_key=True)
+    week = db.Column(db.Integer)
+    period = db.Column(db.Integer)
+    year = db.Column(db.Integer)
     id = db.Column(db.Integer, primary_key=True)
     store = db.Column(db.String)
-    # TODO add date,week,year
     item = db.Column(db.String)
     category1 = db.Column(db.String)
     category2 = db.Column(db.String)
@@ -555,6 +570,10 @@ class StockCount(db.Model):
 
     transactionid = db.Column(db.String, primary_key=True)
     date = db.Column(db.DateTime())
+    dow = db.Column(db.Integer)
+    week = db.Column(db.Integer)
+    period = db.Column(db.Integer)
+    year = db.Column(db.Integer)
     id = db.Column(db.String)
     store = db.Column(db.String)
     item = db.Column(db.String)

@@ -334,6 +334,30 @@ def get_category_costs(regex, start, end, stores):
     return results
 
 
+def get_category_costs_list(regex, start, end, stores) -> list:
+    # Return list of sales
+    query = (
+        db.session.query(
+            Purchases.date,
+            Purchases.week,
+            Purchases.period,
+            Purchases.year,
+            func.sum(Purchases.credit).label("credits"),
+            func.sum(Purchases.debit).label("costs"),
+        )
+        .filter(
+            Purchases.account.in_(regex),
+            Purchases.date.between(start, end),
+            Purchases.id.in_(stores),
+        )
+        .group_by(Purchases.date, Purchases.week, Purchases.period, Purchases.year)
+        .order_by(Purchases.period)
+    ).all()
+    results = pd.DataFrame(query, columns=["Account", "Credits", "Costs"])
+    results["Totals"] = results["Costs"] - results["Credits"]
+    return results
+
+
 def get_category_topten(regex, start, end, stores):
     query = (
         db.session.query(

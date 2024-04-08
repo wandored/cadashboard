@@ -6,6 +6,7 @@ routes for purchasing pages
 from flask import redirect, render_template, session, url_for
 from flask.helpers import url_for
 from flask_security import login_required
+from sqlalchemy import func
 from icecream import ic
 
 from dashapp.authentication.forms import (
@@ -17,10 +18,12 @@ from dashapp.authentication.forms import (
 )
 from dashapp.authentication.models import (
     Restaurants,
+    Purchases,
     db,
 )
 from dashapp.config import Config
 from dashapp.purchasing import blueprint
+from dashapp.home.util import get_category_sales
 from dashapp.purchasing.util import (
     get_category_costs,
     get_category_topten,
@@ -53,7 +56,9 @@ def purchasing():
         data = form3.stores.data
         session["store_list"] = tuple([x.id for x in data])
         if 98 in session["store_list"] and 99 in session["store_list"]:
-            session["store_list"] = tuple([19, 9, 4, 11, 17, 16, 10, 5, 18, 12, 14, 3, 6, 15, 13])
+            session["store_list"] = tuple(
+                [19, 9, 4, 11, 17, 16, 10, 5, 18, 12, 14, 3, 6, 15, 13]
+            )
         elif 99 in session["store_list"]:
             session["store_list"] = tuple([19, 9, 4, 11, 17, 16])
         elif 98 in session["store_list"]:
@@ -75,6 +80,53 @@ def purchasing():
         return redirect(url_for("home_blueprint.stone", store_id=store_id))
 
     food_list = ["Beef", "Food Other", "Dairy", "Pork", "Poultry", "Produce", "Fish"]
+    food_sales_list = [
+        "Additions",
+        "ADD ON",
+        "APPETIZER",
+        "APPETIZERS",
+        "APPS",
+        "BEVERAGE",
+        "BEVERAGES",
+        "Big Game Menu",
+        "Brunch Entree",
+        "CATERING",
+        "Christmas Entree",
+        "Christmas Sides",
+        "Dessert",
+        "DESSERTS",
+        "ENTREE",
+        "ENTREES",
+        "ENTRE",
+        "Event Menu $25",
+        "Event Menu $30",
+        "Kid Meal",
+        "New Years Eve Party Menu",
+        "Private Dining",
+        "Salad",
+        "SALADS",
+        "Side",
+        "SIDES",
+        "SIDE ORDERS" "SOUPS/SALADS",
+        "Valentines Features",
+        "VEGETABLE",
+        "Special Events",
+    ]
+    beer_sales_list = [
+        "BEER",
+        "BEER 1000",
+        "Beer",
+    ]
+    wine_sales_list = [
+        "WINE",
+        "Wine",
+    ]
+    liquor_sales_list = [
+        "LIQUOR",
+        "Liquor",
+    ]
+
+    # Current period purchases
     top_ten = get_category_topten(
         food_list,
         fiscal_dates["start_period"],
@@ -111,6 +163,94 @@ def purchasing():
     store_names = [x[0] for x in store_names]
     store_names = ", ".join(store_names)
 
+    # Yearly sales & costs
+    # TODO get account costs for charts
+    def get_period_category_costs(category, start, end, store_list):
+        return db.session.query(
+            Purchases.period,
+            func.sum(Purchases.debit).label("cost"),
+        ).filter(
+            Purchases.date.between(start, end),
+            Purchases.account.in_(category),
+            Purchases.id.in_(store_list),
+        ).group_by(Purchases.period).all()
+
+    ytd_food_cost_query = get_period_category_costs(
+            food_list,
+            fiscal_dates["start_year"],
+            fiscal_dates["start_day"],
+            session["store_list"],
+            )
+    ytd_food_cost = [x[1] for x in ytd_food_cost_query]
+
+    ytd_beer_cost_query = get_period_category_costs(
+            ["Beer"],
+            fiscal_dates["start_year"],
+            fiscal_dates["start_day"],
+            session["store_list"],
+            )
+    ytd_beer_cost = [x[1] for x in ytd_beer_cost_query]
+    ytd_liquor_cost_query = get_period_category_costs(
+            ["Liquor"],
+            fiscal_dates["start_year"],
+            fiscal_dates["start_day"],
+            session["store_list"],
+            )
+    ytd_liquor_cost = [x[1] for x in ytd_liquor_cost_query]
+    ytd_wine_cost_query = get_period_category_costs(
+            ["Wine"],
+            fiscal_dates["start_year"],
+            fiscal_dates["start_day"],
+            session["store_list"],
+            )
+    ytd_wine_cost = [x[1] for x in ytd_wine_cost_query]
+
+
+    ytd_food_sales = get_category_sales(
+        fiscal_dates["start_year"],
+        fiscal_dates["start_day"],
+        food_sales_list,
+        session["store_list"],
+    )
+    ytd_beer_sales = get_category_sales(
+        fiscal_dates["start_year"],
+        fiscal_dates["start_day"],
+        beer_sales_list,
+        session["store_list"],
+    )
+    ytd_wine_sales = get_category_sales(
+        fiscal_dates["start_year"],
+        fiscal_dates["start_day"],
+        wine_sales_list,
+        session["store_list"],
+    )
+    ytd_liquor_sales = get_category_sales(
+        fiscal_dates["start_year"],
+        fiscal_dates["start_day"],
+        liquor_sales_list,
+        session["store_list"],
+    )
+    ytd_period_food_sales = ytd_food_sales.groupby('period')['sales'].sum()
+    ytd_period_food_sales_list = ytd_period_food_sales.tolist()
+    ytd_period_beer_sales = ytd_beer_sales.groupby('period')['sales'].sum()
+    ytd_period_beer_sales_list = ytd_period_beer_sales.tolist()
+    ytd_period_wine_sales = ytd_wine_sales.groupby('period')['sales'].sum()
+    ytd_period_wine_sales_list = ytd_period_wine_sales.tolist()
+    ytd_period_liquor_sales = ytd_liquor_sales.groupby('period')['sales'].sum()
+    ytd_period_liquor_sales_list = ytd_period_liquor_sales.tolist()
+
+    ytd_food_cost_pct = [x / y * 100 for x, y in zip(ytd_food_cost, ytd_period_food_sales_list)]
+    ytd_beer_cost_pct = [x / y * 100 for x, y in zip(ytd_beer_cost, ytd_period_beer_sales_list)]
+    ytd_wine_cost_pct = [x / y * 100 for x, y in zip(ytd_wine_cost, ytd_period_wine_sales_list)]
+    ytd_liquor_cost_pct = [x / y * 100 for x, y in zip(ytd_liquor_cost, ytd_period_liquor_sales_list)]
+    
+    total_food_sales = ytd_food_sales["sales"].sum()
+    total_beer_sales = ytd_beer_sales["sales"].sum()
+    total_wine_sales = ytd_wine_sales["sales"].sum()
+    total_liquor_sales = ytd_liquor_sales["sales"].sum()
+
+    ic(locals())
+
     return render_template(
         "purchasing/purchasing.html",
         title="Purchasing",
@@ -140,7 +280,9 @@ def purchase(product):
         data = form3.stores.data
         session["store_list"] = tuple([x.id for x in data])
         if 98 in session["store_list"] and 99 in session["store_list"]:
-            session["store_list"] = tuple([19, 9, 4, 11, 17, 16, 10, 5, 18, 12, 14, 3, 6, 15, 13])
+            session["store_list"] = tuple(
+                [19, 9, 4, 11, 17, 16, 10, 5, 18, 12, 14, 3, 6, 15, 13]
+            )
         elif 99 in session["store_list"]:
             session["store_list"] = tuple([19, 9, 4, 11, 17, 16])
         elif 98 in session["store_list"]:

@@ -1,4 +1,11 @@
-<p>{{ _fsdomain('Welcome %(first)s %(last)s!', first=fname, last=lname) }}</p>
+{# This template receives the following context:
+  confirmation_link - the link that should be fetched (GET) to confirm
+  confirmation_token - this token is part of confirmation link - but can be used to
+    construct arbitrary URLs for redirecting.
+  user - the entire user model object
+  security - the Flask-Security configuration
+#}
+<p>{{ _fsdomain('Welcome  %(first)s %(last)s!', first=fname, last=lname) }}</p>
 
 <h2>Your user account has been created on the CentraArchy Dashboard.</h2>
 <div>
@@ -6,8 +13,12 @@
 <p>Password:<h3> {{ password }}</h3></p>
 </div>
 
-<p>Select the link below to sign in.</p>
-<p> "https://dashboard.centraarchy.com" </p>
+{% if security.confirmable %}
+  <p>{{ _fsdomain('Please confirm your email through the link below:') }}</p>
+  <p>
+    <a href="{{ confirmation_link }}">{{ _fsdomain('Confirm my account') }}</a>
+  </p>
+{% endif %}
 
 <h6> This email is intended for employees of CentraArchy RMC only. Please delete if you received this in error.</h6>
 <h4>CentraArchy Support</h4>
