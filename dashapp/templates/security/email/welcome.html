@@ -8,14 +8,11 @@
 <p>{{ _fsdomain('Welcome  %(first)s %(last)s!', first=fname, last=lname) }}</p>
 
 <h2>Your user account has been created on the CentraArchy Dashboard.</h2>
+<h3>{{ _fsdomain(dashboard_url) }}</h3>
 <div>
 <p>Email Address: {{ email }}</p>
 <p>Password:<h3> {{ password }}</h3></p>
 </div>
-
-
-<p>{{ _fsdomain('Sign in through the link below:') }}</p>
-<p>"https://dashboard.centraarchy.com"</p>
 
 
 <h6> This email is intended for employees of CentraArchy RMC only. Please delete if you received this in error.</h6>

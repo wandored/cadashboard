@@ -186,6 +186,7 @@ class UserAdmin(sqla.ModelView):
                 password=model.password2,
                 fname=model.first_name,
                 lname=model.last_name,
+                dashboard_url=current_app.config["DASHBOARD_URL"],
             )
             to, cc = model.email, "it@centraarchy.com"
             reply_to = "support@centraarchy.com"
@@ -197,7 +198,6 @@ class UserAdmin(sqla.ModelView):
             msg.content_subtype = "html"
             try:
                 msg.send()
-                print("Email was sent")
             except Exception as e:
                 print('Email was not sent', e)
 
