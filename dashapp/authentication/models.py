@@ -126,7 +126,6 @@ class UserAdmin(sqla.ModelView):
         "last_login_ip",
         "current_login_ip",
         "login_count",
-        "confirmed_at"
     )
 
     # Automatically display human-readable names for the current and available Roles when creating or editing a User
