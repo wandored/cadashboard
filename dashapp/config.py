@@ -6,6 +6,7 @@ with open("/etc/config.json") as config_file:
 
 class Config:
     COMPANY_NAME = config.get("COMPANY_NAME")
+    DASHBOARD_URL = config.get("DASHBOARD_URL")
     SECRET_KEY = config.get("SECRET_KEY")
     SRVC_ROOT = config.get("SRVC_ROOT")
     SRVC_USER = config.get("SRVC_USER")
