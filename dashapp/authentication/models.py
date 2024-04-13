@@ -11,18 +11,17 @@ from flask_admin.contrib import sqla
 from flask_admin.contrib.sqla.fields import QuerySelectMultipleField
 from flask_admin.form import Select2Widget
 from flask_mailman import EmailMessage, Mail
-from flask_security import current_user, utils
+from flask_security import current_user
 from flask_security.core import (
     RoleMixin,
     Security,
     UserMixin,
 )
 from flask_security.datastore import SQLAlchemySessionUserDatastore
+from flask_security.utils import hash_password
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column
 from wtforms.fields import PasswordField
-
-from dashapp.authentication.util import hash_pass
 
 db = SQLAlchemy()
 mail = Mail()
@@ -172,7 +171,7 @@ class UserAdmin(sqla.ModelView):
         if len(model.password2):
             # ... then encrypt the new password prior to storing it in the database. If the password field is blank,
             # the existing password in the database will be retained.
-            model.password = hash_pass(model.password2)
+            model.password = hash_password(model.password2)
 
         if model.fs_uniquifier is None:
             model.fs_uniquifier = uuid.uuid4().hex
