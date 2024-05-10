@@ -1812,6 +1812,7 @@ def support():
         .sort_values(by=["avg_login"], ascending=False)
         .head(25)
     )
+    users_this_week = user_table[user_table["last_login_at"] >= TODAY - timedelta(days=7)]
 
     query = (
         db.session.query(StockCount.store, StockCount.item)

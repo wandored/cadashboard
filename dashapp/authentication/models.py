@@ -22,6 +22,7 @@ from flask_security.utils import hash_password
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column
 from wtforms.fields import PasswordField
+from dashapp.config import Config
 
 db = SQLAlchemy()
 mail = Mail()
@@ -172,9 +173,32 @@ class UserAdmin(sqla.ModelView):
             # ... then encrypt the new password prior to storing it in the database. If the password field is blank,
             # the existing password in the database will be retained.
             model.password = hash_password(model.password2)
+            # if password is changed, update the fs_uniquifier and send email to user
+            if not is_created:
+                subject = "CentraArchy Dashboard Password Change"
+                html_content = render_template(
+                    "security/email/change_notice.html",
+                    email=model.email,
+                    password=model.password2,
+                    fname=model.first_name,
+                    lname=model.last_name,
+                    dashboard_url=current_app.config["DASHBOARD_URL"],
+                    company_name=Config.COMPANY_NAME,
+                )
+                to, cc = model.email, "it@centraarchy.com"
+                reply_to = "support@centraarchy.com"
+                msg = EmailMessage(subject, html_content, to=[to], cc=[cc], reply_to=[reply_to])
+                msg.content_subtype = "html"
+                try:
+                    msg.send()
+                except Exception as e:
+                    print('Email was not sent', e)
+
 
         if model.fs_uniquifier is None:
             model.fs_uniquifier = uuid.uuid4().hex
+
+
 
         # if a new user is_created send welcome email to user
         if is_created:
@@ -186,6 +210,7 @@ class UserAdmin(sqla.ModelView):
                 fname=model.first_name,
                 lname=model.last_name,
                 dashboard_url=current_app.config["DASHBOARD_URL"],
+                company_name=Config.COMPANY_NAME,
             )
             to, cc = model.email, "it@centraarchy.com"
             reply_to = "support@centraarchy.com"
