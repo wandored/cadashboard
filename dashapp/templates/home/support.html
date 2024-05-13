@@ -13,8 +13,8 @@
     <div class="col-lg-4 col-md-6 mt-4 mb-4">
       <div class="card h-100">
         <div class="card-header bg-primary pb-0">
-          <h4>TOP USER LIST</h4>
-          <h6>Top 10 Users</h6>
+          <h4>CURRENT USERS</h4>
+          <h6>Logged in this week</h6>
         </div>
         <div class="card">
           <table class="table-responsive table-md">
@@ -25,7 +25,7 @@
               </tr>
             </thead>
             <tbody>
-                {% for k, v in top_users.iterrows() %}
+                {% for k, v in users_this_week.iterrows() %}
                     <tr>
                       <th scope="row">{{ v.first_name }} {{ v.last_name }}</th>
                         <td>
