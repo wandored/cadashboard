@@ -1,314 +1,279 @@
 <aside
     class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3 bg-gradient-secondary"
     id="sidenav-main">
-    <div class="sidenav-header">
-        <i class="fas fa-times p-3 cursor-pointer text-white opacity-5 position-absolute end-0 top-0 d-none d-xl-none"
-            aria-hidden="true" id="iconSidenav"></i>
-        <a class="navbar-brand m-0" href="" target="_blank">
-            <img src="/static/assets/img/CA_Profile_light.png" class="navbar-brand-img h-100" alt="main_logo" />
-            <span class="ms-1 font-weight-bold text-white">{{ company_name }}</span>
-        </a>
-    </div>
-    <hr class="horizontal light mt-0 mb-2" />
-    <div class="dropdown" style="text-align: center">
-        <button class="btn {% if 'store' in segment %} active bg-gradient-primary {% else %} bg-gradient-secondary {% endif %} dropdown-toggle" type="button" id="dropdownTable" data-bs-toggle="dropdown" data-bs-auto-close="false">
-            Select Stores
-        </button>
-        <ul class="dropdown-menu ms-1" aria-labelledby="dropdownTable">
-            <form method="POST" action="" style="text-align: left">
-                {{ form3.hidden_tag() }}
-                <fieldset id="" class="form-group mb-0">
-                    <div class="form-group mb-1 text-white">
-                        {{ form3.stores.label(class="form=control-label") }} {% if
-                        form3.stores.errors %} {{ form3.stores(class="form=control
-                        form-control-md is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form3.stores.errors %}
-                            <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                        {% else %} {{ form3.stores(class="form=control form-control-md") }}
-                        {% endif %}
-                    </div>
-                </fieldset>
-                <div class="form-group" style="text-align: center">
-                    {{ form3.submit3(class="btn btn-info btn-sm col-0") }}
-                </div>
-            </form>
-        </ul>
-    </div>
-    <div class="dropdown" style="text-align: center">
-        <button class="btn {% if 'purchasing' in segment %} active bg-gradient-primary {% else %} bg-gradient-secondary {% endif %} dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Purchasing
-        </button>
-        <ul class="dropdown-menu">
-            <li>
-                <a class="dropdown-item font-weight-bold text-primary" href="/purchasing/">Food</a>
-            </li>
-            <li>
-                <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.purchase', product='Beef') }}">Beef</a>
-            </li>
-            <li>
-                <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.purchase', product='Dairy') }}">Dairy</a>
-            </li>
-            <li>
-                <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.purchase', product='Food Other') }}">Food
-                    Other</a>
-            </li>
-            <li>
-                <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.purchase', product='Pork') }}">Pork</a>
-            </li>
-            <li>
-                <a class="dropdown-item"
-                    href="{{ url_for('purchasing_blueprint.purchase', product='Poultry') }}">Poultry</a>
-            </li>
-            <li>
-                <a class="dropdown-item"
-                    href="{{ url_for('purchasing_blueprint.purchase', product='Produce') }}">Produce</a>
-            </li>
-            <li>
-                <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.purchase', product='Fish') }}">Seafood</a>
-            </li>
-            <li>
-                <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.purchase', product='Beer') }}">Beer</a>
-            </li>
-            <li>
-                <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.purchase', product='Wine') }}">Wine</a>
-            </li>
-            <li>
-                <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.purchase', product='Liquor') }}">Liquor</a>
-            </li>
-            <li><a class="dropdown-item" href="#">Supplies</a></li>
-        </ul>
-    </div>
-    <!-- Toolbox list -->
-    <div class="dropdown" style="text-align: center">
-        <button class="btn bg-gradient-secondary dropdown-toggle" type="button" id="dropdownModals" data-bs-toggle="dropdown"
-            aria-haspopup="true" aria-expanded="false">
-            Toolbox
-        </button>
-        <div class="dropdown-menu" aria-labelledby="dropdownModals">
-            <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modal1">Potato Chart</a>
-            <!--TODO fix lobster & stone crab pricing-->
-            <!--<a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modal2">Lobster Price</a>
-            <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modal3">Stone Claw Price</a>
-            -->
-        </div>
-    </div>
-
-    <div class="modal" tabindex="-1" id="modal1" data-bs-backdrop="false">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Potato Rotation Loading Chart</h5>
-                </div>
-                <div class="modal-body">
-                    <form method="POST" action="" style="text-align: center">
-                        <h6>Select a store and click Submit to generate a PDF</h6>
-                        {{ form4.hidden_tag() }}
-                        <fieldset id="" class="form-group mb-0">
-                            <div class="form-group mb-1">
-                                {{ form4.store.label(class="form=control-label") }}
-                                {% if form4.store.errors %}
-                                {{ form4.store(class="form=control form-control-md is-invalid") }}
-                                <div class="invalid-feedback">
-                                    {% for error in form4.store.errors %}
-                                    <span>{{ error }}</span>
-                                    {% endfor %}
-                                </div>
-                                {% else %}
-                                {{ form4.store(class="form=control form-control-md") }}
-                                {% endif %}
-                            </div>
-                        </fieldset>
-                        <div class="form-group">
-                            {{ form4.submit4(class="btn btn-info") }}
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-info" data-bs-dismiss="modal">
-                        Close
-                    </button>
-                </div>
+  <div class="sidenav-header">
+    <i class="fas fa-times p-3 cursor-pointer text-white opacity-5 position-absolute end-0 top-0 d-none d-xl-none"
+       aria-hidden="true" id="iconSidenav"></i>
+    <a class="navbar-brand m-0" href="" target="_blank">
+      <img src="/static/assets/img/CA_Profile_light.png" class="navbar-brand-img h-100" alt="main_logo" />
+      <span class="ms-1 font-weight-bold text-white">{{ company_name }}</span>
+    </a>
+  </div>
+  <hr class="horizontal light mt-0 mb-2" />
+  <div class="dropdown" style="text-align: center">
+    <button class="btn {% if 'store' in segment %} active bg-gradient-primary {% else %} bg-gradient-secondary {% endif %} dropdown-toggle" type="button" id="dropdownTable" data-bs-toggle="dropdown" data-bs-auto-close="false">
+      Select Stores
+    </button>
+    <ul class="dropdown-menu ms-1" aria-labelledby="dropdownTable">
+      <form method="POST" action="" style="text-align: left">
+        {{ form3.hidden_tag() }}
+        <fieldset id="" class="form-group mb-0">
+          <div class="form-group mb-1 text-white">
+            {{ form3.stores.label(class="form=control-label") }} {% if
+            form3.stores.errors %} {{ form3.stores(class="form=control
+            form-control-md is-invalid") }}
+            <div class="invalid-feedback">
+              {% for error in form3.stores.errors %}
+              <span>{{ error }}</span>
+              {% endfor %}
             </div>
+            {% else %} {{ form3.stores(class="form=control form-control-md") }}
+            {% endif %}
+          </div>
+        </fieldset>
+        <div class="form-group" style="text-align: center">
+          {{ form3.submit3(class="btn btn-info btn-sm col-0") }}
         </div>
+      </form>
+    </ul>
+  </div>
+  <!-- Toolbox list -->
+  <div class="dropdown" style="text-align: center">
+    <button class="btn bg-gradient-secondary dropdown-toggle" type="button" id="dropdownModals" data-bs-toggle="dropdown"
+                                                                                                aria-haspopup="true" aria-expanded="false">
+      Toolbox
+    </button>
+    <div class="dropdown-menu" aria-labelledby="dropdownModals">
+      <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modal1">Potato Chart</a>
+      <!--TODO fix lobster & stone crab pricing-->
+      <!--<a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modal2">Lobster Price</a>
+        <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modal3">Stone Claw Price</a>
+      -->
     </div>
+  </div>
 
-    <div class="modal" tabindex="-1" id="modal2" data-bs-backdrop="false">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Live Lobster Price Chart</h5>
-                </div>
-                <div class="modal-body">
-                    <form method="POST" action="" style="text-align: center">
-                        <h6>Select a store and click Submit to generate a PDF</h6>
-                        {{ form5.hidden_tag() }}
-                        <fieldset id="" class="form-group mb-0">
-                            <div class="form-group mb-1">
-                                {{ form5.store.label(class="form=control-label") }} {% if
-                                form5.store.errors %} {{ form5.store(class="form=control
-                                form-control-md is-invalid") }}
-                                <div class="invalid-feedback">
-                                    {% for error in form5.store.errors %}
-                                    <span>{{ error }}</span>
-                                    {% endfor %}
-                                </div>
-                                {% else %} {{ form5.store(class="form=control form-control-md")
-                                }} {% endif %}
-                            </div>
-                        </fieldset>
-                        <div class="form-group">
-                            {{ form5.submit5(class="btn btn-info") }}
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-info" data-bs-dismiss="modal">
-                        Close
-                    </button>
-                </div>
-            </div>
+  <div class="modal" tabindex="-1" id="modal1" data-bs-backdrop="false">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Potato Rotation Loading Chart</h5>
         </div>
-    </div>
-
-    <div class="modal" tabindex="-1" id="modal3" data-bs-backdrop="false">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Stone Claw Menu Price Chart</h5>
+        <div class="modal-body">
+          <form method="POST" action="" style="text-align: center">
+            <h6>Select a store and click Submit to generate a PDF</h6>
+            {{ form4.hidden_tag() }}
+            <fieldset id="" class="form-group mb-0">
+              <div class="form-group mb-1">
+                {{ form4.store.label(class="form=control-label") }}
+                {% if form4.store.errors %}
+                {{ form4.store(class="form=control form-control-md is-invalid") }}
+                <div class="invalid-feedback">
+                  {% for error in form4.store.errors %}
+                  <span>{{ error }}</span>
+                  {% endfor %}
                 </div>
-                <div class="modal-body">
-                    <form method="POST" action="" style="text-align: center">
-                        <h6>Select a store and click Submit to generate PDF</h6>
-                        {{ form6.hidden_tag() }}
-                        <fieldset id="" class="form-group mb-0">
-                            <div class="form-group mb-1">
-                                {{ form6.store.label(class="form=control-label") }} {% if
-                                form6.store.errors %} {{ form6.store(class="form=control
-                                form-control-md is-invalid") }}
-                                <div class="invalid-feedback">
-                                    {% for error in form6.store.errors %}
-                                    <span>{{ error }}</span>
-                                    {% endfor %}
-                                </div>
-                                {% else %} {{ form6.store(class="form=control form-control-md")
-                                }} {% endif %}
-                            </div>
-                        </fieldset>
-                        <div class="form-group">
-                            {{ form6.submit6(class="btn btn-info") }}
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-info" data-bs-dismiss="modal">
-                        Close
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <hr class="horizontal light mt-0 mb-2" />
-
-    <div class="collapse navbar-collapse w-auto max-height-vh-40" id="sidenav-collapse-main">
-        <ul class="navbar-nav">
-            <li class="nav-item">
-              <a class="nav-link text-white {% if 'index' in segment %} active bg-gradient-primary {% else %} bg-gradient-secondary {% endif %}"
-                    href="/">
-                    <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="material-icons opacity-10">dashboard</i>
-                    </div>
-                    <span class="nav-link-text ms-1">Dashboard</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-white active bg-gradient-secondary"
-                    href="https://stockcount.centraarchy.com">
-                    <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="material-icons opacity-10">inventory</i>
-                    </div>
-                    <span class="nav-link-text ms-1">StockCount</span>
-                </a>
-            </li>
-            <li class="nav-item mt-3">
-                <h6 class="ps-4 ms-2 text-uppercase text-xs text-white font-weight-bolder opacity-8">
-                    Account pages
-                </h6>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-white {% if 'profile' in segment %} active bg-gradient-primary {% endif %}"
-                    href="/profile">
-                    <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="material-icons opacity-10">person</i>
-                    </div>
-                    <span class="nav-link-text ms-1">Profile</span>
-                </a>
-            </li>
-            {% for x in current_user.roles %} {% if x == 'admin' %}
-            <li class="nav-item">
-                <a class="nav-link text-white {% if 'support' in segment %} active bg-gradient-primary {% endif %}"
-                    href="/support">
-                    <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="material-icons opacity-10">support_agent</i>
-                    </div>
-                    <span class="nav-link-text ms-1">Support Page</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-white {% if 'admin' in segment %} active bg-gradient-primary {% endif %}"
-                    href="/admin">
-                    <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="material-icons opacity-10">admin_panel_settings</i>
-                    </div>
-                    <span class="nav-link-text ms-1">Admin Page</span>
-                </a>
-            </li>
-            {% endif %} {% endfor %}
-            <li class="nav-item">
-                <a class="nav-link text-white" href="/logout">
-                    <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="material-icons opacity-10">directions_run</i>
-                    </div>
-                    <span class="nav-link-text ms-1">Logout</span>
-                </a>
-            </li>
-        </ul>
-    </div>
-    <hr class="horizontal light mt-0 mb-2" />
-    <div>
-        <p class="text-white text-center mt-1 mb-1">{{ fiscal_dates["date"] }}</p>
-        <p class="text-white text-center mt-1 mb-1">
-            Week - {{ fiscal_dates["week"] }}
-        </p>
-        <p class="text-white text-center mt-1 mb-1">
-            Period - {{ fiscal_dates["period"] }}
-        </p>
-        <p class="text-white text-center mt-1 mb-1">
-            Fiscal Year - {{ fiscal_dates["year"] }}
-        </p>
-    </div>
-    <li>
-        <form method="POST" action="" style="text-align: center">
-            {{ form1.hidden_tag() }}
-            <fieldset id="" class="form-group mb-1">
-                <div class="form-group mb-1">
-                    {{ form1.selectdate.label(class="form=control-label") }} {% if
-                    form1.selectdate.errors %} {{ form1.selectdate(class="form=control
-                    form-control-md is-invalid") }}
-                    <div class="invalid-feedback">
-                        {% for error in form1.selectdate.errors %}
-                        <span>{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                    {% else %} {{ form1.selectdate(class="form=control form-control-md")
-                    }} {% endif %}
-                </div>
+                {% else %}
+                {{ form4.store(class="form=control form-control-md") }}
+                {% endif %}
+              </div>
             </fieldset>
             <div class="form-group">
-                {{ form1.submit1(class="btn btn-info btn-sm") }}
+              {{ form4.submit4(class="btn btn-info") }}
             </div>
-        </form>
-    </li>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-info" data-bs-dismiss="modal">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" tabindex="-1" id="modal2" data-bs-backdrop="false">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Live Lobster Price Chart</h5>
+        </div>
+        <div class="modal-body">
+          <form method="POST" action="" style="text-align: center">
+            <h6>Select a store and click Submit to generate a PDF</h6>
+            {{ form5.hidden_tag() }}
+            <fieldset id="" class="form-group mb-0">
+              <div class="form-group mb-1">
+                {{ form5.store.label(class="form=control-label") }} {% if
+                form5.store.errors %} {{ form5.store(class="form=control
+                form-control-md is-invalid") }}
+                <div class="invalid-feedback">
+                  {% for error in form5.store.errors %}
+                  <span>{{ error }}</span>
+                  {% endfor %}
+                </div>
+                {% else %} {{ form5.store(class="form=control form-control-md")
+                }} {% endif %}
+              </div>
+            </fieldset>
+            <div class="form-group">
+              {{ form5.submit5(class="btn btn-info") }}
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-info" data-bs-dismiss="modal">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" tabindex="-1" id="modal3" data-bs-backdrop="false">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Stone Claw Menu Price Chart</h5>
+        </div>
+        <div class="modal-body">
+          <form method="POST" action="" style="text-align: center">
+            <h6>Select a store and click Submit to generate PDF</h6>
+            {{ form6.hidden_tag() }}
+            <fieldset id="" class="form-group mb-0">
+              <div class="form-group mb-1">
+                {{ form6.store.label(class="form=control-label") }} {% if
+                form6.store.errors %} {{ form6.store(class="form=control
+                form-control-md is-invalid") }}
+                <div class="invalid-feedback">
+                  {% for error in form6.store.errors %}
+                  <span>{{ error }}</span>
+                  {% endfor %}
+                </div>
+                {% else %} {{ form6.store(class="form=control form-control-md")
+                }} {% endif %}
+              </div>
+            </fieldset>
+            <div class="form-group">
+              {{ form6.submit6(class="btn btn-info") }}
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-info" data-bs-dismiss="modal">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <hr class="horizontal light mt-0 mb-2" />
+
+  <div class="collapse navbar-collapse w-auto max-height-vh-40" id="sidenav-collapse-main">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link text-white {% if 'index' in segment %} active bg-gradient-primary {% else %} bg-gradient-secondary {% endif %}"
+           href="/">
+          <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+            <i class="material-icons opacity-10">dashboard</i>
+          </div>
+          <span class="nav-link-text ms-1">Dashboard</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link text-white active bg-gradient-secondary"
+           href="https://stockcount.centraarchy.com">
+          <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+            <i class="material-icons opacity-10">inventory</i>
+          </div>
+          <span class="nav-link-text ms-1">StockCount</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link text-white {% if 'purchasing' in segment %} active bg-gradient-primary {% else %} bg-gradient-secondary {% endif %}"
+           href="/purchasing/">
+          <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+            <i class="material-icons opacity-10">shopping_cart</i>
+          </div>
+          <span class="nav-link-text ms-1">Purchasing</span>
+        </a>
+      </li>
+      <li class="nav-item mt-3">
+        <h6 class="ps-4 ms-2 text-uppercase text-xs text-white font-weight-bolder opacity-8">
+          Account pages
+        </h6>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link text-white {% if 'profile' in segment %} active bg-gradient-primary {% endif %}"
+           href="/profile">
+          <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+            <i class="material-icons opacity-10">person</i>
+          </div>
+          <span class="nav-link-text ms-1">Profile</span>
+        </a>
+      </li>
+      {% for x in current_user.roles %} {% if x == 'admin' %}
+      <li class="nav-item">
+        <a class="nav-link text-white {% if 'support' in segment %} active bg-gradient-primary {% endif %}"
+           href="/support">
+          <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+            <i class="material-icons opacity-10">support_agent</i>
+          </div>
+          <span class="nav-link-text ms-1">Support Page</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link text-white {% if 'admin' in segment %} active bg-gradient-primary {% endif %}"
+           href="/admin">
+          <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+            <i class="material-icons opacity-10">admin_panel_settings</i>
+          </div>
+          <span class="nav-link-text ms-1">Admin Page</span>
+        </a>
+      </li>
+      {% endif %} {% endfor %}
+      <li class="nav-item">
+        <a class="nav-link text-white" href="/logout">
+          <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+            <i class="material-icons opacity-10">directions_run</i>
+          </div>
+          <span class="nav-link-text ms-1">Logout</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+  <hr class="horizontal light mt-0 mb-2" />
+  <div>
+    <p class="text-white text-center mt-1 mb-1">{{ fiscal_dates["date"] }}</p>
+    <p class="text-white text-center mt-1 mb-1">
+    Week - {{ fiscal_dates["week"] }}
+    </p>
+    <p class="text-white text-center mt-1 mb-1">
+    Period - {{ fiscal_dates["period"] }}
+    </p>
+    <p class="text-white text-center mt-1 mb-1">
+    Fiscal Year - {{ fiscal_dates["year"] }}
+    </p>
+  </div>
+  <li>
+    <form method="POST" action="" style="text-align: center">
+      {{ form1.hidden_tag() }}
+      <fieldset id="" class="form-group mb-1">
+        <div class="form-group mb-1">
+          {{ form1.selectdate.label(class="form=control-label") }} {% if
+          form1.selectdate.errors %} {{ form1.selectdate(class="form=control
+          form-control-md is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in form1.selectdate.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+          {% else %} {{ form1.selectdate(class="form=control form-control-md")
+          }} {% endif %}
+        </div>
+      </fieldset>
+      <div class="form-group">
+        {{ form1.submit1(class="btn btn-info btn-sm") }}
+      </div>
+    </form>
+  </li>
 </aside>

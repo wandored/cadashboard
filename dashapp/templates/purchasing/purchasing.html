@@ -7,88 +7,132 @@
 
 {% block content %}
 <div class="container-fluid py-4">
-    <!-- First Row -Charts -->
-    <div class="row mt-0">
-        <div class="col-lg-4 col-md-6 mt-2 mb-2">
-            <div class="card h-100 shadow-primary">
-                <div class="card-body">
-                    <h4 class="mb-0 ">Top 10 Food Items Period To Date</h4>
-                    <div class="table-responsive table-hover">
-                        <table class="table-sm text-dark">
-                            <thead>
-                                <tr>
-                                    <th scope="col">PRODUCT</th>
-                                    <th scope="col">TOTAL COST</th>
-                                    <th scope="col">% OF TOTAL</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    {% for k, s in top_ten.iterrows() %}
-                                <tr>
-                                    <td>
-                                        <p class="mb-0 ms-1 text-begin">{{ s['Item'] }}</p>
-                                    </td>
-                                    <td>
-                                        <p class="mb-0 ms-1 text-begin">{{ "${:,.0f}".format(s['Cost']) }}</p>
-                                    </td>
-                                    <td>
-                                        <p class="mb-0 ms-1 text-begin">{{ "{:,.1f}%".format(s['percent']*100) }}</p>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+  <div class="dropdown" style="text-align: left">
+    <button class="btn active bg-gradient-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+      Purchasing
+    </button>
+    <ul class="dropdown-menu">
+      <li>
+        <a class="dropdown-item font-weight-bold text-primary" href="/purchasing/">Food</a>
+      </li>
+      <li>
+        <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.purchase', product='Beef') }}">Beef</a>
+      </li>
+      <li>
+        <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.purchase', product='Dairy') }}">Dairy</a>
+      </li>
+      <li>
+        <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.purchase', product='Food Other') }}">Food
+          Other</a>
+      </li>
+      <li>
+        <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.purchase', product='Pork') }}">Pork</a>
+      </li>
+      <li>
+        <a class="dropdown-item"
+           href="{{ url_for('purchasing_blueprint.purchase', product='Poultry') }}">Poultry</a>
+      </li>
+      <li>
+        <a class="dropdown-item"
+           href="{{ url_for('purchasing_blueprint.purchase', product='Produce') }}">Produce</a>
+      </li>
+      <li>
+        <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.purchase', product='Fish') }}">Seafood</a>
+      </li>
+      <li>
+        <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.purchase', product='Beer') }}">Beer</a>
+      </li>
+      <li>
+        <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.purchase', product='Wine') }}">Wine</a>
+      </li>
+      <li>
+        <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.purchase', product='Liquor') }}">Liquor</a>
+      </li>
+      <li><a class="dropdown-item" href="#">Supplies</a></li>
+    </ul>
+  </div>
+  <!-- First Row -Charts -->
+  <div class="row mt-0">
+    <div class="col-lg-4 col-md-6 mt-2 mb-2">
+      <div class="card h-100 shadow-primary">
+        <div class="card-body">
+          <h4 class="mb-0 ">Top 10 Food Items Period To Date</h4>
+          <div class="table-responsive table-hover">
+            <table class="table-sm text-dark">
+              <thead>
+                <tr>
+                  <th scope="col">PRODUCT</th>
+                  <th scope="col">TOTAL COST</th>
+                  <th scope="col">% OF TOTAL</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  {% for k, s in top_ten.iterrows() %}
+                  <tr>
+                    <td>
+                      <p class="mb-0 ms-1 text-begin">{{ s['Item'] }}</p>
+                    </td>
+                    <td>
+                      <p class="mb-0 ms-1 text-begin">{{ "${:,.0f}".format(s['Cost']) }}</p>
+                    </td>
+                    <td>
+                      <p class="mb-0 ms-1 text-begin">{{ "{:,.1f}%".format(s['percent']*100) }}</p>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-        <div class="col-lg-4 col-md-6 mt-2 mb-2">
-            <div class="card h-100 bg-gradient-light shadow-primary">
-                <div class="card-body">
-                    <div class="chart">
-                        <canvas id="food-chart" class="chart-canvas" height="100"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-4 col-md-6 mt-2 mb-2">
-            <div class="card h-100 shadow-primary">
-                <div class="card-body">
-                    <h4 class="mb-0 ">Top 10 Food Vendors Period To Date</h4>
-                    <div class="table-responsive table-hover">
-                        <table class="table-sm text-dark">
-                            <thead>
-                                <tr>
-                                    <th scope="col">Vendor</th>
-                                    <th scope="col">TOTAL COST</th>
-                                    <th scope="col">% OF TOTAL</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    {% for k, s in top_ten_vendor.iterrows() %}
-                                <tr>
-                                    <td>
-                                        <p class="mb-0 ms-1 text-begin">{{ s['Vendor'] }}</p>
-                                    </td>
-                                    <td>
-                                        <p class="mb-0 ms-1 text-begin">{{ "${:,.0f}".format(s['Cost']) }}</p>
-                                    </td>
-                                    <td>
-                                        <p class="mb-0 ms-1 text-begin">{{ "{:,.1f}%".format(s['percent']*100) }}</p>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
+    <div class="col-lg-4 col-md-6 mt-2 mb-2">
+      <div class="card h-100 bg-gradient-light shadow-primary">
+        <div class="card-body">
+          <div class="chart">
+            <canvas id="food-chart" class="chart-canvas" height="100"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4 col-md-6 mt-2 mb-2">
+      <div class="card h-100 shadow-primary">
+        <div class="card-body">
+          <h4 class="mb-0 ">Top 10 Food Vendors Period To Date</h4>
+          <div class="table-responsive table-hover">
+            <table class="table-sm text-dark">
+              <thead>
+                <tr>
+                  <th scope="col">Vendor</th>
+                  <th scope="col">TOTAL COST</th>
+                  <th scope="col">% OF TOTAL</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  {% for k, s in top_ten_vendor.iterrows() %}
+                  <tr>
+                    <td>
+                      <p class="mb-0 ms-1 text-begin">{{ s['Vendor'] }}</p>
+                    </td>
+                    <td>
+                      <p class="mb-0 ms-1 text-begin">{{ "${:,.0f}".format(s['Cost']) }}</p>
+                    </td>
+                    <td>
+                      <p class="mb-0 ms-1 text-begin">{{ "{:,.1f}%".format(s['percent']*100) }}</p>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   {% include 'includes/footer.html' %}
 
@@ -101,46 +145,46 @@
 
 <script src="/static/assets/js/plugins/chartjs.min.js"></script>
 <script>
-    var ctx1 = document.getElementById("food-chart").getContext("2d");
-    new Chart(ctx1, {
-        type: "pie",
-        data: {
-            labels: {{ category_items | safe }},
-            datasets: [{
-                label: "Food Costs",
-                data: {{ category_values | safe }},
-                backgroundColor: [
-                    "rgba(233, 30, 99, 1)",
-                    "rgba(123, 128, 154, 1)",
-                    "rgba(26, 115, 232, 1)",
-                    "rgba(190, 177, 106, 0.27)",
-                    "rgba(244, 67, 53, 1)",
-                    "rgba(76, 175, 80, 1)",
-                    "rgba(255, 152, 0, 1)",
-                    "rgba(64, 64, 64, 1)",
-                ],
-                borderColor: [
-                    "rgba(233, 30, 99, 1)",
-                    "rgba(123, 128, 154, 1)",
-                    "rgba(26, 115, 232, 1)",
-                    "rgba(190, 177, 106, 0.27)",
-                    "rgba(244, 67, 53, 1)",
-                    "rgba(76, 175, 80, 1)",
-                    "rgba(255, 152, 0, 1)",
-                    "rgba(64, 64, 64, 1)",
-                ],
-                borderWidth: 1,
-        }, ],
-      },
-        options: {
-        responsive: true,
-        plugins: {
-            legend: {
-                display: false,
-            }
-        },
+  var ctx1 = document.getElementById("food-chart").getContext("2d");
+  new Chart(ctx1, {
+    type: "pie",
+    data: {
+      labels: {{ category_items | safe }},
+      datasets: [{
+        label: "Food Costs",
+        data: {{ category_values | safe }},
+        backgroundColor: [
+          "rgba(233, 30, 99, 1)",
+          "rgba(123, 128, 154, 1)",
+          "rgba(26, 115, 232, 1)",
+          "rgba(190, 177, 106, 0.27)",
+          "rgba(244, 67, 53, 1)",
+          "rgba(76, 175, 80, 1)",
+          "rgba(255, 152, 0, 1)",
+          "rgba(64, 64, 64, 1)",
+        ],
+        borderColor: [
+          "rgba(233, 30, 99, 1)",
+          "rgba(123, 128, 154, 1)",
+          "rgba(26, 115, 232, 1)",
+          "rgba(190, 177, 106, 0.27)",
+          "rgba(244, 67, 53, 1)",
+          "rgba(76, 175, 80, 1)",
+          "rgba(255, 152, 0, 1)",
+          "rgba(64, 64, 64, 1)",
+        ],
+        borderWidth: 1,
+      }, ],
     },
-    });
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          display: false,
+        }
+      },
+    },
+  });
 
 
 </script>

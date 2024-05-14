@@ -206,37 +206,37 @@ def purchasing():
     ytd_wine_cost = [x[1] for x in ytd_wine_cost_query]
 
 
-    ytd_food_sales = get_category_sales(
+    food_sales_table = get_category_sales(
         fiscal_dates["start_year"],
         fiscal_dates["start_day"],
         food_sales_list,
         session["store_list"],
     )
-    ytd_beer_sales = get_category_sales(
+    beer_sales_table = get_category_sales(
         fiscal_dates["start_year"],
         fiscal_dates["start_day"],
         beer_sales_list,
         session["store_list"],
     )
-    ytd_wine_sales = get_category_sales(
+    wine_sales_table = get_category_sales(
         fiscal_dates["start_year"],
         fiscal_dates["start_day"],
         wine_sales_list,
         session["store_list"],
     )
-    ytd_liquor_sales = get_category_sales(
+    liquor_sales_table = get_category_sales(
         fiscal_dates["start_year"],
         fiscal_dates["start_day"],
         liquor_sales_list,
         session["store_list"],
     )
-    ytd_period_food_sales = ytd_food_sales.groupby('period')['sales'].sum()
+    ytd_period_food_sales = food_sales_table.groupby('period')['sales'].sum()
     ytd_period_food_sales_list = ytd_period_food_sales.tolist()
-    ytd_period_beer_sales = ytd_beer_sales.groupby('period')['sales'].sum()
+    ytd_period_beer_sales = beer_sales_table.groupby('period')['sales'].sum()
     ytd_period_beer_sales_list = ytd_period_beer_sales.tolist()
-    ytd_period_wine_sales = ytd_wine_sales.groupby('period')['sales'].sum()
+    ytd_period_wine_sales = wine_sales_table.groupby('period')['sales'].sum()
     ytd_period_wine_sales_list = ytd_period_wine_sales.tolist()
-    ytd_period_liquor_sales = ytd_liquor_sales.groupby('period')['sales'].sum()
+    ytd_period_liquor_sales = liquor_sales_table.groupby('period')['sales'].sum()
     ytd_period_liquor_sales_list = ytd_period_liquor_sales.tolist()
 
     ytd_food_cost_pct = [x / y * 100 for x, y in zip(ytd_food_cost, ytd_period_food_sales_list)]
@@ -244,10 +244,10 @@ def purchasing():
     ytd_wine_cost_pct = [x / y * 100 for x, y in zip(ytd_wine_cost, ytd_period_wine_sales_list)]
     ytd_liquor_cost_pct = [x / y * 100 for x, y in zip(ytd_liquor_cost, ytd_period_liquor_sales_list)]
     
-    total_food_sales = ytd_food_sales["sales"].sum()
-    total_beer_sales = ytd_beer_sales["sales"].sum()
-    total_wine_sales = ytd_wine_sales["sales"].sum()
-    total_liquor_sales = ytd_liquor_sales["sales"].sum()
+    total_food_sales = food_sales_table["sales"].sum()
+    total_beer_sales = beer_sales_table["sales"].sum()
+    total_wine_sales = wine_sales_table["sales"].sum()
+    total_liquor_sales = liquor_sales_table["sales"].sum()
 
     ic(locals())
 
