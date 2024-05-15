@@ -1804,15 +1804,20 @@ def support():
         user_table["login_count"] / user_table["days_since_confirmed"] * 28
     ).round(1)
     no_login = user_table[user_table["last_login_at"].isnull()]
+    no_login = no_login.sort_values(by=["confirmed_at"], ascending=True)
     lapsed_users = user_table[
         user_table["last_login_at"] < TODAY - timedelta(days=30)
-    ].sort_values(by=["last_login_at"], ascending=False)
+    ].sort_values(by=["last_login_at"], ascending=True)
     top_users = (
         user_table[user_table["last_login_at"].notnull()]
         .sort_values(by=["avg_login"], ascending=False)
         .head(25)
     )
-    users_this_week = user_table[user_table["last_login_at"] >= TODAY - timedelta(days=7)]
+    users_this_week = user_table[
+        user_table["last_login_at"] >= TODAY - timedelta(days=7)
+    ]
+    # sort by last login
+    users_this_week = users_this_week.sort_values(by=["last_login_at"], ascending=False)
 
     query = (
         db.session.query(StockCount.store, StockCount.item)
