@@ -103,6 +103,11 @@ class Users(db.Model, UserMixin):
         "Restaurants", secondary=stores_users, backref="users", lazy=True
     )
 
+    def __str__(self):
+        return f"{self.first_name}, {self.last_name}, {self.email}, {self.active}, {self.roles}, {self.stores}"
+    
+    
+
 
 user_datastore = SQLAlchemySessionUserDatastore(db.session, Users, Roles)
 security = Security()

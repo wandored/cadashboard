@@ -21,7 +21,7 @@
             <thead>
               <tr>
                 <th scope="col">USER</th>
-                <th scope="col">AVG LOGINS/PERIOD</th>
+                <th scope="col">LAST LOGIN</th>
               </tr>
             </thead>
             <tbody>
@@ -29,7 +29,7 @@
               <tr>
                 <th scope="row">{{ v.first_name }} {{ v.last_name }}</th>
                 <td>
-                  <p class="mb-0 ms-1 text-begin">{{ v.avg_login }}</p>
+                  <p class="mb-0 ms-1 text-begin">{{ v.current_login_at }}</p>
                 </td>
               </tr>
               {% endfor %}

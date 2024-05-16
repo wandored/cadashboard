@@ -1778,9 +1778,10 @@ def support():
             Users.active,
             Users.confirmed_at,
             Users.last_login_at,
+            Users.current_login_at,
             Users.login_count,
         )
-        .order_by(Users.last_login_at.desc())
+        .order_by(Users.current_login_at.desc())
         .all()
     )
     user_table = pd.DataFrame.from_records(
@@ -1793,6 +1794,7 @@ def support():
             "active",
             "confirmed_at",
             "last_login_at",
+            "current_login_at",
             "login_count",
         ],
     )
@@ -1800,25 +1802,20 @@ def support():
     user_table["days_since_confirmed"] = user_table["confirmed_at"].apply(
         lambda x: (TODAY - x).days
     )
-    user_table["avg_login"] = (
-        user_table["login_count"] / user_table["days_since_confirmed"] * 28
-    ).round(1)
-    no_login = user_table[user_table["last_login_at"].isnull()]
+    no_login = user_table[user_table["current_login_at"].isnull()]
     no_login = no_login.sort_values(by=["confirmed_at"], ascending=True)
     lapsed_users = user_table[
-        user_table["last_login_at"] < TODAY - timedelta(days=30)
-    ].sort_values(by=["last_login_at"], ascending=True)
-    top_users = (
-        user_table[user_table["last_login_at"].notnull()]
-        .sort_values(by=["avg_login"], ascending=False)
-        .head(25)
-    )
+        user_table["current_login_at"] < TODAY - timedelta(days=30)
+    ].sort_values(by=["current_login_at"], ascending=True)
     users_this_week = user_table[
-        user_table["last_login_at"] >= TODAY - timedelta(days=7)
+        user_table["current_login_at"] >= TODAY - timedelta(days=7)
     ]
     # sort by last login
-    users_this_week = users_this_week.sort_values(by=["last_login_at"], ascending=False)
+    users_this_week = users_this_week.sort_values(
+        by=["current_login_at"], ascending=False
+    )
 
+    # DO NOT USE items on stock count
     query = (
         db.session.query(StockCount.store, StockCount.item)
         .filter(
@@ -2183,61 +2180,4 @@ def stone(store_id):
         pdf.output(dest="S").encode("latin-1"),
         mimetype="application/pdf",
         headers={"Content-Disposition": "attachment;filename=stone_claw_prices.pdf"},
-    )
-
-
-@blueprint.route("/users/", methods=["GET", "POST"])
-@login_required
-def users():
-    # user_list = get_user_list()
-    # ask user to select directory to save file
-    #    file_path = filedialog.askdirectory()
-    #    # export user_list to csv file
-    #    with open(f"{file_path}/user_list.csv", "w", newline="") as file:
-    #        writer = csv.writer(file)
-    #        writer.writerow(["ID", "Email", "Active", "Confirmed", "Last Login", "Login Count"])
-    #        for row in user_list:
-    #            writer.writerow(row)
-    #
-    #    return redirect(url_for("home_blueprint.support"))
-
-    # format pdf page
-    pdf_date = TODAY.strftime("%A, %B-%d")
-    pdf = FPDF()
-    pdf.add_page()
-    page_width = pdf.w - 2 * pdf.l_margin
-    pdf.set_font("Times", "B", 14.0)
-    pdf.cell(page_width, 0.0, "User Activity List", align="C")
-    pdf.ln(5)
-    pdf.cell(page_width, 0.0, pdf_date, align="C")
-    pdf.ln(5)
-
-    pdf.set_font("Courier", "", 12)
-    col_width = page_width / 4
-    id_width = page_width / 8
-    pdf.ln(1)
-    th = pdf.font_size + 1
-
-    pdf.cell(col_width, th, str("Email"), border=1)
-    pdf.cell(id_width, th, str("Active"), border=1)
-    pdf.cell(col_width, th, str("Confirimed"), border=1)
-    pdf.cell(col_width, th, str("Last Login"), border=1)
-    pdf.cell(col_width, th, str("Login Count"), border=1)
-    pdf.ln(th)
-
-    for v in user_table:
-        pdf.cell(col_width, th, str(v["email"]), border=1)
-        pdf.cell(id_width, th, str(v["active"]), border=1)
-        pdf.cell(col_width, th, str(v["confirmed_at"]), border=1)
-        pdf.cell(col_width, th, str(v["last_login_at"]), border=1)
-        pdf.cell(col_width, th, str(v["login_count"]), border=1)
-        pdf.ln(th)
-
-    pdf.ln(5)
-    pdf.cell(page_width, 0.0, "- end of report -", align="C")
-
-    return Response(
-        pdf.output(dest="S").encode("latin-1"),
-        mimetype="application/pdf",
-        headers={"Content-Disposition": "attachment;filename=user_activity_report.pdf"},
     )
