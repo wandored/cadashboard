@@ -15,7 +15,7 @@ from flask_security.decorators import roles_accepted
 from fpdf import FPDF
 from icecream import ic
 from pandas._libs.tslibs import period  # noqa: F401
-from sqlalchemy import func
+from sqlalchemy import func, and_
 
 from dashapp.authentication.forms import (
     DateForm,
@@ -102,12 +102,29 @@ def index():
         session["store_list"] = tuple([x.id for x in data])
         if 98 in session["store_list"] and 99 in session["store_list"]:
             session["store_list"] = tuple(
-                [19, 9, 4, 11, 17, 16, 10, 5, 18, 12, 14, 3, 6, 15, 13]
+                store.id
+                for store in Restaurants.query.filter(Restaurants.active == True)  # noqa E712
+                .order_by(Restaurants.name)
+                .all()
             )
         elif 99 in session["store_list"]:
-            session["store_list"] = tuple([19, 9, 4, 11, 17, 16])
+            session["store_list"] = tuple(
+                store.id
+                for store in Restaurants.query.filter(
+                    and_(
+                        Restaurants.active == True, Restaurants.concept == "Steakhouse"
+                    )  # noqa E712
+                )
+                .order_by(Restaurants.name)
+                .all()
+            )
         elif 98 in session["store_list"]:
-            session["store_list"] = tuple([10, 5, 18, 12, 14, 3, 6, 15, 13])
+            session["store_list"] = tuple(
+                store.id
+                for store in Restaurants.query.filter(
+                    and_(Restaurants.active == True, Restaurants.concept == "Casual")
+                )
+            )
         return redirect(url_for("home_blueprint.index"))
 
     if form4.submit4.data and form4.validate():
@@ -385,12 +402,29 @@ def store(store_id):
         session["store_list"] = tuple([x.id for x in data])
         if 98 in session["store_list"] and 99 in session["store_list"]:
             session["store_list"] = tuple(
-                [19, 9, 4, 11, 17, 16, 10, 5, 18, 12, 14, 3, 6, 15, 13]
+                store.id
+                for store in Restaurants.query.filter(Restaurants.active == True)  # noqa E712
+                .order_by(Restaurants.name)
+                .all()
             )
         elif 99 in session["store_list"]:
-            session["store_list"] = tuple([19, 9, 4, 11, 17, 16])
+            session["store_list"] = tuple(
+                store.id
+                for store in Restaurants.query.filter(
+                    and_(
+                        Restaurants.active == True, Restaurants.concept == "Steakhouse"
+                    )  # noqa E712
+                )
+                .order_by(Restaurants.name)
+                .all()
+            )
         elif 98 in session["store_list"]:
-            session["store_list"] = tuple([10, 5, 18, 12, 14, 3, 6, 15, 13])
+            session["store_list"] = tuple(
+                store.id
+                for store in Restaurants.query.filter(
+                    and_(Restaurants.active == True, Restaurants.concept == "Casual")
+                )
+            )
         for x in data:
             # select only 1 store for store page
             if x.id in session["store_list"]:
@@ -1561,17 +1595,35 @@ def marketing():
         session["store_list"] = tuple([x.id for x in data])
         if 98 in session["store_list"] and 99 in session["store_list"]:
             session["store_list"] = tuple(
-                [19, 9, 4, 11, 17, 16, 10, 5, 18, 12, 14, 3, 6, 15, 13]
+                store.id
+                for store in Restaurants.query.filter(Restaurants.active == True)  # noqa E712
+                .order_by(Restaurants.name)
+                .all()
             )
         elif 99 in session["store_list"]:
-            session["store_list"] = tuple([19, 9, 4, 11, 17, 16])
+            session["store_list"] = tuple(
+                store.id
+                for store in Restaurants.query.filter(
+                    and_(
+                        Restaurants.active == True, Restaurants.concept == "Steakhouse"
+                    )  # noqa E712
+                )
+                .order_by(Restaurants.name)
+                .all()
+            )
         elif 98 in session["store_list"]:
-            session["store_list"] = tuple([10, 5, 18, 12, 14, 3, 6, 15, 13])
+            session["store_list"] = tuple(
+                store.id
+                for store in Restaurants.query.filter(
+                    and_(Restaurants.active == True, Restaurants.concept == "Casual")
+                )
+            )
         for x in data:
             # select only 1 store for store page
             if x.id in session["store_list"]:
                 store_id = x.id
                 break
+        session["date_selected"] = fiscal_dates["start_day"]
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
     if form4.submit4.data and form4.validate():
@@ -1744,12 +1796,29 @@ def support():
         session["store_list"] = tuple([x.id for x in data])
         if 98 in session["store_list"] and 99 in session["store_list"]:
             session["store_list"] = tuple(
-                [19, 9, 4, 11, 17, 16, 10, 5, 18, 12, 14, 3, 6, 15, 13]
+                store.id
+                for store in Restaurants.query.filter(Restaurants.active == True)  # noqa E712
+                .order_by(Restaurants.name)
+                .all()
             )
         elif 99 in session["store_list"]:
-            session["store_list"] = tuple([19, 9, 4, 11, 17, 16])
+            session["store_list"] = tuple(
+                store.id
+                for store in Restaurants.query.filter(
+                    and_(
+                        Restaurants.active == True, Restaurants.concept == "Steakhouse"
+                    )  # noqa E712
+                )
+                .order_by(Restaurants.name)
+                .all()
+            )
         elif 98 in session["store_list"]:
-            session["store_list"] = tuple([10, 5, 18, 12, 14, 3, 6, 15, 13])
+            session["store_list"] = tuple(
+                store.id
+                for store in Restaurants.query.filter(
+                    and_(Restaurants.active == True, Restaurants.concept == "Casual")
+                )
+            )
         for x in data:
             # select only 1 store for store page
             if x.id in session["store_list"]:
@@ -1858,12 +1927,29 @@ def profile():
         session["store_list"] = tuple([x.id for x in data])
         if 98 in session["store_list"] and 99 in session["store_list"]:
             session["store_list"] = tuple(
-                [19, 9, 4, 11, 17, 16, 10, 5, 18, 12, 14, 3, 6, 15, 13]
+                store.id
+                for store in Restaurants.query.filter(Restaurants.active == True)  # noqa E712
+                .order_by(Restaurants.name)
+                .all()
             )
         elif 99 in session["store_list"]:
-            session["store_list"] = tuple([19, 9, 4, 11, 17, 16])
+            session["store_list"] = tuple(
+                store.id
+                for store in Restaurants.query.filter(
+                    and_(
+                        Restaurants.active == True, Restaurants.concept == "Steakhouse"
+                    )  # noqa E712
+                )
+                .order_by(Restaurants.name)
+                .all()
+            )
         elif 98 in session["store_list"]:
-            session["store_list"] = tuple([10, 5, 18, 12, 14, 3, 6, 15, 13])
+            session["store_list"] = tuple(
+                store.id
+                for store in Restaurants.query.filter(
+                    and_(Restaurants.active == True, Restaurants.concept == "Casual")
+                )
+            )
         return redirect(url_for("home_blueprint.profile"))
 
     if form4.submit4.data and form4.validate():

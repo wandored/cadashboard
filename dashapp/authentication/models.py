@@ -71,6 +71,7 @@ class Restaurants(db.Model):
     name = db.Column(db.String(64), unique=True)
     toast_id = db.Column(db.Integer)
     active = db.Column(db.Boolean())
+    concept = db.Column(db.String(64))
 
     # __str__ is required by Flask-Admin, so we can have human-readable values for the Role when editing a User.
     # If we were using Python 2.7, this would be __unicode__ instead.
@@ -456,14 +457,16 @@ class LaborTotals(db.Model):
     total_dollars = db.Column(db.Integer)
 
 
-class Menuitems(db.Model):
-    __tablename__ = "menuitems"
+class MenuItemSales(db.Model):
+    __tablename__ = "menuitem_item_sales"
 
     store = db.Column(db.String, primary_key=True)
+    concept = db.Column(db.String, primary_key=True)
     menuitem = db.Column(db.String, primary_key=True)
+    category = db.Column(db.String)
     date = db.Column(db.Date)
-    total_sales = db.Column(db.Float)
-    total_count = db.Column(db.Integer)
+    sales_amount = db.Column(db.Float)
+    sales_count = db.Column(db.Integer)
 
 
 class Purchases(db.Model):
