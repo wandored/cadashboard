@@ -657,3 +657,11 @@ class SalesCarryout(db.Model):
     category = db.Column(db.String)
     quantity = db.Column(db.Float)
     amount = db.Column(db.Integer)
+
+
+class SalesAccount(db.Model):
+    __tablename__ = "sales_account"
+    name = db.Column(db.String, primary_key=True)
+    category = db.Column(db.String)
+    glaccount = db.Column(db.String)
+    sales_type = db.Column(db.String)

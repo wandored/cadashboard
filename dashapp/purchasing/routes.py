@@ -7,8 +7,8 @@ from flask import redirect, render_template, session, url_for
 
 # from flask.helpers import url_for
 from flask_security import login_required
-from sqlalchemy import func, and_
 from icecream import ic
+from sqlalchemy import and_, func
 
 from dashapp.authentication.forms import (
     DateForm,
@@ -18,13 +18,14 @@ from dashapp.authentication.forms import (
     StoreForm,
 )
 from dashapp.authentication.models import (
-    Restaurants,
     Purchases,
+    Restaurants,
+    SalesAccount,
     db,
 )
 from dashapp.config import Config
-from dashapp.purchasing import blueprint
 from dashapp.home.util import get_category_sales
+from dashapp.purchasing import blueprint
 from dashapp.purchasing.util import (
     get_category_costs,
     get_category_topten,
@@ -97,63 +98,62 @@ def purchasing():
         print(store_id)
         return redirect(url_for("home_blueprint.stone", store_id=store_id))
 
-    food_list = ["Beef", "Food Other", "Dairy", "Pork", "Poultry", "Produce", "Fish"]
-    food_sales_list = [
-        "Additions",
-        "ADD ON",
-        "APPETIZER",
-        "APPETIZERS",
-        "APPS",
-        "BEVERAGE",
-        "BEVERAGES",
-        "Big Game Menu",
-        "Brunch Entree",
-        "CATERING",
-        "Christmas Entree",
-        "Christmas Sides",
-        "Dessert",
-        "DESSERTS",
-        "ENTREE",
-        "ENTREES",
-        "ENTRE",
-        "Event Menu $25",
-        "Event Menu $30",
-        "Kid Meal",
-        "New Years Eve Party Menu",
-        "Private Dining",
-        "Salad",
-        "SALADS",
-        "Side",
-        "SIDES",
-        "SIDE ORDERS" "SOUPS/SALADS",
-        "Valentines Features",
-        "VEGETABLE",
-        "Special Events",
-    ]
-    beer_sales_list = [
-        "BEER",
-        "BEER 1000",
-        "Beer",
-    ]
-    wine_sales_list = [
-        "WINE",
-        "Wine",
-    ]
-    liquor_sales_list = [
-        "LIQUOR",
-        "Liquor",
-    ]
+    food_category_list = (
+        db.session.query(Purchases.category2)
+        .filter(Purchases.category1 == "Food")
+        .all()
+    )
+    food_category_list = [x[0] for x in food_category_list]
+    food_category_list = list(set(food_category_list))
+    food_category_list = [x for x in food_category_list if x is not None]
+    food_category_list.sort()
+
+    food_sales_accounts = (
+        db.session.query(SalesAccount.category)
+        .filter(SalesAccount.sales_type == "Food Sales")
+        .all()
+    )
+    food_sales_accounts = [x[0] for x in food_sales_accounts]
+    food_sales_accounts = list(set(food_sales_accounts))
+    food_sales_accounts.sort()
+
+    beer_sales_accounts = (
+        db.session.query(SalesAccount.category)
+        .filter(SalesAccount.sales_type == "Beer Sales")
+        .all()
+    )
+    beer_sales_accounts = [x[0] for x in beer_sales_accounts]
+    beer_sales_accounts = list(set(beer_sales_accounts))
+    beer_sales_accounts.sort()
+
+    wine_sales_accounts = (
+        db.session.query(SalesAccount.category)
+        .filter(SalesAccount.sales_type == "Wine Sales")
+        .all()
+    )
+    wine_sales_accounts = [x[0] for x in wine_sales_accounts]
+    wine_sales_accounts = list(set(wine_sales_accounts))
+    wine_sales_accounts.sort()
+
+    liquor_sales_accounts = (
+        db.session.query(SalesAccount.category)
+        .filter(SalesAccount.sales_type == "Liquor Sales")
+        .all()
+    )
+    liquor_sales_accounts = [x[0] for x in liquor_sales_accounts]
+    liquor_sales_accounts = list(set(liquor_sales_accounts))
+    liquor_sales_accounts.sort()
 
     # Current period purchases
     top_ten = get_category_topten(
-        food_list,
+        food_category_list,
         fiscal_dates["start_period"],
         fiscal_dates["start_day"],
         session["store_list"],
     )
 
     category_costs = get_category_costs(
-        food_list,
+        food_category_list,
         fiscal_dates["start_period"],
         fiscal_dates["start_day"],
         session["store_list"],
@@ -165,7 +165,7 @@ def purchasing():
     category_costs.set_index("Account", inplace=True)
 
     top_ten_vendor = get_vendor_topten(
-        food_list,
+        food_category_list,
         fiscal_dates["start_period"],
         fiscal_dates["start_day"],
         session["store_list"],
@@ -199,7 +199,7 @@ def purchasing():
         )
 
     ytd_food_cost_query = get_period_category_costs(
-        food_list,
+        food_category_list,
         fiscal_dates["start_year"],
         fiscal_dates["start_day"],
         session["store_list"],
@@ -231,25 +231,25 @@ def purchasing():
     food_sales_table = get_category_sales(
         fiscal_dates["start_year"],
         fiscal_dates["start_day"],
-        food_sales_list,
+        food_sales_accounts,
         session["store_list"],
     )
     beer_sales_table = get_category_sales(
         fiscal_dates["start_year"],
         fiscal_dates["start_day"],
-        beer_sales_list,
+        beer_sales_accounts,
         session["store_list"],
     )
     wine_sales_table = get_category_sales(
         fiscal_dates["start_year"],
         fiscal_dates["start_day"],
-        wine_sales_list,
+        wine_sales_accounts,
         session["store_list"],
     )
     liquor_sales_table = get_category_sales(
         fiscal_dates["start_year"],
         fiscal_dates["start_day"],
-        liquor_sales_list,
+        liquor_sales_accounts,
         session["store_list"],
     )
     ytd_period_food_sales = food_sales_table.groupby("period")["sales"].sum()
