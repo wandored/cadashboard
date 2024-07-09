@@ -3,21 +3,38 @@
 routes for supplies pages
 """
 
-import pandas as pd
-from fpdf import FPDF
-from flask.helpers import url_for
-from flask_security.decorators import roles_accepted
-from pandas.core.algorithms import isin
-from dashapp.supply import blueprint
-from flask import flash, render_template, session, redirect, url_for
-from flask.wrappers import Response
-from dashapp.purchasing.util import *
-from dashapp.config import Config
-from flask_security import login_required, current_user
 from datetime import datetime, timedelta
-from dashapp.authentication.forms import *
-from dashapp.authentication.models import *
-from sqlalchemy import and_, or_, func
+
+import pandas as pd
+from flask import flash, redirect, render_template, session, url_for
+from flask.helpers import url_for
+from flask.wrappers import Response
+from flask_security import current_user, login_required
+from flask_security.decorators import roles_accepted
+from fpdf import FPDF
+from pandas.core.algorithms import isin
+from sqlalchemy import and_, func, or_
+
+from dashapp.authentication.forms import (
+    DateForm,
+    LobsterForm,
+    PotatoForm,
+    StoneForm,
+    StoreForm,
+)
+from dashapp.authentication.models import Restaurants
+from dashapp.config import Config
+from dashapp.purchasing.util import (
+    get_category_costs,
+    get_category_topten,
+    get_cost_per_store,
+    get_cost_per_vendor,
+    get_restaurant_topten,
+    get_vendor_topten,
+    period_purchases,
+    set_dates,
+)
+from dashapp.supply import blueprint
 
 
 @blueprint.route("/supplies/", methods=["GET", "POST"])
@@ -45,12 +62,30 @@ def supplies():
         data = form3.stores.data
         session["store_list"] = tuple([x.id for x in data])
         if 98 in session["store_list"] and 99 in session["store_list"]:
-            session["store_list"] = tuple([19, 9, 4, 11, 17, 16, 10, 5, 18, 12, 14, 3, 6, 15, 13])
+            session["store_list"] = tuple(
+                store.id
+                for store in Restaurants.query.filter(Restaurants.active == True)  # noqa E712
+                .order_by(Restaurants.name)
+                .all()
+            )
         elif 99 in session["store_list"]:
-            session["store_list"] = tuple([19, 9, 4, 11, 17, 16])
+            session["store_list"] = tuple(
+                store.id
+                for store in Restaurants.query.filter(
+                    and_(
+                        Restaurants.active == True, Restaurants.concept == "Steakhouse"
+                    )
+                )
+                .order_by(Restaurants.name)
+                .all()
+            )
         elif 98 in session["store_list"]:
-            session["store_list"] = tuple([10, 5, 18, 12, 14, 3, 6, 15, 13])
-        store_id = form3.stores.data.id
+            session["store_list"] = tuple(
+                store.id
+                for store in Restaurants.query.filter(
+                    and_(Restaurants.active == True, Restaurants.concept == "Casual")
+                )
+            )
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
     category_list = [
@@ -135,12 +170,30 @@ def smallwares():
         data = form3.stores.data
         session["store_list"] = tuple([x.id for x in data])
         if 98 in session["store_list"] and 99 in session["store_list"]:
-            session["store_list"] = tuple([19, 9, 4, 11, 17, 16, 10, 5, 18, 12, 14, 3, 6, 15, 13])
+            session["store_list"] = tuple(
+                store.id
+                for store in Restaurants.query.filter(Restaurants.active == True)  # noqa E712
+                .order_by(Restaurants.name)
+                .all()
+            )
         elif 99 in session["store_list"]:
-            session["store_list"] = tuple([19, 9, 4, 11, 17, 16])
+            session["store_list"] = tuple(
+                store.id
+                for store in Restaurants.query.filter(
+                    and_(
+                        Restaurants.active == True, Restaurants.concept == "Steakhouse"
+                    )
+                )
+                .order_by(Restaurants.name)
+                .all()
+            )
         elif 98 in session["store_list"]:
-            session["store_list"] = tuple([10, 5, 18, 12, 14, 3, 6, 15, 13])
-        store_id = form3.stores.data.id
+            session["store_list"] = tuple(
+                store.id
+                for store in Restaurants.query.filter(
+                    and_(Restaurants.active == True, Restaurants.concept == "Casual")
+                )
+            )
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
     category_list = [
@@ -206,12 +259,30 @@ def linen():
         data = form3.stores.data
         session["store_list"] = tuple([x.id for x in data])
         if 98 in session["store_list"] and 99 in session["store_list"]:
-            session["store_list"] = tuple([19, 9, 4, 11, 17, 16, 10, 5, 18, 12, 14, 3, 6, 15, 13])
+            session["store_list"] = tuple(
+                store.id
+                for store in Restaurants.query.filter(Restaurants.active == True)  # noqa E712
+                .order_by(Restaurants.name)
+                .all()
+            )
         elif 99 in session["store_list"]:
-            session["store_list"] = tuple([19, 9, 4, 11, 17, 16])
+            session["store_list"] = tuple(
+                store.id
+                for store in Restaurants.query.filter(
+                    and_(
+                        Restaurants.active == True, Restaurants.concept == "Steakhouse"
+                    )
+                )
+                .order_by(Restaurants.name)
+                .all()
+            )
         elif 98 in session["store_list"]:
-            session["store_list"] = tuple([10, 5, 18, 12, 14, 3, 6, 15, 13])
-        store_id = form3.stores.data.id
+            session["store_list"] = tuple(
+                store.id
+                for store in Restaurants.query.filter(
+                    and_(Restaurants.active == True, Restaurants.concept == "Casual")
+                )
+            )
         return redirect(url_for("home_blueprint.store", store_id=store_id))
 
     category_list = ["Linen"]
