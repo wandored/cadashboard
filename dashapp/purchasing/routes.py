@@ -108,41 +108,41 @@ def purchasing():
     food_category_list = [x for x in food_category_list if x is not None]
     food_category_list.sort()
 
-    food_sales_accounts = (
-        db.session.query(SalesAccount.category)
-        .filter(SalesAccount.sales_type == "Food Sales")
-        .all()
-    )
-    food_sales_accounts = [x[0] for x in food_sales_accounts]
-    food_sales_accounts = list(set(food_sales_accounts))
-    food_sales_accounts.sort()
+    # food_sales_accounts = (
+    #     db.session.query(SalesAccount.category)
+    #     .filter(SalesAccount.sales_type == "Food Sales")
+    #     .all()
+    # )
+    # food_sales_accounts = [x[0] for x in food_sales_accounts]
+    # food_sales_accounts = list(set(food_sales_accounts))
+    # food_sales_accounts.sort()
 
-    beer_sales_accounts = (
-        db.session.query(SalesAccount.category)
-        .filter(SalesAccount.sales_type == "Beer Sales")
-        .all()
-    )
-    beer_sales_accounts = [x[0] for x in beer_sales_accounts]
-    beer_sales_accounts = list(set(beer_sales_accounts))
-    beer_sales_accounts.sort()
+    # beer_sales_accounts = (
+    #     db.session.query(SalesAccount.category)
+    #     .filter(SalesAccount.sales_type == "Beer Sales")
+    #     .all()
+    # )
+    # beer_sales_accounts = [x[0] for x in beer_sales_accounts]
+    # beer_sales_accounts = list(set(beer_sales_accounts))
+    # beer_sales_accounts.sort()
 
-    wine_sales_accounts = (
-        db.session.query(SalesAccount.category)
-        .filter(SalesAccount.sales_type == "Wine Sales")
-        .all()
-    )
-    wine_sales_accounts = [x[0] for x in wine_sales_accounts]
-    wine_sales_accounts = list(set(wine_sales_accounts))
-    wine_sales_accounts.sort()
+    # wine_sales_accounts = (
+    #     db.session.query(SalesAccount.category)
+    #     .filter(SalesAccount.sales_type == "Wine Sales")
+    #     .all()
+    # )
+    # wine_sales_accounts = [x[0] for x in wine_sales_accounts]
+    # wine_sales_accounts = list(set(wine_sales_accounts))
+    # wine_sales_accounts.sort()
 
-    liquor_sales_accounts = (
-        db.session.query(SalesAccount.category)
-        .filter(SalesAccount.sales_type == "Liquor Sales")
-        .all()
-    )
-    liquor_sales_accounts = [x[0] for x in liquor_sales_accounts]
-    liquor_sales_accounts = list(set(liquor_sales_accounts))
-    liquor_sales_accounts.sort()
+    # liquor_sales_accounts = (
+    #     db.session.query(SalesAccount.category)
+    #     .filter(SalesAccount.sales_type == "Liquor Sales")
+    #     .all()
+    # )
+    # liquor_sales_accounts = [x[0] for x in liquor_sales_accounts]
+    # liquor_sales_accounts = list(set(liquor_sales_accounts))
+    # liquor_sales_accounts.sort()
 
     # Current period purchases
     top_ten = get_category_topten(
@@ -231,25 +231,25 @@ def purchasing():
     food_sales_table = get_category_sales(
         fiscal_dates["start_year"],
         fiscal_dates["start_day"],
-        food_sales_accounts,
+        "Food Sales",
         session["store_list"],
     )
     beer_sales_table = get_category_sales(
         fiscal_dates["start_year"],
         fiscal_dates["start_day"],
-        beer_sales_accounts,
+        "Beer Sales",
         session["store_list"],
     )
     wine_sales_table = get_category_sales(
         fiscal_dates["start_year"],
         fiscal_dates["start_day"],
-        wine_sales_accounts,
+        "Wine Sales",
         session["store_list"],
     )
     liquor_sales_table = get_category_sales(
         fiscal_dates["start_year"],
         fiscal_dates["start_day"],
-        liquor_sales_accounts,
+        "Liquor Sales",
         session["store_list"],
     )
     ytd_period_food_sales = food_sales_table.groupby("period")["sales"].sum()
