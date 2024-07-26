@@ -317,6 +317,7 @@ def index():
             float
         )
         table["labor_pct"] = table.dollars / table.sales
+        print(table.dollars, table.sales)
         table["labor_pct_ly"] = table.dollars_ly / table.sales_ly
         totals = table.sum()
 
@@ -332,7 +333,7 @@ def index():
 
     weekly_totals, weekly_table, weekly_top = build_sales_table(
         fiscal_dates["start_week"],
-        fiscal_dates["week_to_date"] + timedelta(days=1),
+        fiscal_dates["start_day"],
         fiscal_dates["start_week_ly"],
         fiscal_dates["week_to_date_ly"],
         "Week",
@@ -340,15 +341,16 @@ def index():
 
     period_totals, period_table, period_top = build_sales_table(
         fiscal_dates["start_period"],
-        fiscal_dates["period_to_date"] + timedelta(days=1),
+        fiscal_dates["start_day"],
         fiscal_dates["start_period_ly"],
         fiscal_dates["period_to_date_ly"],
         "Period",
     )
+    print(period_table)
 
     yearly_totals, yearly_table, yearly_top = build_sales_table(
         fiscal_dates["start_year"],
-        fiscal_dates["year_to_date"] + timedelta(days=1),
+        fiscal_dates["start_day"],
         fiscal_dates["start_year_ly"],
         fiscal_dates["year_to_date_ly"],
         "Year",
