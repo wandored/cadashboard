@@ -458,13 +458,20 @@ class LaborTotals(db.Model):
 
 
 class MenuItemSales(db.Model):
-    __tablename__ = "menuitem_item_sales"
+    __tablename__ = "menu_item_sales"
 
+    date = db.Column(db.Date, primary_key=True)
+    dow = db.Column(db.Integer)
+    week = db.Column(db.Integer)
+    period = db.Column(db.Integer)
+    year = db.Column(db.Integer)
+    store_id = db.Column(db.Integer, primary_key=True)
     store = db.Column(db.String, primary_key=True)
     concept = db.Column(db.String, primary_key=True)
     menuitem = db.Column(db.String, primary_key=True)
     category = db.Column(db.String)
-    date = db.Column(db.Date)
+    sales_type = db.Column(db.String)
+    glaccount = db.Column(db.String)
     sales_amount = db.Column(db.Float)
     sales_count = db.Column(db.Integer)
 
@@ -492,19 +499,20 @@ class Purchases(db.Model):
     company = db.Column(db.String)
 
 
-class SalesCategory(db.Model):
-    __tablename__ = "sales_category"
 
-    store = db.Column(db.String, primary_key=True)
-    id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.Date, primary_key=True)
-    dow = db.Column(db.Integer)
-    week = db.Column(db.Integer)
-    period = db.Column(db.Integer)
-    year = db.Column(db.Integer)
-    category = db.Column(db.String)
-    quantity = db.Column(db.Float)
-    amount = db.Column(db.Float)
+# class SalesCategory(db.Model):
+#     __tablename__ = "sales_category"
+
+#     store = db.Column(db.String, primary_key=True)
+#     id = db.Column(db.Integer, primary_key=True)
+#     date = db.Column(db.Date, primary_key=True)
+#     dow = db.Column(db.Integer)
+#     week = db.Column(db.Integer)
+#     period = db.Column(db.Integer)
+#     year = db.Column(db.Integer)
+#     category = db.Column(db.String)
+#     quantity = db.Column(db.Float)
+#     amount = db.Column(db.Float)
 
 
 class SalesDaypart(db.Model):
@@ -657,3 +665,11 @@ class SalesCarryout(db.Model):
     category = db.Column(db.String)
     quantity = db.Column(db.Float)
     amount = db.Column(db.Integer)
+
+
+class SalesAccount(db.Model):
+    __tablename__ = "sales_account"
+    name = db.Column(db.String, primary_key=True)
+    category = db.Column(db.String)
+    glaccount = db.Column(db.String)
+    sales_type = db.Column(db.String)

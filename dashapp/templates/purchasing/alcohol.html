@@ -72,7 +72,7 @@
     <div class="col-lg-4 col-md-6 mt-2 mb-2">
       <div class="card h-100 shadow-primary">
         <div class="card-body">
-          <h4 class="mb-0 ">Top 10 Food Items Period To Date</h4>
+          <h4 class="mb-0 ">Top 10 Alcolol Items Period To Date</h4>
           <div class="table-responsive table-hover">
             <table class="table-sm text-dark">
               <thead>
@@ -108,7 +108,7 @@
       <div class="card h-100 bg-gradient-light shadow-primary">
         <div class="card-body">
           <div class="chart">
-            <canvas id="food-chart" class="chart-canvas" height="100"></canvas>
+            <canvas id="alcohol-chart" class="chart-canvas" height="100"></canvas>
           </div>
         </div>
       </div>
@@ -116,7 +116,7 @@
     <div class="col-lg-4 col-md-6 mt-2 mb-2">
       <div class="card h-100 shadow-primary">
         <div class="card-body">
-          <h4 class="mb-0 ">Top 10 Food Vendors Period To Date</h4>
+          <h4 class="mb-0 ">Top 10 Alcohol Vendors Period To Date</h4>
           <div class="table-responsive table-hover">
             <table class="table-sm text-dark">
               <thead>
@@ -161,13 +161,13 @@
 
 <script src="/static/assets/js/plugins/chartjs.min.js"></script>
 <script>
-  var ctx1 = document.getElementById("food-chart").getContext("2d");
+  var ctx1 = document.getElementById("alcohol-chart").getContext("2d");
   new Chart(ctx1, {
     type: "pie",
     data: {
       labels: {{ category_items | safe }},
       datasets: [{
-        label: "Food Costs",
+        label: "Alcohol Costs",
         data: {{ category_values | safe }},
         backgroundColor: [
           "rgba(233, 30, 99, 1)",

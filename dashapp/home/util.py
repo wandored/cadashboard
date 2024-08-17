@@ -16,7 +16,7 @@ from dashapp.authentication.models import (
     PotatoLoadTimes,  # noqa: F401
     PotatoSales,
     Restaurants,
-    SalesCategory,
+    MenuItemSales,
     SalesCarryout,
     SalesRecordsDay,  # noqa: F401
     SalesRecordsPeriod,  # noqa: F401
@@ -212,31 +212,31 @@ def get_giftcard_redeem(start, end, store_list):
     return df
 
 
-def get_category_sales(start, end, categories, store_list):
+def get_category_sales(start, end, sales_type, store_list):
     query = (
         db.session.query(
-            SalesCategory.date,
-            SalesCategory.dow,
-            SalesCategory.week,
-            SalesCategory.period,
-            SalesCategory.year,
-            func.sum(SalesCategory.amount).label("sales"),
-            func.sum(SalesCategory.quantity).label("count"),
+            MenuItemSales.date,
+            MenuItemSales.dow,
+            MenuItemSales.week,
+            MenuItemSales.period,
+            MenuItemSales.year,
+            func.sum(MenuItemSales.sales_amount).label("sales"),
+            func.sum(MenuItemSales.sales_count).label("count"),
         )
-        .select_from(SalesCategory)
+        .select_from(MenuItemSales)
         .filter(
-            SalesCategory.date.between(start, end),
-            SalesCategory.id.in_(store_list),
-            SalesCategory.category.in_(categories),
+            MenuItemSales.date.between(start, end),
+            MenuItemSales.store_id.in_(store_list),
+            MenuItemSales.sales_type == sales_type,
         )
         .group_by(
-            SalesCategory.date,
-            SalesCategory.dow,
-            SalesCategory.week,
-            SalesCategory.period,
-            SalesCategory.year,
+            MenuItemSales.date,
+            MenuItemSales.dow,
+            MenuItemSales.week,
+            MenuItemSales.period,
+            MenuItemSales.year,
         )
-        .order_by(SalesCategory.date)
+        .order_by(MenuItemSales.date)
         .all()
     )
     df = pd.DataFrame.from_records(

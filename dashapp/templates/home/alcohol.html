@@ -1,819 +1,870 @@
-{% extends "layouts/base.html" %}
-
-{% block title %} {{ title }} {% endblock %} 
+{% extends "layouts/base.html" %} {% block title %} {{ title }} {% endblock %}
 
 <!-- Specific Page CSS goes HERE  -->
-{% block stylesheets %}{% endblock stylesheets %}
+{% block stylesheets %}{% endblock stylesheets %} {% block content %}
 
-{% block content %}
-
-  <div class="container-fluid py-4">
-    <div class="row min-vh-40 h-100">
+<div class="container-fluid py-4">
+  <div class="row min-vh-40 h-100">
     <!-- First Row -Charts -->
-      <h3>Steakhouse Restaurants</h3>
-      <div class="col-lg-4 col-md-6 mt-4 mb-4">
-        <div class="card z-index-2 ">
-          <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-            <div class="bg-gradient-primary shadow-primary border-radius-lg py-3 pe-1">
-              <div class="chart">
-                <canvas id="chart-wine" class="chart-canvas" height="170"></canvas>
-              </div>
+    <h3>Steakhouse Restaurants</h3>
+    <div class="col-lg-4 col-md-6 mt-4 mb-4">
+      <div class="card z-index-2">
+        <div
+          class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent"
+        >
+          <div
+            class="bg-gradient-primary shadow-primary border-radius-lg py-3 pe-1"
+          >
+            <div class="chart">
+              <canvas
+                id="chart-wine"
+                class="chart-canvas"
+                height="170"
+              ></canvas>
             </div>
           </div>
-          <div class="card-body">
+        </div>
+        <div class="card-body">
           <table class="table-responsive table-md">
             <thead>
-                <th scope="row">TOP 10 WINE VENDORS YTD</th>
+              <th scope="row">TOP 10 WINE VENDORS YTD</th>
               <tr>
                 <th scope="col">VENDOR</th>
                 <th scope="col">COST</th>
               </tr>
             </thead>
-              <tbody>
-                  {% for k, v in steakhouse_wine_vendor.iterrows() %}
-                    <tr>
-                      <th scope="row">{{ k }}</th>
-                      <td>
-                        <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v.cost) }}</p>
-                      </td>
-                    </tr>
-                  {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-4 col-md-6 mt-4 mb-4">
-        <div class="card z-index-2 ">
-          <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-            <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
-              <div class="chart">
-                <canvas id="chart-liquor" class="chart-canvas" height="170"></canvas>
-              </div>
-            </div>
-          </div>
-          <div class="card-body">
-          <table class="table-responsive table-md">
-            <thead>
-                <th scope="row">TOP 10 LIQUORS YTD</th>
+            <tbody>
+              {% for k, v in steakhouse_wine_vendor.iterrows() %}
               <tr>
-                <th scope="col">PRODUCT</th>
-                <th scope="col">COST</th>
+                <th scope="row">{{ k }}</th>
+                <td>
+                  <p class="mb-0 ms-1 text-begin">
+                    {{ "${:,.2f}".format(v.cost) }}
+                  </p>
+                </td>
               </tr>
-            </thead>
-              <tbody>
-                  {% for k, v in steakhouse_liquor_bottle.iterrows() %}
-                    <tr>
-                      <th scope="row">{{ k }}</th>
-                      <td>
-                        <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v.cost) }}</p>
-                      </td>
-                    </tr>
-                  {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-4 col-md-6 mt-4 mb-4">
-        <div class="card z-index-2 ">
-          <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-            <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
-              <div class="chart">
-                <canvas id="chart-beer" class="chart-canvas" height="170"></canvas>
-              </div>
-            </div>
-          </div>
-          <div class="card-body">
-          <table class="table-responsive table-md">
-            <thead>
-                <th scope="row">TOP 10 BEERS YTD</th>
-              <tr>
-                <th scope="col">PRODUCT</th>
-                <th scope="col">COST</th>
-              </tr>
-            </thead>
-              <tbody>
-                  {% for k, v in steakhouse_beer_bottle.iterrows() %}
-                    <tr>
-                      <th scope="row">{{ k }}</th>
-                      <td>
-                        <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v.cost) }}</p>
-                      </td>
-                    </tr>
-                  {% endfor %}
-              </tbody>
-            </table>
-          </div>
+              {% endfor %}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
-    <!-- Second Row -Charts -->
-    <div class="row mt-4">
-      <h3>Casual Restaurants</h3>
-      <div class="col-lg-4 col-md-6 mt-4 mb-4">
-        <div class="card z-index-2 ">
-          <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-            <div class="bg-gradient-primary shadow-primary border-radius-lg py-3 pe-1">
-              <div class="chart">
-                <canvas id="chart-wine_cas" class="chart-canvas" height="170"></canvas>
-              </div>
+    <div class="col-lg-4 col-md-6 mt-4 mb-4">
+      <div class="card z-index-2">
+        <div
+          class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent"
+        >
+          <div
+            class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1"
+          >
+            <div class="chart">
+              <canvas
+                id="chart-liquor"
+                class="chart-canvas"
+                height="170"
+              ></canvas>
             </div>
-          </div>
-          <div class="card-body">
-          <table class="table-responsive table-md">
-            <thead>
-                <th scope="row">TOP 10 WINE VENDORS YTD</th>
-              <tr>
-                <th scope="col">VENDOR</th>
-                <th scope="col">COST</th>
-              </tr>
-            </thead>
-              <tbody>
-                  {% for k, v in casual_wine_vendor.iterrows() %}
-                    <tr>
-                      <th scope="row">{{ k }}</th>
-                      <td>
-                        <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v.cost) }}</p>
-                      </td>
-                    </tr>
-                  {% endfor %}
-              </tbody>
-            </table>
           </div>
         </div>
-      </div>
-      <div class="col-lg-4 col-md-6 mt-4 mb-4">
-        <div class="card z-index-2 ">
-          <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-            <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
-              <div class="chart">
-                <canvas id="chart-liquor_cas" class="chart-canvas" height="170"></canvas>
-              </div>
-            </div>
-          </div>
-          <div class="card-body">
+        <div class="card-body">
           <table class="table-responsive table-md">
             <thead>
-                <th scope="row">TOP 10 LIQUORS YTD</th>
+              <th scope="row">TOP 10 LIQUORS YTD</th>
               <tr>
                 <th scope="col">PRODUCT</th>
                 <th scope="col">COST</th>
               </tr>
             </thead>
-              <tbody>
-                  {% for k, v in casual_liquor_bottle.iterrows() %}
-                    <tr>
-                      <th scope="row">{{ k }}</th>
-                      <td>
-                        <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v.cost) }}</p>
-                      </td>
-                    </tr>
-                  {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-4 col-md-6 mt-4 mb-4">
-        <div class="card z-index-2 ">
-          <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-            <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
-              <div class="chart">
-                <canvas id="chart-beer_cas" class="chart-canvas" height="170"></canvas>
-              </div>
-            </div>
-          </div>
-          <div class="card-body">
-          <table class="table-responsive table-md">
-            <thead>
-                <th scope="row">TOP 10 BEERS YTD</th>
+            <tbody>
+              {% for k, v in steakhouse_liquor_bottle.iterrows() %}
               <tr>
-                <th scope="col">PRODUCT</th>
-                <th scope="col">COST</th>
+                <th scope="row">{{ k }}</th>
+                <td>
+                  <p class="mb-0 ms-1 text-begin">
+                    {{ "${:,.2f}".format(v.cost) }}
+                  </p>
+                </td>
               </tr>
-            </thead>
-              <tbody>
-                  {% for k, v in casual_beer_bottle.iterrows() %}
-                    <tr>
-                      <th scope="row">{{ k }}</th>
-                      <td>
-                        <p class="mb-0 ms-1 text-begin">{{ "${:,.2f}".format(v.cost) }}</p>
-                      </td>
-                    </tr>
-                  {% endfor %}
-              </tbody>
-            </table>
-          </div>
+              {% endfor %}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
-
-    {% include 'includes/footer.html' %}
-
+    <div class="col-lg-4 col-md-6 mt-4 mb-4">
+      <div class="card z-index-2">
+        <div
+          class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent"
+        >
+          <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
+            <div class="chart">
+              <canvas
+                id="chart-beer"
+                class="chart-canvas"
+                height="170"
+              ></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <table class="table-responsive table-md">
+            <thead>
+              <th scope="row">TOP 10 BEERS YTD</th>
+              <tr>
+                <th scope="col">PRODUCT</th>
+                <th scope="col">COST</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for k, v in steakhouse_beer_bottle.iterrows() %}
+              <tr>
+                <th scope="row">{{ k }}</th>
+                <td>
+                  <p class="mb-0 ms-1 text-begin">
+                    {{ "${:,.2f}".format(v.cost) }}
+                  </p>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   </div>
+  <!-- Second Row -Charts -->
+  <div class="row mt-4">
+    <h3>Casual Restaurants</h3>
+    <div class="col-lg-4 col-md-6 mt-4 mb-4">
+      <div class="card z-index-2">
+        <div
+          class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent"
+        >
+          <div
+            class="bg-gradient-primary shadow-primary border-radius-lg py-3 pe-1"
+          >
+            <div class="chart">
+              <canvas
+                id="chart-wine_cas"
+                class="chart-canvas"
+                height="170"
+              ></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <table class="table-responsive table-md">
+            <thead>
+              <th scope="row">TOP 10 WINE VENDORS YTD</th>
+              <tr>
+                <th scope="col">VENDOR</th>
+                <th scope="col">COST</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for k, v in casual_wine_vendor.iterrows() %}
+              <tr>
+                <th scope="row">{{ k }}</th>
+                <td>
+                  <p class="mb-0 ms-1 text-begin">
+                    {{ "${:,.2f}".format(v.cost) }}
+                  </p>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4 col-md-6 mt-4 mb-4">
+      <div class="card z-index-2">
+        <div
+          class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent"
+        >
+          <div
+            class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1"
+          >
+            <div class="chart">
+              <canvas
+                id="chart-liquor_cas"
+                class="chart-canvas"
+                height="170"
+              ></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <table class="table-responsive table-md">
+            <thead>
+              <th scope="row">TOP 10 LIQUORS YTD</th>
+              <tr>
+                <th scope="col">PRODUCT</th>
+                <th scope="col">COST</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for k, v in casual_liquor_bottle.iterrows() %}
+              <tr>
+                <th scope="row">{{ k }}</th>
+                <td>
+                  <p class="mb-0 ms-1 text-begin">
+                    {{ "${:,.2f}".format(v.cost) }}
+                  </p>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4 col-md-6 mt-4 mb-4">
+      <div class="card z-index-2">
+        <div
+          class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent"
+        >
+          <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
+            <div class="chart">
+              <canvas
+                id="chart-beer_cas"
+                class="chart-canvas"
+                height="170"
+              ></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <table class="table-responsive table-md">
+            <thead>
+              <th scope="row">TOP 10 BEERS YTD</th>
+              <tr>
+                <th scope="col">PRODUCT</th>
+                <th scope="col">COST</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for k, v in casual_beer_bottle.iterrows() %}
+              <tr>
+                <th scope="row">{{ k }}</th>
+                <td>
+                  <p class="mb-0 ms-1 text-begin">
+                    {{ "${:,.2f}".format(v.cost) }}
+                  </p>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% include 'includes/footer.html' %}
+</div>
 
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
 
-  <script src="/static/assets/js/plugins/chartjs.min.js"></script>
-  <script>
-      
-    var ctx1 = document.getElementById("chart-wine").getContext("2d");
+<script src="/static/assets/js/plugins/chartjs.min.js"></script>
+<script>
 
-    new Chart(ctx1, {
-      type: "line",
-      data: {
-        labels: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13"],
-        datasets: [{
-          label: "Current",
-          tension: 0,
-          borderWidth: 0,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(255, 255, 255, 1)",
-          pointBorderColor: "transparent",
-          borderColor: "rgba(255, 255, 255, 1)",
-          borderWidth: 4,
-          backgroundColor: "transparent",
-          fill: true,
-          data: {{ steakhouse_wine_chart | safe }},
-          maxBarThickness: 6
-        }, {
-          label: "Last Year",
-          tension: 0,
-          borderWidth: 0,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(200, 200, 200, 1)",
-          pointBorderColor: "transparent",
-          borderColor: "rgba(200, 200, 200, 1)",
-          borderWidth: 4,
-          type: "line",
-          backgroundColor: "transparent",
-          fill: true,
-          data: {{ steakhouse_wine_chart_ly | safe }},
-          maxBarThickness: 6
-        }, ],
+  var ctx1 = document.getElementById("chart-wine").getContext("2d");
+
+  new Chart(ctx1, {
+    type: "line",
+    data: {
+      labels: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13"],
+      datasets: [{
+        label: "Current",
+        tension: 0,
+        borderWidth: 0,
+        pointRadius: 5,
+        pointBackgroundColor: "rgba(255, 255, 255, 1)",
+        pointBorderColor: "transparent",
+        borderColor: "rgba(255, 255, 255, 1)",
+        borderWidth: 4,
+        backgroundColor: "transparent",
+        fill: true,
+        data: {{ steakhouse_wine_chart | safe }},
+        maxBarThickness: 6
+      }, {
+        label: "Last Year",
+        tension: 0,
+        borderWidth: 0,
+        pointRadius: 5,
+        pointBackgroundColor: "rgba(200, 200, 200, 1)",
+        pointBorderColor: "transparent",
+        borderColor: "rgba(200, 200, 200, 1)",
+        borderWidth: 4,
+        type: "line",
+        backgroundColor: "transparent",
+        fill: true,
+        data: {{ steakhouse_wine_chart_ly | safe }},
+        maxBarThickness: 6
+      }, ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false,
+        },
+        title: {
+          display: true,
+          text: "Period Wine Purchases",
+        },
       },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          },
-          title: {
+      interaction: {
+        intersect: false,
+        mode: 'index',
+      },
+      scales: {
+        y: {
+          grid: {
+            drawBorder: false,
             display: true,
-            text: "Period Wine Purchases",
+            drawOnChartArea: true,
+            drawTicks: false,
+            borderDash: [5, 5],
+            color: 'rgba(255, 255, 255, .2)'
           },
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              padding: 10,
-              color: '#f8f9fa',
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-            },
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: false,
-              drawOnChartArea: false,
-              drawTicks: false,
-              borderDash: [5, 5]
-            },
-            ticks: {
-              display: true,
-              color: '#f8f9fa',
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-            }
-          },
-        },
-      },
-    });
-
-    var ctx2 = document.getElementById("chart-liquor").getContext("2d");
-
-    new Chart(ctx2, {
-      type: "line",
-      data: {
-        labels: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13"],
-        datasets: [{
-          label: "Current",
-          tension: 0,
-          borderWidth: 0,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(255, 255, 255, 1)",
-          pointBorderColor: "transparent",
-          borderColor: "rgba(255, 255, 255, 1)",
-          borderWidth: 4,
-          backgroundColor: "transparent",
-          fill: true,
-          data: {{ steakhouse_liquor_chart | safe }},
-          maxBarThickness: 6
-        }, {
-          label: "Last Year",
-          tension: 0,
-          borderWidth: 0,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(200, 200, 200, 1)",
-          pointBorderColor: "transparent",
-          borderColor: "rgba(200, 200, 200, 1)",
-          borderWidth: 4,
-          type: "line",
-          backgroundColor: "transparent",
-          fill: true,
-          data: {{ steakhouse_liquor_chart_ly | safe }},
-          maxBarThickness: 6
-        }, ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          },
-          title: {
+          ticks: {
             display: true,
-            text: "Period Liquor Purchases",
-          },
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
-            },
-            ticks: {
-              display: true,
-              padding: 10,
-              color: '#f8f9fa',
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
+            padding: 10,
+            color: '#f8f9fa',
+            font: {
+              size: 14,
+              weight: 300,
+              family: "Roboto",
+              style: 'normal',
+              lineHeight: 2
             },
           },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: false,
-              drawOnChartArea: false,
-              drawTicks: false,
-              borderDash: [5, 5]
-            },
-            ticks: {
-              display: true,
-              color: '#f8f9fa',
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-            }
-          },
         },
-      },
-    });
-
-    var ctx3 = document.getElementById("chart-beer").getContext("2d");
-
-    new Chart(ctx3, {
-      type: "line",
-      data: {
-        labels: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13"],
-        datasets: [{
-          label: "Current",
-          tension: 0,
-          borderWidth: 0,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(255, 255, 255, 1)",
-          pointBorderColor: "transparent",
-          borderColor: "rgba(255, 255, 255, 1)",
-          borderWidth: 4,
-          backgroundColor: "transparent",
-          fill: true,
-          data: {{ steakhouse_beer_chart | safe }},
-          maxBarThickness: 6
-        }, {
-          label: "Last Year",
-          tension: 0,
-          borderWidth: 0,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(200, 200, 200, 1)",
-          pointBorderColor: "transparent",
-          borderColor: "rgba(200, 200, 200, 1)",
-          borderWidth: 4,
-          type: "line",
-          backgroundColor: "transparent",
-          fill: true,
-          data: {{ steakhouse_beer_chart_ly | safe }},
-          maxBarThickness: 6
-        }, ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
+        x: {
+          grid: {
+            drawBorder: false,
             display: false,
+            drawOnChartArea: false,
+            drawTicks: false,
+            borderDash: [5, 5]
           },
-          title: {
+          ticks: {
             display: true,
-            text: "Period Beer Purchases",
-          },
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
+            color: '#f8f9fa',
+            padding: 10,
+            font: {
+              size: 14,
+              weight: 300,
+              family: "Roboto",
+              style: 'normal',
+              lineHeight: 2
             },
-            ticks: {
-              display: true,
-              padding: 10,
-              color: '#f8f9fa',
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-            },
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: false,
-              drawOnChartArea: false,
-              drawTicks: false,
-              borderDash: [5, 5]
-            },
-            ticks: {
-              display: true,
-              color: '#f8f9fa',
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-            }
-          },
+          }
         },
       },
-    });
-      
-    var ctx4 = document.getElementById("chart-wine_cas").getContext("2d");
+    },
+  });
 
-    new Chart(ctx4, {
-      type: "line",
-      data: {
-        labels: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13"],
-        datasets: [{
-          label: "Current",
-          tension: 0,
-          borderWidth: 0,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(255, 255, 255, 1)",
-          pointBorderColor: "transparent",
-          borderColor: "rgba(255, 255, 255, 1)",
-          borderWidth: 4,
-          backgroundColor: "transparent",
-          fill: true,
-          data: {{ casual_wine_chart | safe }},
-          maxBarThickness: 6
-        }, {
-          label: "Last Year",
-          tension: 0,
-          borderWidth: 0,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(200, 200, 200, 1)",
-          pointBorderColor: "transparent",
-          borderColor: "rgba(200, 200, 200, 1)",
-          borderWidth: 4,
-          type: "line",
-          backgroundColor: "transparent",
-          fill: true,
-          data: {{ casual_wine_chart_ly | safe }},
-          maxBarThickness: 6
-        }, ],
+  var ctx2 = document.getElementById("chart-liquor").getContext("2d");
+
+  new Chart(ctx2, {
+    type: "line",
+    data: {
+      labels: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13"],
+      datasets: [{
+        label: "Current",
+        tension: 0,
+        borderWidth: 0,
+        pointRadius: 5,
+        pointBackgroundColor: "rgba(255, 255, 255, 1)",
+        pointBorderColor: "transparent",
+        borderColor: "rgba(255, 255, 255, 1)",
+        borderWidth: 4,
+        backgroundColor: "transparent",
+        fill: true,
+        data: {{ steakhouse_liquor_chart | safe }},
+        maxBarThickness: 6
+      }, {
+        label: "Last Year",
+        tension: 0,
+        borderWidth: 0,
+        pointRadius: 5,
+        pointBackgroundColor: "rgba(200, 200, 200, 1)",
+        pointBorderColor: "transparent",
+        borderColor: "rgba(200, 200, 200, 1)",
+        borderWidth: 4,
+        type: "line",
+        backgroundColor: "transparent",
+        fill: true,
+        data: {{ steakhouse_liquor_chart_ly | safe }},
+        maxBarThickness: 6
+      }, ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false,
+        },
+        title: {
+          display: true,
+          text: "Period Liquor Purchases",
+        },
       },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
+      interaction: {
+        intersect: false,
+        mode: 'index',
+      },
+      scales: {
+        y: {
+          grid: {
+            drawBorder: false,
+            display: true,
+            drawOnChartArea: true,
+            drawTicks: false,
+            borderDash: [5, 5],
+            color: 'rgba(255, 255, 255, .2)'
+          },
+          ticks: {
+            display: true,
+            padding: 10,
+            color: '#f8f9fa',
+            font: {
+              size: 14,
+              weight: 300,
+              family: "Roboto",
+              style: 'normal',
+              lineHeight: 2
+            },
+          },
+        },
+        x: {
+          grid: {
+            drawBorder: false,
             display: false,
+            drawOnChartArea: false,
+            drawTicks: false,
+            borderDash: [5, 5]
           },
-          title: {
+          ticks: {
             display: true,
-            text: "Period Wine Purchases",
-          },
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
+            color: '#f8f9fa',
+            padding: 10,
+            font: {
+              size: 14,
+              weight: 300,
+              family: "Roboto",
+              style: 'normal',
+              lineHeight: 2
             },
-            ticks: {
-              display: true,
-              padding: 10,
-              color: '#f8f9fa',
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-            },
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: false,
-              drawOnChartArea: false,
-              drawTicks: false,
-              borderDash: [5, 5]
-            },
-            ticks: {
-              display: true,
-              color: '#f8f9fa',
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-            }
-          },
+          }
         },
       },
-    });
+    },
+  });
 
-    var ctx5 = document.getElementById("chart-liquor_cas").getContext("2d");
+  var ctx3 = document.getElementById("chart-beer").getContext("2d");
 
-    new Chart(ctx5, {
-      type: "line",
-      data: {
-        labels: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13"],
-        datasets: [{
-          label: "Current",
-          tension: 0,
-          borderWidth: 0,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(255, 255, 255, 1)",
-          pointBorderColor: "transparent",
-          borderColor: "rgba(255, 255, 255, 1)",
-          borderWidth: 4,
-          backgroundColor: "transparent",
-          fill: true,
-          data: {{ casual_liquor_chart | safe }},
-          maxBarThickness: 6
-        }, {
-          label: "Last Year",
-          tension: 0,
-          borderWidth: 0,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(200, 200, 200, 1)",
-          pointBorderColor: "transparent",
-          borderColor: "rgba(200, 200, 200, 1)",
-          borderWidth: 4,
-          type: "line",
-          backgroundColor: "transparent",
-          fill: true,
-          data: {{ casual_liquor_chart_ly | safe }},
-          maxBarThickness: 6
-        }, ],
+  new Chart(ctx3, {
+    type: "line",
+    data: {
+      labels: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13"],
+      datasets: [{
+        label: "Current",
+        tension: 0,
+        borderWidth: 0,
+        pointRadius: 5,
+        pointBackgroundColor: "rgba(255, 255, 255, 1)",
+        pointBorderColor: "transparent",
+        borderColor: "rgba(255, 255, 255, 1)",
+        borderWidth: 4,
+        backgroundColor: "transparent",
+        fill: true,
+        data: {{ steakhouse_beer_chart | safe }},
+        maxBarThickness: 6
+      }, {
+        label: "Last Year",
+        tension: 0,
+        borderWidth: 0,
+        pointRadius: 5,
+        pointBackgroundColor: "rgba(200, 200, 200, 1)",
+        pointBorderColor: "transparent",
+        borderColor: "rgba(200, 200, 200, 1)",
+        borderWidth: 4,
+        type: "line",
+        backgroundColor: "transparent",
+        fill: true,
+        data: {{ steakhouse_beer_chart_ly | safe }},
+        maxBarThickness: 6
+      }, ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false,
+        },
+        title: {
+          display: true,
+          text: "Period Beer Purchases",
+        },
       },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
+      interaction: {
+        intersect: false,
+        mode: 'index',
+      },
+      scales: {
+        y: {
+          grid: {
+            drawBorder: false,
+            display: true,
+            drawOnChartArea: true,
+            drawTicks: false,
+            borderDash: [5, 5],
+            color: 'rgba(255, 255, 255, .2)'
+          },
+          ticks: {
+            display: true,
+            padding: 10,
+            color: '#f8f9fa',
+            font: {
+              size: 14,
+              weight: 300,
+              family: "Roboto",
+              style: 'normal',
+              lineHeight: 2
+            },
+          },
+        },
+        x: {
+          grid: {
+            drawBorder: false,
             display: false,
+            drawOnChartArea: false,
+            drawTicks: false,
+            borderDash: [5, 5]
           },
-          title: {
+          ticks: {
             display: true,
-            text: "Period Liquor Purchases",
-          },
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
+            color: '#f8f9fa',
+            padding: 10,
+            font: {
+              size: 14,
+              weight: 300,
+              family: "Roboto",
+              style: 'normal',
+              lineHeight: 2
             },
-            ticks: {
-              display: true,
-              padding: 10,
-              color: '#f8f9fa',
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-            },
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: false,
-              drawOnChartArea: false,
-              drawTicks: false,
-              borderDash: [5, 5]
-            },
-            ticks: {
-              display: true,
-              color: '#f8f9fa',
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-            }
-          },
+          }
         },
       },
-    });
+    },
+  });
 
-    var ctx6 = document.getElementById("chart-beer_cas").getContext("2d");
+  var ctx4 = document.getElementById("chart-wine_cas").getContext("2d");
 
-    new Chart(ctx6, {
-      type: "line",
-      data: {
-        labels: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13"],
-        datasets: [{
-          label: "Current",
-          tension: 0,
-          borderWidth: 0,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(255, 255, 255, 1)",
-          pointBorderColor: "transparent",
-          borderColor: "rgba(255, 255, 255, 1)",
-          borderWidth: 4,
-          backgroundColor: "transparent",
-          fill: true,
-          data: {{ casual_beer_chart | safe }},
-          maxBarThickness: 6
-        }, {
-          label: "Last Year",
-          tension: 0,
-          borderWidth: 0,
-          pointRadius: 5,
-          pointBackgroundColor: "rgba(200, 200, 200, 1)",
-          pointBorderColor: "transparent",
-          borderColor: "rgba(200, 200, 200, 1)",
-          borderWidth: 4,
-          type: "line",
-          backgroundColor: "transparent",
-          fill: true,
-          data: {{ casual_beer_chart_ly | safe }},
-          maxBarThickness: 6
-        }, ],
+  new Chart(ctx4, {
+    type: "line",
+    data: {
+      labels: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13"],
+      datasets: [{
+        label: "Current",
+        tension: 0,
+        borderWidth: 0,
+        pointRadius: 5,
+        pointBackgroundColor: "rgba(255, 255, 255, 1)",
+        pointBorderColor: "transparent",
+        borderColor: "rgba(255, 255, 255, 1)",
+        borderWidth: 4,
+        backgroundColor: "transparent",
+        fill: true,
+        data: {{ casual_wine_chart | safe }},
+        maxBarThickness: 6
+      }, {
+        label: "Last Year",
+        tension: 0,
+        borderWidth: 0,
+        pointRadius: 5,
+        pointBackgroundColor: "rgba(200, 200, 200, 1)",
+        pointBorderColor: "transparent",
+        borderColor: "rgba(200, 200, 200, 1)",
+        borderWidth: 4,
+        type: "line",
+        backgroundColor: "transparent",
+        fill: true,
+        data: {{ casual_wine_chart_ly | safe }},
+        maxBarThickness: 6
+      }, ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false,
+        },
+        title: {
+          display: true,
+          text: "Period Wine Purchases",
+        },
       },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
+      interaction: {
+        intersect: false,
+        mode: 'index',
+      },
+      scales: {
+        y: {
+          grid: {
+            drawBorder: false,
+            display: true,
+            drawOnChartArea: true,
+            drawTicks: false,
+            borderDash: [5, 5],
+            color: 'rgba(255, 255, 255, .2)'
+          },
+          ticks: {
+            display: true,
+            padding: 10,
+            color: '#f8f9fa',
+            font: {
+              size: 14,
+              weight: 300,
+              family: "Roboto",
+              style: 'normal',
+              lineHeight: 2
+            },
+          },
+        },
+        x: {
+          grid: {
+            drawBorder: false,
             display: false,
+            drawOnChartArea: false,
+            drawTicks: false,
+            borderDash: [5, 5]
           },
-          title: {
+          ticks: {
             display: true,
-            text: "Period Beer Purchases",
-          },
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        scales: {
-          y: {
-            grid: {
-              drawBorder: false,
-              display: true,
-              drawOnChartArea: true,
-              drawTicks: false,
-              borderDash: [5, 5],
-              color: 'rgba(255, 255, 255, .2)'
+            color: '#f8f9fa',
+            padding: 10,
+            font: {
+              size: 14,
+              weight: 300,
+              family: "Roboto",
+              style: 'normal',
+              lineHeight: 2
             },
-            ticks: {
-              display: true,
-              padding: 10,
-              color: '#f8f9fa',
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-            },
-          },
-          x: {
-            grid: {
-              drawBorder: false,
-              display: false,
-              drawOnChartArea: false,
-              drawTicks: false,
-              borderDash: [5, 5]
-            },
-            ticks: {
-              display: true,
-              color: '#f8f9fa',
-              padding: 10,
-              font: {
-                size: 14,
-                weight: 300,
-                family: "Roboto",
-                style: 'normal',
-                lineHeight: 2
-              },
-            }
-          },
+          }
         },
       },
-    });
-  </script>
+    },
+  });
+
+  var ctx5 = document.getElementById("chart-liquor_cas").getContext("2d");
+
+  new Chart(ctx5, {
+    type: "line",
+    data: {
+      labels: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13"],
+      datasets: [{
+        label: "Current",
+        tension: 0,
+        borderWidth: 0,
+        pointRadius: 5,
+        pointBackgroundColor: "rgba(255, 255, 255, 1)",
+        pointBorderColor: "transparent",
+        borderColor: "rgba(255, 255, 255, 1)",
+        borderWidth: 4,
+        backgroundColor: "transparent",
+        fill: true,
+        data: {{ casual_liquor_chart | safe }},
+        maxBarThickness: 6
+      }, {
+        label: "Last Year",
+        tension: 0,
+        borderWidth: 0,
+        pointRadius: 5,
+        pointBackgroundColor: "rgba(200, 200, 200, 1)",
+        pointBorderColor: "transparent",
+        borderColor: "rgba(200, 200, 200, 1)",
+        borderWidth: 4,
+        type: "line",
+        backgroundColor: "transparent",
+        fill: true,
+        data: {{ casual_liquor_chart_ly | safe }},
+        maxBarThickness: 6
+      }, ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false,
+        },
+        title: {
+          display: true,
+          text: "Period Liquor Purchases",
+        },
+      },
+      interaction: {
+        intersect: false,
+        mode: 'index',
+      },
+      scales: {
+        y: {
+          grid: {
+            drawBorder: false,
+            display: true,
+            drawOnChartArea: true,
+            drawTicks: false,
+            borderDash: [5, 5],
+            color: 'rgba(255, 255, 255, .2)'
+          },
+          ticks: {
+            display: true,
+            padding: 10,
+            color: '#f8f9fa',
+            font: {
+              size: 14,
+              weight: 300,
+              family: "Roboto",
+              style: 'normal',
+              lineHeight: 2
+            },
+          },
+        },
+        x: {
+          grid: {
+            drawBorder: false,
+            display: false,
+            drawOnChartArea: false,
+            drawTicks: false,
+            borderDash: [5, 5]
+          },
+          ticks: {
+            display: true,
+            color: '#f8f9fa',
+            padding: 10,
+            font: {
+              size: 14,
+              weight: 300,
+              family: "Roboto",
+              style: 'normal',
+              lineHeight: 2
+            },
+          }
+        },
+      },
+    },
+  });
+
+  var ctx6 = document.getElementById("chart-beer_cas").getContext("2d");
+
+  new Chart(ctx6, {
+    type: "line",
+    data: {
+      labels: ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13"],
+      datasets: [{
+        label: "Current",
+        tension: 0,
+        borderWidth: 0,
+        pointRadius: 5,
+        pointBackgroundColor: "rgba(255, 255, 255, 1)",
+        pointBorderColor: "transparent",
+        borderColor: "rgba(255, 255, 255, 1)",
+        borderWidth: 4,
+        backgroundColor: "transparent",
+        fill: true,
+        data: {{ casual_beer_chart | safe }},
+        maxBarThickness: 6
+      }, {
+        label: "Last Year",
+        tension: 0,
+        borderWidth: 0,
+        pointRadius: 5,
+        pointBackgroundColor: "rgba(200, 200, 200, 1)",
+        pointBorderColor: "transparent",
+        borderColor: "rgba(200, 200, 200, 1)",
+        borderWidth: 4,
+        type: "line",
+        backgroundColor: "transparent",
+        fill: true,
+        data: {{ casual_beer_chart_ly | safe }},
+        maxBarThickness: 6
+      }, ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false,
+        },
+        title: {
+          display: true,
+          text: "Period Beer Purchases",
+        },
+      },
+      interaction: {
+        intersect: false,
+        mode: 'index',
+      },
+      scales: {
+        y: {
+          grid: {
+            drawBorder: false,
+            display: true,
+            drawOnChartArea: true,
+            drawTicks: false,
+            borderDash: [5, 5],
+            color: 'rgba(255, 255, 255, .2)'
+          },
+          ticks: {
+            display: true,
+            padding: 10,
+            color: '#f8f9fa',
+            font: {
+              size: 14,
+              weight: 300,
+              family: "Roboto",
+              style: 'normal',
+              lineHeight: 2
+            },
+          },
+        },
+        x: {
+          grid: {
+            drawBorder: false,
+            display: false,
+            drawOnChartArea: false,
+            drawTicks: false,
+            borderDash: [5, 5]
+          },
+          ticks: {
+            display: true,
+            color: '#f8f9fa',
+            padding: 10,
+            font: {
+              size: 14,
+              weight: 300,
+              family: "Roboto",
+              style: 'normal',
+              lineHeight: 2
+            },
+          }
+        },
+      },
+    },
+  });
+</script>
 
 {% endblock javascripts %}

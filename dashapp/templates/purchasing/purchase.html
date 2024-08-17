@@ -10,12 +10,9 @@
 <div class="container-fluid py-4" id="top">
   <div class="dropdown" style="text-align: left">
     <button class="btn active bg-gradient-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-      Purchasing
+      Food
     </button>
     <ul class="dropdown-menu">
-      <li>
-        <a class="dropdown-item font-weight-bold text-primary" href="/purchasing/">Food</a>
-      </li>
       <li>
         <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.purchase', product='Beef') }}">Beef</a>
       </li>
@@ -41,6 +38,14 @@
         <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.purchase', product='Fish') }}">Seafood</a>
       </li>
       <li>
+        <a class="dropdown-item font-weight-bold text-primary" href="/purchasing/">Food</a>
+      </li>
+    </ul>
+    <button class="btn active bg-gradient-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+      Alcohol
+    </button>
+    <ul class="dropdown-menu">
+      <li>
         <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.purchase', product='Beer') }}">Beer</a>
       </li>
       <li>
@@ -49,7 +54,18 @@
       <li>
         <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.purchase', product='Liquor') }}">Liquor</a>
       </li>
+      <li>
+        <a class="dropdown-item font-weight-bold text-primary" href="/purchasing/alcohol">Alcohol</a>
+      </li>
+    </ul>
+    <button class="btn active bg-gradient-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+      Supplies
+    </button>
+    <ul class="dropdown-menu">
       <li><a class="dropdown-item" href="#">Supplies</a></li>
+      <li>
+        <a class="dropdown-item font-weight-bold text-primary" href="/purchasing/supplies">Supplies</a>
+      </li>
     </ul>
   </div>
   <!-- First Row -Charts -->
@@ -101,6 +117,7 @@
                 <tr>
                   <th scope="col">RESTAURANT</th>
                   <th scope="col">TOTAL COST</th>
+                  <th scope="col">PCT of SALES</th>
                 </tr>
               </thead>
               <tbody>
@@ -113,6 +130,9 @@
                     <td>
                       <p class="mb-0 ms-1 text-begin">{{ "${:,.0f}".format(s['Cost']) }}</p>
                     </td>
+                    <!-- <td> -->
+                    <!--   <p class="mb-0 ms-1 text-begin">{{ "${:,.0f}".format(s['Cost']) }}</p> -->
+                    <!-- </td> -->
                   </tr>
                   {% endfor %}
                 </tr>
