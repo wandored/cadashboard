@@ -90,12 +90,10 @@ def purchasing():
 
     if form5.submit5.data and form5.validate():
         store_id = form5.store.data.id
-        print(store_id)
         return redirect(url_for("home_blueprint.lobster", store_id=store_id))
 
     if form6.submit6.data and form6.validate():
         store_id = form6.store.data.id
-        print(store_id)
         return redirect(url_for("home_blueprint.stone", store_id=store_id))
 
     food_category_list = (
@@ -313,12 +311,10 @@ def alcohol():
 
     if form5.submit5.data and form5.validate():
         store_id = form5.store.data.id
-        print(store_id)
         return redirect(url_for("home_blueprint.lobster", store_id=store_id))
 
     if form6.submit6.data and form6.validate():
         store_id = form6.store.data.id
-        print(store_id)
         return redirect(url_for("home_blueprint.stone", store_id=store_id))
 
     # get name from Restaurants table based on session["store_list"]
@@ -506,12 +502,10 @@ def purchase(product):
 
     if form5.submit5.data and form5.validate():
         store_id = form5.store.data.id
-        print(store_id)
         return redirect(url_for("home_blueprint.lobster", store_id=store_id))
 
     if form6.submit6.data and form6.validate():
         store_id = form6.store.data.id
-        print(store_id)
         return redirect(url_for("home_blueprint.stone", store_id=store_id))
 
     top_ten = get_category_topten(

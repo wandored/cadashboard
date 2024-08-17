@@ -317,7 +317,7 @@ def index():
             float
         )
         table["labor_pct"] = table.dollars / table.sales
-        print(table.dollars, table.sales)
+        # print(table.dollars, table.sales)
         table["labor_pct_ly"] = table.dollars_ly / table.sales_ly
         totals = table.sum()
 
@@ -346,7 +346,7 @@ def index():
         fiscal_dates["period_to_date_ly"],
         "Period",
     )
-    print(period_table)
+    # print(period_table)
 
     yearly_totals, yearly_table, yearly_top = build_sales_table(
         fiscal_dates["start_year"],
