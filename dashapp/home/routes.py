@@ -1528,30 +1528,33 @@ def store(store_id):
     else:
         ytd_wine_sales_pct = 0
 
-    # service duration Charts
-    table_turn_df = get_timeing_data(
-        fiscal_dates["start_week"], fiscal_dates["start_day"], session["store_list"]
-    )
-    bar_list = table_turn_df["bar"].tolist()
-    dining_room_list = table_turn_df["dining_room"].tolist()
-    handheld_list = table_turn_df["handheld"].tolist()
-    patio_list = table_turn_df["patio"].tolist()
-    online_ordering_list = table_turn_df["online_ordering"].tolist()
+    # TODO this code fails because empty index
+    # df["store"] = data[0]
 
-    table_turn_df_avg = get_timeing_data(
-        fiscal_dates["start_period"], fiscal_dates["start_day"], session["store_list"]
-    )
-    # pivot table on dow to get average time
-    table_turn_df_avg = table_turn_df_avg.pivot_table(
-        values=["bar", "dining_room", "handheld", "patio", "online_ordering"],
-        index=["dow"],
-        aggfunc="mean",
-    )
-    bar_list_avg = table_turn_df_avg["bar"].tolist()
-    dining_room_list_avg = table_turn_df_avg["dining_room"].tolist()
-    handheld_list_avg = table_turn_df_avg["handheld"].tolist()
-    patio_list_avg = table_turn_df_avg["patio"].tolist()
-    online_ordering_list_avg = table_turn_df_avg["online_ordering"].tolist()
+    # # service duration Charts
+    # table_turn_df = get_timeing_data(
+    #     fiscal_dates["start_week"], fiscal_dates["start_day"], session["store_list"]
+    # )
+    # bar_list = table_turn_df["bar"].tolist()
+    # dining_room_list = table_turn_df["dining_room"].tolist()
+    # handheld_list = table_turn_df["handheld"].tolist()
+    # patio_list = table_turn_df["patio"].tolist()
+    # online_ordering_list = table_turn_df["online_ordering"].tolist()
+
+    # table_turn_df_avg = get_timeing_data(
+    #     fiscal_dates["start_period"], fiscal_dates["start_day"], session["store_list"]
+    # )
+    # # pivot table on dow to get average time
+    # table_turn_df_avg = table_turn_df_avg.pivot_table(
+    #     values=["bar", "dining_room", "handheld", "patio", "online_ordering"],
+    #     index=["dow"],
+    #     aggfunc="mean",
+    # )
+    # bar_list_avg = table_turn_df_avg["bar"].tolist()
+    # dining_room_list_avg = table_turn_df_avg["dining_room"].tolist()
+    # handheld_list_avg = table_turn_df_avg["handheld"].tolist()
+    # patio_list_avg = table_turn_df_avg["patio"].tolist()
+    # online_ordering_list_avg = table_turn_df_avg["online_ordering"].tolist()
 
     return render_template(
         "home/store.html",
