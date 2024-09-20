@@ -349,58 +349,59 @@ class Location(db.Model):
     locationnumber = db.Column(db.String)
 
 
-class SalesDetail(db.Model):
-    __tablename__ = "sales_detail"
+# these tables are no longer directly accessed
+# class SalesDetail(db.Model):
+#     __tablename__ = "sales_detail"
 
-    salesdetailid = db.Column(db.Integer, primary_key=True)
-    menuitem = db.Column(db.String(256))
-    amount = db.Column(db.Float)
-    date = db.Column(db.String(64))
-    quantity = db.Column(db.Float)
-    location = db.Column(db.String(64))
-    salesaccount = db.Column(db.String(64))
-    category = db.Column(db.String(64))
-    dailysalessummaryid = db.Column(db.String(64))
-
-
-class SalesEmployee(db.Model):
-    __tablename__ = "sales_employee"
-
-    salesid = db.Column(db.String, primary_key=True)
-    date = db.Column(db.DateTime())
-    daypart = db.Column(db.String)
-    netsales = db.Column(db.Float)
-    numberofguests = db.Column(db.Integer)
-    orderhour = db.Column(db.Integer)
-    salesamount = db.Column(db.Float)
-    location = db.Column(db.String)
-    grosssales = db.Column(db.Float)
-    dailysalessummaryid = db.Column(db.String)
+#     salesdetailid = db.Column(db.Integer, primary_key=True)
+#     menuitem = db.Column(db.String(256))
+#     amount = db.Column(db.Float)
+#     date = db.Column(db.String(64))
+#     quantity = db.Column(db.Float)
+#     location = db.Column(db.String(64))
+#     salesaccount = db.Column(db.String(64))
+#     category = db.Column(db.String(64))
+#     dailysalessummaryid = db.Column(db.String(64))
 
 
-class LaborDetail(db.Model):
-    __tablename__ = "labor_detail"
+# class SalesEmployee(db.Model):
+#     __tablename__ = "sales_employee"
 
-    laborid = db.Column(db.String, primary_key=True)
-    dateworked = db.Column(db.DateTime())
-    jobtitle_id = db.Column(db.String)
-    jobtitle = db.Column(db.String)
-    hours = db.Column(db.Float)
-    total = db.Column(db.Float)
-    location_id = db.Column(db.String)
-    dailylaborsummaryid = db.Column(db.String)
+#     salesid = db.Column(db.String, primary_key=True)
+#     date = db.Column(db.DateTime())
+#     daypart = db.Column(db.String)
+#     netsales = db.Column(db.Float)
+#     numberofguests = db.Column(db.Integer)
+#     orderhour = db.Column(db.Integer)
+#     salesamount = db.Column(db.Float)
+#     location = db.Column(db.String)
+#     grosssales = db.Column(db.Float)
+#     dailysalessummaryid = db.Column(db.String)
 
 
-class SalesPayment(db.Model):
-    __tablename__ = "sales_payment"
+# class LaborDetail(db.Model):
+#     __tablename__ = "labor_detail"
 
-    salespaymentid = db.Column(db.String, primary_key=True)
-    name = db.Column(db.String)
-    amount = db.Column(db.Float)
-    date = db.Column(db.DateTime())
-    location = db.Column(db.String)
-    paymenttype = db.Column(db.String)
-    dailysalessummaryid = db.Column(db.String)
+#     laborid = db.Column(db.String, primary_key=True)
+#     dateworked = db.Column(db.DateTime())
+#     jobtitle_id = db.Column(db.String)
+#     jobtitle = db.Column(db.String)
+#     hours = db.Column(db.Float)
+#     total = db.Column(db.Float)
+#     location_id = db.Column(db.String)
+#     dailylaborsummaryid = db.Column(db.String)
+
+
+# class SalesPayment(db.Model):
+#     __tablename__ = "sales_payment"
+
+#     salespaymentid = db.Column(db.String, primary_key=True)
+#     name = db.Column(db.String)
+#     amount = db.Column(db.Float)
+#     date = db.Column(db.DateTime())
+#     location = db.Column(db.String)
+#     paymenttype = db.Column(db.String)
+#     dailysalessummaryid = db.Column(db.String)
 
 
 ## Table Views
