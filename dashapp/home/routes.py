@@ -310,8 +310,11 @@ def index():
         table = table.fillna(0)
         table["doly"] = table.sales - table.sales_ly
         table["poly"] = (table.sales - table.sales_ly) / table.sales_ly * 100
-        top = table[["doly", "poly"]]
+        #drop row if sales_ly is 0
+        top_table = table[table.sales_ly != 0]
+        top = top_table[["doly", "poly"]]
         top = top.nlargest(5, "poly", keep="all")
+        print(top)
         table["guest_check_avg"] = table["sales"] / table["guests"].astype(float)
         table["guest_check_avg_ly"] = table["sales_ly"] / table["guests_ly"].astype(
             float
@@ -346,7 +349,6 @@ def index():
         fiscal_dates["period_to_date_ly"],
         "Period",
     )
-    # print(period_table)
 
     yearly_totals, yearly_table, yearly_top = build_sales_table(
         fiscal_dates["start_year"],
