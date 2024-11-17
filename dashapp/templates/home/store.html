@@ -21,7 +21,11 @@
             </div>
         </div>
         <hr class="dark horizontal my-0">
-        {% if daily_sales >= daily_sales_ly %}
+          {% if daily_sales_ly == 0 %}
+          <div class="card-footer p-3">
+            <p class="mb-0"><span class="text-sm font-weight-bolder">No sales last year</span></p>
+          </div>
+          {% elif daily_sales >= daily_sales_ly %}
           <div class="card-footer p-3">
             <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((daily_sales - daily_sales_ly) / daily_sales_ly) * 100) }} - {{ "${:,.0f}".format(daily_sales_ly) }}</span> SDLY</p>
           </div>
@@ -44,7 +48,11 @@
             </div>
         </div>
         <hr class="dark horizontal my-0">
-          {% if weekly_sales >= wtd_sales_ly %}
+          {% if weekly_sales_ly == 0 %}
+          <div class="card-footer p-3">
+            <p class="mb-0"><span class="text-sm font-weight-bolder">No sales last year</span></p>
+          </div>
+          {% elif weekly_sales >= wtd_sales_ly %}
           <div class="card-footer p-3">
             <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((weekly_sales - wtd_sales_ly) / wtd_sales_ly) * 100) }} - {{ "${:,.0f}".format(wtd_sales_ly) }}</span> WTD</p>
           </div>
@@ -67,7 +75,11 @@
             </div>
         </div>
         <hr class="dark horizontal my-0">
-          {% if period_sales >= ptd_sales_ly %}
+          {% if period_sales_ly == 0 %}
+          <div class="card-footer p-3">
+            <p class="mb-0"><span class="text-sm font-weight-bolder">No sales last year</span></p>
+          </div>
+          {% elif period_sales >= ptd_sales_ly %}
           <div class="card-footer p-3">
             <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((period_sales - ptd_sales_ly) / ptd_sales_ly) * 100) }} - {{ "${:,.0f}".format(ptd_sales_ly) }}</span> PTD</p>
           </div>
@@ -90,7 +102,11 @@
             </div>
         </div>
         <hr class="dark horizontal my-0">
-          {% if yearly_sales >= ytd_sales_ly %}
+          {% if yearly_sales_ly == 0 %}
+          <div class="card-footer p-3">
+            <p class="mb-0"><span class="text-sm font-weight-bolder">No sales last year</span></p>
+          </div>
+          {% elif yearly_sales >= ytd_sales_ly %}
           <div class="card-footer p-3">
             <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((yearly_sales - ytd_sales_ly) / ytd_sales_ly) * 100) }} - {{ "${:,.0f}".format(ytd_sales_ly) }}</span> YTD</p>
           </div>
