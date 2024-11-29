@@ -17,16 +17,19 @@
           </div>
             <div class="text-end pt-1">
               <p class="text-sm mb-0 text-capitalize">{{ fiscal_dates["date"] }} </p>
+              {% if daily_totals.sales >= ca_sales_record_day %}
+              <h4 class="mb-0">{{ "${:,.0f}".format(daily_totals.sales) }} <i class="fa fa-sack-dollar text-success" aria-hidden="true"></i></h4>
+              {% else %}
               <h4 class="mb-0">{{ "${:,.0f}".format(daily_totals.sales) }}</h4>
+              {% endif %}
             </div>
         </div>
         <hr class="dark horizontal my-0">
-        {% if daily_totals.sales >= daily_totals.sales_ly %}
           <div class="card-footer p-3">
+          {% if daily_totals.sales >= daily_totals.sales_ly %}
             <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((daily_totals.sales - daily_totals.sales_ly) / daily_totals.sales_ly) * 100) }} - {{ "${:,.0f}".format(daily_totals.sales_ly) }}</span> SDLY</p>
           </div>
           {% else %}
-          <div class="card-footer p-3">
             <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((daily_totals.sales - daily_totals.sales_ly)|abs / daily_totals.sales_ly) * 100) }} - {{ "${:,.0f}".format(daily_totals.sales_ly) }}</span> SDLY</p>
           </div>
           {% endif %}
@@ -40,16 +43,19 @@
           </div>
             <div class="text-end pt-1">
               <p class="text-sm mb-0 text-capitalize">Week {{ fiscal_dates["week"] }} Sales</p>
+              {% if weekly_sales >= ca_sales_record_week|int %}
+              <h4 class="mb-0">{{ "${:,.0f}".format(weekly_sales) }} <i class="fa fa-sack-dollar text-success" aria-hidden="true"></i></h4>
+              {% else %}
               <h4 class="mb-0">{{ "${:,.0f}".format(weekly_sales) }}</h4>
+              {% endif %}
             </div>
         </div>
         <hr class="dark horizontal my-0">
-          {% if weekly_sales >= wtd_sales_ly %}
           <div class="card-footer p-3">
+          {% if weekly_sales >= wtd_sales_ly %}
             <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((weekly_sales - wtd_sales_ly) / wtd_sales_ly) * 100) }} - {{ "${:,.0f}".format(wtd_sales_ly) }}</span> WTD</p>
           </div>
           {% else %}
-          <div class="card-footer p-3">
             <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((weekly_sales - wtd_sales_ly)|abs / wtd_sales_ly) * 100) }} - {{ "${:,.0f}".format(wtd_sales_ly) }}</span> WTD</p>
           </div>
           {% endif %}
@@ -63,16 +69,19 @@
           </div>
             <div class="text-end pt-1">
               <p class="text-sm mb-0 text-capitalize">Period {{ fiscal_dates["period"] }} Sales</p>
+              {% if period_sales >= ca_sales_record_period|int %}
+              <h4 class="mb-0">{{ "${:,.0f}".format(period_sales) }} <i class="fa fa-sack-dollar text-success" aria-hidden="true"></i></h4>
+              {% else %}
               <h4 class="mb-0">{{ "${:,.0f}".format(period_sales) }}</h4>
+              {% endif %}
             </div>
         </div>
         <hr class="dark horizontal my-0">
-          {% if period_sales >= ptd_sales_ly %}
           <div class="card-footer p-3">
+          {% if period_sales >= ptd_sales_ly %}
             <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((period_sales - ptd_sales_ly) / ptd_sales_ly) * 100) }} - {{ "${:,.0f}".format(ptd_sales_ly) }}</span> PTD</p>
           </div>
           {% else %}
-          <div class="card-footer p-3">
             <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((period_sales - ptd_sales_ly)|abs / ptd_sales_ly) * 100) }} - {{ "${:,.0f}".format(ptd_sales_ly) }}</span> PTD</p>
           </div>
           {% endif %}
@@ -86,16 +95,19 @@
           </div>
             <div class="text-end pt-1">
               <p class="text-sm mb-0 text-capitalize">Fiscal {{ fiscal_dates["year"] }} Sales</p>
-              <h4 class="mb-0"> {{ "${:,.0f}".format(yearly_sales) }}</h4>
+              {% if yearly_sales >= ca_sales_record_year|int %}
+              <h4 class="mb-0">{{ "${:,.0f}".format(yearly_sales) }} <i class="fa fa-sack-dollar text-success" aria-hidden="true"></i></h4>
+              {% else %}
+              <h4 class="mb-0">{{ "${:,.0f}".format(yearly_sales) }}</h4>
+              {% endif %}
             </div>
         </div>
         <hr class="dark horizontal my-0">
-          {% if yearly_sales >= ytd_sales_ly %}
           <div class="card-footer p-3">
+          {% if yearly_sales >= ytd_sales_ly %}
             <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((yearly_sales - ytd_sales_ly) / ytd_sales_ly) * 100) }} - {{ "${:,.0f}".format(ytd_sales_ly) }}</span> YTD</p>
           </div>
           {% else %}
-          <div class="card-footer p-3">
             <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((yearly_sales - ytd_sales_ly)|abs / ytd_sales_ly) * 100) }} - {{ "${:,.0f}".format(ytd_sales_ly) }}</span> YTD</p>
           </div>
           {% endif %}

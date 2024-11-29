@@ -17,7 +17,11 @@
           </div>
             <div class="text-end pt-1">
               <p class="text-sm mb-0 text-capitalize">{{ fiscal_dates["date"] }} </p>
+              {% if daily_sales >= record_day|int %}
+              <h4 class="mb-0">{{ "${:,.0f}".format(daily_sales) }} <i class="fa fa-sack-dollar text-success" aria-hidden="true"></i></h4>
+              {% else %}
               <h4 class="mb-0">{{ "${:,.0f}".format(daily_sales) }}</h4>
+              {% endif %}
             </div>
         </div>
         <hr class="dark horizontal my-0">
@@ -44,7 +48,11 @@
           </div>
             <div class="text-end pt-1">
               <p class="text-sm mb-0 text-capitalize">Week {{ fiscal_dates["week"] }} Sales</p>
+              {% if weekly_sales >= record_week|int %}
+              <h4 class="mb-0">{{ "${:,.0f}".format(weekly_sales) }} <i class="fa fa-sack-dollar text-success" aria-hidden="true"></i></h4>
+              {% else %}
               <h4 class="mb-0">{{ "${:,.0f}".format(weekly_sales) }}</h4>
+              {% endif %}
             </div>
         </div>
         <hr class="dark horizontal my-0">
@@ -71,7 +79,11 @@
           </div>
             <div class="text-end pt-1">
               <p class="text-sm mb-0 text-capitalize">Period {{ fiscal_dates["period"] }} Sales</p>
+              {% if period_sales >= record_period|int %}
+              <h4 class="mb-0">{{ "${:,.0f}".format(period_sales) }} <i class="fa fa-sack-dollar text-success" aria-hidden="true"></i></h4>
+              {% else %}
               <h4 class="mb-0">{{ "${:,.0f}".format(period_sales) }}</h4>
+              {% endif %}
             </div>
         </div>
         <hr class="dark horizontal my-0">
@@ -98,7 +110,11 @@
           </div>
             <div class="text-end pt-1">
               <p class="text-sm mb-0 text-capitalize">Fiscal {{ fiscal_dates["year"] }} Sales</p>
+              {% if yearly_sales >= record_year|int %}
+              <h4 class="mb-0">{{ "${:,.0f}".format(yearly_sales) }} <i class="fa fa-sack-dollar text-success" aria-hidden="true"></i></h4>
+              {% else %}
               <h4 class="mb-0"> {{ "${:,.0f}".format(yearly_sales) }}</h4>
+              {% endif %}
             </div>
         </div>
         <hr class="dark horizontal my-0">

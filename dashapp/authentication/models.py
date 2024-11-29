@@ -589,6 +589,37 @@ class SalesRecordsYear(db.Model):
     net_sales = db.Column(db.Float)
 
 
+class CASalesRecordDay(db.Model):
+    __tablename__ = "ca_sales_record_day"
+    date = db.Column(db.Date, primary_key=True)
+    dow = db.Column(db.Integer)
+    week = db.Column(db.Integer)
+    period = db.Column(db.Integer)
+    year = db.Column(db.Integer)
+    net_sales = db.Column(db.Float)
+
+
+class CASalesRecordWeek(db.Model):
+    __tablename__ = "ca_sales_record_week"
+    week = db.Column(db.Integer, primary_key=True)
+    period = db.Column(db.Integer, primary_key=True)
+    year = db.Column(db.Integer, primary_key=True)
+    net_sales = db.Column(db.Float)
+
+
+class CASalesRecordPeriod(db.Model):
+    __tablename__ = "ca_sales_record_period"
+    period = db.Column(db.Integer, primary_key=True)
+    year = db.Column(db.Integer, primary_key=True)
+    net_sales = db.Column(db.Float)
+
+
+class CASalesRecordYear(db.Model):
+    __tablename__ = "ca_sales_record_year"
+    year = db.Column(db.Integer, primary_key=True)
+    net_sales = db.Column(db.Float)
+
+
 class TableTurns(db.Model):
     __tablename__ = "table_turns"
     store = db.Column(db.String, primary_key=True)

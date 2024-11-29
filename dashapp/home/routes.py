@@ -35,6 +35,10 @@ from dashapp.authentication.models import (
     StockCount,
     Users,
     db,
+    CASalesRecordDay,
+    CASalesRecordPeriod,
+    CASalesRecordWeek,
+    CASalesRecordYear,
 )
 from dashapp.config import Config
 from dashapp.home import blueprint
@@ -355,6 +359,18 @@ def index():
         fiscal_dates["year_to_date_ly"],
         "Year",
     )
+
+     
+    # get net_sales for day, week, period and year.
+    query = CASalesRecordDay.query.first()
+    ca_sales_record_day = query.net_sales
+    query = CASalesRecordWeek.query.first()
+    ca_sales_record_week = query.net_sales
+    query = CASalesRecordPeriod.query.first()
+    ca_sales_record_period = query.net_sales
+    query = CASalesRecordYear.query.first()
+    ca_sales_record_year = query.net_sales
+
 
     return render_template(
         "home/index.html",
@@ -1571,6 +1587,24 @@ def store(store_id):
     # handheld_list_avg = table_turn_df_avg["handheld"].tolist()
     # patio_list_avg = table_turn_df_avg["patio"].tolist()
     # online_ordering_list_avg = table_turn_df_avg["online_ordering"].tolist()
+
+    # check for sales record for day, week, period, year
+    query = SalesRecordsDay.query.filter(
+        SalesRecordsDay.store == store.name,
+    ).first()
+    record_day = query.net_sales if query else 0
+    query = SalesRecordsWeek.query.filter(
+            SalesRecordsWeek.store == store.name,
+            ).first()
+    record_week = query.net_sales if query else 0
+    query = SalesRecordsPeriod.query.filter(
+            SalesRecordsPeriod.store == store.name,
+            ).first()
+    record_period = query.net_sales if query else 0
+    query = SalesRecordsYear.query.filter(
+            SalesRecordsYear.store == store.name,
+            ).first()
+    record_year = query.net_sales if query else 0
 
     return render_template(
         "home/store.html",
