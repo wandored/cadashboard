@@ -2,6 +2,7 @@
 home/util.py
 Dashboard by wandored
 """
+
 import json
 import requests
 from flask import send_file
@@ -213,6 +214,10 @@ def get_giftcard_redeem(start, end, store_list):
 
 
 def get_category_sales(start, end, sales_type, store_list):
+    cal_query = Calendar.query.with_entities(
+        Calendar.date, Calendar.dow, Calendar.week, Calendar.period, Calendar.year
+    ).filter(Calendar.date.between(start, end))
+    cal_df = pd.DataFrame(cal_query, columns=["date", "dow", "week", "period", "year"])
     query = (
         db.session.query(
             MenuItemSales.date,
@@ -242,6 +247,7 @@ def get_category_sales(start, end, sales_type, store_list):
     df = pd.DataFrame.from_records(
         query, columns=["date", "dow", "week", "period", "year", "sales", "count"]
     )
+    df = df.merge(cal_df, how="outer", on=["date", "dow", "week", "period", "year"])
     df = df.fillna(0)
     df = df.sort_values(by=["date"])
     return df
