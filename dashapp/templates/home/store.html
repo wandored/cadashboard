@@ -1,194 +1,331 @@
-{% extends "layouts/base.html" %}
-
-{% block title %} {{ store_name }} {% endblock %} 
+{% extends "layouts/base.html" %} {% block title %} {{ store_name }} {% endblock
+%}
 
 <!-- Specific Page CSS goes HERE  -->
-{% block stylesheets %}{% endblock stylesheets %}
-
-{% block content %}
+{% block stylesheets %}{% endblock stylesheets %} {% block content %}
 
 <div class="container-fluid py-4">
   <div class="row">
     <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
       <div class="card">
         <div class="card-header p-3 pt-2">
-          <div class="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
+          <div
+            class="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute"
+          >
             <i class="material-icons opacity-10">paid</i>
           </div>
-            <div class="text-end pt-1">
-              <p class="text-sm mb-0 text-capitalize">{{ fiscal_dates["date"] }} </p>
-              {% if daily_sales >= record_day|int %}
-              <h4 class="mb-0">{{ "${:,.0f}".format(daily_sales) }} <i class="fa fa-sack-dollar text-success" aria-hidden="true"></i></h4>
-              {% else %}
-              <h4 class="mb-0">{{ "${:,.0f}".format(daily_sales) }}</h4>
-              {% endif %}
-            </div>
+          <div class="text-end pt-1">
+            <p class="text-sm mb-0 text-capitalize">
+              {{ fiscal_dates["date"] }}
+            </p>
+            {% if daily_sales >= record_day|int %}
+            <h4 class="mb-0">
+              {{ "${:,.0f}".format(daily_sales) }}
+              <i class="fa fa-sack-dollar text-success" aria-hidden="true"></i>
+            </h4>
+            {% else %}
+            <h4 class="mb-0">{{ "${:,.0f}".format(daily_sales) }}</h4>
+            {% endif %}
+          </div>
         </div>
-        <hr class="dark horizontal my-0">
-          {% if daily_sales_ly == 0 %}
-          <div class="card-footer p-3">
-            <p class="mb-0"><span class="text-sm font-weight-bolder">No sales last year</span></p>
-          </div>
-          {% elif daily_sales >= daily_sales_ly %}
-          <div class="card-footer p-3">
-            <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((daily_sales - daily_sales_ly) / daily_sales_ly) * 100) }} - {{ "${:,.0f}".format(daily_sales_ly) }}</span> SDLY</p>
-          </div>
-          {% else %}
-          <div class="card-footer p-3">
-            <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((daily_sales - daily_sales_ly)|abs / daily_sales_ly) * 100) }} - {{ "${:,.0f}".format(daily_sales_ly) }}</span> SDLY</p>
-          </div>
-          {% endif %}
+        <hr class="dark horizontal my-0" />
+        {% if daily_sales_ly == 0 %}
+        <div class="card-footer p-3">
+          <p class="mb-0">
+            <span class="text-sm font-weight-bolder">No sales last year</span>
+          </p>
+        </div>
+        {% elif daily_sales >= daily_sales_ly %}
+        <div class="card-footer p-3">
+          <p class="mb-0">
+            <i class="fa fa-arrow-up text-success" aria-hidden="true"></i
+            ><span class="text-sm font-weight-bolder"
+              >{{ "%{:,.0f}".format(((daily_sales - daily_sales_ly) /
+              daily_sales_ly) * 100) }} - {{ "${:,.0f}".format(daily_sales_ly)
+              }}</span
+            >
+            SDLY
+          </p>
+        </div>
+        {% else %}
+        <div class="card-footer p-3">
+          <p class="mb-0">
+            <i class="fa fa-arrow-down text-danger" aria-hidden="true"></i
+            ><span class="text-sm font-weight-bolder"
+              >{{ "%{:,.0f}".format(((daily_sales - daily_sales_ly)|abs /
+              daily_sales_ly) * 100) }} - {{ "${:,.0f}".format(daily_sales_ly)
+              }}</span
+            >
+            SDLY
+          </p>
+        </div>
+        {% endif %}
       </div>
     </div>
     <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
       <div class="card">
         <div class="card-header p-3 pt-2">
-          <div class="icon icon-lg icon-shape bg-gradient-success shadow-success text-center border-radius-xl mt-n4 position-absolute">
+          <div
+            class="icon icon-lg icon-shape bg-gradient-success shadow-success text-center border-radius-xl mt-n4 position-absolute"
+          >
             <i class="material-icons opacity-10">paid</i>
           </div>
-            <div class="text-end pt-1">
-              <p class="text-sm mb-0 text-capitalize">Week {{ fiscal_dates["week"] }} Sales</p>
-              {% if weekly_sales >= record_week|int %}
-              <h4 class="mb-0">{{ "${:,.0f}".format(weekly_sales) }} <i class="fa fa-sack-dollar text-success" aria-hidden="true"></i></h4>
-              {% else %}
-              <h4 class="mb-0">{{ "${:,.0f}".format(weekly_sales) }}</h4>
-              {% endif %}
-            </div>
+          <div class="text-end pt-1">
+            <p class="text-sm mb-0 text-capitalize">
+              Week {{ fiscal_dates["week"] }} Sales
+            </p>
+            {% if weekly_sales >= record_week|int %}
+            <h4 class="mb-0">
+              {{ "${:,.0f}".format(weekly_sales) }}
+              <i class="fa fa-sack-dollar text-success" aria-hidden="true"></i>
+            </h4>
+            {% else %}
+            <h4 class="mb-0">{{ "${:,.0f}".format(weekly_sales) }}</h4>
+            {% endif %}
+          </div>
         </div>
-        <hr class="dark horizontal my-0">
-          {% if weekly_sales_ly == 0 %}
-          <div class="card-footer p-3">
-            <p class="mb-0"><span class="text-sm font-weight-bolder">No sales last year</span></p>
-          </div>
-          {% elif weekly_sales >= wtd_sales_ly %}
-          <div class="card-footer p-3">
-            <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((weekly_sales - wtd_sales_ly) / wtd_sales_ly) * 100) }} - {{ "${:,.0f}".format(wtd_sales_ly) }}</span> WTD</p>
-          </div>
-          {% else %}
-          <div class="card-footer p-3">
-            <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((weekly_sales - wtd_sales_ly)|abs / wtd_sales_ly) * 100) }} - {{ "${:,.0f}".format(wtd_sales_ly) }}</span> WTD</p>
-          </div>
-          {% endif %}
+        <hr class="dark horizontal my-0" />
+        {% if weekly_sales_ly == 0 %}
+        <div class="card-footer p-3">
+          <p class="mb-0">
+            <span class="text-sm font-weight-bolder">No sales last year</span>
+          </p>
+        </div>
+        {% elif weekly_sales >= wtd_sales_ly %}
+        <div class="card-footer p-3">
+          <p class="mb-0">
+            <i class="fa fa-arrow-up text-success" aria-hidden="true"></i
+            ><span class="text-sm font-weight-bolder"
+              >{{ "%{:,.0f}".format(((weekly_sales - wtd_sales_ly) /
+              wtd_sales_ly) * 100) }} - {{ "${:,.0f}".format(wtd_sales_ly)
+              }}</span
+            >
+            WTD
+          </p>
+        </div>
+        {% else %}
+        <div class="card-footer p-3">
+          <p class="mb-0">
+            <i class="fa fa-arrow-down text-danger" aria-hidden="true"></i
+            ><span class="text-sm font-weight-bolder"
+              >{{ "%{:,.0f}".format(((weekly_sales - wtd_sales_ly)|abs /
+              wtd_sales_ly) * 100) }} - {{ "${:,.0f}".format(wtd_sales_ly)
+              }}</span
+            >
+            WTD
+          </p>
+        </div>
+        {% endif %}
       </div>
     </div>
     <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
       <div class="card">
         <div class="card-header p-3 pt-2">
-          <div class="icon icon-lg icon-shape bg-gradient-info shadow-info text-center border-radius-xl mt-n4 position-absolute">
+          <div
+            class="icon icon-lg icon-shape bg-gradient-info shadow-info text-center border-radius-xl mt-n4 position-absolute"
+          >
             <i class="material-icons opacity-10">paid</i>
           </div>
-            <div class="text-end pt-1">
-              <p class="text-sm mb-0 text-capitalize">Period {{ fiscal_dates["period"] }} Sales</p>
-              {% if period_sales >= record_period|int %}
-              <h4 class="mb-0">{{ "${:,.0f}".format(period_sales) }} <i class="fa fa-sack-dollar text-success" aria-hidden="true"></i></h4>
-              {% else %}
-              <h4 class="mb-0">{{ "${:,.0f}".format(period_sales) }}</h4>
-              {% endif %}
-            </div>
+          <div class="text-end pt-1">
+            <p class="text-sm mb-0 text-capitalize">
+              Period {{ fiscal_dates["period"] }} Sales
+            </p>
+            {% if period_sales >= record_period|int %}
+            <h4 class="mb-0">
+              {{ "${:,.0f}".format(period_sales) }}
+              <i class="fa fa-sack-dollar text-success" aria-hidden="true"></i>
+            </h4>
+            {% else %}
+            <h4 class="mb-0">{{ "${:,.0f}".format(period_sales) }}</h4>
+            {% endif %}
+          </div>
         </div>
-        <hr class="dark horizontal my-0">
-          {% if period_sales_ly == 0 %}
-          <div class="card-footer p-3">
-            <p class="mb-0"><span class="text-sm font-weight-bolder">No sales last year</span></p>
-          </div>
-          {% elif period_sales >= ptd_sales_ly %}
-          <div class="card-footer p-3">
-            <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((period_sales - ptd_sales_ly) / ptd_sales_ly) * 100) }} - {{ "${:,.0f}".format(ptd_sales_ly) }}</span> PTD</p>
-          </div>
-          {% else %}
-          <div class="card-footer p-3">
-            <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((period_sales - ptd_sales_ly)|abs / ptd_sales_ly) * 100) }} - {{ "${:,.0f}".format(ptd_sales_ly) }}</span> PTD</p>
-          </div>
-          {% endif %}
+        <hr class="dark horizontal my-0" />
+        {% if period_sales_ly == 0 %}
+        <div class="card-footer p-3">
+          <p class="mb-0">
+            <span class="text-sm font-weight-bolder">No sales last year</span>
+          </p>
+        </div>
+        {% elif period_sales >= ptd_sales_ly %}
+        <div class="card-footer p-3">
+          <p class="mb-0">
+            <i class="fa fa-arrow-up text-success" aria-hidden="true"></i
+            ><span class="text-sm font-weight-bolder"
+              >{{ "%{:,.0f}".format(((period_sales - ptd_sales_ly) /
+              ptd_sales_ly) * 100) }} - {{ "${:,.0f}".format(ptd_sales_ly)
+              }}</span
+            >
+            PTD
+          </p>
+        </div>
+        {% else %}
+        <div class="card-footer p-3">
+          <p class="mb-0">
+            <i class="fa fa-arrow-down text-danger" aria-hidden="true"></i
+            ><span class="text-sm font-weight-bolder"
+              >{{ "%{:,.0f}".format(((period_sales - ptd_sales_ly)|abs /
+              ptd_sales_ly) * 100) }} - {{ "${:,.0f}".format(ptd_sales_ly)
+              }}</span
+            >
+            PTD
+          </p>
+        </div>
+        {% endif %}
       </div>
     </div>
     <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
       <div class="card">
         <div class="card-header p-3 pt-2">
-          <div class="icon icon-lg icon-shape bg-gradient-warning shadow-warning text-center border-radius-xl mt-n4 position-absolute">
+          <div
+            class="icon icon-lg icon-shape bg-gradient-warning shadow-warning text-center border-radius-xl mt-n4 position-absolute"
+          >
             <i class="material-icons opacity-10">paid</i>
           </div>
-            <div class="text-end pt-1">
-              <p class="text-sm mb-0 text-capitalize">Fiscal {{ fiscal_dates["year"] }} Sales</p>
-              {% if yearly_sales >= record_year|int %}
-              <h4 class="mb-0">{{ "${:,.0f}".format(yearly_sales) }} <i class="fa fa-sack-dollar text-success" aria-hidden="true"></i></h4>
-              {% else %}
-              <h4 class="mb-0"> {{ "${:,.0f}".format(yearly_sales) }}</h4>
-              {% endif %}
-            </div>
+          <div class="text-end pt-1">
+            <p class="text-sm mb-0 text-capitalize">
+              Fiscal {{ fiscal_dates["year"] }} Sales
+            </p>
+            {% if yearly_sales >= record_year|int %}
+            <h4 class="mb-0">
+              {{ "${:,.0f}".format(yearly_sales) }}
+              <i class="fa fa-sack-dollar text-success" aria-hidden="true"></i>
+            </h4>
+            {% else %}
+            <h4 class="mb-0">{{ "${:,.0f}".format(yearly_sales) }}</h4>
+            {% endif %}
+          </div>
         </div>
-        <hr class="dark horizontal my-0">
-          {% if yearly_sales_ly == 0 %}
-          <div class="card-footer p-3">
-            <p class="mb-0"><span class="text-sm font-weight-bolder">No sales last year</span></p>
-          </div>
-          {% elif yearly_sales >= ytd_sales_ly %}
-          <div class="card-footer p-3">
-            <p class="mb-0"><i class="fa fa-arrow-up text-success" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((yearly_sales - ytd_sales_ly) / ytd_sales_ly) * 100) }} - {{ "${:,.0f}".format(ytd_sales_ly) }}</span> YTD</p>
-          </div>
-          {% else %}
-          <div class="card-footer p-3">
-            <p class="mb-0"><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i><span class="text-sm font-weight-bolder">{{ "%{:,.0f}".format(((yearly_sales - ytd_sales_ly)|abs / ytd_sales_ly) * 100) }} - {{ "${:,.0f}".format(ytd_sales_ly) }}</span> YTD</p>
-          </div>
-          {% endif %}
+        <hr class="dark horizontal my-0" />
+        {% if yearly_sales_ly == 0 %}
+        <div class="card-footer p-3">
+          <p class="mb-0">
+            <span class="text-sm font-weight-bolder">No sales last year</span>
+          </p>
+        </div>
+        {% elif yearly_sales >= ytd_sales_ly %}
+        <div class="card-footer p-3">
+          <p class="mb-0">
+            <i class="fa fa-arrow-up text-success" aria-hidden="true"></i
+            ><span class="text-sm font-weight-bolder"
+              >{{ "%{:,.0f}".format(((yearly_sales - ytd_sales_ly) /
+              ytd_sales_ly) * 100) }} - {{ "${:,.0f}".format(ytd_sales_ly)
+              }}</span
+            >
+            YTD
+          </p>
+        </div>
+        {% else %}
+        <div class="card-footer p-3">
+          <p class="mb-0">
+            <i class="fa fa-arrow-down text-danger" aria-hidden="true"></i
+            ><span class="text-sm font-weight-bolder"
+              >{{ "%{:,.0f}".format(((yearly_sales - ytd_sales_ly)|abs /
+              ytd_sales_ly) * 100) }} - {{ "${:,.0f}".format(ytd_sales_ly)
+              }}</span
+            >
+            YTD
+          </p>
+        </div>
+        {% endif %}
       </div>
     </div>
   </div>
   <!-- Sales-Charts -->
   <div class="row mt-4">
     <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
-      <div class="card z-index-2 ">
-        <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-          <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
+      <div class="card z-index-2">
+        <div
+          class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent"
+        >
+          <div
+            class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1"
+          >
             <div class="chart">
-              <canvas id="wtd-sales-chart" class="chart-canvas" height="170"></canvas>
+              <canvas
+                id="wtd-sales-chart"
+                class="chart-canvas"
+                height="170"
+              ></canvas>
             </div>
           </div>
         </div>
         <div class="card-body">
-          <h6 class="mb-0 ">Week to Date Sales</h6>
+          <h6 class="mb-0">Week to Date Sales</h6>
           {% if weekly_sales > wtd_sales_ly %}
-          <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.0f}".format(weekly_sales - wtd_sales_ly) }} over last year</p>
+          <p class="text-sm">
+            <i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{
+            "{:,.0f}".format(weekly_sales - wtd_sales_ly) }} over last year
+          </p>
           {% else %}
-          <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.0f}".format(weekly_sales - wtd_sales_ly) }} below last year</p>
+          <p class="text-sm">
+            <i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{
+            "{:,.0f}".format(weekly_sales - wtd_sales_ly) }} below last year
+          </p>
           {% endif %}
         </div>
       </div>
     </div>
     <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
-      <div class="card z-index-2  ">
-        <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
+      <div class="card z-index-2">
+        <div
+          class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent"
+        >
           <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
             <div class="chart">
-              <canvas id="ptd-sales-chart" class="chart-canvas" height="170"></canvas>
+              <canvas
+                id="ptd-sales-chart"
+                class="chart-canvas"
+                height="170"
+              ></canvas>
             </div>
           </div>
         </div>
         <div class="card-body">
-          <h6 class="mb-0 ">Period to Date Sales</h6>
+          <h6 class="mb-0">Period to Date Sales</h6>
           {% if period_sales > ptd_sales_ly %}
-          <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.0f}".format(period_sales - ptd_sales_ly) }} over last year</p>
+          <p class="text-sm">
+            <i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{
+            "{:,.0f}".format(period_sales - ptd_sales_ly) }} over last year
+          </p>
           {% else %}
-          <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.0f}".format(period_sales - ptd_sales_ly) }} below last year</p>
+          <p class="text-sm">
+            <i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{
+            "{:,.0f}".format(period_sales - ptd_sales_ly) }} below last year
+          </p>
           {% endif %}
         </div>
       </div>
     </div>
     <div class="col-lg-4 mt-4 mb-3">
-      <div class="card z-index-2 ">
-        <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-          <div class="bg-gradient-warning shadow-warning border-radius-lg py-3 pe-1">
+      <div class="card z-index-2">
+        <div
+          class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent"
+        >
+          <div
+            class="bg-gradient-warning shadow-warning border-radius-lg py-3 pe-1"
+          >
             <div class="chart">
-              <canvas id="ytd-sales-chart" class="chart-canvas" height="170"></canvas>
+              <canvas
+                id="ytd-sales-chart"
+                class="chart-canvas"
+                height="170"
+              ></canvas>
             </div>
           </div>
         </div>
         <div class="card-body">
-          <h6 class="mb-0 ">Year to Date Sales</h6>
+          <h6 class="mb-0">Year to Date Sales</h6>
           {% if yearly_sales > ytd_sales_ly %}
-          <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.0f}".format(yearly_sales - ytd_sales_ly) }} over last year</p>
+          <p class="text-sm">
+            <i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{
+            "{:,.0f}".format(yearly_sales - ytd_sales_ly) }} over last year
+          </p>
           {% else %}
-          <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.0f}".format(yearly_sales - ytd_sales_ly) }} below last year</p>
+          <p class="text-sm">
+            <i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{
+            "{:,.0f}".format(yearly_sales - ytd_sales_ly) }} below last year
+          </p>
           {% endif %}
         </div>
       </div>
@@ -198,80 +335,187 @@
   <div class="row mb-4">
     <div class="col-lg-12 mb-md-0 mb-4">
       <div class="card">
-          <ul class="nav nav-tabs mb-0" id="nav-tab" role="tablist">
+        <ul class="nav nav-tabs mb-0" id="nav-tab" role="tablist">
           <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="nav-week-tab" data-bs-toggle="pill" data-bs-target="#nav-week" type="button" role="tab" aria-controls="nav-week" aria-selected="true">Week</button>
+            <button
+              class="nav-link active"
+              id="nav-week-tab"
+              data-bs-toggle="pill"
+              data-bs-target="#nav-week"
+              type="button"
+              role="tab"
+              aria-controls="nav-week"
+              aria-selected="true"
+            >
+              Week
+            </button>
           </li>
           <li class="nav-item" role="presentation">
-            <button class="nav-link" id="nav-period-tab" data-bs-toggle="pill" data-bs-target="#nav-period" type="button" role="tab" aria-controls="nav-period" aria-selected="false">Period</button>
+            <button
+              class="nav-link"
+              id="nav-period-tab"
+              data-bs-toggle="pill"
+              data-bs-target="#nav-period"
+              type="button"
+              role="tab"
+              aria-controls="nav-period"
+              aria-selected="false"
+            >
+              Period
+            </button>
           </li>
           <li class="nav-item" role="presentation">
-            <button class="nav-link" id="nav-year-tab" data-bs-toggle="pill" data-bs-target="#nav-year" type="button" role="tab" aria-controls="nav-year" aria-selected="false">Year</button>
+            <button
+              class="nav-link"
+              id="nav-year-tab"
+              data-bs-toggle="pill"
+              data-bs-target="#nav-year"
+              type="button"
+              role="tab"
+              aria-controls="nav-year"
+              aria-selected="false"
+            >
+              Year
+            </button>
           </li>
         </ul>
         <div class="tab-content" id="nav-tabContent">
-          <div class="tab-pane fade show active" id="nav-week" role="tabpanel" aria-labelledby="nav-week-tab">
+          <div
+            class="tab-pane fade show active"
+            id="nav-week"
+            role="tabpanel"
+            aria-labelledby="nav-week-tab"
+          >
             <div class="card-header pb-0">
               <div class="row">
                 <div class="col-lg-6 col-7">
-                    <h4>Week-{{ fiscal_dates["week"] }} Period-{{ fiscal_dates["period"]}} {{ fiscal_dates["year"]}}</h4>
+                  <h4>
+                    Week-{{ fiscal_dates["week"] }} Period-{{
+                    fiscal_dates["period"]}} {{ fiscal_dates["year"]}}
+                  </h4>
                 </div>
               </div>
             </div>
             <div class="row">
               <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
                 <div class="card z-index-2">
-                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                    <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
+                  <div
+                    class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent"
+                  >
+                    <div
+                      class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1"
+                    >
                       <div class="chart">
-                        <canvas id="chart-week-lunch-sales" class="chart-canvas" height="170"></canvas>
+                        <canvas
+                          id="chart-week-lunch-sales"
+                          class="chart-canvas"
+                          height="170"
+                        ></canvas>
                       </div>
                     </div>
                   </div>
                   <div class="card-body">
-                    <h6 class="mb-0 ">Lunch Sales</h6>
+                    <h6 class="mb-0">Lunch Sales</h6>
                     {% if week_lunch_sales_total > wtd_lunch_sales_total_ly %}
-                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_lunch_sales_pct) }} over last year</p>
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-up text-success"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(wtd_lunch_sales_pct) }} over last
+                      year
+                    </p>
                     {% else %}
-                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_lunch_sales_pct) }} below last year</p>
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-down text-danger"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(wtd_lunch_sales_pct) }} below last
+                      year
+                    </p>
                     {% endif %}
                   </div>
                 </div>
               </div>
               <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
                 <div class="card z-index-2">
-                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                    <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
+                  <div
+                    class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent"
+                  >
+                    <div
+                      class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1"
+                    >
                       <div class="chart">
-                        <canvas id="chart-week-dinner-sales" class="chart-canvas" height="170"></canvas>
+                        <canvas
+                          id="chart-week-dinner-sales"
+                          class="chart-canvas"
+                          height="170"
+                        ></canvas>
                       </div>
                     </div>
                   </div>
                   <div class="card-body">
-                    <h6 class="mb-0 ">Dinner Sales</h6>
+                    <h6 class="mb-0">Dinner Sales</h6>
                     {% if week_dinner_sales_total > wtd_dinner_sales_total_ly %}
-                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_dinner_sales_pct) }} over last year</p>
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-up text-success"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(wtd_dinner_sales_pct) }} over last
+                      year
+                    </p>
                     {% else %}
-                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_dinner_sales_pct) }} below last year</p>
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-down text-danger"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(wtd_dinner_sales_pct) }} below last
+                      year
+                    </p>
                     {% endif %}
                   </div>
                 </div>
               </div>
               <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
                 <div class="card z-index-2">
-                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                    <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
+                  <div
+                    class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent"
+                  >
+                    <div
+                      class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1"
+                    >
                       <div class="chart">
-                        <canvas id="chart-week-togo-sales" class="chart-canvas" height="170"></canvas>
+                        <canvas
+                          id="chart-week-togo-sales"
+                          class="chart-canvas"
+                          height="170"
+                        ></canvas>
                       </div>
                     </div>
                   </div>
                   <div class="card-body">
-                    <h6 class="mb-0 ">To-Go Sales</h6>
+                    <h6 class="mb-0">To-Go Sales</h6>
                     {% if week_togo_sales_total > wtd_togo_sales_total_ly %}
-                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_togo_sales_pct) }} over last year</p>
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-up text-success"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(wtd_togo_sales_pct) }} over last
+                      year
+                    </p>
                     {% else %}
-                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_togo_sales_pct) }} below last year</p>
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-down text-danger"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(wtd_togo_sales_pct) }} below last
+                      year
+                    </p>
                     {% endif %}
                   </div>
                 </div>
@@ -280,57 +524,123 @@
             <div class="row">
               <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
                 <div class="card z-index-2">
-                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                    <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
+                  <div
+                    class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent"
+                  >
+                    <div
+                      class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1"
+                    >
                       <div class="chart">
-                        <canvas id="chart-week-beer-sales" class="chart-canvas" height="170"></canvas>
+                        <canvas
+                          id="chart-week-beer-sales"
+                          class="chart-canvas"
+                          height="170"
+                        ></canvas>
                       </div>
                     </div>
                   </div>
                   <div class="card-body">
-                    <h6 class="mb-0 ">Beer Sales</h6>
+                    <h6 class="mb-0">Beer Sales</h6>
                     {% if week_beer_sales_total > wtd_beer_sales_total_ly %}
-                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_beer_sales_pct) }} over last year</p>
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-up text-success"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(wtd_beer_sales_pct) }} over last
+                      year
+                    </p>
                     {% else %}
-                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_beer_sales_pct) }} below last year</p>
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-down text-danger"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(wtd_beer_sales_pct) }} below last
+                      year
+                    </p>
                     {% endif %}
                   </div>
                 </div>
               </div>
               <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
                 <div class="card z-index-2">
-                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                    <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
+                  <div
+                    class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent"
+                  >
+                    <div
+                      class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1"
+                    >
                       <div class="chart">
-                        <canvas id="chart-week-wine-sales" class="chart-canvas" height="170"></canvas>
+                        <canvas
+                          id="chart-week-wine-sales"
+                          class="chart-canvas"
+                          height="170"
+                        ></canvas>
                       </div>
                     </div>
                   </div>
                   <div class="card-body">
-                    <h6 class="mb-0 ">Wine Sales</h6>
+                    <h6 class="mb-0">Wine Sales</h6>
                     {% if week_wine_sales_total > wtd_wine_sales_total_ly %}
-                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_wine_sales_pct) }} over last year</p>
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-up text-success"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(wtd_wine_sales_pct) }} over last
+                      year
+                    </p>
                     {% else %}
-                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_wine_sales_pct) }} below last year</p>
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-down text-danger"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(wtd_wine_sales_pct) }} below last
+                      year
+                    </p>
                     {% endif %}
                   </div>
                 </div>
               </div>
               <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
                 <div class="card z-index-2">
-                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                    <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
+                  <div
+                    class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent"
+                  >
+                    <div
+                      class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1"
+                    >
                       <div class="chart">
-                        <canvas id="chart-week-liquor-sales" class="chart-canvas" height="170"></canvas>
+                        <canvas
+                          id="chart-week-liquor-sales"
+                          class="chart-canvas"
+                          height="170"
+                        ></canvas>
                       </div>
                     </div>
                   </div>
                   <div class="card-body">
-                    <h6 class="mb-0 ">Liquor Sales</h6>
+                    <h6 class="mb-0">Liquor Sales</h6>
                     {% if week_liquor_sales_total > wtd_liquor_sales_total_ly %}
-                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_liquor_sales_pct) }} over last year</p>
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-up text-success"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(wtd_liquor_sales_pct) }} over last
+                      year
+                    </p>
                     {% else %}
-                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_liquor_sales_pct) }} below last year</p>
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-down text-danger"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(wtd_liquor_sales_pct) }} below last
+                      year
+                    </p>
                     {% endif %}
                   </div>
                 </div>
@@ -339,163 +649,351 @@
             <div class="row">
               <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
                 <div class="card z-index-2">
-                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                    <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
+                  <div
+                    class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent"
+                  >
+                    <div
+                      class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1"
+                    >
                       <div class="chart">
-                        <canvas id="chart-week-giftcard-sales" class="chart-canvas" height="170"></canvas>
+                        <canvas
+                          id="chart-week-giftcard-sales"
+                          class="chart-canvas"
+                          height="170"
+                        ></canvas>
                       </div>
                     </div>
                   </div>
                   <div class="card-body">
-                    <h6 class="mb-0 ">Gift Card Sales</h6>
-                    {% if week_giftcard_sales_total > wtd_giftcard_sales_total_ly %}
-                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_giftcard_sales_pct) }} over last year</p>
+                    <h6 class="mb-0">Gift Card Sales</h6>
+                    {% if week_giftcard_sales_total >
+                    wtd_giftcard_sales_total_ly %}
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-up text-success"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(wtd_giftcard_sales_pct) }} over last
+                      year
+                    </p>
                     {% else %}
-                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_giftcard_sales_pct) }} below last year</p>
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-down text-danger"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(wtd_giftcard_sales_pct) }} below
+                      last year
+                    </p>
                     {% endif %}
                   </div>
                 </div>
               </div>
               <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
                 <div class="card z-index-2">
-                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                    <div class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1">
+                  <div
+                    class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent"
+                  >
+                    <div
+                      class="bg-gradient-success shadow-success border-radius-lg py-3 pe-1"
+                    >
                       <div class="chart">
-                        <canvas id="chart-week-giftcard-redeem" class="chart-canvas" height="170"></canvas>
+                        <canvas
+                          id="chart-week-giftcard-redeem"
+                          class="chart-canvas"
+                          height="170"
+                        ></canvas>
                       </div>
                     </div>
                   </div>
                   <div class="card-body">
-                    <h6 class="mb-0 ">Gift Cards Redeemed</h6>
-                    {% if week_giftcard_redeem_total > wtd_giftcard_redeem_total_ly %}
-                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_giftcard_redeem_pct) }} over last year</p>
+                    <h6 class="mb-0">Gift Cards Redeemed</h6>
+                    {% if week_giftcard_redeem_total >
+                    wtd_giftcard_redeem_total_ly %}
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-up text-success"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(wtd_giftcard_redeem_pct) }} over
+                      last year
+                    </p>
                     {% else %}
-                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(wtd_giftcard_redeem_pct) }} below last year</p>
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-down text-danger"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(wtd_giftcard_redeem_pct) }} below
+                      last year
+                    </p>
                     {% endif %}
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          <div class="tab-pane fade" id="nav-period" role="tabpanel" aria-labelledby="nav-period-tab">
+          <div
+            class="tab-pane fade"
+            id="nav-period"
+            role="tabpanel"
+            aria-labelledby="nav-period-tab"
+          >
             <div class="card-header pb-0">
               <div class="row">
                 <div class="col-lg-6 col-7">
-                    <h4>Period-{{ fiscal_dates["period"] }} {{ fiscal_dates["year"]}}</h4>
+                  <h4>
+                    Period-{{ fiscal_dates["period"] }} {{
+                    fiscal_dates["year"]}}
+                  </h4>
                 </div>
               </div>
             </div>
             <div class="row">
               <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
                 <div class="card z-index-2">
-                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                    <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
+                  <div
+                    class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent"
+                  >
+                    <div
+                      class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1"
+                    >
                       <div class="chart">
-                        <canvas id="chart-period-lunch-sales" class="chart-canvas" height="170"></canvas>
+                        <canvas
+                          id="chart-period-lunch-sales"
+                          class="chart-canvas"
+                          height="170"
+                        ></canvas>
                       </div>
                     </div>
                   </div>
                   <div class="card-body">
-                    <h6 class="mb-0 ">Lunch Sales</h6>
+                    <h6 class="mb-0">Lunch Sales</h6>
                     {% if period_lunch_sales_total > ptd_lunch_sales_total_ly %}
-                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_lunch_sales_pct) }} over last year</p>
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-up text-success"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(ptd_lunch_sales_pct) }} over last
+                      year
+                    </p>
                     {% else %}
-                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_lunch_sales_pct) }} below last year</p>
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-down text-danger"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(ptd_lunch_sales_pct) }} below last
+                      year
+                    </p>
                     {% endif %}
                   </div>
                 </div>
               </div>
               <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
                 <div class="card z-index-2">
-                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                    <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
+                  <div
+                    class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent"
+                  >
+                    <div
+                      class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1"
+                    >
                       <div class="chart">
-                        <canvas id="chart-period-dinner-sales" class="chart-canvas" height="170"></canvas>
+                        <canvas
+                          id="chart-period-dinner-sales"
+                          class="chart-canvas"
+                          height="170"
+                        ></canvas>
                       </div>
                     </div>
                   </div>
                   <div class="card-body">
-                    <h6 class="mb-0 ">Dinner Sales</h6>
-                    {% if period_dinner_sales_total > ptd_dinner_sales_total_ly %}
-                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_dinner_sales_pct) }} over last year</p>
+                    <h6 class="mb-0">Dinner Sales</h6>
+                    {% if period_dinner_sales_total > ptd_dinner_sales_total_ly
+                    %}
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-up text-success"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(ptd_dinner_sales_pct) }} over last
+                      year
+                    </p>
                     {% else %}
-                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_dinner_sales_pct) }} below last year</p>
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-down text-danger"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(ptd_dinner_sales_pct) }} below last
+                      year
+                    </p>
                     {% endif %}
                   </div>
                 </div>
               </div>
               <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
                 <div class="card z-index-2">
-                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                    <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
+                  <div
+                    class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent"
+                  >
+                    <div
+                      class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1"
+                    >
                       <div class="chart">
-                        <canvas id="chart-period-togo-sales" class="chart-canvas" height="170"></canvas>
+                        <canvas
+                          id="chart-period-togo-sales"
+                          class="chart-canvas"
+                          height="170"
+                        ></canvas>
                       </div>
                     </div>
                   </div>
                   <div class="card-body">
-                    <h6 class="mb-0 ">To-Go Sales</h6>
+                    <h6 class="mb-0">To-Go Sales</h6>
                     {% if period_togo_sales_total > ptd_togo_sales_total_ly %}
-                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_togo_sales_pct) }} over last year</p>
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-up text-success"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(ptd_togo_sales_pct) }} over last
+                      year
+                    </p>
                     {% else %}
-                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_togo_sales_pct) }} below last year</p>
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-down text-danger"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(ptd_togo_sales_pct) }} below last
+                      year
+                    </p>
                     {% endif %}
                   </div>
                 </div>
               </div>
               <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
                 <div class="card z-index-2">
-                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                    <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
+                  <div
+                    class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent"
+                  >
+                    <div
+                      class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1"
+                    >
                       <div class="chart">
-                        <canvas id="chart-period-beer-sales" class="chart-canvas" height="170"></canvas>
+                        <canvas
+                          id="chart-period-beer-sales"
+                          class="chart-canvas"
+                          height="170"
+                        ></canvas>
                       </div>
                     </div>
                   </div>
                   <div class="card-body">
-                    <h6 class="mb-0 ">Beer Sales</h6>
+                    <h6 class="mb-0">Beer Sales</h6>
                     {% if period_beer_sales_total > ptd_beer_sales_total_ly %}
-                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_beer_sales_pct) }} over last year</p>
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-up text-success"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(ptd_beer_sales_pct) }} over last
+                      year
+                    </p>
                     {% else %}
-                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_beer_sales_pct) }} below last year</p>
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-down text-danger"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(ptd_beer_sales_pct) }} below last
+                      year
+                    </p>
                     {% endif %}
                   </div>
                 </div>
               </div>
               <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
                 <div class="card z-index-2">
-                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                    <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
+                  <div
+                    class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent"
+                  >
+                    <div
+                      class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1"
+                    >
                       <div class="chart">
-                        <canvas id="chart-period-wine-sales" class="chart-canvas" height="170"></canvas>
+                        <canvas
+                          id="chart-period-wine-sales"
+                          class="chart-canvas"
+                          height="170"
+                        ></canvas>
                       </div>
                     </div>
                   </div>
                   <div class="card-body">
-                    <h6 class="mb-0 ">Wine Sales</h6>
+                    <h6 class="mb-0">Wine Sales</h6>
                     {% if period_wine_sales_total > ptd_wine_sales_total_ly %}
-                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_wine_sales_pct) }} over last year</p>
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-up text-success"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(ptd_wine_sales_pct) }} over last
+                      year
+                    </p>
                     {% else %}
-                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_wine_sales_pct) }} below last year</p>
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-down text-danger"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(ptd_wine_sales_pct) }} below last
+                      year
+                    </p>
                     {% endif %}
                   </div>
                 </div>
               </div>
               <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
                 <div class="card z-index-2">
-                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                    <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
+                  <div
+                    class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent"
+                  >
+                    <div
+                      class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1"
+                    >
                       <div class="chart">
-                        <canvas id="chart-period-liquor-sales" class="chart-canvas" height="170"></canvas>
+                        <canvas
+                          id="chart-period-liquor-sales"
+                          class="chart-canvas"
+                          height="170"
+                        ></canvas>
                       </div>
                     </div>
                   </div>
                   <div class="card-body">
-                    <h6 class="mb-0 ">Liquor Sales</h6>
-                    {% if period_liquor_sales_total > ptd_liquor_sales_total_ly %}
-                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_liquor_sales_pct) }} over last year</p>
+                    <h6 class="mb-0">Liquor Sales</h6>
+                    {% if period_liquor_sales_total > ptd_liquor_sales_total_ly
+                    %}
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-up text-success"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(ptd_liquor_sales_pct) }} over last
+                      year
+                    </p>
                     {% else %}
-                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_liquor_sales_pct) }} below last year</p>
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-down text-danger"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(ptd_liquor_sales_pct) }} below last
+                      year
+                    </p>
                     {% endif %}
                   </div>
                 </div>
@@ -504,45 +1002,96 @@
             <div class="row">
               <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
                 <div class="card z-index-2">
-                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                    <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
+                  <div
+                    class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent"
+                  >
+                    <div
+                      class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1"
+                    >
                       <div class="chart">
-                        <canvas id="chart-period-giftcard-sales" class="chart-canvas" height="170"></canvas>
+                        <canvas
+                          id="chart-period-giftcard-sales"
+                          class="chart-canvas"
+                          height="170"
+                        ></canvas>
                       </div>
                     </div>
                   </div>
                   <div class="card-body">
-                    <h6 class="mb-0 ">Gift Card Sales</h6>
-                    {% if period_giftcard_sales_total > ptd_giftcard_sales_total_ly %}
-                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_giftcard_sales_pct) }} over last year</p>
+                    <h6 class="mb-0">Gift Card Sales</h6>
+                    {% if period_giftcard_sales_total >
+                    ptd_giftcard_sales_total_ly %}
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-up text-success"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(ptd_giftcard_sales_pct) }} over last
+                      year
+                    </p>
                     {% else %}
-                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_giftcard_sales_pct) }} below last year</p>
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-down text-danger"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(ptd_giftcard_sales_pct) }} below
+                      last year
+                    </p>
                     {% endif %}
                   </div>
                 </div>
               </div>
               <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
                 <div class="card z-index-2">
-                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                    <div class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1">
+                  <div
+                    class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent"
+                  >
+                    <div
+                      class="bg-gradient-info shadow-info border-radius-lg py-3 pe-1"
+                    >
                       <div class="chart">
-                        <canvas id="chart-period-giftcard-redeem" class="chart-canvas" height="170"></canvas>
+                        <canvas
+                          id="chart-period-giftcard-redeem"
+                          class="chart-canvas"
+                          height="170"
+                        ></canvas>
                       </div>
                     </div>
                   </div>
                   <div class="card-body">
-                    <h6 class="mb-0 ">Gift Cards Redeemed</h6>
-                    {% if period_giftcard_redeem_total > ptd_giftcard_redeem_total_ly %}
-                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_giftcard_redeem_pct) }} over last year</p>
+                    <h6 class="mb-0">Gift Cards Redeemed</h6>
+                    {% if period_giftcard_redeem_total >
+                    ptd_giftcard_redeem_total_ly %}
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-up text-success"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(ptd_giftcard_redeem_pct) }} over
+                      last year
+                    </p>
                     {% else %}
-                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ptd_giftcard_redeem_pct) }} below last year</p>
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-down text-danger"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(ptd_giftcard_redeem_pct) }} below
+                      last year
+                    </p>
                     {% endif %}
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          <div class="tab-pane fade" id="nav-year" role="tabpanel" aria-labelledby="nav-year-tab">
+          <div
+            class="tab-pane fade"
+            id="nav-year"
+            role="tabpanel"
+            aria-labelledby="nav-year-tab"
+          >
             <div class="card-header pb-0">
               <div class="row">
                 <div class="col-lg-6 col-7">
@@ -553,114 +1102,246 @@
             <div class="row">
               <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
                 <div class="card z-index-2">
-                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                    <div class="bg-gradient-warning shadow-warning border-radius-lg py-3 pe-1">
+                  <div
+                    class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent"
+                  >
+                    <div
+                      class="bg-gradient-warning shadow-warning border-radius-lg py-3 pe-1"
+                    >
                       <div class="chart">
-                        <canvas id="chart-year-lunch-sales" class="chart-canvas" height="170"></canvas>
+                        <canvas
+                          id="chart-year-lunch-sales"
+                          class="chart-canvas"
+                          height="170"
+                        ></canvas>
                       </div>
                     </div>
                   </div>
                   <div class="card-body">
-                    <h6 class="mb-0 ">Lunch Sales</h6>
+                    <h6 class="mb-0">Lunch Sales</h6>
                     {% if year_lunch_sales_total > ytd_lunch_sales_total_ly %}
-                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_lunch_sales_pct) }} over last year</p>
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-up text-success"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(ytd_lunch_sales_pct) }} over last
+                      year
+                    </p>
                     {% else %}
-                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_lunch_sales_pct) }} below last year</p>
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-down text-danger"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(ytd_lunch_sales_pct) }} below last
+                      year
+                    </p>
                     {% endif %}
                   </div>
                 </div>
               </div>
               <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
                 <div class="card z-index-2">
-                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                    <div class="bg-gradient-warning shadow-warning border-radius-lg py-3 pe-1">
+                  <div
+                    class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent"
+                  >
+                    <div
+                      class="bg-gradient-warning shadow-warning border-radius-lg py-3 pe-1"
+                    >
                       <div class="chart">
-                        <canvas id="chart-year-dinner-sales" class="chart-canvas" height="170"></canvas>
+                        <canvas
+                          id="chart-year-dinner-sales"
+                          class="chart-canvas"
+                          height="170"
+                        ></canvas>
                       </div>
                     </div>
                   </div>
                   <div class="card-body">
-                    <h6 class="mb-0 ">Dinner Sales</h6>
+                    <h6 class="mb-0">Dinner Sales</h6>
                     {% if year_dinner_sales_total > ytd_dinner_sales_total_ly %}
-                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_dinner_sales_pct) }} over last year</p>
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-up text-success"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(ytd_dinner_sales_pct) }} over last
+                      year
+                    </p>
                     {% else %}
-                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_dinner_sales_pct) }} below last year</p>
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-down text-danger"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(ytd_dinner_sales_pct) }} below last
+                      year
+                    </p>
                     {% endif %}
                   </div>
                 </div>
               </div>
               <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
                 <div class="card z-index-2">
-                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                    <div class="bg-gradient-warning shadow-warning border-radius-lg py-3 pe-1">
+                  <div
+                    class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent"
+                  >
+                    <div
+                      class="bg-gradient-warning shadow-warning border-radius-lg py-3 pe-1"
+                    >
                       <div class="chart">
-                        <canvas id="chart-year-togo-sales" class="chart-canvas" height="170"></canvas>
+                        <canvas
+                          id="chart-year-togo-sales"
+                          class="chart-canvas"
+                          height="170"
+                        ></canvas>
                       </div>
                     </div>
                   </div>
                   <div class="card-body">
-                    <h6 class="mb-0 ">To-Go Sales</h6>
+                    <h6 class="mb-0">To-Go Sales</h6>
                     {% if year_togo_sales_total > ytd_togo_sales_total_ly %}
-                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_togo_sales_pct) }} over last year</p>
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-up text-success"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(ytd_togo_sales_pct) }} over last
+                      year
+                    </p>
                     {% else %}
-                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_togo_sales_pct) }} below last year</p>
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-down text-danger"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(ytd_togo_sales_pct) }} below last
+                      year
+                    </p>
                     {% endif %}
                   </div>
                 </div>
               </div>
               <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
                 <div class="card z-index-2">
-                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                    <div class="bg-gradient-warning shadow-warning border-radius-lg py-3 pe-1">
+                  <div
+                    class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent"
+                  >
+                    <div
+                      class="bg-gradient-warning shadow-warning border-radius-lg py-3 pe-1"
+                    >
                       <div class="chart">
-                        <canvas id="chart-year-beer-sales" class="chart-canvas" height="170"></canvas>
+                        <canvas
+                          id="chart-year-beer-sales"
+                          class="chart-canvas"
+                          height="170"
+                        ></canvas>
                       </div>
                     </div>
                   </div>
                   <div class="card-body">
-                    <h6 class="mb-0 ">Beer Sales</h6>
+                    <h6 class="mb-0">Beer Sales</h6>
                     {% if year_beer_sales_total > ytd_beer_sales_total_ly %}
-                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_beer_sales_pct) }} over last year</p>
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-up text-success"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(ytd_beer_sales_pct) }} over last
+                      year
+                    </p>
                     {% else %}
-                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_beer_sales_pct) }} below last year</p>
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-down text-danger"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(ytd_beer_sales_pct) }} below last
+                      year
+                    </p>
                     {% endif %}
                   </div>
                 </div>
               </div>
               <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
                 <div class="card z-index-2">
-                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                    <div class="bg-gradient-warning shadow-warning border-radius-lg py-3 pe-1">
+                  <div
+                    class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent"
+                  >
+                    <div
+                      class="bg-gradient-warning shadow-warning border-radius-lg py-3 pe-1"
+                    >
                       <div class="chart">
-                        <canvas id="chart-year-wine-sales" class="chart-canvas" height="170"></canvas>
+                        <canvas
+                          id="chart-year-wine-sales"
+                          class="chart-canvas"
+                          height="170"
+                        ></canvas>
                       </div>
                     </div>
                   </div>
                   <div class="card-body">
-                    <h6 class="mb-0 ">Wine Sales</h6>
+                    <h6 class="mb-0">Wine Sales</h6>
                     {% if year_wine_sales_total > ytd_wine_sales_total_ly %}
-                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_wine_sales_pct) }} over last year</p>
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-up text-success"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(ytd_wine_sales_pct) }} over last
+                      year
+                    </p>
                     {% else %}
-                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_wine_sales_pct) }} below last year</p>
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-down text-danger"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(ytd_wine_sales_pct) }} below last
+                      year
+                    </p>
                     {% endif %}
                   </div>
                 </div>
               </div>
               <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
                 <div class="card z-index-2">
-                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                    <div class="bg-gradient-warning shadow-warning border-radius-lg py-3 pe-1">
+                  <div
+                    class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent"
+                  >
+                    <div
+                      class="bg-gradient-warning shadow-warning border-radius-lg py-3 pe-1"
+                    >
                       <div class="chart">
-                        <canvas id="chart-year-liquor-sales" class="chart-canvas" height="170"></canvas>
+                        <canvas
+                          id="chart-year-liquor-sales"
+                          class="chart-canvas"
+                          height="170"
+                        ></canvas>
                       </div>
                     </div>
                   </div>
                   <div class="card-body">
-                    <h6 class="mb-0 ">Liquor Sales</h6>
+                    <h6 class="mb-0">Liquor Sales</h6>
                     {% if year_liquor_sales_total > ytd_liquor_sales_total_ly %}
-                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_liquor_sales_pct) }} over last year</p>
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-up text-success"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(ytd_liquor_sales_pct) }} over last
+                      year
+                    </p>
                     {% else %}
-                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_liquor_sales_pct) }} below last year</p>
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-down text-danger"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(ytd_liquor_sales_pct) }} below last
+                      year
+                    </p>
                     {% endif %}
                   </div>
                 </div>
@@ -669,38 +1350,84 @@
             <div class="row">
               <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
                 <div class="card z-index-2">
-                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                    <div class="bg-gradient-warning shadow-warning border-radius-lg py-3 pe-1">
+                  <div
+                    class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent"
+                  >
+                    <div
+                      class="bg-gradient-warning shadow-warning border-radius-lg py-3 pe-1"
+                    >
                       <div class="chart">
-                        <canvas id="chart-year-giftcard-sales" class="chart-canvas" height="170"></canvas>
+                        <canvas
+                          id="chart-year-giftcard-sales"
+                          class="chart-canvas"
+                          height="170"
+                        ></canvas>
                       </div>
                     </div>
                   </div>
                   <div class="card-body">
-                    <h6 class="mb-0 ">Gift Card Sales</h6>
-                    {% if year_giftcard_sales_total > ytd_giftcard_sales_total_ly %}
-                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_giftcard_sales_pct) }} over last year</p>
+                    <h6 class="mb-0">Gift Card Sales</h6>
+                    {% if year_giftcard_sales_total >
+                    ytd_giftcard_sales_total_ly %}
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-up text-success"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(ytd_giftcard_sales_pct) }} over last
+                      year
+                    </p>
                     {% else %}
-                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_giftcard_sales_pct) }} below last year</p>
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-down text-danger"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(ytd_giftcard_sales_pct) }} below
+                      last year
+                    </p>
                     {% endif %}
                   </div>
                 </div>
               </div>
               <div class="col-xl-4 col-lg-6 col-md-6 mt-4 mb-4">
                 <div class="card z-index-2">
-                  <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent">
-                    <div class="bg-gradient-warning shadow-warning border-radius-lg py-3 pe-1">
+                  <div
+                    class="card-header p-0 position-relative mt-n4 mx-3 z-index-2 bg-transparent"
+                  >
+                    <div
+                      class="bg-gradient-warning shadow-warning border-radius-lg py-3 pe-1"
+                    >
                       <div class="chart">
-                        <canvas id="chart-year-giftcard-redeem" class="chart-canvas" height="170"></canvas>
+                        <canvas
+                          id="chart-year-giftcard-redeem"
+                          class="chart-canvas"
+                          height="170"
+                        ></canvas>
                       </div>
                     </div>
                   </div>
                   <div class="card-body">
-                    <h6 class="mb-0 ">Gift Cards Redeemed</h6>
-                    {% if year_giftcard_redeem_total > ytd_giftcard_redeem_total_ly %}
-                    <p class="text-sm "><i class="fa fa-arrow-up text-success" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_giftcard_redeem_pct) }} over last year</p>
+                    <h6 class="mb-0">Gift Cards Redeemed</h6>
+                    {% if year_giftcard_redeem_total >
+                    ytd_giftcard_redeem_total_ly %}
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-up text-success"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(ytd_giftcard_redeem_pct) }} over
+                      last year
+                    </p>
                     {% else %}
-                    <p class="text-sm "><i class="fa fa-arrow-down text-danger" aria-hidden="true"></i>{{ "{:,.1f}%".format(ytd_giftcard_redeem_pct) }} below last year</p>
+                    <p class="text-sm">
+                      <i
+                        class="fa fa-arrow-down text-danger"
+                        aria-hidden="true"
+                      ></i
+                      >{{ "{:,.1f}%".format(ytd_giftcard_redeem_pct) }} below
+                      last year
+                    </p>
                     {% endif %}
                   </div>
                 </div>
@@ -1259,7 +1986,7 @@
 
   var ctp4 = document.getElementById("chart-period-beer-sales").getContext("2d");
   periodCommonChart(ctp4, "bar", {{ period_beer_sales_list | safe }}, "Beer Sales", {{ period_beer_sales_list_ly | safe }}, "Same Week LY", "Beer Sales");
-  
+
   var ctp5 = document.getElementById("chart-period-wine-sales").getContext("2d");
   periodCommonChart(ctp5, "bar", {{ period_wine_sales_list | safe }}, "Wine Sales", {{ period_wine_sales_list_ly | safe }}, "Same Week LY", "Wine Sales");
 
@@ -1268,7 +1995,7 @@
 
   var ctp7 = document.getElementById("chart-period-giftcard-sales").getContext("2d");
   periodCommonChart(ctp7, "bar", {{ period_giftcard_sales_list | safe }}, "Gift Card Sales", {{ period_giftcard_sales_list_ly | safe }}, "Same Week LY", "Gift Card Sales");
-  
+
   var ctp8 = document.getElementById("chart-period-giftcard-redeem").getContext("2d");
   periodCommonChart(ctp8, "bar", {{ period_giftcard_redeem_list | safe }}, "Gift Cards Redeemed", {{ period_giftcard_redeem_list_ly | safe }}, "Same Week LY", "Gift Cards Redeemed");
 
@@ -1396,9 +2123,8 @@
 
   var cty7 = document.getElementById("chart-year-giftcard-sales").getContext("2d");
   yearlyCommonChart(cty7, "line", {{ year_giftcard_sales_list | safe }}, "Gift Card Sales", {{ year_giftcard_sales_list_ly | safe }}, "Same Period LY", "Gift Card Sales");
-  
+
   var cty8 = document.getElementById("chart-year-giftcard-redeem").getContext("2d");
   yearlyCommonChart(cty8, "line", {{ year_giftcard_redeem_list | safe }}, "Gift Cards Redeemed", {{ year_giftcard_redeem_list_ly | safe }}, "Same Period LY", "Gift Cards Redeemed");
-
 </script>
 {% endblock javascripts %}

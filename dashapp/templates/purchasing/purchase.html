@@ -59,12 +59,41 @@
       </li>
     </ul>
     <button class="btn active bg-gradient-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-      Supplies
+      Non-Food
     </button>
     <ul class="dropdown-menu">
-      <li><a class="dropdown-item" href="#">Supplies</a></li>
       <li>
-        <a class="dropdown-item font-weight-bold text-primary" href="/purchasing/supplies">Supplies</a>
+        <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.purchase', product='Bar Supplies') }}">Bar</a>
+      </li>
+      <li>
+        <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.purchase', product='Catering Supplies') }}">Catering</a>
+      </li>
+      <li>
+        <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.purchase', product='Cleaning Supplies') }}">Cleaning</a>
+      </li>
+      <li>
+        <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.purchase', product='Kitchen Supplies') }}">Kitchen</a>
+      </li>
+      <li>
+        <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.purchase', product='Rest. Supplies') }}">Restaurant</a>
+      </li>
+      <li>
+        <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.purchase', product='China') }}">China</a>
+      </li>
+      <li>
+        <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.purchase', product='Glassware') }}">Glassware</a>
+      </li>
+      <li>
+        <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.purchase', product='Linen') }}">Linen</a>
+      </li>
+      <li>
+        <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.purchase', product='Silverware') }}">Silverware</a>
+      </li>
+      <li>
+        <a class="dropdown-item" href="{{ url_for('purchasing_blueprint.purchase', product='Smallwares') }}">Smallware</a>
+      </li>
+      <li>
+        <a class="dropdown-item font-weight-bold text-primary" href="/purchasing/supplies">Supply</a>
       </li>
     </ul>
   </div>

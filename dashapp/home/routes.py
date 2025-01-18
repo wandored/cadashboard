@@ -314,7 +314,7 @@ def index():
         table = table.fillna(0)
         table["doly"] = table.sales - table.sales_ly
         table["poly"] = (table.sales - table.sales_ly) / table.sales_ly * 100
-        #drop row if sales_ly is 0
+        # drop row if sales_ly is 0
         top_table = table[table.sales_ly != 0]
         top = top_table[["doly", "poly"]]
         top = top.nlargest(5, "poly", keep="all")
@@ -323,7 +323,9 @@ def index():
             float
         )
         table["labor_pct"] = table.dollars / table.sales
+        # ic(table.labor_pct, table.dollars, table.sales)
         table["labor_pct_ly"] = table.dollars_ly / table.sales_ly
+        # ic(table.labor_pct_ly, table.dollars_ly, table.sales_ly)
         totals = table.sum()
 
         return totals, table, top
@@ -360,7 +362,6 @@ def index():
         "Year",
     )
 
-     
     # get net_sales for day, week, period and year.
     query = CASalesRecordDay.query.first()
     ca_sales_record_day = query.net_sales
@@ -370,7 +371,6 @@ def index():
     ca_sales_record_period = query.net_sales
     query = CASalesRecordYear.query.first()
     ca_sales_record_year = query.net_sales
-
 
     return render_template(
         "home/index.html",
@@ -1072,25 +1072,33 @@ def store(store_id):
     day_host_dollar_ty = day_host_labor["dollars"].sum()
     day_host_pct_ty = day_host_dollar_ty / daily_sales * 100
     day_host_dollar_ly = day_host_labor_ly["dollars"].sum()
-    day_host_pct_ly = (day_host_dollar_ly / daily_sales_ly * 100) if daily_sales_ly else 0
+    day_host_pct_ly = (
+        (day_host_dollar_ly / daily_sales_ly * 100) if daily_sales_ly else 0
+    )
     day_host_dollar_var = day_host_dollar_ty - day_host_dollar_ly
     day_host_percent_var = day_host_pct_ty - day_host_pct_ly
     week_host_dollar_ty = week_host_labor["dollars"].sum()
     week_host_pct_ty = week_host_dollar_ty / weekly_sales * 100
     week_host_dollar_ly = week_host_labor_ly["dollars"].sum()
-    week_host_pct_ly = (week_host_dollar_ly / weekly_sales_ly * 100) if weekly_sales_ly else 0
+    week_host_pct_ly = (
+        (week_host_dollar_ly / weekly_sales_ly * 100) if weekly_sales_ly else 0
+    )
     week_host_dollar_var = week_host_dollar_ty - week_host_dollar_ly
     week_host_percent_var = week_host_pct_ty - week_host_pct_ly
     period_host_dollar_ty = period_host_labor["dollars"].sum()
     period_host_pct_ty = period_host_dollar_ty / period_sales * 100
     period_host_dollar_ly = period_host_labor_ly["dollars"].sum()
-    period_host_pct_ly = (period_host_dollar_ly / period_sales_ly * 100) if period_sales_ly else 0
+    period_host_pct_ly = (
+        (period_host_dollar_ly / period_sales_ly * 100) if period_sales_ly else 0
+    )
     period_host_dollar_var = period_host_dollar_ty - period_host_dollar_ly
     period_host_percent_var = period_host_pct_ty - period_host_pct_ly
     year_host_dollar_ty = year_host_labor["dollars"].sum()
     year_host_pct_ty = year_host_dollar_ty / yearly_sales * 100
     year_host_dollar_ly = year_host_labor_ly["dollars"].sum()
-    year_host_pct_ly = (year_host_dollar_ly / yearly_sales_ly * 100) if yearly_sales_ly else 0
+    year_host_pct_ly = (
+        (year_host_dollar_ly / yearly_sales_ly * 100) if yearly_sales_ly else 0
+    )
     year_host_dollar_var = year_host_dollar_ty - year_host_dollar_ly
     year_host_percent_var = year_host_pct_ty - year_host_pct_ly
 
@@ -1098,49 +1106,49 @@ def store(store_id):
     daily_food_sales = get_category_sales(
         fiscal_dates["start_day"],
         fiscal_dates["end_day"],
-        "Food Sales",
+        ["Food Sales"],
         session["store_list"],
     )
     daily_food_sales_ly = get_category_sales(
         fiscal_dates["start_day_ly"],
         fiscal_dates["end_day_ly"],
-        "Food Sales",
+        ["Food Sales"],
         session["store_list"],
     )
     weekly_food_sales = get_category_sales(
         fiscal_dates["start_week"],
         fiscal_dates["week_to_date"],
-        "Food Sales",
+        ["Food Sales"],
         session["store_list"],
     )
     weekly_food_sales_ly = get_category_sales(
         fiscal_dates["start_week_ly"],
         fiscal_dates["start_day_ly"],
-        "Food Sales",
+        ["Food Sales"],
         session["store_list"],
     )
     period_food_sales = get_category_sales(
         fiscal_dates["start_period"],
         fiscal_dates["period_to_date"],
-        "Food Sales",
+        ["Food Sales"],
         session["store_list"],
     )
     period_food_sales_ly = get_category_sales(
         fiscal_dates["start_period_ly"],
         fiscal_dates["start_day_ly"],
-        "Food Sales",
+        ["Food Sales"],
         session["store_list"],
     )
     year_food_sales = get_category_sales(
         fiscal_dates["start_year"],
         fiscal_dates["year_to_date"],
-        "Food Sales",
+        ["Food Sales"],
         session["store_list"],
     )
     year_food_sales_ly = get_category_sales(
         fiscal_dates["start_year_ly"],
         fiscal_dates["start_day_ly"],
-        "Food Sales",
+        ["Food Sales"],
         session["store_list"],
     )
     daily_food_sales_total = daily_food_sales["sales"].sum()
@@ -1183,25 +1191,41 @@ def store(store_id):
     day_BOH_dollar_ty = day_BOH_labor["dollars"].sum()
     day_BOH_pct_ty = day_BOH_dollar_ty / daily_food_sales_total * 100
     day_BOH_dollar_ly = day_BOH_labor_ly["dollars"].sum()
-    day_BOH_pct_ly = (day_BOH_dollar_ly / daily_food_sales_total_ly * 100) if daily_food_sales_total_ly else 0
+    day_BOH_pct_ly = (
+        (day_BOH_dollar_ly / daily_food_sales_total_ly * 100)
+        if daily_food_sales_total_ly
+        else 0
+    )
     day_BOH_dollar_var = day_BOH_dollar_ty - day_BOH_dollar_ly
     day_BOH_percent_var = day_BOH_pct_ty - day_BOH_pct_ly
     week_BOH_dollar_ty = week_BOH_labor["dollars"].sum()
     week_BOH_pct_ty = week_BOH_dollar_ty / weekly_food_sales_total * 100
     week_BOH_dollar_ly = week_BOH_labor_ly["dollars"].sum()
-    week_BOH_pct_ly = (week_BOH_dollar_ly / weekly_food_sales_total_ly * 100) if weekly_food_sales_total_ly else 0
+    week_BOH_pct_ly = (
+        (week_BOH_dollar_ly / weekly_food_sales_total_ly * 100)
+        if weekly_food_sales_total_ly
+        else 0
+    )
     week_BOH_dollar_var = week_BOH_dollar_ty - week_BOH_dollar_ly
     week_BOH_percent_var = week_BOH_pct_ty - week_BOH_pct_ly
     period_BOH_dollar_ty = period_BOH_labor["dollars"].sum()
     period_BOH_pct_ty = period_BOH_dollar_ty / period_food_sales_total * 100
     period_BOH_dollar_ly = period_BOH_labor_ly["dollars"].sum()
-    period_BOH_pct_ly = (period_BOH_dollar_ly / period_food_sales_total_ly * 100) if period_food_sales_total_ly else 0
+    period_BOH_pct_ly = (
+        (period_BOH_dollar_ly / period_food_sales_total_ly * 100)
+        if period_food_sales_total_ly
+        else 0
+    )
     period_BOH_dollar_var = period_BOH_dollar_ty - period_BOH_dollar_ly
     period_BOH_percent_var = period_BOH_pct_ty - period_BOH_pct_ly
     year_BOH_dollar_ty = year_BOH_labor["dollars"].sum()
     year_BOH_pct_ty = year_BOH_dollar_ty / year_food_sales_total * 100
     year_BOH_dollar_ly = year_BOH_labor_ly["dollars"].sum()
-    year_BOH_pct_ly = (year_BOH_dollar_ly / year_food_sales_total_ly * 100) if year_food_sales_total_ly else 0
+    year_BOH_pct_ly = (
+        (year_BOH_dollar_ly / year_food_sales_total_ly * 100)
+        if year_food_sales_total_ly
+        else 0
+    )
     year_BOH_dollar_var = year_BOH_dollar_ty - year_BOH_dollar_ly
     year_BOH_percent_var = year_BOH_pct_ty - year_BOH_pct_ly
 
@@ -1209,37 +1233,37 @@ def store(store_id):
     week_beer_sales = get_category_sales(
         fiscal_dates["start_week"],
         fiscal_dates["start_day"],
-        "Beer Sales",
+        ["Beer Sales"],
         session["store_list"],
     )
     period_beer_sales = get_category_sales(
         fiscal_dates["start_period"],
         fiscal_dates["start_day"],
-        "Beer Sales",
+        ["Beer Sales"],
         session["store_list"],
     )
     year_beer_sales = get_category_sales(
         fiscal_dates["start_year"],
         fiscal_dates["start_day"],
-        "Beer Sales",
+        ["Beer Sales"],
         session["store_list"],
     )
     week_beer_sales_ly = get_category_sales(
         fiscal_dates["start_week_ly"],
         fiscal_dates["end_week_ly"],
-        "Beer Sales",
+        ["Beer Sales"],
         session["store_list"],
     )
     period_beer_sales_ly = get_category_sales(
         fiscal_dates["start_period_ly"],
         fiscal_dates["end_period_ly"],
-        "Beer Sales",
+        ["Beer Sales"],
         session["store_list"],
     )
     year_beer_sales_ly = get_category_sales(
         fiscal_dates["start_year_ly"],
         fiscal_dates["end_year_ly"],
-        "Beer Sales",
+        ["Beer Sales"],
         session["store_list"],
     )
 
@@ -1286,14 +1310,16 @@ def store(store_id):
     ]["sales"].sum()
 
     period_beer_sales_total = period_beer_sales["sales"].sum()
-    if 'sales' in ptd_beer_sales_ly.columns:
+    if "sales" in ptd_beer_sales_ly.columns:
         ptd_beer_sales_total_ly = ptd_beer_sales_ly["sales"].sum()
     else:
         ptd_beer_sales_total_ly = 0
 
     year_beer_sales_total = year_beer_sales["sales"].sum()
-    if 'sales' in ytd_beer_sales_ly.columns:
-        ytd_beer_sales_total_ly = ytd_beer_sales_ly[year_beer_sales_ly["date"] <= fiscal_dates["start_day"]]["sales"].sum()
+    if "sales" in ytd_beer_sales_ly.columns:
+        ytd_beer_sales_total_ly = ytd_beer_sales_ly[
+            year_beer_sales_ly["date"] <= fiscal_dates["start_day"]
+        ]["sales"].sum()
     else:
         ytd_beer_sales_total_ly = 0
 
@@ -1326,37 +1352,37 @@ def store(store_id):
     week_liquor_sales = get_category_sales(
         fiscal_dates["start_week"],
         fiscal_dates["start_day"],
-        "Liquor Sales",
+        ["Liquor Sales"],
         session["store_list"],
     )
     period_liquor_sales = get_category_sales(
         fiscal_dates["start_period"],
         fiscal_dates["start_day"],
-        "Liquor Sales",
+        ["Liquor Sales"],
         session["store_list"],
     )
     year_liquor_sales = get_category_sales(
         fiscal_dates["start_year"],
         fiscal_dates["start_day"],
-        "Liquor Sales",
+        ["Liquor Sales"],
         session["store_list"],
     )
     week_liquor_sales_ly = get_category_sales(
         fiscal_dates["start_week_ly"],
         fiscal_dates["end_week_ly"],
-        "Liquor Sales",
+        ["Liquor Sales"],
         session["store_list"],
     )
     period_liquor_sales_ly = get_category_sales(
         fiscal_dates["start_period_ly"],
         fiscal_dates["end_period_ly"],
-        "Liquor Sales",
+        ["Liquor Sales"],
         session["store_list"],
     )
     year_liquor_sales_ly = get_category_sales(
         fiscal_dates["start_year_ly"],
         fiscal_dates["end_year_ly"],
-        "Liquor Sales",
+        ["Liquor Sales"],
         session["store_list"],
     )
     week_liquor_sales_list = week_liquor_sales["sales"].tolist()
@@ -1408,13 +1434,13 @@ def store(store_id):
     ]["sales"].sum()
 
     period_liquor_sales_total = period_liquor_sales["sales"].sum()
-    if 'sales' in ptd_liquor_sales_ly.columns:
+    if "sales" in ptd_liquor_sales_ly.columns:
         ptd_liquor_sales_total_ly = ptd_liquor_sales_ly["sales"].sum()
     else:
         ptd_liquor_sales_total_ly = 0
 
     year_liquor_sales_total = year_liquor_sales["sales"].sum()
-    if 'sales' in ytd_liquor_sales_ly.columns:
+    if "sales" in ytd_liquor_sales_ly.columns:
         ytd_liquor_sales_total_ly = ytd_liquor_sales_ly["sales"].sum()
     else:
         ytd_liquor_sales_total_ly = 0
@@ -1448,37 +1474,37 @@ def store(store_id):
     week_wine_sales = get_category_sales(
         fiscal_dates["start_week"],
         fiscal_dates["start_day"],
-        "Wine Sales",
+        ["Wine Sales"],
         session["store_list"],
     )
     period_wine_sales = get_category_sales(
         fiscal_dates["start_period"],
         fiscal_dates["start_day"],
-        "Wine Sales",
+        ["Wine Sales"],
         session["store_list"],
     )
     year_wine_sales = get_category_sales(
         fiscal_dates["start_year"],
         fiscal_dates["start_day"],
-        "Wine Sales",
+        ["Wine Sales"],
         session["store_list"],
     )
     week_wine_sales_ly = get_category_sales(
         fiscal_dates["start_week_ly"],
         fiscal_dates["end_week_ly"],
-        "Wine Sales",
+        ["Wine Sales"],
         session["store_list"],
     )
     period_wine_sales_ly = get_category_sales(
         fiscal_dates["start_period_ly"],
         fiscal_dates["end_period_ly"],
-        "Wine Sales",
+        ["Wine Sales"],
         session["store_list"],
     )
     year_wine_sales_ly = get_category_sales(
         fiscal_dates["start_year_ly"],
         fiscal_dates["end_year_ly"],
-        "Wine Sales",
+        ["Wine Sales"],
         session["store_list"],
     )
     week_wine_sales_list = week_wine_sales["sales"].tolist()
@@ -1524,13 +1550,13 @@ def store(store_id):
     ]["sales"].sum()
 
     period_wine_sales_total = period_wine_sales["sales"].sum()
-    if 'sales' in ptd_wine_sales_ly.columns:
+    if "sales" in ptd_wine_sales_ly.columns:
         ptd_wine_sales_total_ly = ptd_wine_sales_ly["sales"].sum()
     else:
         ptd_wine_sales_total_ly = 0
 
     year_wine_sales_total = year_wine_sales["sales"].sum()
-    if 'sales' in ytd_wine_sales_ly.columns:
+    if "sales" in ytd_wine_sales_ly.columns:
         ytd_wine_sales_total_ly = ytd_wine_sales_ly["sales"].sum()
     else:
         ytd_wine_sales_total_ly = 0
@@ -1594,16 +1620,16 @@ def store(store_id):
     ).first()
     record_day = query.net_sales if query else 0
     query = SalesRecordsWeek.query.filter(
-            SalesRecordsWeek.store == store.name,
-            ).first()
+        SalesRecordsWeek.store == store.name,
+    ).first()
     record_week = query.net_sales if query else 0
     query = SalesRecordsPeriod.query.filter(
-            SalesRecordsPeriod.store == store.name,
-            ).first()
+        SalesRecordsPeriod.store == store.name,
+    ).first()
     record_period = query.net_sales if query else 0
     query = SalesRecordsYear.query.filter(
-            SalesRecordsYear.store == store.name,
-            ).first()
+        SalesRecordsYear.store == store.name,
+    ).first()
     record_year = query.net_sales if query else 0
 
     return render_template(
