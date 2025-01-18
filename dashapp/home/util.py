@@ -232,7 +232,7 @@ def get_category_sales(start, end, sales_type, store_list):
         .filter(
             MenuItemSales.date.between(start, end),
             MenuItemSales.store_id.in_(store_list),
-            MenuItemSales.sales_type == sales_type,
+            MenuItemSales.sales_type.in_(sales_type),
         )
         .group_by(
             MenuItemSales.date,

@@ -167,79 +167,78 @@ def purchasing():
     )
     ytd_food_cost = [x[1] for x in ytd_food_cost_query]
 
-    ytd_beer_cost_query = get_period_category_costs(
-        ["Beer"],
-        fiscal_dates["start_year"],
-        fiscal_dates["start_day"],
-        session["store_list"],
-    )
-    ytd_beer_cost = [x[1] for x in ytd_beer_cost_query]
-    ytd_liquor_cost_query = get_period_category_costs(
-        ["Liquor"],
-        fiscal_dates["start_year"],
-        fiscal_dates["start_day"],
-        session["store_list"],
-    )
-    ytd_liquor_cost = [x[1] for x in ytd_liquor_cost_query]
-    ytd_wine_cost_query = get_period_category_costs(
-        ["Wine"],
-        fiscal_dates["start_year"],
-        fiscal_dates["start_day"],
-        session["store_list"],
-    )
-    ytd_wine_cost = [x[1] for x in ytd_wine_cost_query]
+    # ytd_beer_cost_query = get_period_category_costs(
+    #     ["Beer"],
+    #     fiscal_dates["start_year"],
+    #     fiscal_dates["start_day"],
+    #     session["store_list"],
+    # )
+    # ytd_beer_cost = [x[1] for x in ytd_beer_cost_query]
+    # ytd_liquor_cost_query = get_period_category_costs(
+    #     ["Liquor"],
+    #     fiscal_dates["start_year"],
+    #     fiscal_dates["start_day"],
+    #     session["store_list"],
+    # )
+    # ytd_liquor_cost = [x[1] for x in ytd_liquor_cost_query]
+    # ytd_wine_cost_query = get_period_category_costs(
+    #     ["Wine"],
+    #     fiscal_dates["start_year"],
+    #     fiscal_dates["start_day"],
+    #     session["store_list"],
+    # )
+    # ytd_wine_cost = [x[1] for x in ytd_wine_cost_query]
 
     food_sales_table = get_category_sales(
         fiscal_dates["start_year"],
         fiscal_dates["start_day"],
-        "Food Sales",
+        ["Food Sales"],
         session["store_list"],
     )
-    beer_sales_table = get_category_sales(
-        fiscal_dates["start_year"],
-        fiscal_dates["start_day"],
-        "Beer Sales",
-        session["store_list"],
-    )
-    wine_sales_table = get_category_sales(
-        fiscal_dates["start_year"],
-        fiscal_dates["start_day"],
-        "Wine Sales",
-        session["store_list"],
-    )
-    liquor_sales_table = get_category_sales(
-        fiscal_dates["start_year"],
-        fiscal_dates["start_day"],
-        "Liquor Sales",
-        session["store_list"],
-    )
+    # beer_sales_table = get_category_sales(
+    #     fiscal_dates["start_year"],
+    #     fiscal_dates["start_day"],
+    #     "Beer Sales",
+    #     session["store_list"],
+    # )
+    # wine_sales_table = get_category_sales(
+    #     fiscal_dates["start_year"],
+    #     fiscal_dates["start_day"],
+    #     "Wine Sales",
+    #     session["store_list"],
+    # )
+    # liquor_sales_table = get_category_sales(
+    #     fiscal_dates["start_year"],
+    #     fiscal_dates["start_day"],
+    #     "Liquor Sales",
+    #     session["store_list"],
+    # )
     ytd_period_food_sales = food_sales_table.groupby("period")["sales"].sum()
     ytd_period_food_sales_list = ytd_period_food_sales.tolist()
-    ytd_period_beer_sales = beer_sales_table.groupby("period")["sales"].sum()
-    ytd_period_beer_sales_list = ytd_period_beer_sales.tolist()
-    ytd_period_wine_sales = wine_sales_table.groupby("period")["sales"].sum()
-    ytd_period_wine_sales_list = ytd_period_wine_sales.tolist()
-    ytd_period_liquor_sales = liquor_sales_table.groupby("period")["sales"].sum()
-    ytd_period_liquor_sales_list = ytd_period_liquor_sales.tolist()
+    # ytd_period_beer_sales = beer_sales_table.groupby("period")["sales"].sum()
+    # ytd_period_beer_sales_list = ytd_period_beer_sales.tolist()
+    # ytd_period_wine_sales = wine_sales_table.groupby("period")["sales"].sum()
+    # ytd_period_wine_sales_list = ytd_period_wine_sales.tolist()
+    # ytd_period_liquor_sales = liquor_sales_table.groupby("period")["sales"].sum()
+    # ytd_period_liquor_sales_list = ytd_period_liquor_sales.tolist()
 
     ytd_food_cost_pct = [
         x / y * 100 for x, y in zip(ytd_food_cost, ytd_period_food_sales_list)
     ]
-    ytd_beer_cost_pct = [
-        x / y * 100 for x, y in zip(ytd_beer_cost, ytd_period_beer_sales_list)
-    ]
-    ytd_wine_cost_pct = [
-        x / y * 100 for x, y in zip(ytd_wine_cost, ytd_period_wine_sales_list)
-    ]
-    ytd_liquor_cost_pct = [
-        x / y * 100 for x, y in zip(ytd_liquor_cost, ytd_period_liquor_sales_list)
-    ]
+    # ytd_beer_cost_pct = [
+    #     x / y * 100 for x, y in zip(ytd_beer_cost, ytd_period_beer_sales_list)
+    # ]
+    # ytd_wine_cost_pct = [
+    #     x / y * 100 for x, y in zip(ytd_wine_cost, ytd_period_wine_sales_list)
+    # ]
+    # ytd_liquor_cost_pct = [
+    #     x / y * 100 for x, y in zip(ytd_liquor_cost, ytd_period_liquor_sales_list)
+    # ]
 
     total_food_sales = food_sales_table["sales"].sum()
-    total_beer_sales = beer_sales_table["sales"].sum()
-    total_wine_sales = wine_sales_table["sales"].sum()
-    total_liquor_sales = liquor_sales_table["sales"].sum()
-
+    # total_beer_sales = beer_sales_table["sales"].sum()
+    # total_wine_sales = wine_sales_table["sales"].sum()
+    # total_liquor_sales = liquor_sales_table["sales"].sum()
 
     return render_template(
         "purchasing/purchasing.html",
@@ -395,19 +394,19 @@ def alcohol():
     beer_sales_table = get_category_sales(
         fiscal_dates["start_year"],
         fiscal_dates["start_day"],
-        "Beer Sales",
+        ["Beer Sales"],
         session["store_list"],
     )
     wine_sales_table = get_category_sales(
         fiscal_dates["start_year"],
         fiscal_dates["start_day"],
-        "Wine Sales",
+        ["Wine Sales"],
         session["store_list"],
     )
     liquor_sales_table = get_category_sales(
         fiscal_dates["start_year"],
         fiscal_dates["start_day"],
-        "Liquor Sales",
+        ["Liquor Sales"],
         session["store_list"],
     )
     ytd_period_beer_sales = beer_sales_table.groupby("period")["sales"].sum()
@@ -431,7 +430,6 @@ def alcohol():
     total_wine_sales = wine_sales_table["sales"].sum()
     total_liquor_sales = liquor_sales_table["sales"].sum()
 
-
     return render_template(
         "purchasing/alcohol.html",
         title="Alcohol",
@@ -447,6 +445,157 @@ def alcohol():
         top_ten_vendor=top_ten_vendor,
         category_items=category_items,
         category_values=category_values,
+    )
+
+
+@blueprint.route("/purchasing/supplies", methods=["GET", "POST"])
+@login_required
+def supplies():
+    fiscal_dates = set_dates(session["date_selected"])
+
+    form1 = DateForm()
+    form3 = StoreForm()
+    form4 = PotatoForm()
+    form5 = LobsterForm()
+    form6 = StoneForm()
+
+    if form1.submit1.data and form1.validate():
+        session["date_selected"] = form1.selectdate.data
+        return redirect(url_for("purchasing_blueprint.purchasing"))
+    if form3.submit3.data and form3.validate():
+        session["date_selected"] = fiscal_dates["start_day"]
+        data = form3.stores.data
+        session["store_list"] = tuple([x.id for x in data])
+        if 98 in session["store_list"] and 99 in session["store_list"]:
+            session["store_list"] = tuple(
+                store.id
+                for store in Restaurants.query.filter(Restaurants.active == True)  # noqa E712
+                .order_by(Restaurants.name)
+                .all()
+            )
+        elif 99 in session["store_list"]:
+            session["store_list"] = tuple(
+                store.id
+                for store in Restaurants.query.filter(
+                    and_(
+                        Restaurants.active == True, Restaurants.concept == "Steakhouse"
+                    )
+                )
+                .order_by(Restaurants.name)
+                .all()
+            )
+        elif 98 in session["store_list"]:
+            session["store_list"] = tuple(
+                store.id
+                for store in Restaurants.query.filter(
+                    and_(Restaurants.active == True, Restaurants.concept == "Casual")
+                )
+            )
+        return redirect(url_for("purchasing_blueprint.supplies"))
+    if form4.submit4.data and form4.validate():
+        store_id = form4.store.data.id
+        return redirect(url_for("home_blueprint.potato", store_id=store_id))
+    if form5.submit5.data and form5.validate():
+        store_id = form5.store.data.id
+        return redirect(url_for("home_blueprint.lobster", store_id=store_id))
+    if form6.submit6.data and form6.validate():
+        store_id = form6.store.data.id
+        return redirect(url_for("home_blueprint.stone", store_id=store_id))
+    # get name from Restaurants table based on session["store_list"]
+    store_names = db.session.query(Restaurants.name).filter(
+        Restaurants.id.in_(session["store_list"])
+    )
+    store_names = [x[0] for x in store_names]
+    store_names = ", ".join(store_names)
+
+    supply_category_list = [
+        "Bar Supplies",
+        "Catering Supplies",
+        "China",
+        "Cleaning Supplies",
+        "Glassware",
+        "Kitchen Supplies",
+        "Linen",
+        "Rest. Supplies",
+        "Silverware",
+        "Smallwares",
+    ]
+
+    # Current period purchases
+    top_ten = get_category_topten(
+        supply_category_list,
+        fiscal_dates["start_period"],
+        fiscal_dates["start_day"],
+        session["store_list"],
+    )
+
+    category_costs = get_category_costs(
+        supply_category_list,
+        fiscal_dates["start_period"],
+        fiscal_dates["start_day"],
+        session["store_list"],
+    )
+    category_items = category_costs["Account"].tolist()
+    category_values = category_costs["Totals"].tolist()
+
+    category_costs.set_index("Account", inplace=True)
+
+    top_ten_vendor = get_vendor_topten(
+        supply_category_list,
+        fiscal_dates["start_period"],
+        fiscal_dates["start_day"],
+        session["store_list"],
+    )
+    category_costs_total = category_costs["Totals"].sum()
+    top_ten["percent"] = top_ten["Cost"] / category_costs_total
+    top_ten_vendor["percent"] = top_ten_vendor["Cost"] / category_costs_total
+
+    # Yearly sales & costs
+    # TODO get account costs for charts
+    def get_period_category_costs(category, start, end, store_list):
+        return (
+            db.session.query(
+                Purchases.period,
+                func.sum(Purchases.debit).label("cost"),
+            )
+            .filter(
+                Purchases.date.between(start, end),
+                Purchases.account.in_(category),
+                Purchases.id.in_(store_list),
+            )
+            .group_by(Purchases.period)
+            .all()
+        )
+
+    ytd_supply_cost_query = get_period_category_costs(
+        supply_category_list,
+        fiscal_dates["start_year"],
+        fiscal_dates["start_day"],
+        session["store_list"],
+    )
+    ytd_supply_cost = [x[1] for x in ytd_supply_cost_query]
+
+    total_sales_table = get_category_sales(
+        fiscal_dates["start_year"],
+        fiscal_dates["start_day"],
+        ["Food Sales", "Beer Sales", "Wine Sales", "Liquor Sales"],
+        session["store_list"],
+    )
+    ytd_period_supply_sales = total_sales_table.groupby("period")["sales"].sum()
+    ytd_period_supply_sales_list = ytd_period_supply_sales.tolist()
+
+    ytd_supply_cost_pct = [
+        x / y * 100 for x, y in zip(ytd_supply_cost, ytd_period_supply_sales_list)
+    ]
+
+    total_supply_sales = total_sales_table["sales"].sum()
+
+    return render_template(
+        "purchasing/supplies.html",
+        title="Supplies",
+        company_name=Config.COMPANY_NAME,
+        segment="purchasing",
+        **locals(),
     )
 
 
@@ -586,7 +735,6 @@ def purchase(product):
 
     # category sales
     # TODO get account costs for charts
-
 
     # assign color based on product value
     def color_assigner(product):

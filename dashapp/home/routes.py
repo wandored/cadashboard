@@ -323,7 +323,9 @@ def index():
             float
         )
         table["labor_pct"] = table.dollars / table.sales
+        # ic(table.labor_pct, table.dollars, table.sales)
         table["labor_pct_ly"] = table.dollars_ly / table.sales_ly
+        # ic(table.labor_pct_ly, table.dollars_ly, table.sales_ly)
         totals = table.sum()
 
         return totals, table, top
@@ -1104,49 +1106,49 @@ def store(store_id):
     daily_food_sales = get_category_sales(
         fiscal_dates["start_day"],
         fiscal_dates["end_day"],
-        "Food Sales",
+        ["Food Sales"],
         session["store_list"],
     )
     daily_food_sales_ly = get_category_sales(
         fiscal_dates["start_day_ly"],
         fiscal_dates["end_day_ly"],
-        "Food Sales",
+        ["Food Sales"],
         session["store_list"],
     )
     weekly_food_sales = get_category_sales(
         fiscal_dates["start_week"],
         fiscal_dates["week_to_date"],
-        "Food Sales",
+        ["Food Sales"],
         session["store_list"],
     )
     weekly_food_sales_ly = get_category_sales(
         fiscal_dates["start_week_ly"],
         fiscal_dates["start_day_ly"],
-        "Food Sales",
+        ["Food Sales"],
         session["store_list"],
     )
     period_food_sales = get_category_sales(
         fiscal_dates["start_period"],
         fiscal_dates["period_to_date"],
-        "Food Sales",
+        ["Food Sales"],
         session["store_list"],
     )
     period_food_sales_ly = get_category_sales(
         fiscal_dates["start_period_ly"],
         fiscal_dates["start_day_ly"],
-        "Food Sales",
+        ["Food Sales"],
         session["store_list"],
     )
     year_food_sales = get_category_sales(
         fiscal_dates["start_year"],
         fiscal_dates["year_to_date"],
-        "Food Sales",
+        ["Food Sales"],
         session["store_list"],
     )
     year_food_sales_ly = get_category_sales(
         fiscal_dates["start_year_ly"],
         fiscal_dates["start_day_ly"],
-        "Food Sales",
+        ["Food Sales"],
         session["store_list"],
     )
     daily_food_sales_total = daily_food_sales["sales"].sum()
@@ -1231,37 +1233,37 @@ def store(store_id):
     week_beer_sales = get_category_sales(
         fiscal_dates["start_week"],
         fiscal_dates["start_day"],
-        "Beer Sales",
+        ["Beer Sales"],
         session["store_list"],
     )
     period_beer_sales = get_category_sales(
         fiscal_dates["start_period"],
         fiscal_dates["start_day"],
-        "Beer Sales",
+        ["Beer Sales"],
         session["store_list"],
     )
     year_beer_sales = get_category_sales(
         fiscal_dates["start_year"],
         fiscal_dates["start_day"],
-        "Beer Sales",
+        ["Beer Sales"],
         session["store_list"],
     )
     week_beer_sales_ly = get_category_sales(
         fiscal_dates["start_week_ly"],
         fiscal_dates["end_week_ly"],
-        "Beer Sales",
+        ["Beer Sales"],
         session["store_list"],
     )
     period_beer_sales_ly = get_category_sales(
         fiscal_dates["start_period_ly"],
         fiscal_dates["end_period_ly"],
-        "Beer Sales",
+        ["Beer Sales"],
         session["store_list"],
     )
     year_beer_sales_ly = get_category_sales(
         fiscal_dates["start_year_ly"],
         fiscal_dates["end_year_ly"],
-        "Beer Sales",
+        ["Beer Sales"],
         session["store_list"],
     )
 
@@ -1350,37 +1352,37 @@ def store(store_id):
     week_liquor_sales = get_category_sales(
         fiscal_dates["start_week"],
         fiscal_dates["start_day"],
-        "Liquor Sales",
+        ["Liquor Sales"],
         session["store_list"],
     )
     period_liquor_sales = get_category_sales(
         fiscal_dates["start_period"],
         fiscal_dates["start_day"],
-        "Liquor Sales",
+        ["Liquor Sales"],
         session["store_list"],
     )
     year_liquor_sales = get_category_sales(
         fiscal_dates["start_year"],
         fiscal_dates["start_day"],
-        "Liquor Sales",
+        ["Liquor Sales"],
         session["store_list"],
     )
     week_liquor_sales_ly = get_category_sales(
         fiscal_dates["start_week_ly"],
         fiscal_dates["end_week_ly"],
-        "Liquor Sales",
+        ["Liquor Sales"],
         session["store_list"],
     )
     period_liquor_sales_ly = get_category_sales(
         fiscal_dates["start_period_ly"],
         fiscal_dates["end_period_ly"],
-        "Liquor Sales",
+        ["Liquor Sales"],
         session["store_list"],
     )
     year_liquor_sales_ly = get_category_sales(
         fiscal_dates["start_year_ly"],
         fiscal_dates["end_year_ly"],
-        "Liquor Sales",
+        ["Liquor Sales"],
         session["store_list"],
     )
     week_liquor_sales_list = week_liquor_sales["sales"].tolist()
@@ -1472,37 +1474,37 @@ def store(store_id):
     week_wine_sales = get_category_sales(
         fiscal_dates["start_week"],
         fiscal_dates["start_day"],
-        "Wine Sales",
+        ["Wine Sales"],
         session["store_list"],
     )
     period_wine_sales = get_category_sales(
         fiscal_dates["start_period"],
         fiscal_dates["start_day"],
-        "Wine Sales",
+        ["Wine Sales"],
         session["store_list"],
     )
     year_wine_sales = get_category_sales(
         fiscal_dates["start_year"],
         fiscal_dates["start_day"],
-        "Wine Sales",
+        ["Wine Sales"],
         session["store_list"],
     )
     week_wine_sales_ly = get_category_sales(
         fiscal_dates["start_week_ly"],
         fiscal_dates["end_week_ly"],
-        "Wine Sales",
+        ["Wine Sales"],
         session["store_list"],
     )
     period_wine_sales_ly = get_category_sales(
         fiscal_dates["start_period_ly"],
         fiscal_dates["end_period_ly"],
-        "Wine Sales",
+        ["Wine Sales"],
         session["store_list"],
     )
     year_wine_sales_ly = get_category_sales(
         fiscal_dates["start_year_ly"],
         fiscal_dates["end_year_ly"],
-        "Wine Sales",
+        ["Wine Sales"],
         session["store_list"],
     )
     week_wine_sales_list = week_wine_sales["sales"].tolist()
