@@ -4,40 +4,32 @@ Dashboard by wandored
 """
 
 import json
-import requests
-from flask import send_file
-import pandas as pd
-import numpy as np
-from io import StringIO, BytesIO
-from dashapp.config import Config
 from datetime import timedelta
+
+import pandas as pd
+import requests
+from sqlalchemy import func
+
 from dashapp.authentication.models import (
-    LaborTotals,
+    Calendar,  # noqa: F401
+    GiftCardRedeem,
+    GiftCardSales,
+    MenuItemSales,
     PotatoChart,  # noqa: F401
     PotatoLoadTimes,  # noqa: F401
-    PotatoSales,
-    Restaurants,
-    MenuItemSales,
+    Purchases,
     SalesCarryout,
+    SalesDaypart,
     SalesRecordsDay,  # noqa: F401
     SalesRecordsPeriod,  # noqa: F401
     SalesRecordsWeek,  # noqa: F401
     SalesRecordsYear,  # noqa: F401
     SalesTotals,
-    SalesDaypart,
-    StockCount,
     TableTurns,
-    Users,
-    db,
-    Calendar,  # noqa: F401
-    GiftCardSales,
-    GiftCardRedeem,
-    Purchases,
     UnitsOfMeasure,
+    db,
 )
-from sqlalchemy import func
-
-from icecream import ic
+from dashapp.config import Config
 
 
 def get_sales_charts(start, end, time, store_list):

@@ -1,5 +1,5 @@
 <p>{{ _fsdomain('%(first)s %(last)s!', first=fname, last=lname) }}</p>
-<p>Your password has been changed on {{ _fsdomain(dashboard_url) }}</p>
+<p>Your password has been changed for the <a href='https://dashboard.centraarchy.com'>Dashboard</a> and <a href='https://stockcount.centraarchy.com'>Stockcount</a></p>
 
 <p>Your new credentials are:</p>
 <div>
@@ -10,4 +10,4 @@
   <p>If you did not request to have your password changed please reply to this email to alert support of this change.</p>
 </div>
 <h4>{{ company_name }}</h4>
-<h6> This email is intended for employees of CentraArchy RMC only. Please delete if you received this in error.</h6>
+<h6> This email is intended for employees of {{ company_name }} only. Please delete if you received this in error.</h6>

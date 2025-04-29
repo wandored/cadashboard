@@ -6,6 +6,58 @@
 {% block stylesheets %}{% endblock stylesheets %}
 
 {% block content %}
+  <div class="row">
+    <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+      <div class="card">
+        <div class="card-header p-3 pt-2">
+            <div class="text-end pt-1">
+              <p class="text-sm mb-0 text-capitalize">Total Users</p>
+              <h4 class="mb-0">{{ "{:,.0f}".format(total_users) }}</h4>
+            </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+      <div class="card">
+        <div class="card-header p-3 pt-2">
+            <div class="text-end pt-1">
+              <p class="text-sm mb-0 text-capitalize">Average Daily Logins</p>
+              <h4 class="mb-0">{{ "{:,.1f}".format(avg_daily_logins) }}</h4>
+            </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+      <div class="card">
+        <div class="card-header p-3 pt-2">
+            <div class="text-end pt-1">
+              <p class="text-sm mb-0 text-capitalize">Weekly Active Users</p>
+              <h4 class="mb-0">{{ "{:,.0f}".format(active_weekly_users) }}</h4>
+            </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+      <div class="card">
+        <div class="card-header p-3 pt-2">
+            <div class="text-end pt-1">
+              <p class="text-sm mb-0 text-capitalize">Lapsed Users Over 30 Days</p>
+              <h4 class="mb-0">{{ "{:,.0f}".format(lapse_users) }}</h4>
+            </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+      <div class="card">
+        <div class="card-header p-3 pt-2">
+            <div class="text-end pt-1">
+              <p class="text-sm mb-0 text-capitalize">Never Logged In</p>
+              <h4 class="mb-0">{{ "{:,.0f}".format(never_logged_in) }}</h4>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
 <div class="container-fluid py-4">
   <div class="row">
@@ -136,4 +188,106 @@
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}  
 <script src="/static/assets/js/plugins/progress.js"></script>
+
+  <script src="/static/assets/js/plugins/chartjs.min.js"></script>
+  <script>
+    var ctx = document.getElementById("chart-bars").getContext("2d");
+
+    new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: ["W", "T", "F", "S", "S", "M", "T"],
+        datasets: [{
+          label: "Daily Sales",
+          tension: 0.4,
+          borderWidth: 0,
+          borderRadius: 4,
+          borderSkipped: false,
+          backgroundColor: "rgba(255, 255, 255, .8)",
+          data: {{ login_counts | safe }},
+          maxBarThickness: 6
+        }, {
+          label: "Last Year",
+          tension: 0,
+          borderWidth: 0,
+          pointRadius: 5,
+          pointBackgroundColor: "rgba(200, 200, 200, 1)",
+          pointBorderColor: "transparent",
+          borderColor: "rgba(200, 200, 200, 1)",
+          borderWidth: 4,
+          type: "line",
+          backgroundColor: "transparent",
+          fill: true,
+          data: {{ avg_login_counts | safe }},
+          maxBarThickness: 6
+        }, ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          }
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
+        scales: {
+          y: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              suggestedMin: 0,
+              suggestedMax: 500,
+              beginAtZero: true,
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+              color: "#fff",
+              // Abbreviate the millions
+              callback: function(value, index, values) {
+                return value / 1e3 + ' T';
+              },
+            },
+          },
+          x: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              color: '#f8f9fa',
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+            }
+          },
+        },
+      },
+    });
+
+
 {% endblock javascripts %}
