@@ -106,7 +106,16 @@ class Users(db.Model, UserMixin):
 
     def __str__(self):
         return f"{self.first_name}, {self.last_name}, {self.email}, {self.active}, {self.roles}, {self.stores}"
-    
+
+
+class DailyLogins(db.Model):
+    __tablename__ = "daily_logins"
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    date = db.Column(db.Date)
+    login_count = db.Column(db.Integer)
+
+    def __str__(self):
+        return f"{self.date}, {self.login_count}"
     
 
 
@@ -189,6 +198,7 @@ class UserAdmin(sqla.ModelView):
                     fname=model.first_name,
                     lname=model.last_name,
                     dashboard_url=current_app.config["DASHBOARD_URL"],
+                    stockcount_url=current_app.config["STOCKCOUNT_URL"],
                     company_name=Config.COMPANY_NAME,
                 )
                 to, cc = model.email, "it@centraarchy.com"
@@ -216,6 +226,7 @@ class UserAdmin(sqla.ModelView):
                 fname=model.first_name,
                 lname=model.last_name,
                 dashboard_url=current_app.config["DASHBOARD_URL"],
+                stockcount_url=current_app.config["STOCKCOUNT_URL"],
                 company_name=Config.COMPANY_NAME,
             )
             to, cc = model.email, "it@centraarchy.com"

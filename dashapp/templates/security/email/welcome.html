@@ -1,10 +1,10 @@
 <p>{{ _fsdomain('Welcome  %(first)s %(last)s!', first=fname, last=lname) }}</p>
 
-<h2>Your user account has been created on {{ _fsdomain(dashboard_url) }}</h2>
-<p>Use the following credentials to login:</p>
+<h2>Your user account has been created for the <a href='https://dashboard.centraarchy.com'>Dashboard</a> and <a href='https://stockcount.centraarchy.com'>Stockcount</a></h2>
+<p>Use the following credentials to login to both sites:</p>
 <div>
   <p>Email Address: {{ email }}</p>
   <p>Password: {{ password }}</p>
 </div>
 <h4>{{ company_name }}</h4>
-<h6> This email is intended for employees of CentraArchy RMC only. Please delete if you received this in error.</h6>
+<h6> This email is intended for employees of {{ company_name }} only. Please delete if you received this in error.</h6>

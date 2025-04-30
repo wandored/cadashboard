@@ -13,9 +13,8 @@ from flask.wrappers import Response
 from flask_security import current_user, login_required
 from flask_security.decorators import roles_accepted
 from fpdf import FPDF
-from icecream import ic
 from pandas._libs.tslibs import period  # noqa: F401
-from sqlalchemy import func, and_
+from sqlalchemy import and_, func
 
 from dashapp.authentication.forms import (
     DateForm,
@@ -26,6 +25,11 @@ from dashapp.authentication.forms import (
     UpdateForm,
 )
 from dashapp.authentication.models import (
+    CASalesRecordDay,
+    CASalesRecordPeriod,
+    CASalesRecordWeek,
+    CASalesRecordYear,
+    DailyLogins,
     GiftCardRedeem,
     GiftCardSales,
     LaborTotals,
@@ -35,14 +39,14 @@ from dashapp.authentication.models import (
     StockCount,
     Users,
     db,
-    CASalesRecordDay,
-    CASalesRecordPeriod,
-    CASalesRecordWeek,
-    CASalesRecordYear,
 )
 from dashapp.config import Config
 from dashapp.home import blueprint
 from dashapp.home.util import (
+    SalesRecordsDay,
+    SalesRecordsPeriod,
+    SalesRecordsWeek,
+    SalesRecordsYear,
     find_day_with_sales,
     get_category_sales,
     get_daypart_sales,
@@ -50,12 +54,7 @@ from dashapp.home.util import (
     get_giftcard_sales,
     get_item_avg_cost,
     get_sales_charts,
-    get_timeing_data,
     get_togo_sales,
-    SalesRecordsDay,
-    SalesRecordsPeriod,
-    SalesRecordsWeek,
-    SalesRecordsYear,
     set_dates,
 )
 
@@ -69,6 +68,8 @@ def index():
         session["date_selected"] = TODAY
         return redirect(url_for("home_blueprint.index"))
 
+    print(TODAY)
+    print(session["date_selected"])
     # set store list to all active stores
     session["store_list"] = tuple(
         [
@@ -80,9 +81,11 @@ def index():
     )
 
     fiscal_dates = set_dates(session["date_selected"])
+    print(fiscal_dates["start_day"])
 
     # Check for no sales
     if not SalesTotals.query.filter_by(date=fiscal_dates["start_day"]).all():
+        print(f"no sales on {session['date_selected']}")
         session["date_selected"] = find_day_with_sales(day=fiscal_dates["start_day"])
         return redirect(url_for("home_blueprint.index"))
 
@@ -1904,6 +1907,43 @@ def support():
     if form6.submit6.data and form6.validate():
         store_id = form6.store.data.id
         return redirect(url_for("home_blueprint.stone", store_id=store_id))
+
+    # Fetch daily login counts
+    daily_logins_query = (
+        db.session.query(DailyLogins.date, DailyLogins.login_count)
+        .filter(DailyLogins.date >= fiscal_dates["last_thirty"])
+        .order_by(DailyLogins.date.asc())
+        .all()
+    )
+
+    # Convert query results into lists for charting
+    total_logins = sum([count for _, count in daily_logins_query])
+    days_count = len(daily_logins_query)
+    avg_daily_logins = round(total_logins / days_count, 2)
+
+    # Get Current Week Logins
+    active_weekly_users = (
+        db.session.query(func.count(Users.id))
+        .filter(Users.last_login_at >= fiscal_dates["last_seven"])
+        .scalar()
+    )
+
+    # Get Total Users
+    total_users = db.session.query(func.count(Users.id)).scalar()
+
+    # Get Users That Never Logged In
+    never_logged_in = (
+        db.session.query(func.count(Users.id))
+        .filter(Users.last_login_at == None)
+        .scalar()
+    )
+
+    # Get Lapse Users (Not Logged In for More Than 30 Days)
+    lapse_users = (
+        db.session.query(func.count(Users.id))
+        .filter(Users.last_login_at < datetime.now().date() - timedelta(days=30))
+        .scalar()
+    )
 
     query = (
         db.session.query(

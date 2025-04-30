@@ -1,6 +1,7 @@
 """
 Dashboard by wandored
 """
+
 from datetime import timedelta
 from functools import cache
 
@@ -222,13 +223,27 @@ def get_cost_per_store(regex, start, end, stores):
     df.loc[mask, "base_qty"] = report.base_qty
 
     if not df.empty:
-        df["unit_cost"] = ((df["cost"] / df["count"]) / df["base_qty"]) * report[
+        grouped = (
+            df.groupby("store")
+            .agg(
+                {
+                    "cost": "sum",
+                    "count": "sum",
+                    "base_qty": "mean",
+                    "uofm": "first",
+                }
+            )
+            .reset_index()
+        )
+        grouped["unit_cost"] = (
+            (grouped["cost"] / grouped["count"]) / grouped["base_qty"]
+        ) * report["base_qty"]
+        grouped["unit_qty"] = (grouped["count"] * grouped["base_qty"]) / report[
             "base_qty"
         ]
-        df["unit_qty"] = (df["count"] * df["base_qty"]) / report["base_qty"]
-        df["report_unit"] = report.uofm
+        grouped["report_unit"] = report.uofm
+        df = grouped[["store", "report_unit", "unit_cost", "unit_qty"]]
 
-        df.drop(columns=["count", "cost", "base_qty"], inplace=True)
         df = df[df.unit_cost.notna()]
         table = pd.pivot_table(
             df,

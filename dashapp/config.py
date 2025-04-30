@@ -7,6 +7,7 @@ with open("/etc/config.json") as config_file:
 class Config:
     COMPANY_NAME = config.get("COMPANY_NAME")
     DASHBOARD_URL = config.get("DASHBOARD_URL")
+    STOCKCOUNT_URL = config.get("STOCKCOUNT_URL")
     SECRET_KEY = config.get("SECRET_KEY")
     SQLALCHEMY_DATABASE_URI = config.get("SQLALCHEMY_DATABASE_URI")
     SQLALCHEMY_TRACK_MODIFICATIONS = config.get("SQLALCHEMY_TRACK_MODIFICATIONS")
