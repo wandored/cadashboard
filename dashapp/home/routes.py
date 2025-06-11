@@ -2087,57 +2087,97 @@ def profile():
 def potato(store_id):
     TODAY = datetime.date(datetime.now())
     fiscal_dates = set_dates(datetime.date(datetime.now()))
-
     store = Restaurants.query.filter_by(id=store_id).first()
 
+    # Load all potato sales for the relevant days in one query
+    days_ago = [7, 14, 21, 28]
+    target_dates = [TODAY - timedelta(days=num) for num in days_ago]
     load_times = pd.read_sql_table("potato_load_times", con=db.engine)
-    pot_df = pd.DataFrame(columns=["time", "in_time", "out_time"])
-    for num in [7, 14, 21, 28]:
-        day_pot_sales = pd.DataFrame(
-            columns=["time", "in_time", "out_time", "quantity"]
+
+    # Query all relevant PotatoSales at once
+    sales_query = (
+        db.session.query(
+            PotatoSales.time,
+            PotatoSales.dow,
+            PotatoSales.name,
+            PotatoSales.date,
+            PotatoSales.quantity,
         )
-        for index, row in load_times.iterrows():
-            query = (
-                db.session.query(
-                    func.sum(PotatoSales.quantity).label("quantity")
-                ).filter(
-                    PotatoSales.time.between(row["start_time"], row["stop_time"]),
-                    PotatoSales.dow == fiscal_dates["dow"],
-                    PotatoSales.name == store.name,
-                    PotatoSales.date == TODAY - timedelta(days=num),
-                )
-            ).all()
-            day_pot_sales = pd.concat(
-                [
-                    day_pot_sales,
-                    pd.DataFrame(
-                        {
-                            "time": [row["time"]],
-                            "in_time": [row["in_time"]],
-                            "out_time": [row["out_time"]],
-                            "quantity": [query[0][0]],
-                        }
-                    ),
-                ],
-                ignore_index=True,
-            )
-        pot_df = pot_df.merge(
-            day_pot_sales,
-            on=["time", "in_time", "out_time"],
-            how="outer",
-            suffixes=("", f"_{num}"),
+        .filter(
+            PotatoSales.dow == fiscal_dates["dow"],
+            PotatoSales.name == store.name,
+            PotatoSales.date.in_(target_dates),
         )
+        .all()
+    )
+    sales_df = pd.DataFrame(
+        sales_query, columns=["time", "dow", "name", "date", "quantity"]
+    )
 
-    pot_df.fillna(0, inplace=True)
-    pot_df.loc[:, "AVG"] = pot_df.mean(numeric_only=True, axis=1)
-    pot_df.loc[:, "MEDIAN"] = pot_df.median(numeric_only=True, axis=1)
-    pot_df.loc[:, "MAX"] = pot_df.max(numeric_only=True, axis=1)
+    # Prepare merged DataFrame for all time slots
+    pot_df = load_times[["time", "in_time", "out_time"]].copy()
 
-    # out_times = pd.read_csv("/usr/local/share/potatochart.csv", usecols=["time", "in_time", "out_time"])
-    # out_times = pd.read_sql_table('PotatoLoadTimes', con=db.engine, columns=["time", "in_time", "out_time"])
-    # rotation = pot_df.merge(out_times, on="time", how="left")
-    pot_df.loc["TOTALS"] = pot_df.sum(numeric_only=True)
+    # For each date, aggregate sales by time slot
+    for num, date in zip(days_ago, target_dates):
+        # Filter sales for this date
+        date_sales = sales_df[sales_df["date"] == date]
+        # Merge with load_times to align time slots
+        merged = pd.merge(
+            load_times, date_sales, left_on="time", right_on="time", how="left"
+        )
+        pot_df[f"quantity_{num}"] = merged["quantity"].fillna(0)
 
+    # Calculate statistics
+    quantity_cols = [f"quantity_{num}" for num in days_ago]
+    pot_df["AVG"] = pot_df[quantity_cols].mean(axis=1)
+    pot_df["MEDIAN"] = pot_df[quantity_cols].median(axis=1)
+    pot_df["MAX"] = pot_df[quantity_cols].max(axis=1)
+    totals = pot_df[["AVG", "MEDIAN", "MAX"]].sum()
+    pot_df.loc["TOTALS"] = [None, None, None] + list(totals.values)
+
+    # pot_df = pd.DataFrame(columns=["time", "in_time", "out_time"])
+    # for num in [7, 14, 21, 28]:
+    #     day_pot_sales = pd.DataFrame(
+    #         columns=["time", "in_time", "out_time", "quantity"]
+    #     )
+    #     for index, row in load_times.iterrows():
+    #         query = (
+    #             db.session.query(
+    #                 func.sum(PotatoSales.quantity).label("quantity")
+    #             ).filter(
+    #                 PotatoSales.time.between(row["start_time"], row["stop_time"]),
+    #                 PotatoSales.dow == fiscal_dates["dow"],
+    #                 PotatoSales.name == store.name,
+    #                 PotatoSales.date == TODAY - timedelta(days=num),
+    #             )
+    #         ).all()
+    #         day_pot_sales = pd.concat(
+    #             [
+    #                 day_pot_sales,
+    #                 pd.DataFrame(
+    #                     {
+    #                         "time": [row["time"]],
+    #                         "in_time": [row["in_time"]],
+    #                         "out_time": [row["out_time"]],
+    #                         "quantity": [query[0][0]],
+    #                     }
+    #                 ),
+    #             ],
+    #             ignore_index=True,
+    #         )
+    #     pot_df = pot_df.merge(
+    #         day_pot_sales,
+    #         on=["time", "in_time", "out_time"],
+    #         how="outer",
+    #         suffixes=("", f"_{num}"),
+    #     )
+    #
+    # pot_df.fillna(0, inplace=True)
+    # pot_df.loc[:, "AVG"] = pot_df.mean(numeric_only=True, axis=1)
+    # pot_df.loc[:, "MEDIAN"] = pot_df.median(numeric_only=True, axis=1)
+    # pot_df.loc[:, "MAX"] = pot_df.max(numeric_only=True, axis=1)
+    # pot_df.loc["TOTALS"] = pot_df.sum(numeric_only=True)
+    #
     # format pdf page
     pdf_date = TODAY.strftime("%A, %B-%d")
     pdf = FPDF()
