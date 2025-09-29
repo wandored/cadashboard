@@ -17,9 +17,6 @@ from sqlalchemy import and_, func, or_
 
 from dashapp.authentication.forms import (
     DateForm,
-    LobsterForm,
-    PotatoForm,
-    StoneForm,
     StoreForm,
 )
 from dashapp.authentication.models import Restaurants
