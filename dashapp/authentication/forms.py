@@ -60,33 +60,3 @@ class StoreForm(FlaskForm):
         get_label="name",
     )
     submit3 = SubmitField("Submit")
-
-
-class PotatoForm(FlaskForm):
-    store = QuerySelectField(
-        "",
-        query_factory=store_query,
-        get_label="name",
-        blank_text="Select Store",
-    )
-    submit4 = SubmitField("Submit")
-
-
-class LobsterForm(FlaskForm):
-    store = QuerySelectField(
-        "",
-        query_factory=store_query,
-        get_label="name",
-        blank_text="Select Store",
-    )
-    submit5 = SubmitField("Submit")
-
-
-class StoneForm(FlaskForm):
-    store = QuerySelectField(
-        "",
-        query_factory=store_query,
-        get_label="name",
-        blank_text="Select Store",
-    )
-    submit6 = SubmitField("Submit")

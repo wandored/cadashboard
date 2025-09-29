@@ -12,15 +12,11 @@ from sqlalchemy import and_, func
 
 from dashapp.authentication.forms import (
     DateForm,
-    LobsterForm,
-    PotatoForm,
-    StoneForm,
     StoreForm,
 )
 from dashapp.authentication.models import (
     Purchases,
     Restaurants,
-    SalesAccount,
     db,
 )
 from dashapp.config import Config
@@ -45,9 +41,6 @@ def purchasing():
 
     form1 = DateForm()
     form3 = StoreForm()
-    form4 = PotatoForm()
-    form5 = LobsterForm()
-    form6 = StoneForm()
 
     if form1.submit1.data and form1.validate():
         session["date_selected"] = form1.selectdate.data
@@ -83,18 +76,6 @@ def purchasing():
                 )
             )
         return redirect(url_for("purchasing_blueprint.purchasing"))
-
-    if form4.submit4.data and form4.validate():
-        store_id = form4.store.data.id
-        return redirect(url_for("home_blueprint.potato", store_id=store_id))
-
-    if form5.submit5.data and form5.validate():
-        store_id = form5.store.data.id
-        return redirect(url_for("home_blueprint.lobster", store_id=store_id))
-
-    if form6.submit6.data and form6.validate():
-        store_id = form6.store.data.id
-        return redirect(url_for("home_blueprint.stone", store_id=store_id))
 
     food_category_list = (
         db.session.query(Purchases.category2)
@@ -247,9 +228,6 @@ def purchasing():
         segment="purchasing",
         form1=form1,
         form3=form3,
-        form4=form4,
-        form5=form5,
-        form6=form6,
         fiscal_dates=fiscal_dates,
         top_ten=top_ten,
         top_ten_vendor=top_ten_vendor,
@@ -265,9 +243,6 @@ def alcohol():
 
     form1 = DateForm()
     form3 = StoreForm()
-    form4 = PotatoForm()
-    form5 = LobsterForm()
-    form6 = StoneForm()
 
     if form1.submit1.data and form1.validate():
         session["date_selected"] = form1.selectdate.data
@@ -303,18 +278,6 @@ def alcohol():
                 )
             )
         return redirect(url_for("purchasing_blueprint.alcohol"))
-
-    if form4.submit4.data and form4.validate():
-        store_id = form4.store.data.id
-        return redirect(url_for("home_blueprint.potato", store_id=store_id))
-
-    if form5.submit5.data and form5.validate():
-        store_id = form5.store.data.id
-        return redirect(url_for("home_blueprint.lobster", store_id=store_id))
-
-    if form6.submit6.data and form6.validate():
-        store_id = form6.store.data.id
-        return redirect(url_for("home_blueprint.stone", store_id=store_id))
 
     # get name from Restaurants table based on session["store_list"]
     store_names = db.session.query(Restaurants.name).filter(
@@ -437,9 +400,6 @@ def alcohol():
         segment="purchasing",
         form1=form1,
         form3=form3,
-        form4=form4,
-        form5=form5,
-        form6=form6,
         fiscal_dates=fiscal_dates,
         top_ten=top_ten,
         top_ten_vendor=top_ten_vendor,
@@ -455,9 +415,6 @@ def supplies():
 
     form1 = DateForm()
     form3 = StoreForm()
-    form4 = PotatoForm()
-    form5 = LobsterForm()
-    form6 = StoneForm()
 
     if form1.submit1.data and form1.validate():
         session["date_selected"] = form1.selectdate.data
@@ -492,15 +449,6 @@ def supplies():
                 )
             )
         return redirect(url_for("purchasing_blueprint.supplies"))
-    if form4.submit4.data and form4.validate():
-        store_id = form4.store.data.id
-        return redirect(url_for("home_blueprint.potato", store_id=store_id))
-    if form5.submit5.data and form5.validate():
-        store_id = form5.store.data.id
-        return redirect(url_for("home_blueprint.lobster", store_id=store_id))
-    if form6.submit6.data and form6.validate():
-        store_id = form6.store.data.id
-        return redirect(url_for("home_blueprint.stone", store_id=store_id))
     # get name from Restaurants table based on session["store_list"]
     store_names = db.session.query(Restaurants.name).filter(
         Restaurants.id.in_(session["store_list"])
@@ -606,9 +554,6 @@ def purchase(product):
 
     form1 = DateForm()
     form3 = StoreForm()
-    form4 = PotatoForm()
-    form5 = LobsterForm()
-    form6 = StoneForm()
 
     if form1.submit1.data and form1.validate():
         session["date_selected"] = form1.selectdate.data
@@ -644,18 +589,6 @@ def purchase(product):
                 )
             )
         return redirect(url_for("purchasing_blueprint.purchase", product=product))
-
-    if form4.submit4.data and form4.validate():
-        store_id = form4.store.data.id
-        return redirect(url_for("home_blueprint.potato", store_id=store_id))
-
-    if form5.submit5.data and form5.validate():
-        store_id = form5.store.data.id
-        return redirect(url_for("home_blueprint.lobster", store_id=store_id))
-
-    if form6.submit6.data and form6.validate():
-        store_id = form6.store.data.id
-        return redirect(url_for("home_blueprint.stone", store_id=store_id))
 
     top_ten = get_category_topten(
         [product],
@@ -767,9 +700,6 @@ def purchase(product):
         segment="purchasing",
         form1=form1,
         form3=form3,
-        form4=form4,
-        form5=form5,
-        form6=form6,
         fiscal_dates=fiscal_dates,
         color=color,
         top_ten=top_ten,

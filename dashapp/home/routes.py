@@ -18,9 +18,6 @@ from sqlalchemy import and_, func
 
 from dashapp.authentication.forms import (
     DateForm,
-    LobsterForm,
-    PotatoForm,
-    StoneForm,
     StoreForm,
     UpdateForm,
 )
@@ -30,10 +27,7 @@ from dashapp.authentication.models import (
     CASalesRecordWeek,
     CASalesRecordYear,
     DailyLogins,
-    GiftCardRedeem,
-    GiftCardSales,
     LaborTotals,
-    PotatoSales,
     Restaurants,
     SalesTotals,
     StockCount,
@@ -92,9 +86,6 @@ def index():
     # Get Data
     form1 = DateForm()
     form3 = StoreForm()
-    form4 = PotatoForm()
-    form5 = LobsterForm()
-    form6 = StoneForm()
 
     if form1.submit1.data and form1.validate():
         """
@@ -133,18 +124,6 @@ def index():
                 )
             )
         return redirect(url_for("home_blueprint.index"))
-
-    if form4.submit4.data and form4.validate():
-        store_id = form4.store.data.id
-        return redirect(url_for("home_blueprint.potato", store_id=store_id))
-
-    if form5.submit5.data and form5.validate():
-        store_id = form5.store.data.id
-        return redirect(url_for("home_blueprint.lobster", store_id=store_id))
-
-    if form6.submit6.data and form6.validate():
-        store_id = form6.store.data.id
-        return redirect(url_for("home_blueprint.stone", store_id=store_id))
 
     # Sales Chart
     def get_chart_values(start, end, time_frame):
@@ -409,9 +388,6 @@ def store(store_id):
     # Get Data
     form1 = DateForm()
     form3 = StoreForm()
-    form4 = PotatoForm()
-    form5 = LobsterForm()
-    form6 = StoneForm()
 
     if form1.submit1.data and form1.validate():
         session["date_selected"] = form1.selectdate.data
@@ -452,18 +428,6 @@ def store(store_id):
                 store_id = x.id
                 break
         return redirect(url_for("home_blueprint.store", store_id=store_id))
-
-    if form4.submit4.data and form4.validate():
-        store_id = form4.store.data.id
-        return redirect(url_for("home_blueprint.potato", store_id=store_id))
-
-    if form5.submit5.data and form5.validate():
-        store_id = form5.store.data.id
-        return redirect(url_for("home_blueprint.lobster", store_id=store_id))
-
-    if form6.submit6.data and form6.validate():
-        store_id = form6.store.data.id
-        return redirect(url_for("home_blueprint.stone", store_id=store_id))
 
     # Sales Charts
     daily_sales_list = get_sales_charts(
@@ -1645,201 +1609,6 @@ def store(store_id):
     )
 
 
-@blueprint.route("/marketing/", methods=["GET", "POST"])
-@login_required
-def marketing():
-    fiscal_dates = set_dates(session["date_selected"])
-    form1 = DateForm()
-    form4 = PotatoForm()
-    form5 = LobsterForm()
-    form6 = StoneForm()
-    if form1.submit1.data and form1.validate():
-        """ """
-        session["date_selected"] = form1.selectdate.data
-        return redirect(url_for("home_blueprint.marketing"))
-
-    form3 = StoreForm()
-    if form3.submit3.data and form3.validate():
-        session["date_selected"] = fiscal_dates["start_day"]
-        data = form3.stores.data
-        session["store_list"] = tuple([x.id for x in data])
-        if 98 in session["store_list"] and 99 in session["store_list"]:
-            session["store_list"] = tuple(
-                store.id
-                for store in Restaurants.query.filter(Restaurants.active == True)  # noqa E712
-                .order_by(Restaurants.name)
-                .all()
-            )
-        elif 99 in session["store_list"]:
-            session["store_list"] = tuple(
-                store.id
-                for store in Restaurants.query.filter(
-                    and_(
-                        Restaurants.active == True, Restaurants.concept == "Steakhouse"
-                    )  # noqa E712
-                )
-                .order_by(Restaurants.name)
-                .all()
-            )
-        elif 98 in session["store_list"]:
-            session["store_list"] = tuple(
-                store.id
-                for store in Restaurants.query.filter(
-                    and_(Restaurants.active == True, Restaurants.concept == "Casual")
-                )
-            )
-        for x in data:
-            # select only 1 store for store page
-            if x.id in session["store_list"]:
-                store_id = x.id
-                break
-        session["date_selected"] = fiscal_dates["start_day"]
-        return redirect(url_for("home_blueprint.store", store_id=store_id))
-
-    if form4.submit4.data and form4.validate():
-        store_id = form4.store.data.id
-        return redirect(url_for("home_blueprint.potato", store_id=store_id))
-
-    if form5.submit5.data and form5.validate():
-        store_id = form5.store.data.id
-        return redirect(url_for("home_blueprint.lobster", store_id=store_id))
-
-    if form6.submit6.data and form6.validate():
-        store_id = form6.store.data.id
-        return redirect(url_for("home_blueprint.stone", store_id=store_id))
-
-    # Gift Card Sales
-
-    def get_giftcard_sales(start, end):
-        chart = (
-            db.session.query(
-                GiftCardSales.period,
-                func.sum(GiftCardSales.amount).label("sales"),
-                func.sum(GiftCardSales.quantity).label("count"),
-            )
-            .select_from(GiftCardSales)
-            .filter(GiftCardSales.date.between(start, end))
-            .group_by(GiftCardSales.period)
-        )
-        value = []
-        number = []
-        for p in period_order:
-            for v in chart:
-                if v.period == p:
-                    value.append(int(v.sales))
-                    number.append(int(v.count))
-
-        return value, number
-
-    def get_giftcard_payments(start, end):
-        chart = (
-            db.session.query(
-                GiftCardRedeem.period, func.sum(GiftCardRedeem.amount).label("sales")
-            )
-            .select_from(GiftCardRedeem)
-            .filter(GiftCardRedeem.date.between(start, end))
-            .group_by(GiftCardRedeem.period)
-        )
-        value = []
-        for p in period_order:
-            for v in chart:
-                if v.period == p:
-                    value.append(int(v.sales))
-
-        return value
-
-    # list of last 13 periods
-    period_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
-    slice1 = period_list[fiscal_dates["period"] :]
-    slice2 = period_list[: fiscal_dates["period"]]
-    period_order = slice1 + slice2
-
-    giftcard_sales, giftcard_count = get_giftcard_sales(
-        fiscal_dates["last_threesixtyfive"], fiscal_dates["start_day"]
-    )
-    giftcard_payments = get_giftcard_payments(
-        fiscal_dates["last_threesixtyfive"], fiscal_dates["start_day"]
-    )
-
-    # TODO set to trailing year beginning in 2023
-    giftcard_diff = []
-    dif = 0
-    for ii in range(len(giftcard_sales)):
-        dif = (giftcard_sales[ii] - giftcard_payments[ii]) + dif
-        giftcard_diff.append(dif)
-    giftcard_payments[:] = [-abs(x) for x in giftcard_payments]
-
-    def get_giftcard_sales_per_store(start, end):
-        query = (
-            db.session.query(
-                GiftCardSales.name,
-                func.sum(GiftCardSales.amount).label("sales"),
-                func.sum(GiftCardSales.quantity).label("count"),
-            )
-            .filter(
-                GiftCardSales.date.between(start, end),
-            )
-            .group_by(GiftCardSales.name)
-        ).all()
-        sales = pd.DataFrame.from_records(
-            query, columns=["store", "amount", "quantity"]
-        )
-        sales.sort_values(by=["amount"], ascending=False, inplace=True)
-        sales.loc["TOTALS"] = sales.sum(numeric_only=True)
-        return sales
-
-    def get_giftcard_payments_per_store(start, end):
-        # data = Restaurants.query.with_entities(Restaurants.name, Restaurants.id).all()
-        # df_loc = pd.DataFrame([x.as_dict() for x in data])
-        # df_loc.rename(
-        #    columns={
-        #        "id": "name",
-        #    },
-        #    inplace=True,
-        # )
-
-        query = (
-            db.session.query(
-                GiftCardRedeem.name,
-                GiftCardRedeem.period,
-                func.sum(GiftCardRedeem.amount).label("payment"),
-            )
-            .filter(
-                GiftCardRedeem.date.between(start, end),
-            )
-            .group_by(GiftCardRedeem.name, GiftCardRedeem.period)
-        ).all()
-
-        payments = pd.DataFrame.from_records(
-            query, columns=["name", "payment", "period"]
-        )
-        payments.sort_values(by=["payment"], ascending=False, inplace=True)
-
-        payments.loc["TOTALS"] = payments.sum(numeric_only=True)
-        return payments
-
-    gift_card_sales = get_giftcard_sales_per_store(
-        fiscal_dates["start_year"], fiscal_dates["end_year"]
-    )
-    gift_card_payments = get_giftcard_payments_per_store(
-        fiscal_dates["start_year"], fiscal_dates["end_year"]
-    )
-    gift_card_sales = gift_card_sales.merge(
-        gift_card_payments, left_on="store", right_on="name"
-    )
-    gift_card_sales["diff"] = gift_card_sales["amount"] - gift_card_sales["payment"]
-    gift_card_sales.sort_values(by=["diff"], ascending=False, inplace=True)
-
-    return render_template(
-        "home/marketing.html",
-        title="Marketing",
-        company_name=Config.COMPANY_NAME,
-        segment="marketing",
-        roles=current_user.roles,
-        **locals(),
-    )
-
-
 @blueprint.route("/support/", methods=["GET", "POST"])
 @login_required
 @roles_accepted("admin")
@@ -1851,9 +1620,6 @@ def support():
     form1 = DateForm()
     form2 = UpdateForm()
     form3 = StoreForm()
-    form4 = PotatoForm()
-    form5 = LobsterForm()
-    form6 = StoneForm()
 
     if form1.submit1.data and form1.validate():
         """ """
@@ -1895,18 +1661,6 @@ def support():
                 store_id = x.id
                 break
         return redirect(url_for("home_blueprint.store", store_id=store_id))
-
-    if form4.submit4.data and form4.validate():
-        store_id = form4.store.data.id
-        return redirect(url_for("home_blueprint.potato", store_id=store_id))
-
-    if form5.submit5.data and form5.validate():
-        store_id = form5.store.data.id
-        return redirect(url_for("home_blueprint.lobster", store_id=store_id))
-
-    if form6.submit6.data and form6.validate():
-        store_id = form6.store.data.id
-        return redirect(url_for("home_blueprint.stone", store_id=store_id))
 
     # Fetch daily login counts
     daily_logins_query = (
@@ -2020,9 +1774,6 @@ def profile():
     fiscal_dates = set_dates(session["date_selected"])
     form1 = DateForm()
     form3 = StoreForm()
-    form4 = PotatoForm()
-    form5 = LobsterForm()
-    form6 = StoneForm()
 
     if form1.submit1.data and form1.validate():
         session["date_selected"] = form1.selectdate.data
@@ -2059,18 +1810,6 @@ def profile():
             )
         return redirect(url_for("home_blueprint.profile"))
 
-    if form4.submit4.data and form4.validate():
-        store_id = form4.store.data.id
-        return redirect(url_for("home_blueprint.potato", store_id=store_id))
-
-    if form5.submit5.data and form5.validate():
-        store_id = form5.store.data.id
-        return redirect(url_for("home_blueprint.lobster", store_id=store_id))
-
-    if form6.submit6.data and form6.validate():
-        store_id = form6.store.data.id
-        return redirect(url_for("home_blueprint.stone", store_id=store_id))
-
     store_list = [x.name for x in current_user.stores]
 
     return render_template(
@@ -2082,335 +1821,335 @@ def profile():
     )
 
 
-@blueprint.route("/<int:store_id>/potato/", methods=["GET", "POST"])
-@login_required
-def potato(store_id):
-    TODAY = datetime.date(datetime.now())
-    fiscal_dates = set_dates(datetime.date(datetime.now()))
-    store = Restaurants.query.filter_by(id=store_id).first()
-
-    # Load all potato sales for the relevant days in one query
-    days_ago = [7, 14, 21, 28]
-    target_dates = [TODAY - timedelta(days=num) for num in days_ago]
-    load_times = pd.read_sql_table("potato_load_times", con=db.engine)
-
-    # Query all relevant PotatoSales at once
-    sales_query = (
-        db.session.query(
-            PotatoSales.time,
-            PotatoSales.dow,
-            PotatoSales.name,
-            PotatoSales.date,
-            PotatoSales.quantity,
-        )
-        .filter(
-            PotatoSales.dow == fiscal_dates["dow"],
-            PotatoSales.name == store.name,
-            PotatoSales.date.in_(target_dates),
-        )
-        .all()
-    )
-    sales_df = pd.DataFrame(
-        sales_query, columns=["time", "dow", "name", "date", "quantity"]
-    )
-
-    # Prepare merged DataFrame for all time slots
-    pot_df = load_times[["time", "in_time", "out_time"]].copy()
-
-    # For each date, aggregate sales by time slot
-    for num, date in zip(days_ago, target_dates):
-        # Filter sales for this date
-        date_sales = sales_df[sales_df["date"] == date]
-        # Merge with load_times to align time slots
-        merged = pd.merge(
-            load_times, date_sales, left_on="time", right_on="time", how="left"
-        )
-        pot_df[f"quantity_{num}"] = merged["quantity"].fillna(0)
-
-    # Calculate statistics
-    quantity_cols = [f"quantity_{num}" for num in days_ago]
-    pot_df["AVG"] = pot_df[quantity_cols].mean(axis=1)
-    pot_df["MEDIAN"] = pot_df[quantity_cols].median(axis=1)
-    pot_df["MAX"] = pot_df[quantity_cols].max(axis=1)
-    totals = pot_df[["AVG", "MEDIAN", "MAX"]].sum()
-    pot_df.loc["TOTALS"] = [None, None, None] + list(totals.values)
-
-    # pot_df = pd.DataFrame(columns=["time", "in_time", "out_time"])
-    # for num in [7, 14, 21, 28]:
-    #     day_pot_sales = pd.DataFrame(
-    #         columns=["time", "in_time", "out_time", "quantity"]
-    #     )
-    #     for index, row in load_times.iterrows():
-    #         query = (
-    #             db.session.query(
-    #                 func.sum(PotatoSales.quantity).label("quantity")
-    #             ).filter(
-    #                 PotatoSales.time.between(row["start_time"], row["stop_time"]),
-    #                 PotatoSales.dow == fiscal_dates["dow"],
-    #                 PotatoSales.name == store.name,
-    #                 PotatoSales.date == TODAY - timedelta(days=num),
-    #             )
-    #         ).all()
-    #         day_pot_sales = pd.concat(
-    #             [
-    #                 day_pot_sales,
-    #                 pd.DataFrame(
-    #                     {
-    #                         "time": [row["time"]],
-    #                         "in_time": [row["in_time"]],
-    #                         "out_time": [row["out_time"]],
-    #                         "quantity": [query[0][0]],
-    #                     }
-    #                 ),
-    #             ],
-    #             ignore_index=True,
-    #         )
-    #     pot_df = pot_df.merge(
-    #         day_pot_sales,
-    #         on=["time", "in_time", "out_time"],
-    #         how="outer",
-    #         suffixes=("", f"_{num}"),
-    #     )
-    #
-    # pot_df.fillna(0, inplace=True)
-    # pot_df.loc[:, "AVG"] = pot_df.mean(numeric_only=True, axis=1)
-    # pot_df.loc[:, "MEDIAN"] = pot_df.median(numeric_only=True, axis=1)
-    # pot_df.loc[:, "MAX"] = pot_df.max(numeric_only=True, axis=1)
-    # pot_df.loc["TOTALS"] = pot_df.sum(numeric_only=True)
-    #
-    # format pdf page
-    pdf_date = TODAY.strftime("%A, %B-%d")
-    pdf = FPDF()
-    pdf.add_page()
-    page_width = pdf.w - 2 * pdf.l_margin
-    pdf.set_font("Times", "B", 14.0)
-    pdf.cell(page_width, 0.0, "POTATO LOADING CHART", align="C")
-    pdf.ln(5)
-    pdf.cell(page_width, 0.0, store.name, align="C")
-    pdf.ln(5)
-    pdf.cell(page_width, 0.0, pdf_date, align="C")
-    pdf.ln(5)
-
-    pdf.set_font("Courier", "", 12)
-    col_width = page_width / 8
-    notes_width = page_width / 3
-    pdf.ln(1)
-    th = pdf.font_size + 1
-
-    pdf.cell(col_width, th, str("LUNCH"), border=1)
-    pdf.ln(th)
-    pdf.cell(col_width, th, str("IN TIME"), border=1)
-    pdf.cell(col_width, th, str("Average"), border=1)
-    pdf.cell(col_width, th, str("Median"), border=1)
-    pdf.cell(col_width, th, str("Max"), border=1)
-    pdf.cell(col_width, th, str("OUT TIME"), border=1)
-    pdf.cell(notes_width, th, str("NOTES"), border=1)
-    pdf.ln(th)
-    for k, v in pot_df.iterrows():
-        if v["time"] == "15:00":
-            pdf.ln(th)
-            pdf.cell(col_width, th, str("DINNER"), border=1)
-            pdf.ln(th)
-            pdf.cell(col_width, th, str("IN TIME"), border=1)
-            pdf.cell(col_width, th, str("Average"), border=1)
-            pdf.cell(col_width, th, str("Median"), border=1)
-            pdf.cell(col_width, th, str("Max"), border=1)
-            pdf.cell(col_width, th, str("OUT TIME"), border=1)
-            pdf.cell(notes_width, th, str("NOTES"), border=1)
-            pdf.ln(th)
-        if k == "TOTALS":
-            pdf.ln(th)
-            pdf.cell(col_width, th, str("TOTALS"), border=1)
-            pdf.ln(th)
-            pdf.cell(col_width, th, "", border=1)
-            pdf.cell(col_width, th, str(round(v["AVG"])), border=1)
-            pdf.cell(col_width, th, str(round(v["MEDIAN"])), border=1)
-            pdf.cell(col_width, th, str(round(v["MAX"])), border=1)
-            pdf.cell(col_width, th, "", border=1)
-            pdf.cell(notes_width, th, "", border=1)
-            pdf.ln(th)
-            continue
-        pdf.cell(col_width, th, str(v["in_time"]), border=1)
-        pdf.cell(col_width, th, str(round(v["AVG"])), border=1)
-        pdf.cell(col_width, th, str(round(v["MEDIAN"])), border=1)
-        pdf.cell(col_width, th, str(round(v["MAX"])), border=1)
-        pdf.cell(col_width, th, str(v["out_time"]), border=1)
-        pdf.cell(notes_width, th, "", border=1)
-        pdf.ln(th)
-
-    pdf.ln(5)
-    pdf.set_font("Times", "", 10.0)
-    pdf.cell(
-        page_width, 0.0, "* Calculated from previous 4 weeks same day sales", align="L"
-    )
-    pdf.ln(5)
-    pdf.cell(page_width, 0.0, "- end of report -", align="C")
-
-    return Response(
-        pdf.output(dest="S").encode("latin-1"),
-        mimetype="application/pdf",
-        headers={"Content-Disposition": "attachment;filename=potato_loading.pdf"},
-    )
-
-
-@blueprint.route("/<int:store_id>/lobster/", methods=["GET", "POST"])
-@login_required
-def lobster(store_id):
-    TODAY = datetime.date(datetime.now())
-    fiscal_dates = set_dates(session["date_selected"])
-
-    store = Restaurants.query.filter_by(id=store_id).first()
-
-    live_lobster_avg_cost = get_item_avg_cost(
-        "SEAFOOD Lobster Live Maine",
-        fiscal_dates["last_seven"],
-        fiscal_dates["start_day"],
-        store_id,
-    )
-
-    with open("./lobster_items.json") as file:
-        lobster_items = json.load(file)
-
-    # format pdf page
-    pdf_date = TODAY.strftime("%A, %B-%d")
-    pdf = FPDF()
-    pdf.add_page()
-    page_width = pdf.w - 2 * pdf.l_margin
-    pdf.set_font("Times", "B", 14.0)
-    pdf.cell(page_width, 0.0, "LOBSTER PRICE CHART", align="C")
-    pdf.ln(5)
-    pdf.cell(page_width, 0.0, store.name, align="C")
-    pdf.ln(5)
-    pdf.cell(page_width, 0.0, pdf_date, align="C")
-    pdf.ln(5)
-
-    pdf.set_font("Courier", "", 12)
-    col_width = page_width / 5
-    size_width = page_width / 3
-    pdf.ln(1)
-    th = pdf.font_size + 1
-
-    pdf.cell(col_width, th, str("Avg Cost/lb"), border=1)
-    pdf.cell(
-        col_width,
-        th,
-        "${:,.2f}".format(round(live_lobster_avg_cost, 2)),
-        align="R",
-        border=1,
-    )
-    pdf.ln(2 * th)
-    pdf.cell(size_width, th, str("Size"), border=1)
-    pdf.cell(col_width, th, str("Cost"), border=1)
-    pdf.cell(col_width, th, str("Price @40%"), border=1)
-    pdf.ln(th)
-
-    for v in lobster_items["lobster_sizes"]:
-        pdf.cell(size_width, th, str(v["item"]), border=1)
-        pdf.cell(
-            col_width,
-            th,
-            "${:,.2f}".format(round(live_lobster_avg_cost * v["factor"], 2)),
-            align="R",
-            border=1,
-        )
-        pdf.cell(
-            col_width,
-            th,
-            "${:,.2f}".format(round(live_lobster_avg_cost * v["factor"] / 0.4)),
-            align="R",
-            border=1,
-        )
-        pdf.ln(th)
-
-    pdf.ln(5)
-    pdf.set_font("Times", "", 10.0)
-    pdf.cell(page_width, 0.0, "* Calculated from previous 7 days purchases", align="L")
-    pdf.ln(5)
-    pdf.cell(page_width, 0.0, "- end of report -", align="C")
-
-    return Response(
-        pdf.output(dest="S").encode("latin-1"),
-        mimetype="application/pdf",
-        headers={"Content-Disposition": "attachment;filename=lobster_prices.pdf"},
-    )
-
-
-@blueprint.route("/<int:store_id>/stone/", methods=["GET", "POST"])
-@login_required
-def stone(store_id):
-    TODAY = datetime.date(datetime.now())
-    fiscal_dates = set_dates(session["date_selected"])
-
-    store = Restaurants.query.filter_by(id=store_id).first()
-
-    stone_claw_avg_cost = get_item_avg_cost(
-        "SEAFOOD Crab Stone Claws",
-        fiscal_dates["last_seven"],
-        fiscal_dates["start_day"],
-        store_id,
-    )
-    with open("./stone_claw_items.json") as file:
-        stone_items = json.load(file)
-
-    # format pdf page
-    pdf_date = TODAY.strftime("%A, %B-%d")
-    pdf = FPDF()
-    pdf.add_page()
-    page_width = pdf.w - 2 * pdf.l_margin
-    pdf.set_font("Times", "B", 14.0)
-    pdf.cell(page_width, 0.0, "STONE CLAW PRICE CHART", align="C")
-    pdf.ln(5)
-    pdf.cell(page_width, 0.0, store.name, align="C")
-    pdf.ln(5)
-    pdf.cell(page_width, 0.0, pdf_date, align="C")
-    pdf.ln(5)
-
-    pdf.set_font("Courier", "", 12)
-    col_width = page_width / 5
-    size_width = page_width / 3
-    pdf.ln(1)
-    th = pdf.font_size + 1
-
-    pdf.cell(col_width, th, str("Avg Cost/lb"), border=1)
-    pdf.cell(
-        col_width,
-        th,
-        "${:,.2f}".format(round(stone_claw_avg_cost, 2)),
-        align="R",
-        border=1,
-    )
-    pdf.ln(2 * th)
-    pdf.cell(size_width, th, str("Size"), border=1)
-    pdf.cell(col_width, th, str("Cost"), border=1)
-    pdf.cell(col_width, th, str("Price @40%"), border=1)
-    pdf.ln(th)
-
-    for v in stone_items["stone_sizes"]:
-        pdf.cell(size_width, th, str(v["item"]), border=1)
-        pdf.cell(
-            col_width,
-            th,
-            "${:,.2f}".format(round(stone_claw_avg_cost * v["factor"], 2)),
-            align="R",
-            border=1,
-        )
-        pdf.cell(
-            col_width,
-            th,
-            "${:,.2f}".format(round(stone_claw_avg_cost * v["factor"] / 0.4)),
-            align="R",
-            border=1,
-        )
-        pdf.ln(th)
-
-    pdf.ln(5)
-    pdf.set_font("Times", "", 10.0)
-    pdf.cell(page_width, 0.0, "* Calculated from previous 7 days purchases", align="L")
-    pdf.ln(5)
-    pdf.cell(page_width, 0.0, "- end of report -", align="C")
-
-    return Response(
-        pdf.output(dest="S").encode("latin-1"),
-        mimetype="application/pdf",
-        headers={"Content-Disposition": "attachment;filename=stone_claw_prices.pdf"},
-    )
+# @blueprint.route("/<int:store_id>/potato/", methods=["GET", "POST"])
+# @login_required
+# def potato(store_id):
+#     TODAY = datetime.date(datetime.now())
+#     fiscal_dates = set_dates(datetime.date(datetime.now()))
+#     store = Restaurants.query.filter_by(id=store_id).first()
+#
+#     # Load all potato sales for the relevant days in one query
+#     days_ago = [7, 14, 21, 28]
+#     target_dates = [TODAY - timedelta(days=num) for num in days_ago]
+#     load_times = pd.read_sql_table("potato_load_times", con=db.engine)
+#
+#     # Query all relevant PotatoSales at once
+#     sales_query = (
+#         db.session.query(
+#             PotatoSales.time,
+#             PotatoSales.dow,
+#             PotatoSales.name,
+#             PotatoSales.date,
+#             PotatoSales.quantity,
+#         )
+#         .filter(
+#             PotatoSales.dow == fiscal_dates["dow"],
+#             PotatoSales.name == store.name,
+#             PotatoSales.date.in_(target_dates),
+#         )
+#         .all()
+#     )
+#     sales_df = pd.DataFrame(
+#         sales_query, columns=["time", "dow", "name", "date", "quantity"]
+#     )
+#
+#     # Prepare merged DataFrame for all time slots
+#     pot_df = load_times[["time", "in_time", "out_time"]].copy()
+#
+#     # For each date, aggregate sales by time slot
+#     for num, date in zip(days_ago, target_dates):
+#         # Filter sales for this date
+#         date_sales = sales_df[sales_df["date"] == date]
+#         # Merge with load_times to align time slots
+#         merged = pd.merge(
+#             load_times, date_sales, left_on="time", right_on="time", how="left"
+#         )
+#         pot_df[f"quantity_{num}"] = merged["quantity"].fillna(0)
+#
+#     # Calculate statistics
+#     quantity_cols = [f"quantity_{num}" for num in days_ago]
+#     pot_df["AVG"] = pot_df[quantity_cols].mean(axis=1)
+#     pot_df["MEDIAN"] = pot_df[quantity_cols].median(axis=1)
+#     pot_df["MAX"] = pot_df[quantity_cols].max(axis=1)
+#     totals = pot_df[["AVG", "MEDIAN", "MAX"]].sum()
+#     pot_df.loc["TOTALS"] = [None, None, None] + list(totals.values)
+#
+#     # pot_df = pd.DataFrame(columns=["time", "in_time", "out_time"])
+#     # for num in [7, 14, 21, 28]:
+#     #     day_pot_sales = pd.DataFrame(
+#     #         columns=["time", "in_time", "out_time", "quantity"]
+#     #     )
+#     #     for index, row in load_times.iterrows():
+#     #         query = (
+#     #             db.session.query(
+#     #                 func.sum(PotatoSales.quantity).label("quantity")
+#     #             ).filter(
+#     #                 PotatoSales.time.between(row["start_time"], row["stop_time"]),
+#     #                 PotatoSales.dow == fiscal_dates["dow"],
+#     #                 PotatoSales.name == store.name,
+#     #                 PotatoSales.date == TODAY - timedelta(days=num),
+#     #             )
+#     #         ).all()
+#     #         day_pot_sales = pd.concat(
+#     #             [
+#     #                 day_pot_sales,
+#     #                 pd.DataFrame(
+#     #                     {
+#     #                         "time": [row["time"]],
+#     #                         "in_time": [row["in_time"]],
+#     #                         "out_time": [row["out_time"]],
+#     #                         "quantity": [query[0][0]],
+#     #                     }
+#     #                 ),
+#     #             ],
+#     #             ignore_index=True,
+#     #         )
+#     #     pot_df = pot_df.merge(
+#     #         day_pot_sales,
+#     #         on=["time", "in_time", "out_time"],
+#     #         how="outer",
+#     #         suffixes=("", f"_{num}"),
+#     #     )
+#     #
+#     # pot_df.fillna(0, inplace=True)
+#     # pot_df.loc[:, "AVG"] = pot_df.mean(numeric_only=True, axis=1)
+#     # pot_df.loc[:, "MEDIAN"] = pot_df.median(numeric_only=True, axis=1)
+#     # pot_df.loc[:, "MAX"] = pot_df.max(numeric_only=True, axis=1)
+#     # pot_df.loc["TOTALS"] = pot_df.sum(numeric_only=True)
+#     #
+#     # format pdf page
+#     pdf_date = TODAY.strftime("%A, %B-%d")
+#     pdf = FPDF()
+#     pdf.add_page()
+#     page_width = pdf.w - 2 * pdf.l_margin
+#     pdf.set_font("Times", "B", 14.0)
+#     pdf.cell(page_width, 0.0, "POTATO LOADING CHART", align="C")
+#     pdf.ln(5)
+#     pdf.cell(page_width, 0.0, store.name, align="C")
+#     pdf.ln(5)
+#     pdf.cell(page_width, 0.0, pdf_date, align="C")
+#     pdf.ln(5)
+#
+#     pdf.set_font("Courier", "", 12)
+#     col_width = page_width / 8
+#     notes_width = page_width / 3
+#     pdf.ln(1)
+#     th = pdf.font_size + 1
+#
+#     pdf.cell(col_width, th, str("LUNCH"), border=1)
+#     pdf.ln(th)
+#     pdf.cell(col_width, th, str("IN TIME"), border=1)
+#     pdf.cell(col_width, th, str("Average"), border=1)
+#     pdf.cell(col_width, th, str("Median"), border=1)
+#     pdf.cell(col_width, th, str("Max"), border=1)
+#     pdf.cell(col_width, th, str("OUT TIME"), border=1)
+#     pdf.cell(notes_width, th, str("NOTES"), border=1)
+#     pdf.ln(th)
+#     for k, v in pot_df.iterrows():
+#         if v["time"] == "15:00":
+#             pdf.ln(th)
+#             pdf.cell(col_width, th, str("DINNER"), border=1)
+#             pdf.ln(th)
+#             pdf.cell(col_width, th, str("IN TIME"), border=1)
+#             pdf.cell(col_width, th, str("Average"), border=1)
+#             pdf.cell(col_width, th, str("Median"), border=1)
+#             pdf.cell(col_width, th, str("Max"), border=1)
+#             pdf.cell(col_width, th, str("OUT TIME"), border=1)
+#             pdf.cell(notes_width, th, str("NOTES"), border=1)
+#             pdf.ln(th)
+#         if k == "TOTALS":
+#             pdf.ln(th)
+#             pdf.cell(col_width, th, str("TOTALS"), border=1)
+#             pdf.ln(th)
+#             pdf.cell(col_width, th, "", border=1)
+#             pdf.cell(col_width, th, str(round(v["AVG"])), border=1)
+#             pdf.cell(col_width, th, str(round(v["MEDIAN"])), border=1)
+#             pdf.cell(col_width, th, str(round(v["MAX"])), border=1)
+#             pdf.cell(col_width, th, "", border=1)
+#             pdf.cell(notes_width, th, "", border=1)
+#             pdf.ln(th)
+#             continue
+#         pdf.cell(col_width, th, str(v["in_time"]), border=1)
+#         pdf.cell(col_width, th, str(round(v["AVG"])), border=1)
+#         pdf.cell(col_width, th, str(round(v["MEDIAN"])), border=1)
+#         pdf.cell(col_width, th, str(round(v["MAX"])), border=1)
+#         pdf.cell(col_width, th, str(v["out_time"]), border=1)
+#         pdf.cell(notes_width, th, "", border=1)
+#         pdf.ln(th)
+#
+#     pdf.ln(5)
+#     pdf.set_font("Times", "", 10.0)
+#     pdf.cell(
+#         page_width, 0.0, "* Calculated from previous 4 weeks same day sales", align="L"
+#     )
+#     pdf.ln(5)
+#     pdf.cell(page_width, 0.0, "- end of report -", align="C")
+#
+#     return Response(
+#         pdf.output(dest="S").encode("latin-1"),
+#         mimetype="application/pdf",
+#         headers={"Content-Disposition": "attachment;filename=potato_loading.pdf"},
+#     )
+#
+#
+# @blueprint.route("/<int:store_id>/lobster/", methods=["GET", "POST"])
+# @login_required
+# def lobster(store_id):
+#     TODAY = datetime.date(datetime.now())
+#     fiscal_dates = set_dates(session["date_selected"])
+#
+#     store = Restaurants.query.filter_by(id=store_id).first()
+#
+#     live_lobster_avg_cost = get_item_avg_cost(
+#         "SEAFOOD Lobster Live Maine",
+#         fiscal_dates["last_seven"],
+#         fiscal_dates["start_day"],
+#         store_id,
+#     )
+#
+#     with open("./lobster_items.json") as file:
+#         lobster_items = json.load(file)
+#
+#     # format pdf page
+#     pdf_date = TODAY.strftime("%A, %B-%d")
+#     pdf = FPDF()
+#     pdf.add_page()
+#     page_width = pdf.w - 2 * pdf.l_margin
+#     pdf.set_font("Times", "B", 14.0)
+#     pdf.cell(page_width, 0.0, "LOBSTER PRICE CHART", align="C")
+#     pdf.ln(5)
+#     pdf.cell(page_width, 0.0, store.name, align="C")
+#     pdf.ln(5)
+#     pdf.cell(page_width, 0.0, pdf_date, align="C")
+#     pdf.ln(5)
+#
+#     pdf.set_font("Courier", "", 12)
+#     col_width = page_width / 5
+#     size_width = page_width / 3
+#     pdf.ln(1)
+#     th = pdf.font_size + 1
+#
+#     pdf.cell(col_width, th, str("Avg Cost/lb"), border=1)
+#     pdf.cell(
+#         col_width,
+#         th,
+#         "${:,.2f}".format(round(live_lobster_avg_cost, 2)),
+#         align="R",
+#         border=1,
+#     )
+#     pdf.ln(2 * th)
+#     pdf.cell(size_width, th, str("Size"), border=1)
+#     pdf.cell(col_width, th, str("Cost"), border=1)
+#     pdf.cell(col_width, th, str("Price @40%"), border=1)
+#     pdf.ln(th)
+#
+#     for v in lobster_items["lobster_sizes"]:
+#         pdf.cell(size_width, th, str(v["item"]), border=1)
+#         pdf.cell(
+#             col_width,
+#             th,
+#             "${:,.2f}".format(round(live_lobster_avg_cost * v["factor"], 2)),
+#             align="R",
+#             border=1,
+#         )
+#         pdf.cell(
+#             col_width,
+#             th,
+#             "${:,.2f}".format(round(live_lobster_avg_cost * v["factor"] / 0.4)),
+#             align="R",
+#             border=1,
+#         )
+#         pdf.ln(th)
+#
+#     pdf.ln(5)
+#     pdf.set_font("Times", "", 10.0)
+#     pdf.cell(page_width, 0.0, "* Calculated from previous 7 days purchases", align="L")
+#     pdf.ln(5)
+#     pdf.cell(page_width, 0.0, "- end of report -", align="C")
+#
+#     return Response(
+#         pdf.output(dest="S").encode("latin-1"),
+#         mimetype="application/pdf",
+#         headers={"Content-Disposition": "attachment;filename=lobster_prices.pdf"},
+#     )
+#
+#
+# @blueprint.route("/<int:store_id>/stone/", methods=["GET", "POST"])
+# @login_required
+# def stone(store_id):
+#     TODAY = datetime.date(datetime.now())
+#     fiscal_dates = set_dates(session["date_selected"])
+#
+#     store = Restaurants.query.filter_by(id=store_id).first()
+#
+#     stone_claw_avg_cost = get_item_avg_cost(
+#         "SEAFOOD Crab Stone Claws",
+#         fiscal_dates["last_seven"],
+#         fiscal_dates["start_day"],
+#         store_id,
+#     )
+#     with open("./stone_claw_items.json") as file:
+#         stone_items = json.load(file)
+#
+#     # format pdf page
+#     pdf_date = TODAY.strftime("%A, %B-%d")
+#     pdf = FPDF()
+#     pdf.add_page()
+#     page_width = pdf.w - 2 * pdf.l_margin
+#     pdf.set_font("Times", "B", 14.0)
+#     pdf.cell(page_width, 0.0, "STONE CLAW PRICE CHART", align="C")
+#     pdf.ln(5)
+#     pdf.cell(page_width, 0.0, store.name, align="C")
+#     pdf.ln(5)
+#     pdf.cell(page_width, 0.0, pdf_date, align="C")
+#     pdf.ln(5)
+#
+#     pdf.set_font("Courier", "", 12)
+#     col_width = page_width / 5
+#     size_width = page_width / 3
+#     pdf.ln(1)
+#     th = pdf.font_size + 1
+#
+#     pdf.cell(col_width, th, str("Avg Cost/lb"), border=1)
+#     pdf.cell(
+#         col_width,
+#         th,
+#         "${:,.2f}".format(round(stone_claw_avg_cost, 2)),
+#         align="R",
+#         border=1,
+#     )
+#     pdf.ln(2 * th)
+#     pdf.cell(size_width, th, str("Size"), border=1)
+#     pdf.cell(col_width, th, str("Cost"), border=1)
+#     pdf.cell(col_width, th, str("Price @40%"), border=1)
+#     pdf.ln(th)
+#
+#     for v in stone_items["stone_sizes"]:
+#         pdf.cell(size_width, th, str(v["item"]), border=1)
+#         pdf.cell(
+#             col_width,
+#             th,
+#             "${:,.2f}".format(round(stone_claw_avg_cost * v["factor"], 2)),
+#             align="R",
+#             border=1,
+#         )
+#         pdf.cell(
+#             col_width,
+#             th,
+#             "${:,.2f}".format(round(stone_claw_avg_cost * v["factor"] / 0.4)),
+#             align="R",
+#             border=1,
+#         )
+#         pdf.ln(th)
+#
+#     pdf.ln(5)
+#     pdf.set_font("Times", "", 10.0)
+#     pdf.cell(page_width, 0.0, "* Calculated from previous 7 days purchases", align="L")
+#     pdf.ln(5)
+#     pdf.cell(page_width, 0.0, "- end of report -", align="C")
+#
+#     return Response(
+#         pdf.output(dest="S").encode("latin-1"),
+#         mimetype="application/pdf",
+#         headers={"Content-Disposition": "attachment;filename=stone_claw_prices.pdf"},
+#     )
