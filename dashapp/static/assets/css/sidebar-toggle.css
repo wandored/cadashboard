@@ -1,8 +1,21 @@
 /* Custom CSS to enable sidebar toggle on desktop screens */
 
+:root {
+  --sidebar-width: 17.125rem;
+}
+
+/* Styling for sidebar close icon */
+#iconSidenav {
+  opacity: 0.8;
+}
+
+#iconSidenav:hover {
+  opacity: 1;
+}
+
 /* Make sidebar hideable on all screen sizes, not just mobile */
 .g-sidenav-show:not(.g-sidenav-pinned) .sidenav {
-  transform: translateX(-17.125rem);
+  transform: translateX(calc(-1 * var(--sidebar-width)));
   transition: transform 0.3s ease-in-out;
 }
 
@@ -18,6 +31,6 @@
   }
   
   .g-sidenav-show.g-sidenav-pinned .main-content {
-    margin-left: 17.125rem;
+    margin-left: var(--sidebar-width);
   }
 }
