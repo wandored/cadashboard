@@ -824,16 +824,14 @@ function darkMode(el) {
   } else {
     // remove the user's preference from local storage
     localStorage.removeItem("darkMode");
-};
+  }
+}
+
 const checkbox = document.getElementById("dark-version");
 
 // add an event listener to the dark mode checkbox
-checkbox.addEventListener("click", () => {
-  darkMode(checkbox);
-});
-// update local storage to remember the user's preference for dark mode
-if (isDarkModeEnabled) {
-  localStorage.setItem("darkMode", "enabled");
-} else {
-  localStorage.removeItem("darkMode");
+if (checkbox) {
+  checkbox.addEventListener("click", () => {
+    darkMode(checkbox);
+  });
 }

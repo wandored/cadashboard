@@ -65,6 +65,11 @@
       href="/static/assets/css/material-dashboard.css?v=3.0.0"
       rel="stylesheet"
     />
+    <!-- Custom CSS for sidebar toggle -->
+    <link
+      href="/static/assets/css/sidebar-toggle.css"
+      rel="stylesheet"
+    />
 
     <link
       rel="stylesheet"
@@ -73,7 +78,7 @@
     {% block stylesheets %}{% endblock stylesheets %}
   </head>
 
-  <body class="g-sidenav-show bg-gray-300">
+  <body class="g-sidenav-show g-sidenav-pinned bg-gray-300">
     {% include 'includes/sidebar.html' %}
 
     <main
