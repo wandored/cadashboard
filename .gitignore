@@ -1,4 +1,5 @@
 dashapp/*.db
+instance/*.db
 *.sql
 *.csv
 /output
