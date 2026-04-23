@@ -11,6 +11,7 @@ from passlib.hash import bcrypt
 # Inspiration -> https://www.vitoshacademy.com/hashing-passwords-in-python/
 # TODO this page can be deleted
 
+
 def hash_pass(password):
     """Hash a password for storing."""
 
