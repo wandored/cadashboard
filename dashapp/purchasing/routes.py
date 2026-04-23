@@ -203,9 +203,9 @@ def purchasing():
     # ytd_period_liquor_sales = liquor_sales_table.groupby("period")["sales"].sum()
     # ytd_period_liquor_sales_list = ytd_period_liquor_sales.tolist()
 
-    ytd_food_cost_pct = [
-        x / y * 100 for x, y in zip(ytd_food_cost, ytd_period_food_sales_list)
-    ]
+    # ytd_food_cost_pct = [
+    #     x / y * 100 for x, y in zip(ytd_food_cost, ytd_period_food_sales_list)
+    # ]
     # ytd_beer_cost_pct = [
     #     x / y * 100 for x, y in zip(ytd_beer_cost, ytd_period_beer_sales_list)
     # ]
